@@ -8,10 +8,15 @@ module.exports = function(grunt) {
             options: {
                 jshintrc: ".jshintrc"
             },
-            files: ["cal-heatmap.js"]
+            files: ["cal-heatmap.js", "test/test.js"]
         },
         csslint: {
-            src: "cal-heatmap.css"
+            base: {
+                src: "cal-heatmap.css",
+                rules: {
+                    "known-properties": false
+                }
+            }
         },
         uglify: {
             files: {
