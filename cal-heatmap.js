@@ -18,6 +18,8 @@ var CalHeatMap = function() {
 
 		dateFormat : "%H:%M, %A %B %e %Y",
 
+		legendFormat : "%H:%M",
+
 		// Callback when clicking on a time block
 		onClick : function(start, end, itemNb) {},
 
@@ -40,19 +42,53 @@ var CalHeatMap = function() {
 	};
 
 	var allowedDomains = {
-		"hour" : {},
-		"day" : {},
+		"min" : {
+			row: 10,
+			column: 6,
+			position: {
+				x : function(d) { return Math.floor(d.getMinutes() / allowedDomains.min.row); },
+				y : function(d) { return d.getMinutes() % allowedDomains.min.row;}
+			},
+			dateFormat: "%H:%M, %A %B %e %Y",
+			legendFormat: d3.time.format("")
+		},
+		"hour" : {
+			row: 6,
+			column: 4,
+			position: {
+				x : function(d) { return Math.floor(d.getHours() / allowedDomains.hour.row); },
+				y : function(d) { return d.getHours() % allowedDomains.hour.row;}
+			},
+			dateFormat: "%H, %A %B %e %Y",
+			legendFormat: d3.time.format("%H:00")
+		},
+		"day" : {
+			row: 7,
+			column: 5,
+			position: {
+				x : function(d) { return Math.floor(d.getDate() / allowedDomains.day.row); },
+				y : function(d) { return d.getDate() % allowedDomains.day.row;}
+			},
+			dateFormat: "%H, %A %B %e %Y",
+			legendFormat: d3.time.format("%e")
+		},
 		"week" : {},
-		"month" : {},
+		"month" : {
+			row: 7,
+			column: 6,
+			position: {
+				x : function(d) { return Math.floor(d.getMonth() / allowedDomains.month.row); },
+				y : function(d) { return d.getMonth() % allowedDomains.month.row;}
+			},
+			dateFormat: "%H, %A %B %e %Y",
+			legendFormat: d3.time.format("%B")
+		},
 		"year" : {}
 	};
 
-	var domain = getDomain(options.start);
-
-	var
-		graphStartDate = domain[0],
-		dataEndDate = domain[1],
-		graphEndDate = dataEndDate;
+	var graphStartDate = null,
+			dataEndDate = null,
+			graphEndDate = dataEndDate;
 
 	var w, h, m = [0, 0, 25, 0]; // top right bottom left margin
 
@@ -70,6 +106,19 @@ var CalHeatMap = function() {
 		);
 	};
 
+	function positionSubDomainX(d) {
+		var p = allowedDomains[options.subDomain].position.x(d);
+		return p * options.cellsize + p * options.cellpadding;
+	}
+
+	function positionSubDomainY(d) {
+		var p = allowedDomains[options.subDomain].position.y(d);
+		return p * options.cellsize + p * options.cellpadding;
+	}
+
+	function legendFormat(d) {
+		return allowedDomains[options.domain].legendFormat(d);
+	}
 
 
 
@@ -80,12 +129,12 @@ var CalHeatMap = function() {
 
 		var graphLegendHeight = options.cellsize*2;
 
-		w = options.cellsize*6 + options.cellpadding*6 + options.cellpadding;
-		h = options.cellsize*10 + options.cellpadding*9 + options.cellpadding;
+		w = options.cellsize*allowedDomains[options.subDomain].column + options.cellpadding*allowedDomains[options.subDomain].column + options.cellpadding;
+		h = options.cellsize*allowedDomains[options.subDomain].row + options.cellpadding*allowedDomains[options.subDomain].row + options.cellpadding;
 
 		svg = d3.select("#" + options.id + " .graph")
 			.selectAll()
-			.data(d3.time.hours(graphStartDate, graphEndDate).map(function(d) {
+			.data(getDomain(options.start).map(function(d) {
 				return d.getTime();
 			}))
 			.enter().append("div")
@@ -105,7 +154,7 @@ var CalHeatMap = function() {
 			.attr("text-anchor", "middle")
 			.attr("vertical-align", "middle")
 			.attr("x", w/2)
-			.text(function(d) { var date = new Date(d); return date.getHours() + ":00"; });
+			.text(function(d) { var date = new Date(d); return legendFormat(date); });
 
 		rect = svg.selectAll("rect")
 			.data(function(d) { return getSubDomain(d); })
@@ -113,8 +162,8 @@ var CalHeatMap = function() {
 			.attr("class", "graph-rect")
 			.attr("width", options.cellsize)
 			.attr("height", options.cellsize)
-			.attr("x", function(d) { var p = Math.floor(d.getMinutes()/10); return p * options.cellsize + p * options.cellpadding; })
-			.attr("y", function(d) { var p = d.getMinutes() % 10; return p * options.cellsize + p * options.cellpadding; });
+			.attr("x", function(d) { return positionSubDomainX(d); })
+			.attr("y", function(d) { return positionSubDomainY(d); });
 
 		rect.append("svg:title");
 
@@ -264,22 +313,20 @@ var CalHeatMap = function() {
 	 * @param  number|Date	d	A date, or timestamp in milliseconds
 	 * @return Date				The start of the hour
 	 */
-	function getMinuteSubDomain(d) {
+	function getMinuteDomain(d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), 0);
-		return d3.time.minutes(start, new Date(start.getTime() + 3600 * 1000));
-	}
-
-	function getHourSubDomain(d) {
-	}
-
-	function getDaySubDomain(d) {
+		return d3.time.minutes(start, new Date(start.getTime() + 3600 * 1000 * range));
 	}
 
 
-	function getWeekSubDomain(d) {
-	}
-
-	function getMonthSubDomain(d) {
+	/**
+	 * Return the start of an hour
+	 * @param  number|Date	d	A date, or timestamp in milliseconds
+	 * @return Date				The start of the hour
+	 */
+	function getHourDomain(d, range) {
+		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), 0);
+		return d3.time.hours(start,	new Date(start.getTime() + 3600 * 1000 * range));
 	}
 
 	/**
@@ -287,25 +334,9 @@ var CalHeatMap = function() {
 	 * @param  number|Date	d	A date, or timestamp in milliseconds
 	 * @return Date				The start of the hour
 	 */
-	function getHourDomain(d) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), 0);
-		return [
-			start,
-			new Date(start.getTime() + 3600 * 1000 * options.range)
-		];
-	}
-
-	/**
-	 * Return the start of an hour
-	 * @param  number|Date	d	A date, or timestamp in milliseconds
-	 * @return Date				The start of the hour
-	 */
-	function getDayDomain(d) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0);
-		return [
-			start,
-			new Date(start.getTime() + 3600 * 24 * 1000 * options.range)
-		];
+	function getDayDomain(d, range) {
+		var start = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0);
+		return d3.time.days(start, new Date(start.getTime() + 3600 * 24 * 1000 * range));
 	}
 
 	/**
@@ -339,7 +370,7 @@ var CalHeatMap = function() {
 			monthToAddForSameYear = options.range;
 		}
 
-		return [
+		return d3.time.months(
 			start,
 			new Date(
 				(start.getMonth() < 11 ? start.getFullYear() : (start.getFullYear()+1)),
@@ -348,7 +379,7 @@ var CalHeatMap = function() {
 				0,
 				0
 			)
-		];
+		);
 	}
 
 	/**
@@ -357,10 +388,7 @@ var CalHeatMap = function() {
 	 * @return Date				The start of the hour
 	 */
 	function getYearDomain(d) {
-		return [
-			new Date(d.getFullYear(), 0, 1, 0, 0),
-			new Date(d.getFullYear()+1, 0, 1, 0, 0)
-		];
+		return d3.time.years(new Date(d.getFullYear(), 0, 1, 0, 0), new Date(d.getFullYear()+1, 0, 1, 0, 0));
 	}
 
 
@@ -370,11 +398,11 @@ var CalHeatMap = function() {
 		}
 
 		switch(options.domain) {
-			case "hour" : return getHourDomain(date);
-			case "day" : return getDayDomain(date);
-			case "week" : return getWeekDomain(date);
-			case "month" : return getMonthDomain(date);
-			case "year" : return getYearDomain(date);
+			case "hour" : return getHourDomain(date, options.range);
+			case "day" : return getDayDomain(date, options.range);
+			case "week" : return getWeekDomain(date, options.range);
+			case "month" : return getMonthDomain(date, options.range);
+			case "year" : return getYearDomain(date, options.range);
 		}
 	}
 
@@ -384,11 +412,11 @@ var CalHeatMap = function() {
 		}
 
 		switch(options.subDomain) {
-			case "min" : return getMinuteSubDomain(date);
-			case "hour" : return getHourSubDomain(date);
-			case "day" : return getDaySubDomain(date);
-			case "week" : return getWeekSubDomain(date);
-			case "month" : return getMonthSubDomain(date);
+			case "min" : return getMinuteDomain(date, 1);
+			case "hour" : return getHourDomain(date, 24);
+			case "day" : return getDayDomain(date, null);
+			case "week" : return getWeekDomain(date, 1);
+			case "month" : return getMonthDomain(date, 1);
 		}
 	}
 
@@ -405,6 +433,11 @@ var CalHeatMap = function() {
 					}
 				}
 			}
+
+			var domain = getDomain(options.start);
+			graphStartDate = domain[0],
+			dataEndDate = domain[domain.length-1],
+			graphEndDate = dataEndDate;
 
 			if (options.uri === "") {
 				options.uri = "/api/scheduled-jobs/stats/"+ parseInt(options.start.getTime()/1000, 10) + "/" + parseInt(dataEndDate.getTime()/1000, 10);

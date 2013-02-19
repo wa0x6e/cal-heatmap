@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Cal-HeatMap Test</title>
+	<script type="text/javascript" src="../d3.min.js"></script>
+	<script type="text/javascript" src="../cal-heatmap.js"></script>
+
+	<link href="./css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../cal-heatmap.css" rel="stylesheet" />
+</head>
+<body>
+
+	<div class="container">
+
+		<h2>Blank calendar</h2>
+
+		<p>Display 12 hours, from the current hour.</p>
+
+		<div id="cal-heatmap">
+			<div class="graph"></div>
+		</div>
+		<script type="text/javascript">
+			CalHeatMap.init({
+				loadOnInit : false,
+				uri : "data.json"
+			});
+		</script>
+
+		<pre><code>CalHeatMap.init({
+		loadOnInit : false
+	});</code></pre>
+
+		<hr/>
+
+		<h2>Calendar with custom date domain</h2>
+
+		<p>Display 6 hours, from midnight on January 1st, 2000.</p>
+
+		<div id="graph_a">
+			<div class="graph"></div>
+		</div>
+		<script type="text/javascript">
+			CalHeatMap.init({
+				loadOnInit : false,
+				start : new Date(2000, 0, 1),
+				id : "graph_a",
+				range : 6
+			});
+		</script>
+
+		<pre><code>CalHeatMap.init({
+		loadOnInit : false,
+		start : new Date(2000, 0, 1),
+		id : "graph_a",
+		range : 6
+	});</code></pre>
+
+		<hr/>
+
+		<h2>Calendar with other range than minutes</h2>
+
+		<p>Display 15 days, subdivized by hour, from today</p>
+
+		<div id="graph_b">
+			<div class="graph"></div>
+		</div>
+		<script type="text/javascript">
+			CalHeatMap.init({
+				loadOnInit : false,
+				id : "graph_b",
+				range : 15,
+				domain : "day",
+				subDomain : "hour"
+			});
+		</script>
+
+		<pre><code>CalHeatMap.init({
+		loadOnInit : false,
+		id : "graph_a",
+		range : 6
+	});</code></pre>
+
+	<hr>
+
+	<p>Display 3 months, subdivized by day</p>
+
+		<div id="graph_c">
+			<div class="graph"></div>
+		</div>
+		<script type="text/javascript">
+			CalHeatMap.init({
+				loadOnInit : false,
+				id : "graph_c",
+				range : 3,
+				domain : "month",
+				subDomain : "day"
+			});
+		</script>
+
+		<pre><code>CalHeatMap.init({
+		loadOnInit : false,
+		id : "graph_a",
+		range : 6
+	});</code></pre>
+
+
+</div>
+
+</body>
+</html>
