@@ -28,6 +28,6 @@ module.exports = function(grunt) {
     // Task to run build
     grunt.registerTask("build", ["qunit", "jshint", "uglify", "csslint"]);
 
-
-    grunt.registerTask("test", ["qunit", "jshint", "csslint"]);
+    // Task for travis
+    grunt.registerTask("travis", ["qunit", "jshint", "csslint"]);
 };

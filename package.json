@@ -18,7 +18,7 @@
     "grunt-contrib-uglify": "~0.1.1"
   },
   "scripts": {
-    "test": "test"
+    "test": "grunt travis --verbose"
   },
   "repository": {
     "type": "git",
