@@ -1,1 +1,3 @@
+before_script: npm install -g grunt
+
 script: grunt test --verbose
