@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         qunit: {
             files: ["test/index.html"]
         },
@@ -19,8 +20,10 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
-            files: {
-                "cal-heatmap.min.js" : ["cal-heatmap.js"]
+            base: {
+                files: {
+                    "cal-heatmap.min.js" : ["cal-heatmap.js"]
+                }
             }
         }
     });

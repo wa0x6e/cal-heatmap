@@ -24,7 +24,6 @@ var CalHeatMap = function() {
 		// Whether to display the scale
 		displayScale : true,
 
-
 		itemName : ["item", "items"],
 
 		// Start of the graph
@@ -32,6 +31,7 @@ var CalHeatMap = function() {
 
 		uri : "",
 
+		// Load remote data on calendar creation
 		loadOnInit : true,
 
 		domain : "hour",

@@ -1,7 +1,7 @@
 {
   "name": "Cal-HeatMap",
   "version": "1.0.0",
-  "description": "A calendar heat map to visualize time serie  with d3.js",
+  "description": "A calendar heat map ala github contribution graph, to visualize time serie data with d3.js",
   "main": "cal-heatmap.js",
   "directories": {
     "example": "examples",
