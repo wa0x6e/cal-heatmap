@@ -41,10 +41,12 @@ var CalHeatMap = function() {
 		subDomain : "min"
 	};
 
+	var getDayOfYear = d3.time.format("%j");
+
 	var allowedDomains = {
 		"min" : {
 			row: 10,
-			column: 6,
+			column: function(d) {return 6;},
 			position: {
 				x : function(d) { return Math.floor(d.getMinutes() / allowedDomains.min.row); },
 				y : function(d) { return d.getMinutes() % allowedDomains.min.row;}
@@ -54,7 +56,7 @@ var CalHeatMap = function() {
 		},
 		"hour" : {
 			row: 6,
-			column: 4,
+			column: function(d) {return 4;},
 			position: {
 				x : function(d) { return Math.floor(d.getHours() / allowedDomains.hour.row); },
 				y : function(d) { return d.getHours() % allowedDomains.hour.row;}
@@ -64,18 +66,18 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			row: 7,
-			column: 5,
+			column: function() { return (options.domain === "year" ? 55 : 5);},
 			position: {
-				x : function(d) { return Math.floor(d.getDate() / allowedDomains.day.row); },
-				y : function(d) { return d.getDate() % allowedDomains.day.row;}
+				x : function(d) { return Math.floor(((options.domain === "year") ? getDayOfYear(d) : d.getDate()) / allowedDomains.day.row); },
+				y : function(d) { return ((options.domain === "year") ? getDayOfYear(d) : d.getDate()) % allowedDomains.day.row;}
 			},
 			dateFormat: "%H, %A %B %e %Y",
 			legendFormat: d3.time.format("%e")
 		},
 		"week" : {},
 		"month" : {
-			row: 7,
-			column: 6,
+			row: 1,
+			column: function(d) {return 12;},
 			position: {
 				x : function(d) { return Math.floor(d.getMonth() / allowedDomains.month.row); },
 				y : function(d) { return d.getMonth() % allowedDomains.month.row;}
@@ -83,7 +85,16 @@ var CalHeatMap = function() {
 			dateFormat: "%H, %A %B %e %Y",
 			legendFormat: d3.time.format("%B")
 		},
-		"year" : {}
+		"year" : {
+			row: 1,
+			column: function(d) {return 12;},
+			position: {
+				x : function(d) { return Math.floor(d.getFullYear() / allowedDomains.year.row); },
+				y : function(d) { return d.getFullYear() % allowedDomains.year.row;}
+			},
+			dateFormat: "%Y",
+			legendFormat: d3.time.format("%Y")
+		}
 	};
 
 	var graphStartDate = null,
@@ -129,7 +140,7 @@ var CalHeatMap = function() {
 
 		var graphLegendHeight = options.cellsize*2;
 
-		w = options.cellsize*allowedDomains[options.subDomain].column + options.cellpadding*allowedDomains[options.subDomain].column + options.cellpadding;
+		w = options.cellsize*allowedDomains[options.subDomain].column() + options.cellpadding*allowedDomains[options.subDomain].column() + options.cellpadding;
 		h = options.cellsize*allowedDomains[options.subDomain].row + options.cellpadding*allowedDomains[options.subDomain].row + options.cellpadding;
 
 		svg = d3.select("#" + options.id + " .graph")
@@ -344,7 +355,7 @@ var CalHeatMap = function() {
 	 * @param  number|Date	d	A date, or timestamp in milliseconds
 	 * @return Date				The start of the hour
 	 */
-	function getWeekDomain(d) {
+	function getWeekDomain(d, range) {
 		var start = d3.time.monday(d);
 		var end = start;
 		return [
@@ -358,9 +369,14 @@ var CalHeatMap = function() {
 	 * @param  Date		d	A date
 	 * @return Array
 	 */
-	function getMonthDomain(d) {
+	function getMonthDomain(d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0);
-		var monthToAddForSameYear = 0;
+		var end = new Date(start);
+		end = end.setMonth(end.getMonth()+range);
+
+		return d3.time.months(start, end);
+
+		/*var monthToAddForSameYear = 0;
 		var monthToAddForNextYear = 0;
 
 		if ((start.getMonth()+options.range) > 11) {
@@ -379,7 +395,7 @@ var CalHeatMap = function() {
 				0,
 				0
 			)
-		);
+		);*/
 	}
 
 	/**
@@ -414,9 +430,9 @@ var CalHeatMap = function() {
 		switch(options.subDomain) {
 			case "min" : return getMinuteDomain(date, 1);
 			case "hour" : return getHourDomain(date, 24);
-			case "day" : return getDayDomain(date, null);
+			case "day" : return getDayDomain(date, ((options.domain === "year") ? 365 : 30));
 			case "week" : return getWeekDomain(date, 1);
-			case "month" : return getMonthDomain(date, 1);
+			case "month" : return getMonthDomain(date, 12);
 		}
 	}
 
