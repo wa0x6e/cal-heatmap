@@ -1,0 +1,20 @@
+{
+	"curly":	 true,
+	"eqeqeq":	 true,
+	"noarg":	 true,
+	"noempty":	 true,
+	"undef":	 true,
+	"quotmark":	 "double",
+	"boss":	 true,
+	"regexdash":	 true,
+	"browser":	 true,
+	"devel":	 true,
+	"wsh":	 true,
+	"trailing":	 true,
+	"jquery":	 true,
+	"loopfunc":	 true,
+
+	"predef" : [
+		"d3"
+	]
+}
