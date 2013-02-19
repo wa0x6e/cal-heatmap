@@ -323,17 +323,17 @@ var CalHeatMap = function() {
 	}
 
 	/**
-	 * Return the start of an hour
-	 * @param  number|Date	d	A date, or timestamp in milliseconds
-	 * @return Date				The start of the hour
+	 * Return the month domain for the current date
+	 * @param  Date		d	A date
+	 * @return Array
 	 */
 	function getMonthDomain(d) {
 		var start = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0);
 		var monthToAddForSameYear = 0;
 		var monthToAddForNextYear = 0;
 
-		if ((start.getMonth()+options.range) > 12) {
-			monthToAddForSameYear = start.getMonth() + options.range - 12;
+		if ((start.getMonth()+options.range) > 11) {
+			monthToAddForSameYear = start.getMonth() + options.range - 11;
 			monthToAddForNextYear = options.range - monthToAddForSameYear;
 		} else {
 			monthToAddForSameYear = options.range;
@@ -342,9 +342,9 @@ var CalHeatMap = function() {
 		return [
 			start,
 			new Date(
-				(start.getMonth() < 12 ? start.getFullYear() : (start.getFullYear()+1)),
-				(monthToAddForNextYear === 0 ? (start.getMonth()+options.range) : (start.getMonth()+options.range-12)),
-				0,
+				(start.getMonth() < 11 ? start.getFullYear() : (start.getFullYear()+1)),
+				(monthToAddForNextYear === 0 ? (start.getMonth()+options.range) : (start.getMonth()+options.range-11)),
+				1,
 				0,
 				0
 			)
