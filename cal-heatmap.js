@@ -175,6 +175,7 @@ var CalHeatMap = function() {
 	 */
 	function display (data) {
 		svg.each(function(hour) {
+			hour = hour/1000;
 			d3.select(this).selectAll("rect")
 				.attr("class", function(d) {
 					var min = d.getMinutes();
