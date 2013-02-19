@@ -1,0 +1,30 @@
+{
+  "name": "Cal-HeatMap",
+  "version": "1.0.0",
+  "description": "A calendar heat map to visualize time serie  with d3.js",
+  "main": "cal-heatmap.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "dependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-jshint": "~0.1.1"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-qunit": "~0.1.1",
+    "grunt-css": "~0.5.3",
+    "grunt-contrib-uglify": "~0.1.1"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kamisama/cal-heatmap.git"
+  },
+  "author": "Wan Qi Chen",
+  "license": "MIT",
+  "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1"
+}
