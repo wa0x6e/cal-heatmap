@@ -25,6 +25,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-css");
 
-    // Task to run tests
+    // Task to run build
     grunt.registerTask("build", ["qunit", "jshint", "uglify", "csslint"]);
+
+
+    grunt.registerTask("test", ["qunit", "jshint", "csslint"]);
 };
