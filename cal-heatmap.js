@@ -183,7 +183,7 @@ var CalHeatMap = function() {
 		var h = self.options.cellsize*domainType[self.options.subDomain].row + self.options.cellpadding*domainType[self.options.subDomain].row + self.options.cellpadding;
 
 		// Format the domain legend according to the domain type
-		var legendFormat = d3.time.format(domainType[self.options.domain].format.legend);
+		var legendFormat = d3.time.format(self.options.format.legend);
 
 		// Painting all the domains
 		svg = d3.select("#" + self.options.id)
