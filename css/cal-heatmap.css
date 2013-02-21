@@ -1,0 +1,56 @@
+/* Cal-HeatMap CSS */
+
+.graph-label 
+{
+	fill: #999;
+	font-size: 10px
+}
+
+.graph-rect 
+{
+	fill: #ededed;
+	shape-rendering: crispedges
+}
+
+.graph-rect:hover 
+{
+	stroke: #000;
+	stroke-width: 1px
+}
+
+.q0 
+{
+	background-color: #fff;
+	fill: #fff;
+	stroke: #ededed
+}
+
+.q1 
+{
+	background-color: #dae289;
+	fill: #dae289
+}
+
+.q2 
+{
+	background-color: #cedb9c;
+	fill: #9cc069
+}
+
+.q3 
+{
+	background-color: #b5cf6b;
+	fill: #669d45
+}
+
+.q4 
+{
+	background-color: #637939;
+	fill: #637939
+}
+
+.q5 
+{
+	background-color: #3b6427;
+	fill: #3b6427
+}
