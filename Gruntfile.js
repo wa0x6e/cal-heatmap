@@ -33,7 +33,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-css");
 
-    // Task to run build
+    // Task for build
     grunt.registerTask("build", ["qunit", "jshint", "uglify", "csslint"]);
 
     // Task for travis

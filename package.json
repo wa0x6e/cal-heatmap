@@ -1,7 +1,13 @@
 {
   "name": "Cal-HeatMap",
   "version": "1.0.0",
-  "description": "A calendar heat map ala github contribution graph, to visualize time serie data with d3.js",
+  "description": "A module to create calendar heat map to visualise time data series a la github contribution graph",
+  "keywords" : [
+    "calendar",
+    "graph",
+    "d3js",
+    "heat map"
+  ],
   "main": "cal-heatmap.js",
   "directories": {
     "example": "examples",
@@ -22,9 +28,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kamisama/cal-heatmap.git"
+    "url": "https://github.com/kamisama/cal-heatmap.git"
   },
-  "author": "Wan Qi Chen",
+  "homepage" : "https://github.com/kamisama/cal-heatmap",
+  "author": {
+    "name": "Wan Qi Chen",
+    "url": "http://www.kamisama.me"
+    },
   "license": "MIT",
   "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1"
 }
