@@ -10,7 +10,6 @@
   ],
   "main": "cal-heatmap.js",
   "directories": {
-    "example": "examples",
     "test": "test"
   },
   "dependencies": {
