@@ -36,5 +36,10 @@
     "url": "http://www.kamisama.me"
     },
   "license": "MIT",
-  "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1"
+  "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1",
+  "volo": {
+    "dependencies": {
+      "d3": "d3"
+    }
+  }
 }
