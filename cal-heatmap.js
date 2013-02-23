@@ -427,7 +427,7 @@ CalHeatMap.prototype = {
 		if (typeof d === "number") {
 			d = new Date(d);
 		}
-		return new Date(d.getFullYear(), d.getMonth(), 0);
+		return new Date(d.getFullYear(), d.getMonth()+1, 0);
 	},
 
 	/**
@@ -468,7 +468,7 @@ CalHeatMap.prototype = {
 	 * @return Date				The start of the hour
 	 */
 	getHourDomain: function (d, range) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
+		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0);
 		if (typeof range === "number") {
 			range = new Date(start.getTime() + 3600 * 1000 * range);
 		}
@@ -517,13 +517,27 @@ CalHeatMap.prototype = {
 			date = new Date(date);
 		}
 
+		var computeDaySubDomainSize = function(date, subDomain) {
+			if (subDomain === "year") {
+				var format = d3.format("%j");
+				return format(date);
+			} else if (subDomain === "month") {
+				var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
+				return lastDayOfMonth.getDate();
+			} else if (subDomain === "week") {
+				return 7;
+			}
+		};
+
 		switch(this.options.subDomain) {
 			case "min"   : return this.getMinuteDomain(date, 1);
 			case "hour"  : return this.getHourDomain(date, ((this.options.domain === "month") ? new Date(date.getFullYear(), date.getMonth()+1) : 24));
-			case "day"   : return this.getDayDomain(date, ((this.options.domain === "year") ? 365 : 30));
+			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
 			case "week"  : return this.getWeekDomain(date, 1);
 			case "month" : return this.getMonthDomain(date, 12);
 		}
+
+
 	},
 
 	/**
