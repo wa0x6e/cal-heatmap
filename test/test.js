@@ -520,7 +520,7 @@ test("get subdomain when subdomain is HOUR", function() {
 
 	expect(4);
 
-	var date = new Date(2013, 0, 25, 20, 26);
+	var date = new Date(2013, 0, 25, 0, 26);
 
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false, start : date, domain: "day", subDomain: "hour", range: 1});
@@ -554,7 +554,31 @@ test("get subdomain when subdomain is DAY", function() {
 	equal(domain.length, 1, "Domain is equal to one month");
 	equal(subDomain.length, endDate.getDate(), "SubDomain size is equal to number of days in the current month");
 	equal(subDomain[0].getTime(), startDate.getTime(), "Subdomain start at first day of month");
-	equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "SubDomain end at lastday of month");
+	equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "SubDomain end at last day of month");
+
+});
+
+
+
+
+test("get subdomain when subdomain is MONTH", function() {
+
+	expect(4);
+
+	var date = new Date(2013, 0, 1, 20, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "year", subDomain: "month", range: 1});
+	var domain = cal.getDomain(date);
+	var subDomain = cal.getSubDomain(date);
+
+	var startDate = new Date(2013, 0, 1);
+	var endDate = new Date(2013, 11, 1);
+
+	equal(domain.length, 1, "Domain is equal to 1 year");
+	equal(subDomain.length, 12, "SubDomain size is equal to 12 months");
+	equal(subDomain[0].getTime(), startDate.getTime(), "Subdomain start at first day of year");
+	equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "SubDomain end at first day of last month");
 
 });
 

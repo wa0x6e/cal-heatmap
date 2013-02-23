@@ -468,7 +468,7 @@ CalHeatMap.prototype = {
 	 * @return Date				The start of the hour
 	 */
 	getHourDomain: function (d, range) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0);
+		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
 		if (typeof range === "number") {
 			range = new Date(start.getTime() + 3600 * 1000 * range);
 		}
