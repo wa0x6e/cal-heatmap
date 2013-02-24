@@ -31,6 +31,27 @@ test("get domain when domain is 1 HOUR", function() {
 	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
 });
 
+test("get domain when domain is 1 HOUR, from a timestamp", function() {
+
+	expect(6);
+
+	var date     = new Date(2003, 10, 31, 20, 26);
+	var nextHour = new Date(2003, 10, 31, 21);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, range: 1, start: date});
+	var domain = cal.getDomain(date.getTime());
+	var domainEnd = domain[domain.length-1];
+
+	equal(domain.length, 1, "Domain size is 1 hour");
+
+	equal(domain[0].getFullYear(), date.getFullYear(), "Domain start year is equal to date year");
+	equal(domain[0].getMonth(), date.getMonth(), "Domain start month is equal to date month");
+	equal(domain[0].getDate(), date.getDate(), "Domain start day is equal to date day");
+	equal(domain[0].getHours(), date.getHours(), "Domain start hour is equal to date hour");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+});
+
 test("get domain when domain is 1 DAY", function() {
 
 	expect(6);
@@ -41,6 +62,27 @@ test("get domain when domain is 1 DAY", function() {
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false, domain: "day", range:1, start : date});
 	var domain = cal.getDomain(date);
+	var domainEnd = domain[domain.length-1];
+
+	equal(domain.length, 1, "Domain size is 1 day");
+
+	equal(domain[0].getFullYear(), date.getFullYear(), "Domain start year is equal to date year");
+	equal(domain[0].getMonth(), date.getMonth(), "Domain start month is equal to date month");
+	equal(domain[0].getDate(), date.getDate(), "Domain start day is equal to date day");
+	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+});
+
+test("get domain when domain is 1 DAY, from a timestamp", function() {
+
+	expect(6);
+
+	var date    = new Date(2003, 10, 20, 23, 26);
+	var nextDay = new Date(2003, 10, 21);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, domain: "day", range:1, start : date});
+	var domain = cal.getDomain(date.getTime());
 	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 day");
@@ -94,6 +136,27 @@ test("get domain when domain is 1 WEEK, from a date right on beginning of the we
 
 });
 
+test("get domain when domain is 1 WEEK, from a timestamp", function() {
+
+	expect(6);
+
+	var date      = new Date(2013, 1, 20, 20, 15);	// Wednesday : February 20th, 2013
+	var weekStart = new Date(2013, 1, 18);			// Monday : February 18th, 2013
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, domain: "week", range: 1, start : date});
+	var domain = cal.getDomain(date.getTime());
+
+	equal(domain.length, 1, "Domain size is 1 week");
+
+	equal(domain[0].getFullYear(), weekStart.getFullYear(), "Domain start year is equal to the weeks monday's year");
+	equal(domain[0].getMonth(), weekStart.getMonth(), "Domain start month is equal to weeks monday's month");
+	equal(domain[0].getDate(), weekStart.getDate(), "Domain start day is equal to the weeks monday date");
+	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+
+});
+
 test("get domain when domain is 1 MONTH", function() {
 
 	expect(6);
@@ -116,6 +179,28 @@ test("get domain when domain is 1 MONTH", function() {
 
 });
 
+test("get domain when domain is 1 MONTH, from a timestamp", function() {
+
+	expect(6);
+
+	var date      = new Date(2003, 10, 25, 23, 26);
+	var nextMonth = new Date(2003, 11, 1, 0, 0);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, domain: "month", range: 1, start : date});
+	var domain = cal.getDomain(date.getTime());
+	var domainEnd = domain[domain.length-1];
+
+	equal(domain.length, 1, "Domain size is 1 month");
+
+	equal(domain[0].getFullYear(), date.getFullYear(), "Domain start year is equal to date year");
+	equal(domain[0].getMonth(), date.getMonth(), "Domain start month is equal to date month");
+	equal(domain[0].getDate(), 1, "Domain start day is equal to first day of month");
+	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+
+});
+
 test("get domain when domain is 1 YEAR", function() {
 
 	expect(6);
@@ -126,6 +211,28 @@ test("get domain when domain is 1 YEAR", function() {
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false, domain: "year", range: 1, start : date});
 	var domain = cal.getDomain(date);
+	var domainEnd = domain[domain.length-1];
+
+	equal(domain.length, 1, "Domain size is 1 year");
+
+	equal(domain[0].getFullYear(), date.getFullYear(), "Domain start year is equal to date year");
+	equal(domain[0].getMonth(), 0, "Domain start month is equal to first month of year");
+	equal(domain[0].getDate(), 1, "Domain start day is equal to first day of month");
+	equal(domain[0].getHours(), 0, "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), 0, "Domain start minutes is equal to 0");
+
+});
+
+test("get domain when domain is 1 YEAR. from a timestamp", function() {
+
+	expect(6);
+
+	var date     = new Date(2004, 10, 20, 23, 26);
+	var nextYear = new Date(2005, 0, 1);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, domain: "year", range: 1, start : date});
+	var domain = cal.getDomain(date.getTime());
 	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 year");
@@ -584,6 +691,39 @@ test("get subdomain when subdomain is MONTH", function() {
 
 /*
 	-----------------------------------------------------------------
+	OTHER DATE COMPUTATION
+	-----------------------------------------------------------------
+ */
+
+module( "Date computation" );
+
+test("Get end of month, from a date", function() {
+
+	expect(1);
+
+	var cal = new CalHeatMap();
+
+	var date = new Date(2013, 0, 25);
+	var endOfMonth = new Date(2013, 1, 0);
+
+	equal(cal.getEndOfMonth(date).getTime(), endOfMonth.getTime());
+});
+
+
+test("Get end of month, from a timestamp", function() {
+
+	expect(1);
+
+	var cal = new CalHeatMap();
+
+	var date = new Date(2013, 0, 25);
+	var endOfMonth = new Date(2013, 1, 0);
+
+	equal(cal.getEndOfMonth(date.getTime()).getTime(), endOfMonth.getTime());
+});
+
+/*
+	-----------------------------------------------------------------
 	SETTINGS
 	-----------------------------------------------------------------
  */
@@ -623,7 +763,7 @@ test("Basic default scale", function() {
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false});
 
-	equal(cal.scale(0), "q1");
+	equal(cal.scale(0), "");
 	equal(cal.scale(5), "q1");
 	equal(cal.scale(10), "q1");
 	equal(cal.scale(15), "q2");
@@ -641,7 +781,7 @@ test("Positive custom scale", function() {
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false, scales: [100, 200, 300, 400]});
 
-	equal(cal.scale(0), "q1");
+	equal(cal.scale(0), "");
 	equal(cal.scale(50), "q1");
 	equal(cal.scale(100), "q1");
 	equal(cal.scale(150), "q2");
@@ -677,8 +817,8 @@ test("Float value custom scale", function() {
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false, scales: [0.1, 0.2, 0.3]});
 
-	equal(cal.scale(-100), "q1");
-	equal(cal.scale(0), "q1");
+	equal(cal.scale(-100), "qi");
+	equal(cal.scale(0), "");
 	equal(cal.scale(0.1), "q1");
 	equal(cal.scale(0.15), "q2");
 	equal(cal.scale(0.2), "q2");
