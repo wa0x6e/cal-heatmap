@@ -691,6 +691,150 @@ test("get subdomain when subdomain is MONTH", function() {
 
 /*
 	-----------------------------------------------------------------
+	DOMAIN AND SUBDOMAIN TEST
+	-----------------------------------------------------------------
+ */
+
+module( "Domain and subdomain test" );
+
+test("HOUR -> MIN", function() {
+
+	expect(12);
+
+	var date = new Date(2013, 0, 1, 10, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "hour", subDomain: "min", range: 3});
+	var domain = cal.getDomain(date);
+	var subDomain = cal.getSubDomain(date);
+
+	var startDate = new Date(2013, 0, 1, 10);
+	var endDate = new Date(2013, 0, 1, 12);
+
+	equal(domain.length, 3, "Domain is equal to 3 hours");
+	equal(domain[0].getTime(), startDate.getTime());
+	equal(domain[domain.length-1].getTime(), endDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+		equal(subDomain.length, 60, "The hour subdomain contains 60 minutes");
+
+		domainStartDate = new Date(domainStartDate);
+
+		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), domainStartDate.getHours(), 0);
+		var endDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), domainStartDate.getHours(), 59);
+
+		equal(subDomain[0].getTime(), startDate.getTime(), "The hour subdomain start is the first minute of hour");
+		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The hour subdomain start is the last minute of hour");
+	});
+
+});
+
+test("DAY -> HOUR", function() {
+
+	expect(12);
+
+	var date = new Date(2013, 0, 1, 10, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "day", subDomain: "hour", range: 3});
+	var domain = cal.getDomain(date);
+	var subDomain = cal.getSubDomain(date);
+
+	var startDate = new Date(2013, 0, 1, 0);
+	var endDate = new Date(2013, 0, 3, 0);
+
+	equal(domain.length, 3, "Domain is equal to 3 days");
+	equal(domain[0].getTime(), startDate.getTime());
+	equal(domain[domain.length-1].getTime(), endDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+		equal(subDomain.length, 24, "The day subdomain contains 24 hours");
+
+		domainStartDate = new Date(domainStartDate);
+
+		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 0);
+		var endDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 23);
+
+		equal(subDomain[0].getTime(), startDate.getTime(), "The hour subdomain start is the first hour of day");
+		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The hour subdomain start is the last hour of day");
+	});
+
+});
+
+
+test("DAY -> MIN", function() {
+
+	expect(12);
+
+	var date = new Date(2013, 0, 1, 10, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "day", subDomain: "min", range: 3});
+	var domain = cal.getDomain(date);
+	var subDomain = cal.getSubDomain(date);
+
+	var startDate = new Date(2013, 0, 1, 0);
+	var endDate = new Date(2013, 0, 3, 0);
+
+	equal(domain.length, 3, "Domain is equal to 3 days");
+	equal(domain[0].getTime(), startDate.getTime());
+	equal(domain[domain.length-1].getTime(), endDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+		equal(subDomain.length, 1440, "The day subdomain contains 1440 minutes");
+
+		domainStartDate = new Date(domainStartDate);
+
+		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 0);
+		var endDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 23, 59);
+
+		equal(subDomain[0].getTime(), startDate.getTime(), "The hour subdomain start is the first minute of day");
+		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The hour subdomain start is the last minute of day");
+	});
+
+});
+
+test("MONTH -> DAY", function() {
+
+	expect(12);
+
+	var date = new Date(2013, 0, 1, 15, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "month", subDomain: "day", range: 3});
+	var domain = cal.getDomain(date);
+
+	var startDate = new Date(2013, 0);
+	var endDate = new Date(2013, 2);
+
+	equal(domain.length, 3, "Domain is equal to 3 months");
+	equal(domain[0].getTime(), startDate.getTime());
+	equal(domain[domain.length-1].getTime(), endDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+
+		domainStartDate = new Date(domainStartDate);
+
+		var endOfMonth = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth()+1, 0);
+
+		equal(subDomain.length, endOfMonth.getDate(), "The month contains " + endOfMonth.getDate() + " days");
+
+		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
+
+		equal(subDomain[0].getTime(), startDate.getTime(), "The month subdomain start is the first day of month : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].getTime(), endOfMonth.getTime(), "The month subdomain end is the last day of month : " + subDomain[subDomain.length-1]);
+	});
+
+});
+
+
+
+/*
+	-----------------------------------------------------------------
 	OTHER DATE COMPUTATION
 	-----------------------------------------------------------------
  */

@@ -159,7 +159,7 @@ var CalHeatMap = function() {
 	var formatDate,
 		formatNumber = d3.format(",d");
 
-	var svg = null;
+	this.svg = null;
 	var rect = null;
 
 	function positionSubDomainX(d) {
@@ -197,7 +197,7 @@ var CalHeatMap = function() {
 		var legendFormat = d3.time.format(self.options.format.legend);
 
 		// Painting all the domains
-		svg = d3.select("#" + self.options.id)
+		self.svg = d3.select("#" + self.options.id)
 			.append("div")
 			.attr("class", "graph")
 			.selectAll()
@@ -216,7 +216,7 @@ var CalHeatMap = function() {
 			.attr("transform", "translate(0, 1)");
 
 		// Addending a label to each domain
-		svg.append("svg:text")
+		self.svg.append("svg:text")
 			.attr("y", h + graphLegendHeight/1.5)
 			.attr("class", "graph-label")
 			.attr("text-anchor", "middle")
@@ -225,7 +225,7 @@ var CalHeatMap = function() {
 			.text(function(d) { return legendFormat(new Date(d)); });
 
 		// Drawing the sudomain inside each domain
-		rect = svg.selectAll("rect")
+		rect = self.svg.selectAll("rect")
 			.data(function(d) { return self.getSubDomain(d); })
 			.enter().append("svg:rect")
 			.attr("class", "graph-rect")
@@ -261,7 +261,7 @@ var CalHeatMap = function() {
 	 * @param  {[type]} data  [description]
 	 */
 	function display (data) {
-		svg.each(function(domainUnit) {
+		self.svg.each(function(domainUnit) {
 			d3.select(this).selectAll("rect")
 				.attr("class", function(d) {
 					var subDomainUnit = domainType[self.options.subDomain].extractUnit(d);
@@ -459,7 +459,7 @@ CalHeatMap.prototype = {
 	 */
 	getMinuteDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		return d3.time.minutes(start, new Date(start.getTime() + 3600 * 1000 * range));
+		return d3.time.minutes(start, new Date(start.getTime() + 60 * 1000 * range));
 	},
 
 	/**
@@ -477,12 +477,15 @@ CalHeatMap.prototype = {
 
 	/**
 	 * Return the start of an hour
-	 * @param  number|Date	d	A date, or timestamp in milliseconds
-	 * @return Date				The start of the hour
+	 * @param  number|Date	d		A date, or timestamp in milliseconds
+	 * @param  int			range	Number of days in the range
+	 * @return Date					The start of the hour
 	 */
 	getDayDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-		return d3.time.days(start, new Date(start.getTime() + 3600 * 24 * 1000 * range));
+		var end = new Date(start);
+		end = end.setDate(end.getDate()+range);
+		return d3.time.days(start, end);
 	},
 
 	/**
@@ -517,20 +520,31 @@ CalHeatMap.prototype = {
 			date = new Date(date);
 		}
 
-		var computeDaySubDomainSize = function(date, subDomain) {
-			if (subDomain === "day") {
+		var computeDaySubDomainSize = function(date, domain) {
+			if (domain === "year") {
 				var format = d3.format("%j");
 				return format(date);
-			} else if (subDomain === "month") {
+			} else if (domain === "month") {
 				var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
 				return lastDayOfMonth.getDate();
-			} else if (subDomain === "week") {
+			} else if (domain === "week") {
 				return 7;
 			}
 		};
 
+		var computeMinSubDomainSize = function(date, domain) {
+			if (domain === "day") {
+				return 1440;
+			} else if (domain === "hour") {
+				return 60;
+			} else if (domain === "week") {
+				return 25200;
+			}
+		};
+
+
 		switch(this.options.subDomain) {
-			case "min"   : return this.getMinuteDomain(date, 1);
+			case "min"   : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
 			case "hour"  : return this.getHourDomain(date, ((this.options.domain === "month") ? new Date(date.getFullYear(), date.getMonth()+1) : 24));
 			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
 			case "week"  : return this.getWeekDomain(date, 1);
