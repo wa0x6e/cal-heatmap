@@ -518,7 +518,7 @@ CalHeatMap.prototype = {
 		}
 
 		var computeDaySubDomainSize = function(date, subDomain) {
-			if (subDomain === "year") {
+			if (subDomain === "day") {
 				var format = d3.format("%j");
 				return format(date);
 			} else if (subDomain === "month") {
@@ -548,11 +548,18 @@ CalHeatMap.prototype = {
 	 */
 	scale: function(n) {
 		for (var i = 0, total = this.options.scales.length-1; i < total; i++) {
+
+			if (n === 0 && this.options.scales[0] > 0) {
+				return "";
+			} else if (this.options.scales[0] > 0 && n < 0) {
+				return "qi";
+			}
+
 			if (n <= this.options.scales[i]) {
 				return "q" + (i+1);
 			}
 		}
-		return n === 0 ? "" : "q" + this.options.scales.length;
+		return "q" + this.options.scales.length;
 	}
 
 };
