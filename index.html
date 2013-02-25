@@ -143,7 +143,9 @@
 				<td>
 					<a href="#range-example" class="example-link">Example</a>
 					<strong>Start Date of the calendar</strong>
-					<p>Default is the current date.</p></td>
+					<p>Default is the current date.<br/>
+					The calendar does not start at this date, but at the beginning of the domain. If the domain is a day, the calendar will start at 00:00 on this date, if it's a month, it will start at the 1 of the month of the date.
+					</p></td>
 			</tr>
 			<tr>
 				<td><code>cellsize</code></td>
@@ -165,7 +167,23 @@
 				<td><code>scales</code></td>
 				<td>Array</td>
 				<td>[10, 20, 30, 40]</td>
-				<td><a href="#scale-example" class="example-link">Example</a></td>
+				<td><a href="#scale-example" class="example-link">Example</a>
+				<strong>Threshold for the scale</strong>
+				<p>Each couple of values represent a color on the calendar :</p>
+
+				<ul>
+					<li>0</li>
+					<li>1 -> 9</li>
+					<li>10 -> 19</li>
+					<li>20 -> 29</li>
+					<li>30 -> 39</li>
+					<li>More than 40</li>
+				</ul>
+
+				<p>It also accepts negative and float values.</p>
+
+				<p>You can set more than 4 threshold. Each threshold correspond to 1 class in the css file. Be default, the css support only 4 threshold. Add the corresponding class to the css.</p>
+				</td>
 			</tr>
 			<tr>
 				<td><code>displayScale</code></td>
@@ -216,6 +234,8 @@
 						<li><code>date</code> : Formatting of the date displayed when hovering a sudDomain cell</li>
 						<li><code>label</code> : Formatting of the domain label, displayed below each domain</li>
 					</ul>
+
+				<p>Refer to <a href="https://github.com/mbostock/d3/wiki/Time-Formatting">d3.js time formatting documentation</a> for accepted format.</p>
 
 				<p>You have to always set the 2 properties, even you wish to only change one. They're by default null, and depends on the domain and subdomain used.</p>
 
@@ -344,6 +364,62 @@ calendar.init({
 	cellpadding: 1
 });</code></pre>
 
+	<div class="bs-docs-example">
+		<h3 id="scale-example">By months, then by weeks</h3>
+	<p>Display weeks for February, March and April 2000.</p>
+
+		<div id="graph_j"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				uri: "datas-years.json",
+				start: new Date(2000, 1),
+				id : "graph_j",
+				domain : "month",
+				subDomain : "week",
+				range : 3,
+				scales: [120, 400, 450, 500]
+			});
+		</script>
+</div>
+		<pre class="prettyprint javascript"><code>CalHeatMap.init({
+	uri: "datas-years.json",
+	start: new Date(2000, 1),
+	id : "graph_c",
+	domain : "month",		// Group datas by month
+	subDomain : "week",		// Split each month by week
+	range : 3,			// Just display 3 months
+	scales: [120, 400, 450, 500] 	// Custom threshold for the scale
+});</code></pre>
+
+	<div class="bs-docs-example">
+		<h3 id="cell-example">By weeks, then by hours</h3>
+	<p>Display all the hours of the first 2 weeks of Januray 2000</p>
+
+		<div id="graph_h"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				uri: "datas-years.json",
+				start: new Date(2000, 0),
+				id : "graph_h",
+				domain : "week",
+				subDomain : "hour",
+				range : 2
+			});
+		</script>
+</div>
+		<pre class="prettyprint javascript"><code>CalHeatMap.init({
+	uri: "datas-years.json",
+	start: new Date(2000, 0),
+	id : "graph_h",
+	domain : "week",
+	subDomain : "hour",
+	range : 2
+});</code></pre>
+
+
+
 
 
 	<div class="bs-docs-example">
@@ -461,7 +537,7 @@ calendar.init({
 
 <ul>
 	<li>Week domain and subDomain are not supported yet</li>
-	<li>Day Subdomain is not displayed correctly</li>
+
 </ul>
 
 <h2><a href="#authors" id="authors">Authors</a></h2>
