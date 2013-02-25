@@ -1195,8 +1195,8 @@ test("Display empty calendar", function() {
 	cal.init({loadOnInit: false});
 
 	equal($("#cal-heatmap .graph").length, 1, "Calendar was created");
-	equal($("#cal-heatmap .hour").length, 12, "The graph contains 12 hours");
-	equal($("#cal-heatmap .hour rect").length, 60*12, "The graph contains 720 minutes");
+	equal($("#cal-heatmap .graph-domain").length, 12, "The graph contains 12 hours");
+	equal($("#cal-heatmap .graph-domain rect").length, 60*12, "The graph contains 720 minutes");
 	equal($("#cal-heatmap .graph-scale").length, 1, "A scale is created");
 });
 
@@ -1226,7 +1226,7 @@ test("Display domain according to range number", function() {
 	var cal = new CalHeatMap();
 	cal.init({loadOnInit: false, range: 5});
 
-	equal($("#cal-heatmap .hour").length, 5, "The graph contains only 5 hours");
+	equal($("#cal-heatmap .graph-domain").length, 5, "The graph contains only 5 hours");
 
 });
 
