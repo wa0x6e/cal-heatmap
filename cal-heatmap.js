@@ -483,7 +483,8 @@ CalHeatMap.prototype = {
 		} else {
 			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate()-d.getDay()+1);
 		}
-		return d3.time.mondays(monday, new Date(monday.getTime() + 3600 * 24 * 7 * 1000 * range));
+		var endDate = new Date(monday);
+		return d3.time.mondays(monday, endDate.setDate(endDate.getDate() + range*7));
 	},
 
 	getYearDomain: function(d, range){

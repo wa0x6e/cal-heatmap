@@ -320,7 +320,7 @@ test("get domain when domain is > 1 WEEK", function() {
 	var domain = cal.getDomain(date);
 	var domainEnd = domain[domain.length-1];
 
-	equal(domain.length, 3, "Domain size is 2 week");
+	equal(domain.length, 3, "Domain size is 3 weeks");
 
 	equal(domain[0].getFullYear(), 2013, "Domain start year is equal to date year");
 	equal(domain[0].getMonth(), 1, "Domain start month is equal to date month");
