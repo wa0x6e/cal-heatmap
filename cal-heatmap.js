@@ -485,7 +485,10 @@ CalHeatMap.prototype = {
 	getWeekDomain: function (d, range) {
 		var monday;
 		if (d.getDay() === 1) {
-			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate()) ;
+			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		} else if (d.getDay() === 0) {
+			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+			monday.setDate(monday.getDate() - 6);
 		} else {
 			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate()-d.getDay()+1);
 		}
