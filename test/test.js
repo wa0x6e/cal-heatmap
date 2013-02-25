@@ -874,6 +874,47 @@ test("WEEK -> HOUR", function() {
 
 });
 
+test("MONTH -> WEEK", function() {
+
+	expect(9);
+
+	var date = new Date(2013, 0, 1, 15, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "month", subDomain: "week", range: 3});
+	var domain = cal.getDomain(date);
+
+	var startDate = new Date(2013, 0);
+	var endDate = new Date(2013, 2);
+
+	equal(domain.length, 3, "Domain is equal to 3 months");
+	equal(domain[0].getTime(), startDate.getTime());
+	equal(domain[domain.length-1].getTime(), endDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+
+		domainStartDate = new Date(domainStartDate);
+
+		var endOfMonth = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth()+1, 0);
+		var weekNb = Math.ceil(endOfMonth.getDate() / 7);
+
+		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
+		if (startDate.getDay() > 1) {
+			startDate.setDate(startDate.getDate() - startDate.getDay() + 1);
+		} else if (startDate.getDay() === 0) {
+			startDate.seDate(startDate.getDate() - 6);
+		}
+
+		var endDate = new Date(startDate);
+		endDate.setDate(endDate.getDate() + 28);
+
+		equal(subDomain[0].getTime(), startDate.getTime(), "The month subdomain start is the first day of first week : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The month subdomain end is the first day of last week : " + subDomain[subDomain.length-1]);
+	});
+
+});
+
 test("MONTH -> DAY", function() {
 
 	expect(12);

@@ -114,7 +114,13 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			row: 7,
-			column: function() { return (self.options.domain === "year" ? 54 : 5);},
+			column: function() {
+				switch(self.options.domain) {
+					case "year" : return 54;
+					case "month" : return 5;
+					case "week" : return 1;
+				}
+			},
 			position: {
 				x : function(d) {
 					switch(self.options.domain) {
@@ -134,19 +140,30 @@ var CalHeatMap = function() {
 			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
 		},
 		"week" : {
-			row: 7,
-			column: 4,
+			row: 1,
+			column: function(d) {
+				d = new Date(d);
+				switch(self.options.domain) {
+					case "year" : return 54;
+					case "month" : return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d);
+				}
+				return 1;
+			},
 			position: {
 				x: function(d) {
-					return 0;
+					switch(self.options.domain) {
+						case "year" : return self.getWeekNumber(d);
+						case "month" : return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth())) - 1;
+					}
 				},
 				y: function(d) {
 					return 0;
 				}
 			},
 			format: {
-				date: "",
-				legend: "%B Week #%W"
+				date: "%B Week #%W",
+				legend: "%B Week #%W",
+				connector: "on"
 			},
 			extractUnit : function(d) { return self.getWeekNumber(d); }
 		},
@@ -273,12 +290,16 @@ var CalHeatMap = function() {
 
 		// Get datas from remote, parse them to expected format, then display them in the graph
 		if (self.options.loadOnInit) {
-			d3.json(self.options.uri, function(data) {
-				display(parseDatas(data));
-			});
+			self.fill(self.options.uri);
 		}
 
 		return true;
+	};
+
+	this.fill = function(uri) {
+		d3.json(uri, function(data) {
+			display(parseDatas(data));
+		});
 	};
 
 
@@ -493,7 +514,7 @@ CalHeatMap.prototype = {
 			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate()-d.getDay()+1);
 		}
 		var endDate = new Date(monday);
-		return d3.time.mondays(monday, endDate.setDate(endDate.getDate() + range*7));
+		return d3.time.mondays(monday, new Date(endDate.setDate(endDate.getDate() + range*7)));
 	},
 
 	getYearDomain: function(d, range){
@@ -602,12 +623,29 @@ CalHeatMap.prototype = {
 			}
 		};
 
+		var computeWeekSubDomainSize = function(date, domain) {
+			if (domain === "month") {
+				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
+				var endWeekNb = parent.getWeekNumber(endOfMonth);
+				var startWeekNb = parent.getWeekNumber(new Date(date.getFullYear(), date.getMonth()));
+
+				if (startWeekNb > endWeekNb) {
+					startWeekNb = 0;
+					endWeekNb++;
+				}
+
+				return endWeekNb - startWeekNb + 1;
+			} else if (domain === "year") {
+				return parent.getDayOfYear(new Date(date.getFullYear(), 11, 31));
+			}
+		};
+
 
 		switch(this.options.subDomain) {
 			case "min"   : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
 			case "hour"  : return this.getHourDomain(date, computeHourSubDomainSize(date, this.options.domain));
 			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
-			case "week"  : return this.getWeekDomain(date, 1);
+			case "week"  : return this.getWeekDomain(date, computeWeekSubDomainSize(date, this.options.domain));
 			case "month" : return this.getMonthDomain(date, 12);
 		}
 
