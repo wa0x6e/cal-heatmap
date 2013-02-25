@@ -108,10 +108,8 @@ var CalHeatMap = function() {
 				connector: "at"
 			},
 			extractUnit : function(d) {
-				if (self.options.subDomain === "hour") {
-					return d.getHours() + "" + self.getDayOfYear(d);
-				}
-				return d.getHours();
+				var formatHour = d3.time.format("%H");
+				return d.getFullYear() + "" +  self.getDayOfYear(d) + "" + formatHour(d);
 			}
 		},
 		"day" : {
@@ -133,7 +131,7 @@ var CalHeatMap = function() {
 				legend: "%e %b",
 				connector: "on"
 			},
-			extractUnit : function(d) { return self.getDayOfYear(d); }
+			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
 		},
 		"week" : {
 			row: 7,
@@ -148,7 +146,7 @@ var CalHeatMap = function() {
 			},
 			format: {
 				date: "",
-				legend: ""
+				legend: "%B Week #%W"
 			},
 			extractUnit : function(d) { return self.getWeekNumber(d); }
 		},
@@ -188,6 +186,10 @@ var CalHeatMap = function() {
 	this.svg = null;
 	var rect = null;
 
+	// Record all the valid domains
+	// Each domain value is a timestamp in milliseconds
+	this._domains = [];
+
 	function positionSubDomainX(d) {
 		var index = domainType[self.options.subDomain].position.x(d);
 		return index * self.options.cellsize + index * self.options.cellpadding;
@@ -222,14 +224,14 @@ var CalHeatMap = function() {
 		// Format the domain legend according to the domain type
 		var legendFormat = d3.time.format(self.options.format.legend);
 
+		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
+
 		// Painting all the domains
 		self.svg = d3.select("#" + self.options.id)
 			.append("div")
 			.attr("class", "graph")
 			.selectAll()
-			.data(self.getDomain(self.options.start).map(function(d) {
-				return d.getTime();
-			}))
+			.data(self._domains)
 			.enter().append("div")
 			.attr("class", "graph-domain")
 			.style("width", function(d) { return w(d) + "px"; })
@@ -330,8 +332,12 @@ var CalHeatMap = function() {
 
 		for (var d in data) {
 			var date = new Date(d*1000);
-			var domainUnit = self.getDomain(date)[0];
-			domainUnit = domainUnit.getTime();
+			var domainUnit = self.getDomain(date)[0].getTime();
+
+			// Don't record datas not relevant to the current domain
+			if (self._domains.indexOf(domainUnit) < 0) {
+				continue;
+			}
 
 			var subDomainUnit = domainType[self.options.subDomain].extractUnit(date);
 			if (typeof stats[domainUnit] === "undefined") {
