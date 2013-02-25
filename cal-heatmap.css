@@ -1,5 +1,10 @@
 /* Cal-HeatMap CSS */
 
+.graph-domain
+{
+	margin-right: 2px;
+}
+
 .graph-label 
 {
 	fill: #999;
