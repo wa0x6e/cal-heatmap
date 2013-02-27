@@ -1286,3 +1286,82 @@ test("Append graph to the passed DOM ID", function() {
 	equal($("#cal-heatmap .graph").length, 0, "Default ID is empty");
 
 });
+
+/*
+	-----------------------------------------------------------------
+	DATA SOURCE
+	-----------------------------------------------------------------
+ */
+
+module( "Data source" );
+
+test("Data Source is undefined", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	var datas;
+
+	cal.init({data: datas, loadOnInit: false});
+	equal(cal.getDatas(datas), false);
+});
+
+test("Data Source is invalid : number", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	var datas = 2560;
+
+	cal.init({data: datas, loadOnInit: false});
+	equal(cal.getDatas(datas), false);
+});
+
+
+test("Data Source is a JSON object", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	var datas = {test: 5};
+
+	cal.init({data: datas, loadOnInit: false});
+	equal(cal.getDatas(datas), datas);
+});
+
+
+test("Data Source is an URI", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	var filePath = "path/to/file.json";
+
+	cal.init({data: filePath, loadOnInit: false});
+	equal(
+		cal.parseURI(filePath, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])),
+		filePath
+	);
+});
+
+
+test("Data Source is a regex string, replace by timestamp", function() {
+
+	var cal = new CalHeatMap();
+	cal.init({start: new Date(), loadOnInit: false});
+	var uri = "get?start={{t:start}}&end={{t:end}}";
+
+	var parsedUri = "get?start=" + cal._domains[0]/1000 + "&end=" + cal._domains[cal._domains.length-1]/1000;
+
+	equal(cal.parseURI(uri, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])), parsedUri, "Start and end token was replaced by a timestamp : " + parsedUri);
+});
+
+test("Data Source is a regex string, replace by ISO-8601 Date", function() {
+
+	var cal = new CalHeatMap();
+	cal.init({start: new Date(), loadOnInit: false});
+	var uri = "get?start={{d:start}}&end={{d:end}}";
+
+	var startDate = new Date(cal._domains[0]);
+	var endDate = new Date(cal._domains[cal._domains.length-1]);
+
+	var parsedUri = "get?start=" + startDate.toISOString() + "&end=" + endDate.toISOString();
+
+	equal(cal.parseURI(uri, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
+});

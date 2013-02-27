@@ -54,7 +54,7 @@ var CalHeatMap = function() {
 		start : new Date(),
 
 		// URL, where to fetch the original datas
-		uri : "",
+		data : "",
 
 		// Load remote data on calendar creation
 		// When false, the calendar will be left empty
@@ -67,13 +67,13 @@ var CalHeatMap = function() {
 
 
 
-	var domainType = {
+	this._domainType = {
 		"min" : {
 			row: 10,
 			column: function(d) { return 6; },
 			position: {
-				x : function(d) { return Math.floor(d.getMinutes() / domainType.min.row); },
-				y : function(d) { return d.getMinutes() % domainType.min.row;}
+				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row); },
+				y : function(d) { return d.getMinutes() % self._domainType.min.row;}
 			},
 			format: {
 				date: "%H:%M, %A %B %-e, %Y",
@@ -94,13 +94,13 @@ var CalHeatMap = function() {
 			position: {
 				x : function(d) {
 					if (self.options.domain === "month") {
-						return Math.floor(d.getHours() / domainType.hour.row) + (d.getDate()-1)*4;
+						return Math.floor(d.getHours() / self._domainType.hour.row) + (d.getDate()-1)*4;
 					} else if (self.options.domain === "week") {
-						return Math.floor(d.getHours() / domainType.hour.row) + self.getWeekDay(d)*4;
+						return Math.floor(d.getHours() / self._domainType.hour.row) + self.getWeekDay(d)*4;
 					}
-					return Math.floor(d.getHours() / domainType.hour.row);
+					return Math.floor(d.getHours() / self._domainType.hour.row);
 				},
-				y : function(d) { return d.getHours() % domainType.hour.row;}
+				y : function(d) { return d.getHours() % self._domainType.hour.row;}
 			},
 			format: {
 				date: "%Hh, %A %B %-e, %Y",
@@ -171,8 +171,8 @@ var CalHeatMap = function() {
 			row: 1,
 			column: function(d) {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getMonth() / domainType.month.row); },
-				y : function(d) { return d.getMonth() % domainType.month.row;}
+				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row); },
+				y : function(d) { return d.getMonth() % self._domainType.month.row;}
 			},
 			format: {
 				date: "%B %Y",
@@ -185,8 +185,8 @@ var CalHeatMap = function() {
 			row: 1,
 			column: function(d) {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getFullYear() / domainType.year.row); },
-				y : function(d) { return d.getFullYear() % domainType.year.row;}
+				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row); },
+				y : function(d) { return d.getFullYear() % this._domainType.year.row;}
 			},
 			format: {
 				date: "%Y",
@@ -197,28 +197,11 @@ var CalHeatMap = function() {
 		}
 	};
 
-	var formatDate,
-		formatNumber = d3.format(",d");
-
 	this.svg = null;
-	var rect = null;
 
 	// Record all the valid domains
 	// Each domain value is a timestamp in milliseconds
 	this._domains = [];
-
-	function positionSubDomainX(d) {
-		var index = domainType[self.options.subDomain].position.x(d);
-		return index * self.options.cellsize + index * self.options.cellpadding;
-	}
-
-	function positionSubDomainY(d) {
-		var index = domainType[self.options.subDomain].position.y(d);
-		return index * self.options.cellsize + index * self.options.cellpadding;
-	}
-
-
-
 
 	/**
 	 * Display the graph for the first time
@@ -228,15 +211,15 @@ var CalHeatMap = function() {
 
 		var graphLegendHeight = self.options.cellsize*2;
 
-		formatDate = d3.time.format(self.options.format.date);
+		self.formatDate = d3.time.format(self.options.format.date);
 
 		// Compute the width of the domain block
 		var w = function(d) {
-			return self.options.cellsize*domainType[self.options.subDomain].column(d) + self.options.cellpadding*domainType[self.options.subDomain].column(d);
+			return self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
 		};
 
 		// Compute the height of the domain block
-		var h = self.options.cellsize*domainType[self.options.subDomain].row + self.options.cellpadding*domainType[self.options.subDomain].row + self.options.cellpadding;
+		var h = self.options.cellsize*self._domainType[self.options.subDomain].row + self.options.cellpadding*self._domainType[self.options.subDomain].row + self.options.cellpadding;
 
 		// Format the domain legend according to the domain type
 		var legendFormat = d3.time.format(self.options.format.legend);
@@ -270,110 +253,31 @@ var CalHeatMap = function() {
 			.text(function(d) { return legendFormat(new Date(d)); });
 
 		// Drawing the sudomain inside each domain
-		rect = self.svg.selectAll("rect")
+		var rect = self.svg.selectAll("rect")
 			.data(function(d) { return self.getSubDomain(d); })
 			.enter().append("svg:rect")
 			.attr("class", "graph-rect")
 			.attr("width", self.options.cellsize)
 			.attr("height", self.options.cellsize)
-			.attr("x", function(d) { return positionSubDomainX(d); })
-			.attr("y", function(d) { return positionSubDomainY(d); })
+			.attr("x", function(d) { return self.positionSubDomainX(d); })
+			.attr("y", function(d) { return self.positionSubDomainY(d); })
 			;
 
 		// Appeding a title to each subdomain
-		rect.append("svg:title").text(function(d){ return formatDate(d); });
+		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
 
 		// Display scale if needed
 		if (self.options.displayScale) {
 			self.displayScale();
 		}
 
-		// Get datas from remote, parse them to expected format, then display them in the graph
+		// Fill the graph with some datas
 		if (self.options.loadOnInit) {
-			self.fill(self.options.uri);
+			self.fill(self.getDatas(self.options.data, new Date(self._domains[0]), new Date(self._domains[self._domains.length-1])));
 		}
 
 		return true;
 	};
-
-	this.fill = function(uri) {
-		d3.json(uri, function(data) {
-			display(parseDatas(data));
-		});
-	};
-
-
-
-	/**
-	 * Colorize all rectangles according to their items count
-	 *
-	 * @param  {[type]} data  [description]
-	 */
-	function display (data) {
-		self.svg.each(function(domainUnit) {
-			d3.select(this).selectAll("rect")
-				.attr("class", function(d) {
-					var subDomainUnit = domainType[self.options.subDomain].extractUnit(d);
-
-					return "graph-rect" +
-					((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ?
-						(" " + self.scale(data[domainUnit][subDomainUnit])) : ""
-					);
-				})
-				.on("click", function(d) {
-					var subDomainUnit = domainType[self.options.subDomain].extractUnit(d);
-					return self.onClick(
-						d,
-						(data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ? data[domainUnit][subDomainUnit] : 0
-					);
-				})
-				.select("title")
-				.text(function(d) {
-					var subDomainUnit = domainType[self.options.subDomain].extractUnit(d);
-
-					return (
-					((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ?
-						(formatNumber(data[domainUnit][subDomainUnit]) + " " + self.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + domainType[self.options.subDomain].format.connector + " ") :
-						""
-						) + formatDate(d));
-				});
-			}
-		);
-	}
-
-
-	/**
-	 * Convert a JSON result into the expected format
-	 *
-	 * @param  {[type]} data [description]
-	 * @return {[type]}      [description]
-	 */
-	function parseDatas(data) {
-		var stats = {};
-
-		for (var d in data) {
-			var date = new Date(d*1000);
-			var domainUnit = self.getDomain(date)[0].getTime();
-
-			// Don't record datas not relevant to the current domain
-			if (self._domains.indexOf(domainUnit) < 0) {
-				continue;
-			}
-
-			var subDomainUnit = domainType[self.options.subDomain].extractUnit(date);
-			if (typeof stats[domainUnit] === "undefined") {
-				stats[domainUnit] = {};
-			}
-
-			if (typeof stats[domainUnit][subDomainUnit] !== "undefined") {
-				stats[domainUnit][subDomainUnit] += data[d];
-			} else {
-				stats[domainUnit][subDomainUnit] = data[d];
-			}
-		}
-
-		return stats;
-	}
 
 
 	this.init = function(settings) {
@@ -389,23 +293,19 @@ var CalHeatMap = function() {
 			}
 		}
 
-		if (!domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
+		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
 			console.log("The domain name is not valid");
 			return false;
 		}
 
 		var domain = self.getDomain(self.options.start);
 
-		if (self.options.uri === "") {
-			self.options.uri = "/api/scheduled-jobs/stats/"+ parseInt(self.options.start.getTime()/1000, 10) + "/" + parseInt(domain[domain.length-1].getTime()/1000, 10);
-		}
-
 		if (self.options.format.date === null) {
-			self.options.format.date = domainType[self.options.subDomain].format.date;
+			self.options.format.date = this._domainType[self.options.subDomain].format.date;
 		}
 
 		if (self.options.format.legend === null) {
-			self.options.format.legend = domainType[self.options.domain].format.legend;
+			self.options.format.legend = this._domainType[self.options.domain].format.legend;
 		}
 
 		return _init();
@@ -431,7 +331,7 @@ CalHeatMap.prototype = {
 		return this.options.onClick(d, itemNb);
 	},
 
-
+	formatNumber: d3.format(",d"),
 
 	displayScale: function() {
 
@@ -672,6 +572,126 @@ CalHeatMap.prototype = {
 			}
 		}
 		return "q" + this.options.scales.length;
+	},
+
+	fill: function(datas) {
+		if (datas !== false) {
+			this.display(this.parseDatas(datas));
+		}
+	},
+
+	getDatas: function(source, startDate, endDate) {
+		var parent = this;
+		switch(typeof source) {
+			case "string" :
+				if (source === "") {
+					return false;
+				} else {
+					d3.json(this.parseURI(source, startDate, endDate), function(data) {
+						parent.fill(data);
+					});
+				}
+				break;
+			case "object" :
+				// @todo Check that it's a valid JSON object
+				return source;
+		}
+
+		return false;
+	},
+
+	/**
+	 * Convert a JSON result into the expected format
+	 *
+	 * @param  {[type]} data [description]
+	 * @return {[type]}      [description]
+	 */
+	parseDatas: function(data) {
+		var stats = {};
+
+		for (var d in data) {
+			var date = new Date(d*1000);
+			var domainUnit = this.getDomain(date)[0].getTime();
+
+			// Don't record datas not relevant to the current domain
+			if (this._domains.indexOf(domainUnit) < 0) {
+				continue;
+			}
+
+			var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
+			if (typeof stats[domainUnit] === "undefined") {
+				stats[domainUnit] = {};
+			}
+
+			if (typeof stats[domainUnit][subDomainUnit] !== "undefined") {
+				stats[domainUnit][subDomainUnit] += data[d];
+			} else {
+				stats[domainUnit][subDomainUnit] = data[d];
+			}
+		}
+
+		return stats;
+	},
+
+
+	/**
+	 * Colorize all rectangles according to their items count
+	 *
+	 * @param  {[type]} data  [description]
+	 */
+	display: function(data) {
+		var parent = this;
+		this.svg.each(function(domainUnit) {
+			d3.select(this).selectAll("rect")
+				.attr("class", function(d) {
+					var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+
+					return "graph-rect" +
+					((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ?
+						(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
+					);
+				})
+				.on("click", function(d) {
+					var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+					return parent.onClick(
+						d,
+						(data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ? data[domainUnit][subDomainUnit] : 0
+					);
+				})
+				.select("title")
+				.text(function(d) {
+					var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+
+					return (
+					((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ?
+						(parent.formatNumber(data[domainUnit][subDomainUnit]) + " " + parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + parent._domainType[parent.options.subDomain].format.connector + " ") :
+						""
+						) + parent.formatDate(d));
+				});
+			}
+		);
+	},
+
+	positionSubDomainX: function(d) {
+		var index = this._domainType[this.options.subDomain].position.x(d);
+		return index * this.options.cellsize + index * this.options.cellpadding;
+	},
+
+	positionSubDomainY: function(d) {
+		var index = this._domainType[this.options.subDomain].position.y(d);
+		return index * this.options.cellsize + index * this.options.cellpadding;
+	},
+
+	parseURI: function(str, startDate, endDate) {
+		// Use a timestamp in seconds
+		str = str.replace(/\{\{t:start\}\}/g, startDate.getTime()/1000);
+		str = str.replace(/\{\{t:end\}\}/g, endDate.getTime()/1000);
+
+		// Use a string date, following the ISO-8601
+		str = str.replace(/\{\{d:start\}\}/g, startDate.toISOString());
+		str = str.replace(/\{\{d:end\}\}/g, endDate.toISOString());
+
+		return str;
 	}
 
 };
