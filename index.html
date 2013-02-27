@@ -35,7 +35,7 @@
 			<script type="text/javascript">
 				var calendar = new CalHeatMap();
 				calendar.init({
-					uri: "datas-hours.json",
+					data: "datas-hours.json",
 					start : new Date(2000, 0)
 				});
 			</script>
@@ -58,7 +58,7 @@
 &lt;script type="text/javascript">
 	var cal = new CalHeatMap();
 	cal.init({
-		uri: "datas.json"
+		data: "datas.json"
 	});
 &lt;/script></code></pre>
 		</li>
@@ -80,13 +80,31 @@
 				<th>Description</th>
 			</tr>
 			<tr>
-				<td><code>uri</code></td>
-				<td>String</td>
+				<td><code>data</code></td>
+				<td>String|Object</td>
 				<td>""</td>
 				<td>
 					<a href="#range-example" class="example-link">Example</a>
 					<strong>The calendar datas source</strong>
-					<p>Path to a <a href="#data-source">JSON file</a></p></td>
+					<p>The datas source is a JSON object. <code>data</code> can be a path to a <a href="#data-source">JSON file</a>, or directly a JSON object. (See <a href="#data-source">the data source section </a> for accepted format).</p>
+
+					<p>If you're getting your datas form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the start timetstamp and <b>yyy</b> is the end timestamp, <code>data</code> also accept date tokens, that will be automatically replaced by the current start and end date of the calendar.</p>
+
+					<p>Available tokens are :</p>
+
+					<ul>
+						<li><code>{{t:start}}</code>: timestamp of the calendar's first date</li>
+						<li><code>{{t:end}}</code>: timestamp of the calendar's last date</li>
+						<li><code>{{d:start}}</code>: ISO-8601 formatted date of the calendar's first date</li>
+						<li><code>{{d:end}}</code>: ISO-8601 formatted date of the calendar's last date</li>
+					</ul>
+
+					<p><b>Example</b>: <code>api?start={{t:start}}&end={{d:end}}</code> will fetch
+						<code>api?start=1362006000&end=2013-02-27T23:00:00.000Z</code></p>
+
+					<div class="alert alert-infos">All timestamp are in seconds</div>
+
+				</td>
 			</tr>
 			<tr>
 				<td><code>id</code></td>
@@ -254,7 +272,7 @@
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-hours.json",
+				data: "datas-hours.json",
 				start : new Date(2000, 0),
 				id : "graph_a",
 				range : 6
@@ -263,7 +281,7 @@
 		</div>
 		<pre class="prettyprint javascript"><code>var calendar = new CalHeatMap();
 calendar.init({
-	uri: "data-hours.json",		// Fill the calendar with the datas from datas-hours.json
+	data: "data-hours.json",		// Fill the calendar with the datas from datas-hours.json
 	start : new Date(2000, 0),	// Start the graph on January 2000
 	id : "graph_a", 		// Prepend the calendar to the #graph_a in the DOM
 	range : 6 			// Just display 6 hours
@@ -278,7 +296,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 0, 15),
 				id : "graph_b",
 				range : 15,			// Number of days to display
@@ -288,7 +306,7 @@ calendar.init({
 		</script>
 </div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 0, 15),
 	id : "graph_b",
 	domain : "day",		// Group datas by days
@@ -312,7 +330,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 1),
 				id : "graph_c",
 				domain : "month",
@@ -323,7 +341,7 @@ calendar.init({
 		</script>
 </div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 1),
 	id : "graph_c",
 	domain : "month",		// Group datas by month
@@ -342,7 +360,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 0),
 				id : "graph_f",
 				domain : "month",
@@ -354,7 +372,7 @@ calendar.init({
 		</script>
 </div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_f",
 	domain : "month",
@@ -372,7 +390,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 1),
 				id : "graph_j",
 				domain : "month",
@@ -383,7 +401,7 @@ calendar.init({
 		</script>
 </div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 1),
 	id : "graph_c",
 	domain : "month",		// Group datas by month
@@ -400,7 +418,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 0),
 				id : "graph_h",
 				domain : "week",
@@ -410,7 +428,7 @@ calendar.init({
 		</script>
 </div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_h",
 	domain : "week",
@@ -435,7 +453,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 0),
 				id : "graph_d",
 				domain : "year",
@@ -447,7 +465,7 @@ calendar.init({
 		</script>
 </div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_d",
 	domain : "year",
@@ -471,7 +489,7 @@ calendar.init({
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
 			calendar.init({
-				uri: "datas-years.json",
+				data: "datas-years.json",
 				start: new Date(2000, 0),
 				id : "graph_e",
 				range : 1,
@@ -494,7 +512,7 @@ calendar.init({
 
 		</div>
 		<pre class="prettyprint javascript"><code>CalHeatMap.init({
-	uri: "datas-years.json",
+	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_e",
 	range : 1,
