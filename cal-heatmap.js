@@ -677,5 +677,11 @@ CalHeatMap.prototype = {
 };
 
 
-
-
+/**
+ * AMD Loader
+ */
+if (typeof define === "function" && define.amd) {
+	define(["d3"], function(d3) {
+		return CalHeatMap;
+	});
+}

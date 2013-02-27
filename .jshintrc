@@ -15,6 +15,7 @@
 	"loopfunc":	 true,
 
 	"predef" : [
-		"d3"
+		"d3",
+		"define"
 	]
 }
