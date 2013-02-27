@@ -40,5 +40,13 @@
     "dependencies": {
       "d3": "d3"
     }
-  }
+  },
+  "jam": {
+    "dependencies": {
+      "d3": ">=3.0.6"
+    },
+  },
+  "bugs": "https://github.com/kamisama/cal-heatmap/issues",
+  "github": "https://github.com/kamisama/cal-heatmap",
+  "categories": ["Data", "Visualization"]
 }
