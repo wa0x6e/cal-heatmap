@@ -1,5 +1,5 @@
 {
-  "name": "Cal-HeatMap",
+  "name": "cal-heatMap",
   "version": "1.0.1",
   "description": "A module to create calendar heat map to visualise time data series a la github contribution graph",
   "keywords" : [
@@ -33,7 +33,7 @@
   "author": {
     "name": "Wan Qi Chen",
     "url": "http://www.kamisama.me"
-    },
+  },
   "license": "MIT",
   "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1",
   "volo": {
@@ -44,7 +44,7 @@
   "jam": {
     "dependencies": {
       "d3": ">=3.0.6"
-    },
+    }
   },
   "bugs": "https://github.com/kamisama/cal-heatmap/issues",
   "github": "https://github.com/kamisama/cal-heatmap",
