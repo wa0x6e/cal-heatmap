@@ -5,7 +5,7 @@ require.config({
 	paths: {
 		"jquery": "jquery-1.9.1",
 		"d3": "d3.min",
-		"cal-heatmap": "../cal-heatmap"
+		"cal-heatmap": "../src/cal-heatmap"
 	}
 });
 

@@ -1,11 +1,3 @@
-/*! cal-heatmap v1.1.2 (Thu Feb 28 2013 18:27:02)
- *  ---------------------------------------------
- *  A module to create calendar heat map to visualise time data series a la github contribution graph
- *  https://github.com/kamisama/cal-heatmap
- *  Licensed under the MIT license
- *  Copyright 2013 Wan Qi Chen
- */
-
 var CalHeatMap = function() {
 
 	"use strict";
