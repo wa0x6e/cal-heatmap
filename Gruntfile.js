@@ -73,7 +73,7 @@ module.exports = function(grunt) {
 
     // TO RUN BEFORE COMMIT
     // ====================
-    grunt.registerTask("quick-build", ["concat", "jshint", "csslint", "uglify"]);
+    grunt.registerTask("quick-build", ["jshint", "csslint"]);
 
     // Full build without version bump
     grunt.registerTask("build", ["concat", "qunit", "qunit-cov", "jshint", "csslint", "uglify"]);
