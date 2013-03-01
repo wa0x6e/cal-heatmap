@@ -634,32 +634,35 @@ CalHeatMap.prototype = {
 	display: function(data) {
 		var parent = this;
 		this.svg.each(function(domainUnit) {
-			d3.select(this).selectAll("rect")
-				.attr("class", function(d) {
-					var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-					return "graph-rect" +
-					((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ?
-						(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
-					);
-				})
-				.on("click", function(d) {
-					var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-					return parent.onClick(
-						d,
-						(data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ? data[domainUnit][subDomainUnit] : 0
-					);
-				})
-				.select("title")
-				.text(function(d) {
-					var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+			if (data.hasOwnProperty(domainUnit)) {
+				d3.select(this).selectAll("rect")
+					.attr("class", function(d) {
+						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-					return (
-					((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) ?
-						(parent.formatNumber(data[domainUnit][subDomainUnit]) + " " + parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + parent._domainType[parent.options.subDomain].format.connector + " ") :
-						""
-						) + parent.formatDate(d));
-				});
+						return "graph-rect" +
+						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
+							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
+						);
+					})
+					.on("click", function(d) {
+						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+						return parent.onClick(
+							d,
+							(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
+						);
+					})
+					.select("title")
+					.text(function(d) {
+						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+
+						return (
+						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
+							(parent.formatNumber(data[domainUnit][subDomainUnit]) + " " + parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + parent._domainType[parent.options.subDomain].format.connector + " ") :
+							""
+							) + parent.formatDate(d));
+					});
+				}
 			}
 		);
 	},
