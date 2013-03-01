@@ -42,7 +42,7 @@ module.exports = function(grunt) {
         "qunit-cov": {
             test:
             {
-                minimum: 0.75,
+                minimum: 0.85,
                 srcDir: "src",
                 depDirs: ["test"],
                 outDir: "jscoverage",
