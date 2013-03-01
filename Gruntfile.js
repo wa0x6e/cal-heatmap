@@ -78,19 +78,6 @@ module.exports = function(grunt) {
     // Full build without version bump
     grunt.registerTask("build", ["concat", "qunit", "qunit-cov", "jshint", "csslint", "uglify"]);
 
-
-    // TO RUN JUST BEFORE RELEASING A NEW VERSION
-    // ==========================================
-
-    // Task for patch version release
-    grunt.registerTask("r", ["concat", "qunit", "qunit-cov", "jshint", "csslint", "bump", "uglify"]);
-
-    // Task for minor version release
-    grunt.registerTask("rmin", ["concat", "qunit", "qunit-cov", "jshint", "csslint", "bump:minor", "uglify"]);
-
-    // Task for major version release
-    grunt.registerTask("rmaj", ["concat", "qunit", "qunit-cov", "jshint", "csslint", "bump:major", "uglify"]);
-
     // FOR TRAVIS
     // ==========
     grunt.registerTask("travis", ["qunit", "jshint", "csslint"]);
