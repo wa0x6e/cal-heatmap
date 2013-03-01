@@ -527,7 +527,7 @@ CalHeatMap.prototype = {
 
 				return endWeekNb - startWeekNb + 1;
 			} else if (domain === "year") {
-				return parent.getDayOfYear(new Date(date.getFullYear(), 11, 31));
+				return parent.getWeekNumber(new Date(date.getFullYear(), 11, 31));
 			}
 		};
 
@@ -581,6 +581,7 @@ CalHeatMap.prototype = {
 					d3.json(this.parseURI(source, startDate, endDate), function(data) {
 						parent.fill(data);
 					});
+					return true;
 				}
 				break;
 			case "object" :

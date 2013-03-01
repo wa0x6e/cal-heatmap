@@ -1015,6 +1015,42 @@ test("YEAR -> MONTH", function() {
 
 });
 
+test("YEAR -> WEEK", function() {
+
+	expect(4);
+
+	var date = new Date(2005, 6, 1, 15, 26);
+
+	var cal = new CalHeatMap();
+	cal.init({loadOnInit: false, start : date, domain: "year", subDomain: "week", range: 1});
+	var domain = cal.getDomain(date);
+
+	var startDate = new Date(date.getFullYear(), 0);
+	var endDate = new Date(date.getFullYear()+1, 0, 0);
+
+	equal(domain.length, 1, "Domain is equal to 1 year");
+	equal(domain[0].getTime(), startDate.getTime(), "Domain start the monday of the first week of the week");
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+
+		domainStartDate = new Date(domainStartDate);
+		var weekNb = cal.getWeekNumber(endDate);
+
+
+		if (domainStartDate.getDay() > 1) {
+			domainStartDate.setDate(domainStartDate.getDay()*-1+2);
+		} else if (domainStartDate.getDay() === 0) {
+			domainStartDate.setDate(-6);
+		}
+
+		equal(subDomain.length, weekNb, "The year contains " + weekNb + " weeks");
+		equal(subDomain[0].getTime(), domainStartDate.getTime(), "The year subdomain start is the first week of year : " + subDomain[0]);
+		//equal(subDomain[subDomain.length-1].getTime(), domainEndDate.getTime(), "The year subdomain end is the last week of year : " + subDomain[subDomain.length-1]);
+	});
+
+});
+
 
 test("YEAR -> DAY", function() {
 
@@ -1293,7 +1329,7 @@ test("Append graph to the passed DOM ID", function() {
 	-----------------------------------------------------------------
  */
 
-module( "Data source" );
+module( "Data Source property parsing" );
 
 test("Data Source is undefined", function() {
 	expect(1);
@@ -1326,6 +1362,33 @@ test("Data Source is a JSON object", function() {
 	equal(cal.getDatas(datas), datas);
 });
 
+test("Data Source is a regular string", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	var datas = "regular string";
+
+	cal.init({data: datas, loadOnInit: false});
+	equal(cal.getDatas(datas, new Date(), new Date()), true, "True is returned, datas is loaded via d3.json callback");
+});
+
+test("Data Source is a en empty string", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	var datas = "";
+
+	cal.init({data: datas, loadOnInit: false});
+	equal(cal.getDatas(datas), false);
+});
+
+/*
+	-----------------------------------------------------------------
+
+	-----------------------------------------------------------------
+ */
+
+module( "Interpreting Data source template" );
 
 test("Data Source is an URI", function() {
 	expect(1);
@@ -1364,4 +1427,64 @@ test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 	var parsedUri = "get?start=" + startDate.toISOString() + "&end=" + endDate.toISOString();
 
 	equal(cal.parseURI(uri, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
+});
+
+
+/*
+	-----------------------------------------------------------------
+	DATA SOURCE PARSING
+	-----------------------------------------------------------------
+ */
+
+module( "Data processing" );
+
+test("Grouping datas by hour>min", function() {
+	expect(6);
+
+	var date = new Date(2000, 0, 1);
+	var date1 = date.getTime()/1000;
+	var date2 = date1+3600;
+	var date3 = date2+60;
+
+	var datas = {};
+	datas[date1] = 15;	// 15 events for 00:00
+	datas[date2] = 25;	// 25 events for 01:00
+	datas[date3] = 1;	// 01 events for 01:01
+
+	var cal = new CalHeatMap();
+	cal.init({data: datas, loadOnInit: false, start: date});
+
+	var calDatas = cal.parseDatas(datas);
+
+	equal(Object.keys(calDatas).length, 2, "Only datas for 2 hours");
+	equal(Object.keys(calDatas[date1*1000]).length, 1, "First hour contains 1 event");
+	equal(Object.keys(calDatas[date2*1000]).length, 2, "Second hour contains 2 events");
+	equal(calDatas[date1*1000]["0"], 15);
+	equal(calDatas[date2*1000]["0"], 25);
+	equal(calDatas[date2*1000]["1"], 1);
+
+});
+
+test("Grouping datas by day>hour", function() {
+	expect(2);
+
+	var date = new Date(2000, 0, 1);
+	var date1 = date.getTime()/1000;
+	var date2 = date1+3600;
+	var date3 = date2+60;
+
+	var datas = {};
+	datas[date1] = 15;	// 15 events for 00:00
+	datas[date2] = 25;	// 25 events for 01:00
+	datas[date3] = 1;	// 01 events for 01:01
+
+	var cal = new CalHeatMap();
+	cal.init({data: datas, loadOnInit: false, start: date, domain: "day", subDomain: "hour"});
+
+	var calDatas = cal.parseDatas(datas);
+	console.log(calDatas);
+
+	equal(Object.keys(calDatas).length, 1, "Only datas for 1 day");
+	equal(Object.keys(calDatas[date1*1000]).length, 2, "Day contains datas for 2 hours");
+
 });

@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1 [2013-02-28]
+
+* [fix] Fix displaying week subdomain from a year domain
+* [new] Add test code coverage in grunt
+
 ## v1.1.0 [2013-02-27]
 
 * [new] Add Bower and Jam support
