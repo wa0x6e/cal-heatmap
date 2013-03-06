@@ -234,6 +234,9 @@ test("get domain when domain is 1 YEAR. from a timestamp", function() {
 
 });
 
+
+
+
 /*
 	-----------------------------------------------------------------
 	DOMAIN TESTS WHEN FOR GREATER DOMAIN RANGE
@@ -719,8 +722,6 @@ test("DAY -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	console.log(cal.svg);
-
 	cal.svg.each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 24, "The day subdomain contains 24 hours");
@@ -753,8 +754,6 @@ test("DAY -> MIN", function() {
 	equal(domain.length, 3, "Domain is equal to 3 days");
 	equal(domain[0].getTime(), startDate.getTime(), "First domain start is midnight of first day");
 	equal(domain[domain.length-1].getTime(), endDate.getTime(), "Last domain start is midnight of last day");
-
-	console.log(domain);
 
 	cal.svg.each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
@@ -1049,7 +1048,53 @@ test("YEAR -> DAY", function() {
 
 });
 
+/*
+	-----------------------------------------------------------------
+	NEXT AND PREVIOUS DOMAIN
+	-----------------------------------------------------------------
+ */
 
+module( "Next and previous domain" );
+
+test("get next domain", function() {
+
+	expect(3);
+
+	var date = new Date(2000, 0, 1);
+
+	var cal = createCalendar({start: date});
+	var domain = cal.getDomain(date.getTime());
+
+	var nextDomain = cal.getNextDomain();
+
+	var domainEnd = date.setHours(date.getHours() + 11);
+	var expectedNextDomain = new Date(domainEnd);
+	expectedNextDomain.setHours(expectedNextDomain.getHours() + 1);
+
+	equal(domain.length, 12, "Domain contains 12 hours");
+	equal(domain[domain.length-1].getTime(), domainEnd, "Domain end at " + new Date(domainEnd));
+	equal(nextDomain.getTime(), expectedNextDomain.getTime(), "Next domain is " + expectedNextDomain);
+});
+
+test("get previous domain", function() {
+
+	expect(3);
+
+	var date = new Date(2000, 0, 1, 2);
+
+	var cal = createCalendar({start: date});
+	var domain = cal.getDomain(date.getTime());
+
+	var previousDomain = cal.getPreviousDomain();
+
+	var domainStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours());
+	var expectedPreviousDomain = new Date(domain[0]);
+	expectedPreviousDomain.setHours(expectedPreviousDomain.getHours() - 1);
+
+	equal(domain.length, 12, "Domain contains 12 hours");
+	equal(domain[0].getTime(), domainStart.getTime(), "Domain start at " + domainStart);
+	equal(previousDomain.getTime(), expectedPreviousDomain.getTime(), "previous domain is " + expectedPreviousDomain);
+});
 
 /*
 	-----------------------------------------------------------------
@@ -1189,11 +1234,11 @@ test("Float value custom scale", function() {
 
 /*
 	-----------------------------------------------------------------
-	SVG POSITIONNING
+	Callback
 	-----------------------------------------------------------------
  */
 
-module( "Event" );
+module( "Callback" );
 
 test("OnClick", function() {
 
@@ -1210,6 +1255,42 @@ test("OnClick", function() {
 	equal(response.i, 58);
 	equal(response.d.getTime(), date.getTime());
 
+});
+
+test("afterLoadPreviousDomain", function() {
+
+	expect(2);
+
+	var testFunction = function(start, end) { return {start:start, end:end}; };
+
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomainCallback: testFunction});
+
+	var date = new Date(2012, 0, 1, 20, 35);
+	var previousDomainStart = new Date(2012, 0, 1, 20);
+	var previousDomainEnd = new Date(2012, 0, 1, 20, 59);
+
+	var response = cal.afterLoadPreviousDomainCallback(date);
+
+	equal(response.start.getTime(), previousDomainStart.getTime(), "Callback return first subdomain of the date");
+	equal(response.end.getTime(), previousDomainEnd.getTime(), "Callback return last subdomain of the date");
+});
+
+test("afterLoadNextDomain", function() {
+
+	expect(2);
+
+	var testFunction = function(start, end) { return {start:start, end:end}; };
+
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadNextDomainCallback: testFunction});
+
+	var date = new Date(2012, 0, 1, 20, 35);
+	var nextDomainStart = new Date(2012, 0, 1, 20);
+	var nextDomainEnd = new Date(2012, 0, 1, 20, 59);
+
+	var response = cal.afterLoadNextDomainCallback(date);
+
+	equal(response.start.getTime(), nextDomainStart.getTime(), "Callback return first subdomain of the date");
+	equal(response.end.getTime(), nextDomainEnd.getTime(), "Callback return last subdomain of the date");
 });
 
 /*
@@ -1431,7 +1512,6 @@ test("Grouping datas by day>hour", function() {
 	var cal = createCalendar({data: datas, start: date, domain: "day", subDomain: "hour"});
 
 	var calDatas = cal.parseDatas(datas);
-	console.log(calDatas);
 
 	equal(Object.keys(calDatas).length, 1, "Only datas for 1 day");
 	equal(Object.keys(calDatas[date1*1000]).length, 2, "Day contains datas for 2 hours");
