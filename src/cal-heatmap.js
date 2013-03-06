@@ -58,7 +58,7 @@ var CalHeatMap = function() {
 		subDomain : "min",
 
 		// Animation duration
-		duration : 1500
+		duration : 500
 	};
 
 
@@ -261,8 +261,6 @@ var CalHeatMap = function() {
 
 		self.paint();
 
-		console.log(self.svg);
-
 		self.getDatas(
 			self.options.data,
 			new Date(self._domains[self._domains.length-1]),
@@ -275,13 +273,25 @@ var CalHeatMap = function() {
 	this.loadPreviousDomain = function() {
 		d3.event.preventDefault();
 
-		self._domains.unshift(self.getPreviousDomain());
+		self._domains.unshift(self.getPreviousDomain().getTime());
 		self._domains.pop();
 
-		self.paint();
+		self.paint(true);
+
+		self.getDatas(
+			self.options.data,
+			new Date(self._domains[0]),
+			self.getSubDomain(self._domains[0]).pop(),
+			self.svg
+		);
 	};
 
-	this.paint = function() {
+	this.paint = function(reverse) {
+
+		if (typeof reverse === "undefined") {
+			reverse = false;
+		}
+
 		var graphLegendHeight = self.options.cellsize*2;
 
 		// Compute the width of the domain block
@@ -300,7 +310,23 @@ var CalHeatMap = function() {
 			if (width === 0) {
 				return domainsWidth[i];
 			} else {
-				return domainsWidth[i+1];
+				return reverse ? domainsWidth[0] : domainsWidth[i+1];
+			}
+		};
+
+		var domainPositionXExit = function(d) {
+			if (reverse) {
+				return width;
+			} else {
+				return w(d) * -1 - self.options.domainGutter;
+			}
+		};
+
+		var labelPositionXExit = function(d) {
+			if (reverse) {
+				return width + w(d)/2;
+			} else { console.log(d);
+				return (self.options.domainGutter + w(d)/2) * -1;
 			}
 		};
 
@@ -324,7 +350,12 @@ var CalHeatMap = function() {
 				if (width === 0) {
 					domainsWidth.push(tempWidth - tempLastDomainWidth);
 				} else {
-					domainsWidth.push(width);
+					if (reverse) {
+						domainsWidth.unshift(tempLastDomainWidth * -1);
+					} else {
+						domainsWidth.push(width);
+					}
+
 				}
 
 				return wd;
@@ -349,14 +380,7 @@ var CalHeatMap = function() {
 			.text(function(d) { return legendFormat(new Date(d)); });
 
 
-		label.transition().duration(self.options.duration)
-		.attr("x", function(d, i){ return domainsWidth[i] + w(d) / 2; });
 
-
-
-		label.exit().transition().duration(self.options.duration)
-			.attr("x", function(d){ return (w(d) * -1 - self.options.domainGutter)/2; })
-			.remove();
 
 		// Drawing the sudomain inside each domain
 		var rect = domainSvg.selectAll("rect")
@@ -372,15 +396,25 @@ var CalHeatMap = function() {
 		// Appeding a title to each subdomain
 		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
 
-		var exitDomainWidth = domainsWidth[1];
+
+		var exitDomainWidth = reverse ? (width-domainsWidth[domainsWidth.length-1]) : domainsWidth[1];
 
 		if (width !== 0) {
 			var i = domainsWidth.length-1;
-			while (i >= 1) {
-				domainsWidth[i] -= domainsWidth[1];
+			while (i >= 0) {
+				if (reverse) {
+					domainsWidth[i] -= domainsWidth[0];
+				} else if (i >= 1) {
+					domainsWidth[i] -= domainsWidth[1];
+				}
+
 				i--;
 			}
-			domainsWidth.shift();
+			if (reverse) {
+				domainsWidth.pop() ;
+			} else {
+				domainsWidth.shift();
+			}
 		}
 
 		domainSvg
@@ -390,8 +424,15 @@ var CalHeatMap = function() {
 		;
 
 		domainSvg.exit().transition().duration(self.options.duration)
-		.attr("x", function(d){ return w(d) * -1 - self.options.domainGutter; })
+		.attr("x", function(d){ console.log("moving domain to " + domainPositionXExit(d)); return domainPositionXExit(d); })
 		.remove();
+
+		label.transition().duration(self.options.duration)
+		.attr("x", function(d, i){ return domainsWidth[i] + w(d) / 2; });
+
+		label.exit().transition().duration(self.options.duration)
+			.attr("x", function(d){ console.log("moving label to " + labelPositionXExit(d)); return labelPositionXExit(d); })
+			.remove();
 
 		if (width === 0) {
 			width = tempWidth;
@@ -410,6 +451,7 @@ var CalHeatMap = function() {
 				;
 			}
 		}
+
 
 
 		if (self.svg === null) {
@@ -590,6 +632,13 @@ CalHeatMap.prototype = {
 		if (typeof range === "number") {
 			range = new Date(start.getTime() + 3600 * 1000 * range);
 		}
+
+		if (range < start) {
+			var tmp = range;
+			range = start;
+			start = tmp;
+		}
+
 		return d3.time.hours(start,	range);
 	},
 
@@ -708,7 +757,7 @@ CalHeatMap.prototype = {
 	},
 
 	getPreviousDomain: function() {
-		return this.getDomain(this._domains[this._domains.length-1], -2)[0];
+		return this.getDomain(this._domains[0], -1)[0];
 	},
 
 	/**
@@ -804,7 +853,7 @@ CalHeatMap.prototype = {
 	 *
 	 * @param  {[type]} data  [description]
 	 */
-	display: function(data, domain) { //console.log(domain);
+	display: function(data, domain) {
 		var parent = this;
 		domain.each(function(domainUnit) {
 
