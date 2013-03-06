@@ -241,7 +241,13 @@ var CalHeatMap = function() {
 
 		// Fill the graph with some datas
 		if (self.options.loadOnInit) {
-			self.fill(self.getDatas(self.options.data, new Date(self._domains[0]), new Date(self._domains[self._domains.length-1])));
+			self.fill(
+				self.getDatas(
+					self.options.data,
+					new Date(self._domains[0]),
+					self.getSubDomain(self._domains[self._domains.length-1]).pop()
+				),
+				self.svg);
 		}
 
 		return true;
@@ -251,9 +257,19 @@ var CalHeatMap = function() {
 		d3.event.preventDefault();
 
 		self._domains.shift();
-		self._domains.push(self.getNextDomain());
+		self._domains.push(self.getNextDomain().getTime());
 
 		self.paint();
+
+		console.log(self.svg);
+
+		self.getDatas(
+			self.options.data,
+			new Date(self._domains[self._domains.length-1]),
+			self.getSubDomain(self._domains[self._domains.length-1]).pop(),
+			self.svg
+		);
+
 	};
 
 	this.loadPreviousDomain = function() {
@@ -292,12 +308,12 @@ var CalHeatMap = function() {
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
 			.attr("height", h + 20)
 			.selectAll("svg")
-			.data(self._domains, function(d) {return d;});
+			.data(self._domains, function(d) { return d;});
 
 		var tempWidth = 0;
 		var tempLastDomainWidth = 0;
 
-		self.svg = domainSvg
+		var svg = domainSvg
 			.enter()
 			.insert("svg:svg")
 			.attr("width", function(d){
@@ -317,6 +333,7 @@ var CalHeatMap = function() {
 			.attr("x", function(d, i){ return positionX(i); })
 			.attr("transform", "translate(0, 1)")
 			;
+
 
 		// Appending a label to each domain
 		var label = d3.select("#" + self.options.id + " .graph").selectAll("text")
@@ -392,6 +409,14 @@ var CalHeatMap = function() {
 					.attr("width", width)
 				;
 			}
+		}
+
+
+		if (self.svg === null) {
+			self.svg = svg;
+		} else {
+			self.svg = d3.select("#" + self.options.id + " .graph").selectAll("svg")
+			.data(self._domains, function(d) {return d;});
 		}
 	};
 
@@ -708,21 +733,26 @@ CalHeatMap.prototype = {
 		return "q" + this.options.scales.length;
 	},
 
-	fill: function(datas) {
+	fill: function(datas, domain) {
 		if (datas !== false) {
-			this.display(this.parseDatas(datas));
+			this.display(this.parseDatas(datas), domain);
 		}
 	},
 
-	getDatas: function(source, startDate, endDate) {
+	getDatas: function(source, startDate, endDate, domain) {
 		var parent = this;
+
+		if (typeof domain === "undefined") {
+			domain = parent.svg;
+		}
+
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
 					return false;
 				} else {
 					d3.json(this.parseURI(source, startDate, endDate), function(data) {
-						parent.fill(data);
+						parent.fill(data, domain);
 					});
 					return true;
 				}
@@ -774,9 +804,9 @@ CalHeatMap.prototype = {
 	 *
 	 * @param  {[type]} data  [description]
 	 */
-	display: function(data) {
+	display: function(data, domain) { //console.log(domain);
 		var parent = this;
-		this.svg.each(function(domainUnit) {
+		domain.each(function(domainUnit) {
 
 			if (data.hasOwnProperty(domainUnit)) {
 				d3.select(this).selectAll("rect")
