@@ -58,7 +58,18 @@ var CalHeatMap = function() {
 		subDomain : "min",
 
 		// Animation duration
-		duration : 500
+		duration : 500,
+
+		// Domain browsing
+		// Dynamically change calendar domain by loading
+		// next/previous domain
+		browsing: false,
+
+		// Callback after loading the next domain in the calendar
+		afterLoadNextDomainCallback : function(start) {},
+
+		// Callback after loading the previous domain in the calendar
+		afterLoadPreviousDomainCallback : function(start) {}
 	};
 
 
@@ -220,19 +231,18 @@ var CalHeatMap = function() {
 
 		self.paint();
 
-		d3.select("#" + self.options.id).append("a")
-		.attr("href", "#")
-		.on("click", function(d) {
-			self.loadPreviousDomain();
-		})
-		.text("Previous");
+		if (self.options.browsing) {
+			d3.select("#" + self.options.id).append("a")
+			.attr("href", "#")
+			.on("click", function(d) { self.loadPreviousDomain(); })
+			.text("Previous");
 
-		d3.select("#" + self.options.id).append("a")
-		.attr("href", "#")
-		.on("click", function(d) {
-			self.loadNextDomain();
-		})
-		.text("Next");
+			d3.select("#" + self.options.id).append("a")
+			.attr("href", "#")
+			.on("click", function(d) { self.loadNextDomain(); })
+			.text("Next");
+		}
+
 
 		// Display scale if needed
 		if (self.options.displayScale) {
@@ -256,8 +266,8 @@ var CalHeatMap = function() {
 	this.loadNextDomain = function() {
 		d3.event.preventDefault();
 
-		self._domains.shift();
 		self._domains.push(self.getNextDomain().getTime());
+		self._domains.shift();
 
 		self.paint();
 
@@ -267,6 +277,8 @@ var CalHeatMap = function() {
 			self.getSubDomain(self._domains[self._domains.length-1]).pop(),
 			self.svg
 		);
+
+		self.afterLoadNextDomainCallback(new Date(self._domains[self._domains.length-1]));
 
 	};
 
@@ -284,6 +296,8 @@ var CalHeatMap = function() {
 			self.getSubDomain(self._domains[0]).pop(),
 			self.svg
 		);
+
+		self.afterLoadPreviousDomainCallback(new Date(self._domains[0]));
 	};
 
 	this.paint = function(reverse) {
@@ -325,7 +339,7 @@ var CalHeatMap = function() {
 		var labelPositionXExit = function(d) {
 			if (reverse) {
 				return width + w(d)/2;
-			} else { console.log(d);
+			} else {
 				return (self.options.domainGutter + w(d)/2) * -1;
 			}
 		};
@@ -338,6 +352,7 @@ var CalHeatMap = function() {
 
 		var tempWidth = 0;
 		var tempLastDomainWidth = 0;
+
 
 		var svg = domainSvg
 			.enter()
@@ -417,21 +432,19 @@ var CalHeatMap = function() {
 			}
 		}
 
-		domainSvg
-			.transition()
-			.duration(self.options.duration)
+		domainSvg.transition().duration(self.options.duration)
 			.attr("x", function(d, i){ return domainsWidth[i]; })
 		;
 
 		domainSvg.exit().transition().duration(self.options.duration)
-		.attr("x", function(d){ console.log("moving domain to " + domainPositionXExit(d)); return domainPositionXExit(d); })
+		.attr("x", function(d){ return domainPositionXExit(d); })
 		.remove();
 
 		label.transition().duration(self.options.duration)
 		.attr("x", function(d, i){ return domainsWidth[i] + w(d) / 2; });
 
 		label.exit().transition().duration(self.options.duration)
-			.attr("x", function(d){ console.log("moving label to " + labelPositionXExit(d)); return labelPositionXExit(d); })
+			.attr("x", function(d){ return labelPositionXExit(d); })
 			.remove();
 
 		if (width === 0) {
@@ -445,14 +458,11 @@ var CalHeatMap = function() {
 			if (tw !== width) {
 				width = tw;
 				d3.select("#" + self.options.id + " .graph")
-					.transition()
-					.duration(self.options.duration)
+					.transition().duration(self.options.duration)
 					.attr("width", width)
 				;
 			}
 		}
-
-
 
 		if (self.svg === null) {
 			self.svg = svg;
@@ -498,15 +508,15 @@ var CalHeatMap = function() {
 };
 
 
-
-
-
-
-
 CalHeatMap.prototype = {
 
+
+	// =========================================================================//
+	// CALLBACK																	//
+	// =========================================================================//
+
 	/**
-	 * Function to execute when clicking on a subdomain block
+	 * Callback when clicking on a subdomain cell
 	 * @param  Date		d		Date of the subdomain block
 	 * @param  int		itemNb	Number of items in that date
 	 */
@@ -514,7 +524,33 @@ CalHeatMap.prototype = {
 		return this.options.onClick(d, itemNb);
 	},
 
+	/**
+	 * Callback after shifting the calendar one domain back
+	 * @param  Date		start	Domain start date
+	 * @param  Date		end		Domain end date
+	 */
+	afterLoadPreviousDomainCallback: function(start) {
+		var subDomain = this.getSubDomain(start);
+		return this.options.afterLoadPreviousDomainCallback(subDomain.shift(), subDomain.pop());
+	},
+
+	/**
+	 * Callback after shifting the calendar one domain above
+	 * @param  Date		start	Domain start date
+	 * @param  Date		end		Domain end date
+	 */
+	afterLoadNextDomainCallback: function(start) {
+		var subDomain = this.getSubDomain(start);
+		return this.options.afterLoadNextDomainCallback(subDomain.shift(), subDomain.pop());
+	},
+
+
+
 	formatNumber: d3.format(",d"),
+
+	// =========================================================================//
+	// PAINTING : SCALE															//
+	// =========================================================================//
 
 	displayScale: function() {
 
@@ -536,7 +572,7 @@ CalHeatMap.prototype = {
 			.attr("fill-opacity", 0)
 			;
 
-		scaleItem.transition().delay(function(d, i) { return 1500 * i/10;}).attr("fill-opacity", 1);
+		scaleItem.transition().delay(function(d, i) { return parent.options.duration * i/10;}).attr("fill-opacity", 1);
 
 		scaleItem
 			.append("svg:title")
@@ -553,6 +589,68 @@ CalHeatMap.prototype = {
 		;
 	},
 
+	// =========================================================================//
+	// PAINTING : SUBDOMAIN FILLING												//
+	// =========================================================================//
+
+	/**
+	 * Colorize all rectangles according to their items count
+	 *
+	 * @param  {[type]} data  [description]
+	 */
+	display: function(data, domain) {
+		var parent = this;
+		domain.each(function(domainUnit) {
+
+			if (data.hasOwnProperty(domainUnit)) {
+				d3.select(this).selectAll("rect")
+					.attr("class", function(d) {
+						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+
+						return "graph-rect" +
+						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
+							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
+						);
+					})
+					.on("click", function(d) {
+						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+						return parent.onClick(
+							d,
+							(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
+						);
+					})
+					.select("title")
+					.text(function(d) {
+						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+
+						return (
+						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
+							(parent.formatNumber(data[domainUnit][subDomainUnit]) + " " + parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + parent._domainType[parent.options.subDomain].format.connector + " ") :
+							""
+							) + parent.formatDate(d));
+					});
+				}
+			}
+		);
+	},
+
+	// =========================================================================//
+	// POSITIONNING																//
+	// =========================================================================//
+
+	positionSubDomainX: function(d) {
+		var index = this._domainType[this.options.subDomain].position.x(d);
+		return index * this.options.cellsize + index * this.options.cellpadding;
+	},
+
+	positionSubDomainY: function(d) {
+		var index = this._domainType[this.options.subDomain].position.y(d);
+		return index * this.options.cellsize + index * this.options.cellpadding;
+	},
+
+	// =========================================================================//
+	// DOMAIN COMPUTATION														//
+	// =========================================================================//
 
 	/**
 	 * Return the day of the year for the date
@@ -605,11 +703,17 @@ CalHeatMap.prototype = {
 			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate()-d.getDay()+1);
 		}
 		var endDate = new Date(monday);
-		return d3.time.mondays(monday, new Date(endDate.setDate(endDate.getDate() + range*7)));
+
+		var stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
+
+		return d3.time.mondays(Math.min(monday, stop), Math.max(monday, stop));
 	},
 
 	getYearDomain: function(d, range){
-		return d3.time.years(new Date(d.getFullYear(), 0), new Date(d.getFullYear()+range, 0));
+		var start = new Date(d.getFullYear(), 0);
+		var stop = new Date(d.getFullYear()+range, 0);
+
+		return d3.time.years(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -619,7 +723,9 @@ CalHeatMap.prototype = {
 	 */
 	getMinuteDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		return d3.time.minutes(start, new Date(start.getTime() + 60 * 1000 * range));
+		var stop = new Date(start.getTime() + 60 * 1000 * range);
+
+		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -629,17 +735,12 @@ CalHeatMap.prototype = {
 	 */
 	getHourDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
+		var stop = range;
 		if (typeof range === "number") {
-			range = new Date(start.getTime() + 3600 * 1000 * range);
+			stop = new Date(start.getTime() + 3600 * 1000 * range);
 		}
 
-		if (range < start) {
-			var tmp = range;
-			range = start;
-			start = tmp;
-		}
-
-		return d3.time.hours(start,	range);
+		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -650,9 +751,10 @@ CalHeatMap.prototype = {
 	 */
 	getDayDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-		var end = new Date(start);
-		end = new Date(end.setDate(end.getDate()+ parseInt(range, 10)));
-		return d3.time.days(start, end);
+		var stop = new Date(start);
+		stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
+
+		return d3.time.days(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -662,10 +764,10 @@ CalHeatMap.prototype = {
 	 */
 	getMonthDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth());
-		var end = new Date(start);
-		end = end.setMonth(end.getMonth()+range);
+		var stop = new Date(start);
+		stop = stop.setMonth(stop.getMonth()+range);
 
-		return d3.time.months(start, end);
+		return d3.time.months(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	getDomain: function(date, range) {
@@ -753,7 +855,7 @@ CalHeatMap.prototype = {
 	},
 
 	getNextDomain: function() {
-		return this.getDomain(this._domains[this._domains.length-1], 2)[1];
+		return this.getDomain(this._domains[this._domains.length-1], 2).pop();
 	},
 
 	getPreviousDomain: function() {
@@ -781,6 +883,10 @@ CalHeatMap.prototype = {
 		}
 		return "q" + this.options.scales.length;
 	},
+
+	// =========================================================================//
+	// DATAS																	//
+	// =========================================================================//
 
 	fill: function(datas, domain) {
 		if (datas !== false) {
@@ -847,58 +953,6 @@ CalHeatMap.prototype = {
 		return stats;
 	},
 
-
-	/**
-	 * Colorize all rectangles according to their items count
-	 *
-	 * @param  {[type]} data  [description]
-	 */
-	display: function(data, domain) {
-		var parent = this;
-		domain.each(function(domainUnit) {
-
-			if (data.hasOwnProperty(domainUnit)) {
-				d3.select(this).selectAll("rect")
-					.attr("class", function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-
-						return "graph-rect" +
-						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
-							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
-						);
-					})
-					.on("click", function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-						return parent.onClick(
-							d,
-							(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
-						);
-					})
-					.select("title")
-					.text(function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-
-						return (
-						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
-							(parent.formatNumber(data[domainUnit][subDomainUnit]) + " " + parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + parent._domainType[parent.options.subDomain].format.connector + " ") :
-							""
-							) + parent.formatDate(d));
-					});
-				}
-			}
-		);
-	},
-
-	positionSubDomainX: function(d) {
-		var index = this._domainType[this.options.subDomain].position.x(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
-	},
-
-	positionSubDomainY: function(d) {
-		var index = this._domainType[this.options.subDomain].position.y(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
-	},
-
 	parseURI: function(str, startDate, endDate) {
 		// Use a timestamp in seconds
 		str = str.replace(/\{\{t:start\}\}/g, startDate.getTime()/1000);
@@ -910,7 +964,6 @@ CalHeatMap.prototype = {
 
 		return str;
 	}
-
 };
 
 
