@@ -1357,6 +1357,26 @@ test("Append graph to the passed DOM ID", function() {
 
 });
 
+test("Paint Next and Previous link", function() {
+
+	expect(2);
+
+	var cal = createCalendar({browsing: true});
+
+	equal($("#cal-heatmap .graph-browse-next").length, 1, "Next link exists");
+	equal($("#cal-heatmap .graph-browse-previous").length, 1, "Previous link exists");
+});
+
+test("Don't paint Next and Previous link", function() {
+
+	expect(2);
+
+	var cal = createCalendar({});
+
+	equal($("#cal-heatmap .graph-browse-next").length, 0, "Next link don't exists");
+	equal($("#cal-heatmap .graph-browse-previous").length, 0, "Previous link don't exists");
+});
+
 /*
 	-----------------------------------------------------------------
 	DATA SOURCE
