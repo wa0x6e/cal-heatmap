@@ -21,6 +21,8 @@ var CalHeatMap = function() {
 		// Padding between each cell, in pixel
 		cellpadding : 2,
 
+		domainGutter : 2,
+
 		format : {
 			// Formatting of the date when hovering an subdomain block
 			// @default : null, will use the formatting according to domain type
@@ -53,7 +55,10 @@ var CalHeatMap = function() {
 
 		domain : "hour",
 
-		subDomain : "min"
+		subDomain : "min",
+
+		// Animation duration
+		duration : 1500
 	};
 
 
@@ -105,10 +110,11 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			row: 7,
-			column: function() {
+			column: function(d) {
+				d = new Date(d);
 				switch(self.options.domain) {
 					case "year" : return 54;
-					case "month" : return 5;
+					case "month" : return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1;
 					case "week" : return 1;
 				}
 			},
@@ -194,68 +200,39 @@ var CalHeatMap = function() {
 	// Each domain value is a timestamp in milliseconds
 	this._domains = [];
 
+	// Total width of the graph
+	var width = 0;
+
+	// Save domains width
+	var domainsWidth = [];
+
 	/**
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
 	 */
 	var _init = function() {
 
-		var graphLegendHeight = self.options.cellsize*2;
-
 		self.formatDate = d3.time.format(self.options.format.date);
-
-		// Compute the width of the domain block
-		var w = function(d) {
-			return self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
-		};
-
-		// Compute the height of the domain block
-		var h = self.options.cellsize*self._domainType[self.options.subDomain].row + self.options.cellpadding*self._domainType[self.options.subDomain].row + self.options.cellpadding;
-
-		// Format the domain legend according to the domain type
-		var legendFormat = d3.time.format(self.options.format.legend);
-
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
-		// Painting all the domains
-		self.svg = d3.select("#" + self.options.id)
-			.append("div")
-			.attr("class", "graph")
-			.selectAll()
-			.data(self._domains)
-			.enter().append("div")
-			.attr("class", "graph-domain")
-			.style("width", function(d) { return w(d) + "px"; })
-			.style("height", h + graphLegendHeight + "px")
-			.style("display", "inline-block")
-			.append("svg:svg")
-			.attr("width", function(d){ return w(d); })
-			.attr("height", h + graphLegendHeight)
-			.append("svg:g")
-			.attr("transform", "translate(0, 1)");
+		d3.select("#" + self.options.id).append("svg")
+			.attr("class", "graph");
 
-		// Addending a label to each domain
-		self.svg.append("svg:text")
-			.attr("y", h + graphLegendHeight/1.5)
-			.attr("class", "graph-label")
-			.attr("text-anchor", "middle")
-			.attr("vertical-align", "middle")
-			.attr("x", function(d){ return w(d)/2; })
-			.text(function(d) { return legendFormat(new Date(d)); });
+		self.paint();
 
-		// Drawing the sudomain inside each domain
-		var rect = self.svg.selectAll("rect")
-			.data(function(d) { return self.getSubDomain(d); })
-			.enter().append("svg:rect")
-			.attr("class", "graph-rect")
-			.attr("width", self.options.cellsize)
-			.attr("height", self.options.cellsize)
-			.attr("x", function(d) { return self.positionSubDomainX(d); })
-			.attr("y", function(d) { return self.positionSubDomainY(d); })
-			;
+		d3.select("#" + self.options.id).append("a")
+		.attr("href", "#")
+		.on("click", function(d) {
+			self.loadPreviousDomain();
+		})
+		.text("Previous");
 
-		// Appeding a title to each subdomain
-		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
+		d3.select("#" + self.options.id).append("a")
+		.attr("href", "#")
+		.on("click", function(d) {
+			self.loadNextDomain();
+		})
+		.text("Next");
 
 		// Display scale if needed
 		if (self.options.displayScale) {
@@ -268,6 +245,154 @@ var CalHeatMap = function() {
 		}
 
 		return true;
+	};
+
+	this.loadNextDomain = function() {
+		d3.event.preventDefault();
+
+		self._domains.shift();
+		self._domains.push(self.getNextDomain());
+
+		self.paint();
+	};
+
+	this.loadPreviousDomain = function() {
+		d3.event.preventDefault();
+
+		self._domains.unshift(self.getPreviousDomain());
+		self._domains.pop();
+
+		self.paint();
+	};
+
+	this.paint = function() {
+		var graphLegendHeight = self.options.cellsize*2;
+
+		// Compute the width of the domain block
+		// @param int d Domain start timestamp
+		var w = function(d) {
+			return self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
+		};
+
+		// Compute the height of the domain block
+		var h = self.options.cellsize*self._domainType[self.options.subDomain].row + self.options.cellpadding*self._domainType[self.options.subDomain].row + self.options.cellpadding;
+
+		// Format the domain legend according to the domain type
+		var legendFormat = d3.time.format(self.options.format.legend);
+
+		var positionX = function(i) {
+			if (width === 0) {
+				return domainsWidth[i];
+			} else {
+				return domainsWidth[i+1];
+			}
+		};
+
+		// Painting all the domains
+		var domainSvg = d3.select("#" + self.options.id + " .graph")
+			.attr("height", h + 20)
+			.selectAll("svg")
+			.data(self._domains, function(d) {return d;});
+
+		var tempWidth = 0;
+		var tempLastDomainWidth = 0;
+
+		self.svg = domainSvg
+			.enter()
+			.insert("svg:svg")
+			.attr("width", function(d){
+				var wd = w(d);
+
+				tempWidth += tempLastDomainWidth = wd+self.options.domainGutter;
+
+				if (width === 0) {
+					domainsWidth.push(tempWidth - tempLastDomainWidth);
+				} else {
+					domainsWidth.push(width);
+				}
+
+				return wd;
+			})
+			.attr("height", h + graphLegendHeight)
+			.attr("x", function(d, i){ return positionX(i); })
+			.attr("transform", "translate(0, 1)")
+			;
+
+		// Appending a label to each domain
+		var label = d3.select("#" + self.options.id + " .graph").selectAll("text")
+			.data(self._domains, function(d) { return d;});
+
+		label
+			.enter().insert("text")
+			.attr("y", h + graphLegendHeight/1.5)
+			.attr("x", function(d, i){ return positionX(i) + w(d) / 2; })
+			.attr("class", "graph-label")
+			.attr("text-anchor", "middle")
+			.attr("vertical-align", "middle")
+			.text(function(d) { return legendFormat(new Date(d)); });
+
+
+		label.transition().duration(self.options.duration)
+		.attr("x", function(d, i){ return domainsWidth[i] + w(d) / 2; });
+
+
+
+		label.exit().transition().duration(self.options.duration)
+			.attr("x", function(d){ return (w(d) * -1 - self.options.domainGutter)/2; })
+			.remove();
+
+		// Drawing the sudomain inside each domain
+		var rect = domainSvg.selectAll("rect")
+			.data(function(d) { return self.getSubDomain(d); })
+			.enter().append("svg:rect")
+			.attr("class", "graph-rect")
+			.attr("width", self.options.cellsize)
+			.attr("height", self.options.cellsize)
+			.attr("x", function(d) { return self.positionSubDomainX(d); })
+			.attr("y", function(d) { return self.positionSubDomainY(d); })
+			;
+
+		// Appeding a title to each subdomain
+		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
+
+		var exitDomainWidth = domainsWidth[1];
+
+		if (width !== 0) {
+			var i = domainsWidth.length-1;
+			while (i >= 1) {
+				domainsWidth[i] -= domainsWidth[1];
+				i--;
+			}
+			domainsWidth.shift();
+		}
+
+		domainSvg
+			.transition()
+			.duration(self.options.duration)
+			.attr("x", function(d, i){ return domainsWidth[i]; })
+		;
+
+		domainSvg.exit().transition().duration(self.options.duration)
+		.attr("x", function(d){ return w(d) * -1 - self.options.domainGutter; })
+		.remove();
+
+		if (width === 0) {
+			width = tempWidth;
+			d3.select("#" + self.options.id + " .graph").attr("width", width);
+		} else if (tempLastDomainWidth !== exitDomainWidth) {
+			// Compute the new width
+			var tw = width + tempLastDomainWidth - exitDomainWidth;
+
+			// If the new width is different, resize the graph
+			if (tw !== width) {
+				width = tw;
+				d3.select("#" + self.options.id + " .graph")
+					.transition()
+					.duration(self.options.duration)
+					.attr("width", width)
+				;
+			}
+		}
 	};
 
 
@@ -332,13 +457,21 @@ CalHeatMap.prototype = {
 			.append("svg:svg")
 			.attr("class", "graph-scale")
 			.attr("height", this.options.cellsize + (this.options.cellpadding*2))
-			.selectAll().data(d3.range(0, this.options.scales.length+1))
+			.selectAll().data(d3.range(0, this.options.scales.length+1));
+
+		var scaleItem = scale
 			.enter()
 			.append("svg:rect")
 			.attr("width", this.options.cellsize)
 			.attr("height", this.options.cellsize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
 			.attr("transform", function(d) { return "translate(" + (d * (parent.options.cellsize + parent.options.cellpadding))  + ", " + parent.options.cellpadding + ")"; })
+			.attr("fill-opacity", 0)
+			;
+
+		scaleItem.transition().delay(function(d, i) { return 1500 * i/10;}).attr("fill-opacity", 1);
+
+		scaleItem
 			.append("svg:title")
 			.text(function(d) {
 				var nextThreshold = parent.options.scales[d+1];
@@ -461,17 +594,21 @@ CalHeatMap.prototype = {
 		return d3.time.months(start, end);
 	},
 
-	getDomain: function(date) {
+	getDomain: function(date, range) {
 		if (typeof date === "number") {
 			date = new Date(date);
 		}
 
+		if (typeof range === "undefined") {
+			range = this.options.range;
+		}
+
 		switch(this.options.domain) {
-			case "hour"  : return this.getHourDomain(date, this.options.range);
-			case "day"   : return this.getDayDomain(date, this.options.range);
-			case "week"  : return this.getWeekDomain(date, this.options.range);
-			case "month" : return this.getMonthDomain(date, this.options.range);
-			case "year"  : return this.getYearDomain(date, this.options.range);
+			case "hour"  : return this.getHourDomain(date, range);
+			case "day"   : return this.getDayDomain(date, range);
+			case "week"  : return this.getWeekDomain(date, range);
+			case "month" : return this.getMonthDomain(date, range);
+			case "year"  : return this.getYearDomain(date, range);
 		}
 	},
 
@@ -539,8 +676,14 @@ CalHeatMap.prototype = {
 			case "week"  : return this.getWeekDomain(date, computeWeekSubDomainSize(date, this.options.domain));
 			case "month" : return this.getMonthDomain(date, 12);
 		}
+	},
 
+	getNextDomain: function() {
+		return this.getDomain(this._domains[this._domains.length-1], 2)[1];
+	},
 
+	getPreviousDomain: function() {
+		return this.getDomain(this._domains[this._domains.length-1], -2)[0];
 	},
 
 	/**
