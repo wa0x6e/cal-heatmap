@@ -10,7 +10,7 @@ var CalHeatMap = function() {
 		id : "cal-heatmap",
 
 		// Threshold for each scale
-		scales : [10,20,30,40],
+		scale : [10,20,30,40],
 
 		// Number of domain to display on the graph
 		range : 12,
@@ -65,6 +65,11 @@ var CalHeatMap = function() {
 		// next/previous domain
 		browsing: false,
 
+		browsingOptions: {
+			nextLabel : "Next",
+			previousLabel : "Previous"
+		},
+
 		// Callback after loading the next domain in the calendar
 		afterLoadNextDomainCallback : function(start) {},
 
@@ -90,6 +95,7 @@ var CalHeatMap = function() {
 			extractUnit : function(d) { return d.getMinutes(); }
 		},
 		"hour" : {
+			name: "hour",
 			row: 6,
 			column: function(d) {
 				switch(self.options.domain) {
@@ -120,6 +126,7 @@ var CalHeatMap = function() {
 			}
 		},
 		"day" : {
+			name: "day",
 			row: 7,
 			column: function(d) {
 				d = new Date(d);
@@ -148,6 +155,7 @@ var CalHeatMap = function() {
 			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
 		},
 		"week" : {
+			name: "week",
 			row: 1,
 			column: function(d) {
 				d = new Date(d);
@@ -176,6 +184,7 @@ var CalHeatMap = function() {
 			extractUnit : function(d) { return self.getWeekNumber(d); }
 		},
 		"month" : {
+			name: "month",
 			row: 1,
 			column: function(d) {return 12;},
 			position: {
@@ -190,6 +199,7 @@ var CalHeatMap = function() {
 			extractUnit : function(d) { return d.getMonth(); }
 		},
 		"year" : {
+			name: "year",
 			row: 1,
 			column: function(d) {return 12;},
 			position: {
@@ -226,22 +236,30 @@ var CalHeatMap = function() {
 		self.formatDate = d3.time.format(self.options.format.date);
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
+		if (self.options.browsing) {
+			d3.select("#" + self.options.id).append("a")
+			.attr("href", "#")
+			.attr("rel", "prev")
+			.attr("class", "graph-browse-previous")
+			.attr("title", "Load previous " + self._domainType[self.options.domain].name)
+			.on("click", function(d) { self.loadPreviousDomain(); })
+			.html(self.options.browsingOptions.previousLabel);
+
+			d3.select("#" + self.options.id).append("a")
+			.attr("href", "#")
+			.attr("rel", "next")
+			.attr("class", "graph-browse-next")
+			.attr("title", "Load next " + self._domainType[self.options.domain].name)
+			.on("click", function(d) { self.loadNextDomain(); })
+			.html(self.options.browsingOptions.nextLabel);
+		}
+
 		d3.select("#" + self.options.id).append("svg")
 			.attr("class", "graph");
 
 		self.paint();
 
-		if (self.options.browsing) {
-			d3.select("#" + self.options.id).append("a")
-			.attr("href", "#")
-			.on("click", function(d) { self.loadPreviousDomain(); })
-			.text("Previous");
 
-			d3.select("#" + self.options.id).append("a")
-			.attr("href", "#")
-			.on("click", function(d) { self.loadNextDomain(); })
-			.text("Next");
-		}
 
 
 		// Display scale if needed
@@ -393,8 +411,6 @@ var CalHeatMap = function() {
 			.attr("text-anchor", "middle")
 			.attr("vertical-align", "middle")
 			.text(function(d) { return legendFormat(new Date(d)); });
-
-
 
 
 		// Drawing the sudomain inside each domain
@@ -560,7 +576,7 @@ CalHeatMap.prototype = {
 			.append("svg:svg")
 			.attr("class", "graph-scale")
 			.attr("height", this.options.cellsize + (this.options.cellpadding*2))
-			.selectAll().data(d3.range(0, this.options.scales.length+1));
+			.selectAll().data(d3.range(0, this.options.scale.length+1));
 
 		var scaleItem = scale
 			.enter()
@@ -577,13 +593,13 @@ CalHeatMap.prototype = {
 		scaleItem
 			.append("svg:title")
 			.text(function(d) {
-				var nextThreshold = parent.options.scales[d+1];
+				var nextThreshold = parent.options.scale[d+1];
 				if (d === 0) {
-					return "less than " + parent.options.scales[d] + " " + parent.options.itemName[1];
-				} else if (d === parent.options.scales.length) {
-					return "more than " + parent.options.scales[d-1] + " " + parent.options.itemName[1];
+					return "less than " + parent.options.scale[d] + " " + parent.options.itemName[1];
+				} else if (d === parent.options.scale.length) {
+					return "more than " + parent.options.scale[d-1] + " " + parent.options.itemName[1];
 				} else {
-					return "between " + parent.options.scales[d-1] + " and " + parent.options.scales[d] + " " + parent.options.itemName[1];
+					return "between " + parent.options.scale[d-1] + " and " + parent.options.scale[d] + " " + parent.options.itemName[1];
 				}
 			})
 		;
@@ -869,19 +885,19 @@ CalHeatMap.prototype = {
 	 * @return string		Classname according to the scale
 	 */
 	scale: function(n) {
-		for (var i = 0, total = this.options.scales.length-1; i < total; i++) {
+		for (var i = 0, total = this.options.scale.length-1; i < total; i++) {
 
-			if (n === 0 && this.options.scales[0] > 0) {
+			if (n === 0 && this.options.scale[0] > 0) {
 				return "";
-			} else if (this.options.scales[0] > 0 && n < 0) {
+			} else if (this.options.scale[0] > 0 && n < 0) {
 				return "qi";
 			}
 
-			if (n <= this.options.scales[i]) {
+			if (n <= this.options.scale[i]) {
 				return "q" + (i+1);
 			}
 		}
-		return "q" + this.options.scales.length;
+		return "q" + this.options.scale.length;
 	},
 
 	// =========================================================================//

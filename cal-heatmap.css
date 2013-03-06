@@ -1,5 +1,31 @@
 /* Cal-HeatMap CSS */
 
+.graph-browse-previous, .graph-browse-next
+{
+	padding: 5px;
+	background-image: linear-gradient(to bottom, rgb(255, 255, 255), rgb(230, 230, 230));
+	border: 1px solid #999;
+	border-radius: 3px;
+	line-height: 12px;
+	font-size: 12px;
+} 
+
+.graph-browse-previous:hover, .graph-browse-next:hover {
+	text-decoration: none;
+}
+
+.graph-browse-previous
+{
+	margin-right: 5px;
+}
+
+.graph
+{
+	clear: both;
+	display: block;
+	margin-top: 10px;
+}
+
 .graph-label 
 {
 	fill: #999;
