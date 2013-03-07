@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.0 [2013-03-06]
+
+* [new] Can know browse the calendar, by setting the new `browsing` property to `true`
+* [new] Add animation when displaying the scale
+* [change] Rename `scales` property to `scale`
+
 ## v1.1.1 [2013-02-28]
 
 * [fix] Fix displaying week subdomain from a year domain
