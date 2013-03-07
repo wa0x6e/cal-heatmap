@@ -71,10 +71,10 @@ var CalHeatMap = function() {
 		},
 
 		// Callback after loading the next domain in the calendar
-		afterLoadNextDomainCallback : function(start) {},
+		afterLoadNextDomain : function(start) {},
 
 		// Callback after loading the previous domain in the calendar
-		afterLoadPreviousDomainCallback : function(start) {}
+		afterLoadPreviousDomain : function(start) {}
 	};
 
 
@@ -296,7 +296,7 @@ var CalHeatMap = function() {
 			self.svg
 		);
 
-		self.afterLoadNextDomainCallback(new Date(self._domains[self._domains.length-1]));
+		self.afterLoadNextDomain(new Date(self._domains[self._domains.length-1]));
 
 	};
 
@@ -315,7 +315,7 @@ var CalHeatMap = function() {
 			self.svg
 		);
 
-		self.afterLoadPreviousDomainCallback(new Date(self._domains[0]));
+		self.afterLoadPreviousDomain(new Date(self._domains[0]));
 	};
 
 	this.paint = function(reverse) {
@@ -545,9 +545,9 @@ CalHeatMap.prototype = {
 	 * @param  Date		start	Domain start date
 	 * @param  Date		end		Domain end date
 	 */
-	afterLoadPreviousDomainCallback: function(start) {
+	afterLoadPreviousDomain: function(start) {
 		var subDomain = this.getSubDomain(start);
-		return this.options.afterLoadPreviousDomainCallback(subDomain.shift(), subDomain.pop());
+		return this.options.afterLoadPreviousDomain(subDomain.shift(), subDomain.pop());
 	},
 
 	/**
@@ -555,9 +555,9 @@ CalHeatMap.prototype = {
 	 * @param  Date		start	Domain start date
 	 * @param  Date		end		Domain end date
 	 */
-	afterLoadNextDomainCallback: function(start) {
+	afterLoadNextDomain: function(start) {
 		var subDomain = this.getSubDomain(start);
-		return this.options.afterLoadNextDomainCallback(subDomain.shift(), subDomain.pop());
+		return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
 	},
 
 
