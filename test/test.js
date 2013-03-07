@@ -953,6 +953,36 @@ test("MONTH -> HOUR", function() {
 
 });
 
+test("YEAR -> DAY", function() {
+
+	expect(5);
+
+	var date = new Date(2013, 6, 1, 15, 26);
+
+	var cal = createCalendar({start : date, domain: "year", subDomain: "day", range: 1});
+	var domain = cal.getDomain(date);
+
+	var startDate = new Date(2013, 0);
+	var endDate = new Date(2014, 0, 0);
+
+	equal(domain.length, 1, "Domain is equal to 1 year");
+	equal(domain[0].getTime(), startDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+
+		domainStartDate = new Date(domainStartDate);
+		var domainEndDate = new Date(domainStartDate.getFullYear(), 11, 31);
+
+		var yearDaysNb = cal.getDayOfYear(domainEndDate);
+
+		equal(subDomain.length, yearDaysNb, "The year contains " + yearDaysNb + " days");
+		equal(subDomain[0].getTime(), domainStartDate.getTime(), "The year subdomain start is the first day of first month of year : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].getTime(), domainEndDate.getTime(), "The year subdomain end is the last day of last month of year : " + subDomain[subDomain.length-1]);
+	});
+
+});
+
 test("YEAR -> MONTH", function() {
 
 	expect(9);
@@ -1096,6 +1126,7 @@ test("get previous domain", function() {
 	equal(previousDomain.getTime(), expectedPreviousDomain.getTime(), "previous domain is " + expectedPreviousDomain);
 });
 
+
 /*
 	-----------------------------------------------------------------
 	OTHER DATE COMPUTATION
@@ -1128,6 +1159,19 @@ test("Get end of month, from a timestamp", function() {
 
 	equal(cal.getEndOfMonth(date.getTime()).getTime(), endOfMonth.getTime());
 });
+
+test("Get the day of the year", function() {
+
+	expect(4);
+
+	var cal = createCalendar({});
+
+	equal(cal.getDayOfYear(new Date(2013, 0)), 1, "Getting the first day of year 2013");
+	equal(cal.getDayOfYear(new Date(2013, 11, 31)), 365, "Getting the last day of year 2013");
+	equal(cal.getDayOfYear(new Date(2016, 0)), 1, "Getting the first day of (leap) year 2016");
+	equal(cal.getDayOfYear(new Date(2016, 11, 31)), 366, "Getting the last day of (leap) year 2016");
+});
+
 
 /*
 	-----------------------------------------------------------------
@@ -1256,6 +1300,7 @@ test("OnClick", function() {
 	equal(response.d.getTime(), date.getTime());
 
 });
+
 
 test("afterLoadPreviousDomain", function() {
 
@@ -1535,6 +1580,30 @@ test("Grouping datas by day>hour", function() {
 
 	equal(Object.keys(calDatas).length, 1, "Only datas for 1 day");
 	equal(Object.keys(calDatas[date1*1000]).length, 2, "Day contains datas for 2 hours");
+
+});
+
+test("Filter out datas not relevant to calendar domain", function() {
+	expect(4);
+
+	var date = new Date(2000, 0, 1);
+	var date1 = date.getTime()/1000;
+	var date2 = date1+3600;
+	var date3 = date2+60;
+
+	var datas = {};
+	datas[date1] = 15;	// 15 events for 00:00
+	datas[date2] = 25;	// 25 events for 01:00
+	datas[date3] = 1;	// 01 events for 01:01
+
+	var cal = createCalendar({data: datas, start: new Date(2000, 0, 1, 1), domain: "hour", subDomain: "min"});
+
+	var calDatas = cal.parseDatas(datas);
+
+	equal(Object.keys(calDatas).length, 1, "Only datas for 1 hour");
+	equal(calDatas.hasOwnProperty(date1*1000), false, "Datas for the first hour are filtered out");
+	equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
+	equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
 
 });
 
