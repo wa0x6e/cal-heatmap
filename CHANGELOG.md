@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.1 [2013-03-07]
+
+* [fix] Fix domain positioning on Firefox
+
 ## v2.0.0 [2013-03-06]
 
 * [new] Can know browse the calendar, by setting the new `browsing` property to `true`

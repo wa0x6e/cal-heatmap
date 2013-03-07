@@ -399,7 +399,6 @@ var CalHeatMap = function() {
 			})
 			.attr("height", h + graphLegendHeight)
 			.attr("x", function(d, i){ return positionX(i); })
-			.attr("transform", "translate(0, 1)")
 			;
 
 
