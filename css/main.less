@@ -17,8 +17,12 @@ pre.prettyprint {
 }
 .prettyprint {
     padding: 8px;
-    background-color: rgb(247, 247, 249);
+    background-color: #f0f0f0;
     border: 1px solid rgb(225, 225, 232);
+}
+
+pre{
+	background-color: #f0f0f0;
 }
 
 .bs-docs-example h3 {
@@ -43,6 +47,7 @@ body
 	
 	.bs-docs-example
 	{
+		padding: 1em 1.5em;
 		border: 1px solid #a9c0d3;
 	}
 	
@@ -79,14 +84,56 @@ h1
 .example-link{
 	float: right;
 	font-size: 0.8em;
-	opacity: 0.5;
+	opacity: 0.5;	
 }
 
 .example-link:hover
 {
 	opacity: 1;
+	text-decoration: none;
 }
 
 small{
 	color: #999;
 }
+
+#cal-heatmap
+{
+	position: relative;
+}
+
+@buttonWidth : 22px;
+@gutter: 6px;
+
+.ftr #cal-heatmap .graph-browse-previous, .ftr #cal-heatmap .graph-browse-next, {
+	width: @buttonWidth;
+	height: 70px;
+	padding: 0;
+	border: 0;
+	border-radius: 3px;
+	vertical-align: middle;
+	text-align: center;
+	background-color: #c9dbee;
+	background-image: none;
+	
+	i {
+		margin-top: (70px/2 - 14px/2);
+		color: lighten(#000, 50);
+		text-shadow: 0 1px 0 #fff;
+	}
+	
+	&:hover i {
+		color: lighten(#000, 40);
+		margin-top: (70px/2 - 14px/2);	
+	}
+}
+
+.ftr #cal-heatmap .graph-browse-previous {
+	position: absolute;
+	left: @buttonWidth * -1 - @gutter;
+}
+
+.ftr #cal-heatmap .graph-browse-next {
+	position: absolute;
+	right: @buttonWidth * -1 - @gutter;
+} 

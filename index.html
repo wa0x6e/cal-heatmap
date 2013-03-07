@@ -4,14 +4,16 @@
 	<meta charset="UTF-8">
 	<title>Cal-HeatMap : Calendar Heat map with d3.js</title>
 
-
+	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css" />
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
 	<link rel="stylesheet" href="./css/cal-heatmap.css" />
 	<link rel="stylesheet" href="./css/main.css" />
-	<link href='http://fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
-	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+	<link href='//fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
 	<script type="text/javascript" src="./js/cal-heatmap.min.js"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
 	<a href="https://github.com/kamisama/cal-heatmap"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
@@ -30,13 +32,22 @@
 
 
 			<div id="cal-heatmap">
-				<div class="graph"></div>
+
 			</div>
 			<script type="text/javascript">
 				var calendar = new CalHeatMap();
 				calendar.init({
-					data: "datas-hours.json",
-					start : new Date(2000, 0)
+					data: "datas-years.json",
+					domain: "day",
+					subDomain: "hour",
+					range: 18,
+					start : new Date(2000, 2),
+					browsing: true,
+					browsingOptions: {
+						previousLabel : "<i class=\"icon-chevron-left\"></i>",
+						nextLabel: "<i class=\"icon-chevron-right\"></i>"
+					},
+					scale: [4, 6, 8, 11]
 				});
 			</script>
 			</div>
@@ -72,201 +83,313 @@
 
 		<h2><a href="#api" id="api">API</a></h2>
 
-		<table class="table table-bordered">
-			<tr>
-				<th>Name</th>
-				<th>Type</th>
-				<th>Default</th>
-				<th>Description</th>
-			</tr>
-			<tr>
-				<td><code>data</code></td>
-				<td>String|Object</td>
-				<td>""</td>
-				<td>
-					<a href="#range-example" class="example-link">Example</a>
-					<strong>The calendar datas source</strong>
-					<p>The datas source is a JSON object. <code>data</code> can be a path to a <a href="#data-source">JSON file</a>, or directly a JSON object. (See <a href="#data-source">the data source section </a> for accepted format).</p>
+		    <ul class="nav nav-tabs">
+			    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+			    <li><a href="#callback" data-toggle="tab">Callback</a></li>
+			    <li><a href="#formatting" data-toggle="tab">Formatting</a></li>
+		    </ul>
 
-					<p>If you're getting your datas form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the start timetstamp and <b>yyy</b> is the end timestamp, <code>data</code> also accept date tokens, that will be automatically replaced by the current start and end date of the calendar.</p>
+		<div class="tab-content">
 
-					<p>Available tokens are :</p>
+			<div class="tab-pane active" id="general">
+			<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Default</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>data</code></td>
+					<td>String|Object</td>
+					<td>""</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>The calendar datas source</strong>
+						<p>The datas source is a JSON object. <code>data</code> can be a path to a <a href="#data-source">JSON file</a>, or directly a JSON object. (See <a href="#data-source">the data source section </a> for accepted format).</p>
+
+						<p>If you're getting your datas form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the start timetstamp and <b>yyy</b> is the end timestamp, <code>data</code> also accept date tokens, that will be automatically replaced by the current start and end date of the calendar.</p>
+
+						<p>Available tokens are :</p>
+
+						<ul>
+							<li><code>{{t:start}}</code>: timestamp of the calendar's first date</li>
+							<li><code>{{t:end}}</code>: timestamp of the calendar's last date</li>
+							<li><code>{{d:start}}</code>: ISO-8601 formatted date of the calendar's first date</li>
+							<li><code>{{d:end}}</code>: ISO-8601 formatted date of the calendar's last date</li>
+						</ul>
+
+						<p><b>Example</b>: <code>api?start={{t:start}}&end={{d:end}}</code> will fetch
+							<code>api?start=1362006000&end=2013-02-27T23:00:00.000Z</code></p>
+
+						<div class="alert alert-infos">All timestamp are in seconds</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>id</code></td>
+					<td>String</td>
+					<td>#cal-heatmap</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						ID of the element to insert the calendar to</td>
+				</tr>
+				<tr>
+					<td><code>domain</code></td>
+					<td>String</td>
+					<td>hour</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Type of time unit for the domain</strong>
+						<p>Can take one of the following values :</p>
+						<ul>
+							<li>hour</li>
+							<li>day</li>
+							<li>week</li>
+							<li>month</li>
+							<li>year</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>subDomain</code></td>
+					<td>String</td>
+					<td>min</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Time division inside the domain</strong>
+						<p>Can take one of the following values :</p>
+						<ul>
+							<li>min</li>
+							<li>hour</li>
+							<li>day</li>
+							<li>week</li>
+							<li>month</li>
+						</ul>
+
+						<div class="alert">Obviously, the subDomain must be "smaller" than the domain. A <strong>day</strong> domain can only accept an <strong>hour</strong> or <strong>min</strong> subDomain, not day, week, month or year.</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>range</code></td>
+					<td>integer</td>
+					<td>12</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Number of domain to display</td>
+				</tr>
+				<tr>
+					<td><code>start</code></td>
+					<td>Date</td>
+					<td>new Date()</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Start Date of the calendar</strong>
+						<p>Default is the current date.<br/>
+						Note that the calendar does not start at this date, but at the beginning of the domain of the date. If the domain is a day, the calendar will start at 00:00 on this date, if it's a month, it will start at the 1 of the month of the date.
+						</p></td>
+				</tr>
+
+
+				<tr>
+					<td><code>loadOnInit</code></td>
+					<td>Boolean</td>
+					<td>true</td>
+					<td><strong>Whether to fill the calendar with the datas, on calendar creation</strong>
+						<p>Passing <code>false</code> will create a blank calendar.</p></td>
+				</tr>
+
+			</table>
+		</div>
+
+			<div class="tab-pane"  id="callback">
+			<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Default</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>onClick</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Callback when clicking on a subdomain cell</strong>
+						<p>2 arguments is passed to the callback :</p>
+						<ul>
+							<li><code>date</code>: Date of the cell that was clicked</li>
+							<li><code>itemNb</code>: Number of items at this date</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>afterLoadPreviousDomain</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Callback when clicking on a subdomain cell</strong>
+						<p>2 arguments is passed to the callback :</p>
+						<ul>
+							<li><code>start</code>: Start of the new domain that was loaded</li>
+							<li><code>end</code>: End of the new domain that was loaded</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>afterLoadNextDomain</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Callback when clicking on a subdomain cell</strong>
+						<p>2 arguments is passed to the callback :</p>
+						<ul>
+							<li><code>start</code>: Start of the new domain that was loaded</li>
+							<li><code>end</code>: End of the new domain that was loaded</li>
+						</ul></td>
+				</tr>
+			</table>
+			</div>
+
+			<div class="tab-pane" id="formatting">
+			<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Default</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>cellsize</code></td>
+					<td>integer</td>
+					<td>10</td>
+					<td>
+						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Size of each subDomain cell, in pixel</td>
+				</tr>
+				<tr>
+					<td><code>cellpadding</code></td>
+					<td>integer</td>
+					<td>2</td>
+					<td>
+						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Gutter between each subDomain cell, in pixel</td>
+				</tr>
+				<tr>
+					<td><code>domainGutter</code></td>
+					<td>integer</td>
+					<td>2</td>
+					<td>
+						Gutter between each domain.</td>
+				</tr>
+				<tr>
+					<td><code>scale</code></td>
+					<td>Array</td>
+					<td>[10, 20, 30, 40]</td>
+					<td><a href="#scale-example" class="example-link"><i class="icon-file"></i> Example</a>
+					<strong>Threshold for the scale</strong>
+					<p>Each couple of values represent a color on the calendar :</p>
 
 					<ul>
-						<li><code>{{t:start}}</code>: timestamp of the calendar's first date</li>
-						<li><code>{{t:end}}</code>: timestamp of the calendar's last date</li>
-						<li><code>{{d:start}}</code>: ISO-8601 formatted date of the calendar's first date</li>
-						<li><code>{{d:end}}</code>: ISO-8601 formatted date of the calendar's last date</li>
+						<li>0</li>
+						<li>1 -> 9</li>
+						<li>10 -> 19</li>
+						<li>20 -> 29</li>
+						<li>30 -> 39</li>
+						<li>More than 40</li>
 					</ul>
 
-					<p><b>Example</b>: <code>api?start={{t:start}}&end={{d:end}}</code> will fetch
-						<code>api?start=1362006000&end=2013-02-27T23:00:00.000Z</code></p>
+					<p>It also accepts negative and float values.</p>
 
-					<div class="alert alert-infos">All timestamp are in seconds</div>
+					<p>You can set more than 4 threshold. Each threshold correspond to 1 class in the css file. By default, the css support only 4 thresholds. Add the corresponding class to the css.</p>
+					</td>
+				</tr>
+				<tr>
+					<td><code>displayScale</code></td>
+					<td>Boolean</td>
+					<td>true</td>
+					<td>
+						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Whether to display the scale</td>
+				</tr>
+				<tr>
+					<td><code>itemName</code></td>
+					<td>Array</td>
+					<td>["item", "items"]</td>
+					<td>
+						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Name of the data type you're representing on the calendar</strong>
+						<p>First index is the singular form, second index is the plural form.</p></td>
+				</tr>
 
-				</td>
-			</tr>
-			<tr>
-				<td><code>id</code></td>
-				<td>String</td>
-				<td>#cal-heatmap</td>
-				<td>
-					<a href="#range-example" class="example-link">Example</a>
-					ID of the element to insert the calendar to</td>
-			</tr>
-			<tr>
-				<td><code>domain</code></td>
-				<td>String</td>
-				<td>hour</td>
-				<td>
-					<a href="#domain-example" class="example-link">Example</a>
-					<strong>Type of time unit for the domain</strong>
-					<p>Can take one of the following values :</p>
+				<tr>
+					<td><code>format</code></td>
+					<td>Object</td>
+					<td>{}</td>
+					<td>
+						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Custom formatting of dates and labels</strong>
+						<p>This object has two properties :</p>
+						<ul>
+							<li><code>date</code> : Formatting of the date displayed when hovering a subDomain cell</li>
+							<li><code>label</code> : Formatting of the domain label, displayed below each domain</li>
+						</ul>
+
+					<p>Refer to <a href="https://github.com/mbostock/d3/wiki/Time-Formatting">d3.js time formatting documentation</a> for accepted format.</p>
+
+					<p>You have to always set the 2 properties, even you wish to only change one. They're by default null, and depends on the domain and subdomain used.</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td><code>browsing</code></td>
+					<td>boolean</td>
+					<td>false</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Whether to enable domain browsing. Will display 2 links to shift the calendar one domain back or forward.</td>
+				</tr>
+
+				<tr>
+					<td><code>browsingOptions</code></td>
+					<td>Object</td>
+					<td>{nextLabel: "Next", previousLabel: "Previous"}</td>
+					<td>Text to display inside the links for browsing domains. Can also accept html.
+
+					<p>By default, will display links like in the <a href="#domain-example">second example</a>.</p>
+
+					<p>You can customize the text and the css to have more beautiful buttons, like in the <a href="#cal-heatmap">main example</a>.</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td><code>duration</code></td>
+					<td>integer</td>
+					<td>500</td>
+					<td>Duration of the animation in milliseconds. Two things are animated in the calendar :
+
 					<ul>
-						<li>hour</li>
-						<li>day</li>
-						<li>week</li>
-						<li>month</li>
-						<li>year</li>
-					</ul></td>
-			</tr>
-			<tr>
-				<td><code>subDomain</code></td>
-				<td>String</td>
-				<td>min</td>
-				<td>
-					<a href="#domain-example" class="example-link">Example</a>
-					<strong>Time division inside the domain</strong>
-					<p>Can take one of the following values :</p>
-					<ul>
-						<li>min</li>
-						<li>hour</li>
-						<li>day</li>
-						<li>week</li>
-						<li>month</li>
-					</ul></td>
-			</tr>
-			<tr>
-				<td><code>range</code></td>
-				<td>integer</td>
-				<td>12</td>
-				<td>
-					<a href="#range-example" class="example-link">Example</a>
-					Number of domain to display</td>
-			</tr>
-			<tr>
-				<td><code>start</code></td>
-				<td>Date</td>
-				<td>new Date()</td>
-				<td>
-					<a href="#range-example" class="example-link">Example</a>
-					<strong>Start Date of the calendar</strong>
-					<p>Default is the current date.<br/>
-					The calendar does not start at this date, but at the beginning of the domain. If the domain is a day, the calendar will start at 00:00 on this date, if it's a month, it will start at the 1 of the month of the date.
-					</p></td>
-			</tr>
-			<tr>
-				<td><code>cellsize</code></td>
-				<td>integer</td>
-				<td>10</td>
-				<td>
-					<a href="#cell-example" class="example-link">Example</a>
-					Size of each sudDomain cell, in pixel</td>
-			</tr>
-			<tr>
-				<td><code>cellpadding</code></td>
-				<td>integer</td>
-				<td>2</td>
-				<td>
-					<a href="#cell-example" class="example-link">Example</a>
-					Gutter between each subDomain cell, in pixel</td>
-			</tr>
-			<tr>
-				<td><code>scales</code></td>
-				<td>Array</td>
-				<td>[10, 20, 30, 40]</td>
-				<td><a href="#scale-example" class="example-link">Example</a>
-				<strong>Threshold for the scale</strong>
-				<p>Each couple of values represent a color on the calendar :</p>
-
-				<ul>
-					<li>0</li>
-					<li>1 -> 9</li>
-					<li>10 -> 19</li>
-					<li>20 -> 29</li>
-					<li>30 -> 39</li>
-					<li>More than 40</li>
-				</ul>
-
-				<p>It also accepts negative and float values.</p>
-
-				<p>You can set more than 4 threshold. Each threshold correspond to 1 class in the css file. Be default, the css support only 4 threshold. Add the corresponding class to the css.</p>
-				</td>
-			</tr>
-			<tr>
-				<td><code>displayScale</code></td>
-				<td>Boolean</td>
-				<td>true</td>
-				<td>
-					<a href="#format-example" class="example-link">Example</a>
-					Whether to display the scale</td>
-			</tr>
-			<tr>
-				<td><code>loadOnInit</code></td>
-				<td>Boolean</td>
-				<td>true</td>
-				<td><strong>Whether to fill the calendar with the datas, on calendar creation</strong>
-					<p>Passing <code>false</code> will create a blank calendar.</p></td>
-			</tr>
-			<tr>
-				<td><code>itemName</code></td>
-				<td>Array</td>
-				<td>["item", "items"]</td>
-				<td>
-					<a href="#itemname-example" class="example-link">Example</a>
-					<strong>Name of the data type you're representing on the calendar</strong>
-					<p>First index is the singular form, second index is the plural form.</p></td>
-			</tr>
-			<tr>
-				<td><code>onClick</code></td>
-				<td>callback</td>
-				<td>null</td>
-				<td>
-					<a href="#format-example" class="example-link">Example</a>
-					<strong>Callback when clicking on a subdomain cell</strong>
-					<p>2 arguments is passed to the callback :</p>
-					<ul>
-						<li><code>date</code>: Date of the cell that was clicked</li>
-						<li><code>itemNb</code>: Count number occured at this date</li>
-					</ul></td>
-			</tr>
-			<tr>
-				<td><code>format</code></td>
-				<td>Object</td>
-				<td>{}</td>
-				<td>
-					<a href="#format-example" class="example-link">Example</a>
-					<strong>Custom formatting of dates and labels</strong>
-					<p>This object has two properties :</p>
-					<ul>
-						<li><code>date</code> : Formatting of the date displayed when hovering a sudDomain cell</li>
-						<li><code>label</code> : Formatting of the domain label, displayed below each domain</li>
+						<li>When displaying the scale</li>
+						<li>When browsing the calendar</li>
 					</ul>
 
-				<p>Refer to <a href="https://github.com/mbostock/d3/wiki/Time-Formatting">d3.js time formatting documentation</a> for accepted format.</p>
+					</td>
+				</tr>
 
-				<p>You have to always set the 2 properties, even you wish to only change one. They're by default null, and depends on the domain and subdomain used.</p>
+			</table>
+			</div>
 
-				</td>
-			</tr>
-		</table>
+		</div>
 
 		<h2><a href="#examples" id="examples">Examples</a></h2>
 
 
 		<div class="bs-docs-example">
-			<h3 id="range-example">Custom range</h3>
-		<p>Display 6 hours, from midnight on January 1st, 2000. Each hours is split in 60 minutes.</p>
+			<h3 id="range-example">Default values</h3>
+		<p>Display 12 hours, from midnight on January 1st, 2000. Each hours is split in 60 minutes.</p>
 
 		<div id="graph_a"></div>
 		<script type="text/javascript">
@@ -275,22 +398,20 @@
 				data: "datas-hours.json",
 				start : new Date(2000, 0),
 				id : "graph_a",
-				range : 6
 			});
 		</script>
 		</div>
 		<pre class="prettyprint javascript"><code>var calendar = new CalHeatMap();
 calendar.init({
-	data: "data-hours.json",		// Fill the calendar with the datas from datas-hours.json
+	data: "data-hours.json",	// Fill the calendar with the datas from datas-hours.json
 	start : new Date(2000, 0),	// Start the graph on January 2000
-	id : "graph_a", 		// Prepend the calendar to the #graph_a in the DOM
-	range : 6 			// Just display 6 hours
+	id : "graph_a" 			// Prepend the calendar to the #graph_a in the DOM
 });</code></pre>
 
 
 		<div class="bs-docs-example">
-			<h3 id="domain-example">By days, then by hours</h3>
-		<p>Display all the hours for 15 days, starting from January 15th, 2000</p>
+			<h3 id="domain-example">By days, then by hours, with browsing options</h3>
+		<p>Display all the hours for 15 days, starting from January 15th, 2000. Also enable domain browsing : click on the next and previous links to shift the calendar back or forward.</p>
 
 		<div id="graph_b"></div>
 		<script type="text/javascript">
@@ -301,7 +422,11 @@ calendar.init({
 				id : "graph_b",
 				range : 15,			// Number of days to display
 				domain : "day",		// Display days
-				subDomain : "hour"	// Split each day by hours
+				subDomain : "hour",	// Split each day by hours
+				browsing : true,	// Enable browsing
+				afterLoadNextDomain : function(start, end) {
+					alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+				}
 			});
 		</script>
 </div>
@@ -311,7 +436,11 @@ calendar.init({
 	id : "graph_b",
 	domain : "day",		// Group datas by days
 	subDomain : "hour",	// Split each day by hours
-	range : 15		// Number of days to display
+	range : 15,		// Number of days to display
+	browsing : true,	// Enable browsing
+	afterLoadNextDomain : function(start, end) {
+		alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+	}
 });</code></pre>
 
 
@@ -336,7 +465,7 @@ calendar.init({
 				domain : "month",
 				subDomain : "day",
 				range : 3,
-				scales: [40, 60, 80, 100]
+				scale: [40, 60, 80, 100]
 			});
 		</script>
 </div>
@@ -347,7 +476,7 @@ calendar.init({
 	domain : "month",		// Group datas by month
 	subDomain : "day",		// Split each month by days
 	range : 3,			// Just display 3 months
-	scales: [40, 60, 80, 100] 	// Custom threshold for the scale
+	scale: [40, 60, 80, 100] 	// Custom threshold for the scale
 });</code></pre>
 
 
@@ -396,7 +525,7 @@ calendar.init({
 				domain : "month",
 				subDomain : "week",
 				range : 3,
-				scales: [120, 400, 450, 500]
+				scale: [120, 400, 450, 500]
 			});
 		</script>
 </div>
@@ -407,7 +536,7 @@ calendar.init({
 	domain : "month",		// Group datas by month
 	subDomain : "week",		// Split each month by week
 	range : 3,			// Just display 3 months
-	scales: [120, 400, 450, 500] 	// Custom threshold for the scale
+	scale: [120, 400, 450, 500] 	// Custom threshold for the scale
 });</code></pre>
 
 	<div class="bs-docs-example">
@@ -459,7 +588,7 @@ calendar.init({
 				domain : "year",
 				subDomain : "day",
 				range : 1,
-				scales: [40, 60, 80, 100],
+				scale: [40, 60, 80, 100],
 				itemName: ["lost kitten", "lost kittens"]
 			});
 		</script>
@@ -471,7 +600,7 @@ calendar.init({
 	domain : "year",
 	subDomain : "day",
 	range : 1,
-	scales: [40, 60, 80, 100],
+	scale: [40, 60, 80, 100],
 	itemName: ["lost kitten", "lost kittens"]	// Use another data name instead of the boring "items"
 });</code></pre>
 
@@ -495,7 +624,7 @@ calendar.init({
 				range : 1,
 				domain : "year",
 				subDomain : "month",
-				scales: [1950, 2050, 2150, 2250],
+				scale: [1950, 2050, 2150, 2250],
 				displayScale: false,
 				format: {
 					date: "==%B==",
@@ -518,7 +647,7 @@ calendar.init({
 	range : 1,
 	domain : "year",
 	subDomain : "month",
-	scales: [1950, 2050, 2150, 2250],
+	scale: [1950, 2050, 2150, 2250],
 	displayScale: false,				// Don't display the scale
 	format: {
 		date: "==%B==",				// Custom date format, hover on a month to view
