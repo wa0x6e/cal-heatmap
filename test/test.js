@@ -1184,7 +1184,7 @@ test("Positive custom scale", function() {
 
 	expect(8);
 
-	var cal = createCalendar({scales: [100, 200, 300, 400]});
+	var cal = createCalendar({scale: [100, 200, 300, 400]});
 
 	equal(cal.scale(0), "");
 	equal(cal.scale(50), "q1");
@@ -1201,7 +1201,7 @@ test("Positive and negative custom scale", function() {
 
 	expect(8);
 
-	var cal = createCalendar({scales: [-100, 0, 100, 200, 300, 400]});
+	var cal = createCalendar({scale: [-100, 0, 100, 200, 300, 400]});
 
 	equal(cal.scale(-200), "q1");
 	equal(cal.scale(-100), "q1");
@@ -1218,7 +1218,7 @@ test("Float value custom scale", function() {
 
 	expect(9);
 
-	var cal = createCalendar({scales: [0.1, 0.2, 0.3]});
+	var cal = createCalendar({scale: [0.1, 0.2, 0.3]});
 
 	equal(cal.scale(-100), "qi");
 	equal(cal.scale(0), "");
@@ -1227,8 +1227,8 @@ test("Float value custom scale", function() {
 	equal(cal.scale(0.2), "q2");
 	equal(cal.scale(0.25), "q3");
 	equal(cal.scale(0.3), "q3");
-	equal(cal.scale(0.35), "q3", "Classes top at q3, since scales contains only 3 items");
-	equal(cal.scale(0.4), "q3", "Classes top at q3, since scales contains only 3 items");
+	equal(cal.scale(0.35), "q3", "Classes top at q3, since scale contains only 3 items");
+	equal(cal.scale(0.4), "q3", "Classes top at q3, since scale contains only 3 items");
 
 });
 
@@ -1263,13 +1263,13 @@ test("afterLoadPreviousDomain", function() {
 
 	var testFunction = function(start, end) { return {start:start, end:end}; };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomainCallback: testFunction});
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomain: testFunction});
 
 	var date = new Date(2012, 0, 1, 20, 35);
 	var previousDomainStart = new Date(2012, 0, 1, 20);
 	var previousDomainEnd = new Date(2012, 0, 1, 20, 59);
 
-	var response = cal.afterLoadPreviousDomainCallback(date);
+	var response = cal.afterLoadPreviousDomain(date);
 
 	equal(response.start.getTime(), previousDomainStart.getTime(), "Callback return first subdomain of the date");
 	equal(response.end.getTime(), previousDomainEnd.getTime(), "Callback return last subdomain of the date");
@@ -1281,13 +1281,13 @@ test("afterLoadNextDomain", function() {
 
 	var testFunction = function(start, end) { return {start:start, end:end}; };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadNextDomainCallback: testFunction});
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadNextDomain: testFunction});
 
 	var date = new Date(2012, 0, 1, 20, 35);
 	var nextDomainStart = new Date(2012, 0, 1, 20);
 	var nextDomainEnd = new Date(2012, 0, 1, 20, 59);
 
-	var response = cal.afterLoadNextDomainCallback(date);
+	var response = cal.afterLoadNextDomain(date);
 
 	equal(response.start.getTime(), nextDomainStart.getTime(), "Callback return first subdomain of the date");
 	equal(response.end.getTime(), nextDomainEnd.getTime(), "Callback return last subdomain of the date");
