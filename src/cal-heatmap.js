@@ -282,7 +282,9 @@ var CalHeatMap = function() {
 	};
 
 	this.loadNextDomain = function() {
-		d3.event.preventDefault();
+		if (d3.event) {
+			d3.event.preventDefault();
+		}
 
 		self._domains.push(self.getNextDomain().getTime());
 		self._domains.shift();
@@ -301,7 +303,9 @@ var CalHeatMap = function() {
 	};
 
 	this.loadPreviousDomain = function() {
-		d3.event.preventDefault();
+		if (d3.event) {
+			d3.event.preventDefault();
+		}
 
 		self._domains.unshift(self.getPreviousDomain().getTime());
 		self._domains.pop();
