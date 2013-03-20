@@ -658,6 +658,7 @@ CalHeatMap.prototype = {
 				}
 			}
 		);
+		return true;
 	},
 
 	// =========================================================================//
@@ -914,10 +915,14 @@ CalHeatMap.prototype = {
 	// DATAS																	//
 	// =========================================================================//
 
+	/**
+	 * @todo Add check for empty data
+	 */
 	fill: function(datas, domain) {
 		if (datas !== false) {
-			this.display(this.parseDatas(datas), domain);
+			return this.display(this.parseDatas(datas), domain);
 		}
+		return false;
 	},
 
 	getDatas: function(source, startDate, endDate, domain) {
