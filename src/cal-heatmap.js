@@ -527,6 +527,7 @@ var CalHeatMap = function() {
 };
 
 
+
 CalHeatMap.prototype = {
 
 
@@ -563,9 +564,7 @@ CalHeatMap.prototype = {
 		return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
 	},
 
-
-
-	formatNumber: d3.format(",d"),
+	formatNumber: d3.format(",g"),
 
 	// =========================================================================//
 	// PAINTING : SCALE															//
