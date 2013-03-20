@@ -34,7 +34,7 @@ var CalHeatMap = function() {
 		},
 
 		// Callback when clicking on a time block
-		onClick : function(date, itemNb) {},
+		onClick : null,
 
 		// Whether to display the scale
 		displayScale : true,
@@ -626,17 +626,25 @@ CalHeatMap.prototype = {
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						return "graph-rect" +
+						var htmlClass = "graph-rect" +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
 							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
 						);
+
+						if (parent.options.onClick !== null) {
+							htmlClass += " hover_cursor";
+						}
+
+						return htmlClass;
 					})
 					.on("click", function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-						return parent.onClick(
-							d,
-							(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
-						);
+						if (parent.options.onClick !== null) {
+							var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+							return parent.onClick(
+								d,
+								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
+							);
+						}
 					})
 					.select("title")
 					.text(function(d) {
