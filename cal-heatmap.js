@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.0.1 (Thu Mar 07 2013 15:45:21)
+/*! cal-heatmap v2.0.2 (Wed Mar 20 2013 19:20:11)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -42,7 +42,7 @@ var CalHeatMap = function() {
 		},
 
 		// Callback when clicking on a time block
-		onClick : function(date, itemNb) {},
+		onClick : null,
 
 		// Whether to display the scale
 		displayScale : true,
@@ -535,6 +535,7 @@ var CalHeatMap = function() {
 };
 
 
+
 CalHeatMap.prototype = {
 
 
@@ -571,9 +572,7 @@ CalHeatMap.prototype = {
 		return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
 	},
 
-
-
-	formatNumber: d3.format(",d"),
+	formatNumber: d3.format(",g"),
 
 	// =========================================================================//
 	// PAINTING : SCALE															//
@@ -634,17 +633,25 @@ CalHeatMap.prototype = {
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						return "graph-rect" +
+						var htmlClass = "graph-rect" +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
 							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
 						);
+
+						if (parent.options.onClick !== null) {
+							htmlClass += " hover_cursor";
+						}
+
+						return htmlClass;
 					})
 					.on("click", function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-						return parent.onClick(
-							d,
-							(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
-						);
+						if (parent.options.onClick !== null) {
+							var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
+							return parent.onClick(
+								d,
+								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
+							);
+						}
 					})
 					.select("title")
 					.text(function(d) {
@@ -659,6 +666,7 @@ CalHeatMap.prototype = {
 				}
 			}
 		);
+		return true;
 	},
 
 	// =========================================================================//
@@ -915,10 +923,14 @@ CalHeatMap.prototype = {
 	// DATAS																	//
 	// =========================================================================//
 
+	/**
+	 * @todo Add check for empty data
+	 */
 	fill: function(datas, domain) {
 		if (datas !== false) {
-			this.display(this.parseDatas(datas), domain);
+			return this.display(this.parseDatas(datas), domain);
 		}
+		return false;
 	},
 
 	getDatas: function(source, startDate, endDate, domain) {

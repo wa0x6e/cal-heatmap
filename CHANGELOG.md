@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.2 [2013-03-20]
+
+* [fix] Floating number does not display in tooltip
+* [enhancement] Change cursor to pointer on subdomain hover if it's associated to an onClick event
+
 ## v2.0.1 [2013-03-07]
 
 * [fix] Fix domain positioning on Firefox
