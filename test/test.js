@@ -130,6 +130,26 @@ test("get domain when domain is 1 WEEK, from a date right on beginning of the we
 
 });
 
+test("get domain when domain is 1 WEEK, from a sunday", function() {
+
+	expect(6);
+
+	var date      = new Date(2013, 1, 17, 20, 15);	// Monday : February 18th, 2013
+	var weekStart = new Date(2013, 1, 11);			// Monday : February 18th, 2013
+
+	var cal = createCalendar({domain: "week", range: 1, start : date});
+	var domain = cal.getDomain(date);
+
+	equal(domain.length, 1, "Domain size is 1 week");
+
+	equal(domain[0].getFullYear(), weekStart.getFullYear(), "Domain start year is equal to the weeks monday's year");
+	equal(domain[0].getMonth(), weekStart.getMonth(), "Domain start month is equal to weeks monday's month");
+	equal(domain[0].getDate(), weekStart.getDate(), "Domain start day is equal to the weeks monday date");
+	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+
+});
+
 test("get domain when domain is 1 WEEK, from a timestamp", function() {
 
 	expect(6);
@@ -1420,6 +1440,36 @@ test("Don't paint Next and Previous link", function() {
 
 	equal($("#cal-heatmap .graph-browse-next").length, 0, "Next link don't exists");
 	equal($("#cal-heatmap .graph-browse-previous").length, 0, "Previous link don't exists");
+});
+
+test("Fill subdomain only if there is data", function() {
+
+	expect(1);
+
+	var date = new Date(2000, 0, 1);
+	var date1 = date.getTime()/1000;
+	var date2 = date1+3600;
+	var date3 = date2+60;
+
+	var datas = {};
+	datas[date1] = 15;	// 15 events for 00:00
+	datas[date2] = 25;	// 25 events for 01:00
+	datas[date3] = 1;	// 01 events for 01:01
+
+	var cal = createCalendar({data: datas});
+	var response = cal.fill(datas, cal.svg);
+
+	equal(response, true);
+});
+
+test("Don't fill subdomain if data equal to false", function() {
+
+	expect(1);
+
+	var cal = createCalendar({data: false});
+	var response = cal.fill(false, cal.svg);
+
+	equal(response, false);
 });
 
 /*
