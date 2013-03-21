@@ -915,7 +915,7 @@ CalHeatMap.prototype = {
 				return "q" + (i+1);
 			}
 		}
-		return "q" + this.options.scale.length;
+		return "q" + (this.options.scale.length + 1);
 	},
 
 	// =========================================================================//
