@@ -1291,8 +1291,8 @@ test("Float value custom scale", function() {
 	equal(cal.scale(0.2), "q2");
 	equal(cal.scale(0.25), "q3");
 	equal(cal.scale(0.3), "q3");
-	equal(cal.scale(0.35), "q3", "Classes top at q3, since scale contains only 3 items");
-	equal(cal.scale(0.4), "q3", "Classes top at q3, since scale contains only 3 items");
+	equal(cal.scale(0.35), "q4", "Classes top at q3, since scale contains only 3 items");
+	equal(cal.scale(0.4), "q4", "Classes top at q3, since scale contains only 3 items");
 
 });
 

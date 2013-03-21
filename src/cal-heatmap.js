@@ -903,7 +903,7 @@ CalHeatMap.prototype = {
 			return "";
 		}
 
-		for (var i = 0, total = this.options.scale.length-1; i < total; i++) {
+		for (var i = 0, total = this.options.scale.length-1; i <= total; i++) {
 
 			if (n === 0 && this.options.scale[0] > 0) {
 				return "";
