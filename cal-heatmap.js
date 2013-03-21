@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.0.2 (Wed Mar 20 2013 19:20:11)
+/*! cal-heatmap v2.0.3 (Thu Mar 21 2013 13:19:49)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -904,7 +904,14 @@ CalHeatMap.prototype = {
 	 * @return string		Classname according to the scale
 	 */
 	scale: function(n) {
-		for (var i = 0, total = this.options.scale.length-1; i < total; i++) {
+
+		if (isNaN(n)) {
+			return "qi";
+		} else if (n === null) {
+			return "";
+		}
+
+		for (var i = 0, total = this.options.scale.length-1; i <= total; i++) {
 
 			if (n === 0 && this.options.scale[0] > 0) {
 				return "";
@@ -916,7 +923,7 @@ CalHeatMap.prototype = {
 				return "q" + (i+1);
 			}
 		}
-		return "q" + this.options.scale.length;
+		return "q" + (this.options.scale.length + 1);
 	},
 
 	// =========================================================================//

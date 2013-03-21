@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.3 [2013-03-21]
+
+* [fix#8] Support for null values
+* [fix#7] Wrong color for the last interval values
+
 ## v2.0.2 [2013-03-20]
 
 * [fix] Floating number does not display in tooltip
