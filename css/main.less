@@ -23,6 +23,7 @@ pre.prettyprint {
 
 pre{
 	background-color: #f0f0f0;
+	position: relative;
 }
 
 .bs-docs-example h3 {
@@ -142,3 +143,21 @@ small{
 	position: absolute;
 	right: @buttonWidth * -1 - @gutter;
 } 
+
+a.jsfiddle {
+	background-color: #406aa2;
+	color: #fff;
+	position: absolute;
+	right: 10px;
+	top:  10px;
+	padding: 0.25em 0.6em;
+	font-size: 10px;
+	text-transform: uppercase;
+	border-bottom: 1px solid #fff;
+	border-top: 1px solid darken(#406aa2, 5);
+}
+
+.jsfiddle:hover {
+	background: darken(#406aa2, 10);
+	text-decoration: none;
+}
