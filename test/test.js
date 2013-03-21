@@ -1296,6 +1296,31 @@ test("Float value custom scale", function() {
 
 });
 
+test("Null value", function() {
+
+	expect(3);
+
+	var cal = createCalendar({});
+
+	equal(cal.scale(null), "");
+	equal(cal.scale(0), "");
+	equal(cal.scale(1), "q1");
+
+});
+
+test("Not a number", function() {
+
+	expect(4);
+
+	var cal = createCalendar({});
+
+	equal(cal.scale("Hello"), "qi");
+	equal(cal.scale({}), "qi");
+	equal(cal.scale(0), "");
+	equal(cal.scale(1), "q1");
+
+});
+
 /*
 	-----------------------------------------------------------------
 	Callback

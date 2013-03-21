@@ -896,6 +896,13 @@ CalHeatMap.prototype = {
 	 * @return string		Classname according to the scale
 	 */
 	scale: function(n) {
+
+		if (isNaN(n)) {
+			return "qi";
+		} else if (n === null) {
+			return "";
+		}
+
 		for (var i = 0, total = this.options.scale.length-1; i < total; i++) {
 
 			if (n === 0 && this.options.scale[0] > 0) {
