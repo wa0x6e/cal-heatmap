@@ -8,7 +8,7 @@
 	border-radius: 3px;
 	line-height: 12px;
 	font-size: 12px;
-} 
+}
 
 .graph-browse-previous:hover, .graph-browse-next:hover {
 	text-decoration: none;
@@ -26,22 +26,26 @@
 	margin-top: 10px;
 }
 
-.graph-label 
+.graph-label
 {
 	fill: #999;
 	font-size: 10px
 }
 
-.graph-rect 
+.graph-rect
 {
 	fill: #ededed;
 	shape-rendering: crispedges
 }
 
-.graph-rect:hover 
+.graph-rect:hover
 {
 	stroke: #000;
 	stroke-width: 1px
+}
+
+.hover_cursor:hover {
+	cursor: pointer;
 }
 
 .qi {
@@ -49,38 +53,38 @@
 	fill: #999;
 }
 
-.q0 
+.q0
 {
 	background-color: #fff;
 	fill: #fff;
 	stroke: #ededed
 }
 
-.q1 
+.q1
 {
 	background-color: #dae289;
 	fill: #dae289
 }
 
-.q2 
+.q2
 {
 	background-color: #cedb9c;
 	fill: #9cc069
 }
 
-.q3 
+.q3
 {
 	background-color: #b5cf6b;
 	fill: #669d45
 }
 
-.q4 
+.q4
 {
 	background-color: #637939;
 	fill: #637939
 }
 
-.q5 
+.q5
 {
 	background-color: #3b6427;
 	fill: #3b6427
