@@ -9,8 +9,9 @@ var CalHeatMap = function() {
 		// DOM ID of the container to append the graph to
 		id : "cal-heatmap",
 
-		// Threshold for each scale
-		scale : [10,20,30,40],
+		// ================================================
+		// DOMAIN
+		// ================================================
 
 		// Number of domain to display on the graph
 		range : 12,
@@ -23,23 +24,9 @@ var CalHeatMap = function() {
 
 		domainGutter : 2,
 
-		format : {
-			// Formatting of the date when hovering an subdomain block
-			// @default : null, will use the formatting according to domain type
-			date : null,
+		domain : "hour",
 
-			// Formatting of domain label
-			// @default : null, will use the formatting according to domain type
-			legend : null
-		},
-
-
-
-		// Whether to display the scale
-		displayScale : true,
-
-		// Name of the items to represent in the calendar
-		itemName : ["item", "items"],
+		subDomain : "min",
 
 		// Start date of the graph
 		// @default now
@@ -52,9 +39,47 @@ var CalHeatMap = function() {
 		// When false, the calendar will be left empty
 		loadOnInit : true,
 
-		domain : "hour",
+		// ================================================
+		// SCALE
+		// ================================================
 
-		subDomain : "min",
+		// Threshold for the scale
+		scale : [10,20,30,40],
+
+		// Whether to display the scale
+		displayScale : true,
+
+		// ================================================
+		// TEXT FORMATTING
+		// ================================================
+
+		format : {
+			// Formatting of the date when hovering an subdomain block
+			// @default : null, will use the formatting according to domain type
+			date : null,
+
+			// Formatting of domain label
+			// @default : null, will use the formatting according to domain type
+			legend : null
+		},
+
+		// Name of the items to represent in the calendar
+		itemName : ["item", "items"],
+
+		cellLabel : {
+			empty: "{date}",
+			filled: "{count} {name} {connector} {date}"
+		},
+
+		scaleLabel : {
+			lower: "less than {min} {name}",
+			inner: "between {down} and {up} {name}",
+			upper: "more than {max} {name}"
+		},
+
+		// ================================================
+		// BROWSING
+		// ================================================
 
 		// Animation duration
 		duration : 500,
@@ -69,8 +94,9 @@ var CalHeatMap = function() {
 			previousLabel : "Previous"
 		},
 
+		// ================================================
 		// CALLBACK
-		// ========
+		// ================================================
 
 		// Callback when clicking on a time block
 		onClick : null,
@@ -630,11 +656,18 @@ CalHeatMap.prototype = {
 			.text(function(d) {
 				var nextThreshold = parent.options.scale[d+1];
 				if (d === 0) {
-					return "less than " + parent.options.scale[d] + " " + parent.options.itemName[1];
+					return (parent.options.scaleLabel.lower).format({
+						min: parent.options.scale[d],
+						name: parent.options.itemName[1]});
 				} else if (d === parent.options.scale.length) {
-					return "more than " + parent.options.scale[d-1] + " " + parent.options.itemName[1];
+					return (parent.options.scaleLabel.upper).format({
+						max: parent.options.scale[d-1],
+						name: parent.options.itemName[1]});
 				} else {
-					return "between " + parent.options.scale[d-1] + " and " + parent.options.scale[d] + " " + parent.options.itemName[1];
+					return (parent.options.scaleLabel.inner).format({
+						down: parent.options.scale[d-1],
+						up: parent.options.scale[d],
+						name: parent.options.itemName[1]});
 				}
 			})
 		;
@@ -683,10 +716,17 @@ CalHeatMap.prototype = {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
 						return (
-						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
-							(parent.formatNumber(data[domainUnit][subDomainUnit]) + " " + parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)] + " " + parent._domainType[parent.options.subDomain].format.connector + " ") :
-							""
-							) + parent.formatDate(d));
+						data[domainUnit].hasOwnProperty(subDomainUnit) ?
+							(parent.options.cellLabel.filled).format({
+								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
+								name: parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)],
+								connector: parent._domainType[parent.options.subDomain].format.connector,
+								date: parent.formatDate(d)
+							}) :
+							(parent.options.cellLabel.empty).format({
+								date: parent.formatDate(d)
+							})
+						);
 					});
 				}
 			}
@@ -1037,6 +1077,19 @@ CalHeatMap.prototype = {
 	}
 };
 
+/**
+ * Sprintf like function
+ * @source http://stackoverflow.com/a/4795914/805649
+ * @return String
+ */
+String.prototype.format = function () {
+	var formatted = this;
+	for (var prop in arguments[0]) {
+		var regexp = new RegExp("\\{" + prop + "\\}", "gi");
+		formatted = formatted.replace(regexp, arguments[0][prop]);
+	}
+	return formatted;
+};
 
 /**
  * AMD Loader
