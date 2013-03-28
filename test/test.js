@@ -1346,6 +1346,19 @@ test("OnClick", function() {
 
 });
 
+test("afterLoad", function() {
+
+	expect(1);
+
+	$("#cal-heatmap").data("test", "Dummy Data");
+	var finalString = "Edited data";
+	var testFunction = function() { $("#cal-heatmap").data("test", finalString); };
+
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: testFunction});
+
+	equal($("#cal-heatmap").data("test"), finalString);
+});
+
 
 test("afterLoadPreviousDomain", function() {
 
@@ -1381,6 +1394,31 @@ test("afterLoadNextDomain", function() {
 
 	equal(response.start.getTime(), nextDomainStart.getTime(), "Callback return first subdomain of the date");
 	equal(response.end.getTime(), nextDomainEnd.getTime(), "Callback return last subdomain of the date");
+});
+
+test("afterLoad is not a valid callback : null", function() {
+
+	expect(1);
+
+	try {
+		var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: null});
+		equal(1, 1, "No exception thrown");
+	} catch (e) {
+
+	}
+
+});
+
+test("afterLoad is not a valid callback : string", function() {
+
+	expect(1);
+
+	try {
+		var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: "null"});
+	} catch (e) {
+		equal(1, 1, "An exception is thrown");
+	}
+
 });
 
 /*

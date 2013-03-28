@@ -33,8 +33,7 @@ var CalHeatMap = function() {
 			legend : null
 		},
 
-		// Callback when clicking on a time block
-		onClick : null,
+
 
 		// Whether to display the scale
 		displayScale : true,
@@ -69,6 +68,15 @@ var CalHeatMap = function() {
 			nextLabel : "Next",
 			previousLabel : "Previous"
 		},
+
+		// CALLBACK
+		// ========
+
+		// Callback when clicking on a time block
+		onClick : null,
+
+		// Callback when clicking on a time block
+		afterLoad : null,
 
 		// Callback after loading the next domain in the calendar
 		afterLoadNextDomain : function(start) {},
@@ -260,7 +268,9 @@ var CalHeatMap = function() {
 		self.paint();
 
 
-
+		if (self.options.afterLoad !== null) {
+			self.afterLoad();
+		}
 
 		// Display scale if needed
 		if (self.options.displayScale) {
@@ -541,7 +551,22 @@ CalHeatMap.prototype = {
 	 * @param  int		itemNb	Number of items in that date
 	 */
 	onClick : function(d, itemNb) {
-		return this.options.onClick(d, itemNb);
+		if (typeof (this.options.onClick) === "function") {
+			return this.options.onClick(d, itemNb);
+		} else {
+			throw new Error("Provided callback for onClick is not a function.");
+		}
+	},
+
+	/**
+	 * Callback to fire after drawing the calendar, but before filling it
+	 */
+	afterLoad : function() {
+		if (typeof (this.options.afterLoad) === "function") {
+			return this.options.afterLoad();
+		} else {
+			throw new Error("Provided callback for afterLoad is not a function.");
+		}
 	},
 
 	/**
@@ -550,8 +575,12 @@ CalHeatMap.prototype = {
 	 * @param  Date		end		Domain end date
 	 */
 	afterLoadPreviousDomain: function(start) {
-		var subDomain = this.getSubDomain(start);
-		return this.options.afterLoadPreviousDomain(subDomain.shift(), subDomain.pop());
+		if (typeof (this.options.afterLoadPreviousDomain) === "function") {
+			var subDomain = this.getSubDomain(start);
+			return this.options.afterLoadPreviousDomain(subDomain.shift(), subDomain.pop());
+		} else {
+			throw new Error("Provided callback for afterLoadPreviousDomain is not a function.");
+		}
 	},
 
 	/**
@@ -560,8 +589,12 @@ CalHeatMap.prototype = {
 	 * @param  Date		end		Domain end date
 	 */
 	afterLoadNextDomain: function(start) {
-		var subDomain = this.getSubDomain(start);
-		return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
+		if (typeof (this.options.afterLoadNextDomain) === "function") {
+			var subDomain = this.getSubDomain(start);
+			return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
+		} else {
+			throw new Error("Provided callback for afterLoadNextDomain is not a function.");
+		}
 	},
 
 	formatNumber: d3.format(",g"),
