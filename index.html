@@ -7,11 +7,11 @@
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css" />
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
-	<link rel="stylesheet" href="./css/cal-heatmap.css" />
-	<link rel="stylesheet" href="./css/main.css" />
+	<link rel="stylesheet" href="./css/cal-heatmap.css?v=2.1.0" />
+	<link rel="stylesheet" href="./css/main.css?v=2.1.0" />
 	<link href='//fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
-	<script type="text/javascript" src="./js/cal-heatmap.min.js"></script>
+	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.0"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 </head>
@@ -211,12 +211,20 @@
 					<th>Description</th>
 				</tr>
 				<tr>
+					<td><code>afterLoad</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<strong>Called after drawing the empty calendar, with no datas in it yet</strong>
+					</td>
+				</tr>
+				<tr>
 					<td><code>onClick</code></td>
 					<td>callback</td>
 					<td>null</td>
 					<td>
 						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
-						<strong>Callback when clicking on a subdomain cell</strong>
+						<strong>Called when clicking on a subdomain cell</strong>
 						<p>2 arguments is passed to the callback :</p>
 						<ul>
 							<li><code>date</code>: Date of the cell that was clicked</li>
@@ -229,7 +237,7 @@
 					<td>null</td>
 					<td>
 						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
-						<strong>Callback when clicking on a subdomain cell</strong>
+						<strong>Called after loading the previous domain</strong>
 						<p>2 arguments is passed to the callback :</p>
 						<ul>
 							<li><code>start</code>: Start of the new domain that was loaded</li>
@@ -242,7 +250,7 @@
 					<td>null</td>
 					<td>
 						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
-						<strong>Callback when clicking on a subdomain cell</strong>
+						<strong>Called after loading the next domain</strong>
 						<p>2 arguments is passed to the callback :</p>
 						<ul>
 							<li><code>start</code>: Start of the new domain that was loaded</li>
@@ -263,7 +271,7 @@
 				<tr>
 					<td><code>cellsize</code></td>
 					<td>integer</td>
-					<td>10</td>
+					<td><pre class="api-default">10</pre></td>
 					<td>
 						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
 						Size of each subDomain cell, in pixel</td>
@@ -271,7 +279,7 @@
 				<tr>
 					<td><code>cellpadding</code></td>
 					<td>integer</td>
-					<td>2</td>
+					<td><pre class="api-default">2</pre></td>
 					<td>
 						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
 						Gutter between each subDomain cell, in pixel</td>
@@ -279,14 +287,14 @@
 				<tr>
 					<td><code>domainGutter</code></td>
 					<td>integer</td>
-					<td>2</td>
+					<td><pre class="api-default">2</pre></td>
 					<td>
 						Gutter between each domain.</td>
 				</tr>
 				<tr>
 					<td><code>scale</code></td>
 					<td>Array</td>
-					<td>[10, 20, 30, 40]</td>
+					<td><pre class="api-default">[10, 20, 30, 40]</pre></td>
 					<td><a href="#scale-example" class="example-link"><i class="icon-file"></i> Example</a>
 					<strong>Threshold for the scale</strong>
 					<p>Each couple of values represent a color on the calendar :</p>
@@ -308,25 +316,80 @@
 				<tr>
 					<td><code>displayScale</code></td>
 					<td>Boolean</td>
-					<td>true</td>
+					<td><pre class="api-default">true</pre></td>
 					<td>
 						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
 						Whether to display the scale</td>
 				</tr>
 				<tr>
+					<td><code>scaleLabel</code></td>
+					<td>Object</td>
+					<td>
+<pre class="api-default">{
+  lower: "less than {min} {name}",
+  inner: "between {down} and {up} {name}",
+  upper: "more than {max} {name}"
+}</pre>
+		</td>
+					<td>
+						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<p>Template for the title when hovering on a scale/legend</p>
+
+						<p>See <a href="#itemname-example">Example</a> for usage</p>
+
+						<p><code>lower</code> is used to format the title of the most left cell of the scale, and <code>upper</code> the most right cell. <code>inner</code> is used for all the cells in between.</p>
+
+						<p>Strings can take various tokens, that are replaced on runtime.</p>
+
+						<ul>
+							<li><code>{min}</code>: smallest value of the scale</li>
+							<li><code>{max}</code>: biggest value of the scale</li>
+							<li><code>{down}</code>: lower bound of the current stop</li>
+							<li><code>{up}</code>: upper bound of the current stop</li>
+							<li><code>{name}</code>: Refer to the item name, defined by <code>itemName</code> property below</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
 					<td><code>itemName</code></td>
 					<td>Array</td>
-					<td>["item", "items"]</td>
+					<td><pre class="api-default">["item", "items"]</pre></td>
 					<td>
 						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
 						<strong>Name of the data type you're representing on the calendar</strong>
 						<p>First index is the singular form, second index is the plural form.</p></td>
 				</tr>
+				<tr>
+					<td><code>cellLabel</code></td>
+					<td>Object</td>
+					<td>
+<pre class="api-default">{
+  empty: "{date}",
+  filled: "{count} {name} {connector} {date}"
+}</pre>
+					</td>
+					<td>
+						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<p>Template for the title when hovering on date cell</p>
 
+						<p>See <a href="#itemname-example">Example</a> for usage</p>
+
+						<p><code>empty</code> is used to format the title of the date cell when it's empty, and <code>filled</code> when the cell contains datas.</p>
+
+						<p>Strings can take various tokens, that are replaced on runtime.</p>
+
+						<ul>
+							<li><code>{count}</code>: the cell value</li>
+							<li><code>{name}</code>: Item name, defined by <code>itemName</code> property</li>
+							<li><code>{connector}</code>: an english preposition (at, on) before the date. Its default value depends on the subdomain, whether it's an hour (e.g: <strong>at</strong> 15:53) or what's left (e.g: <strong>on</strong> Monday)</li>
+							<li><code>{date}</code>: the cell date, formatted as defined by the <code>format</code> property below</li>
+						</ul>
+					</td>
+				</tr>
 				<tr>
 					<td><code>format</code></td>
 					<td>Object</td>
-					<td>{}</td>
+					<td><pre class="api-default">{}</pre></td>
 					<td>
 						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
 						<strong>Custom formatting of dates and labels</strong>
@@ -346,7 +409,7 @@
 				<tr>
 					<td><code>browsing</code></td>
 					<td>boolean</td>
-					<td>false</td>
+					<td><pre class="api-default">false</pre></td>
 					<td>
 						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
 						Whether to enable domain browsing. Will display 2 links to shift the calendar one domain back or forward.</td>
@@ -355,7 +418,11 @@
 				<tr>
 					<td><code>browsingOptions</code></td>
 					<td>Object</td>
-					<td>{nextLabel: "Next", previousLabel: "Previous"}</td>
+					<td>
+<pre class="api-default">{
+  nextLabel: "Next",
+  previousLabel: "Previous"
+}</pre></td>
 					<td>Text to display inside the links for browsing domains. Can also accept html.
 
 					<p>By default, will display links like in the <a href="#domain-example">second example</a>.</p>
@@ -368,7 +435,7 @@
 				<tr>
 					<td><code>duration</code></td>
 					<td>integer</td>
-					<td>500</td>
+					<td><pre class="api-default">500</pre></td>
 					<td>Duration of the animation in milliseconds. Two things are animated in the calendar :
 
 					<ul>
