@@ -580,7 +580,8 @@ CalHeatMap.prototype = {
 		if (typeof (this.options.onClick) === "function") {
 			return this.options.onClick(d, itemNb);
 		} else {
-			throw new Error("Provided callback for onClick is not a function.");
+			console.log("Provided callback for onClick is not a function.");
+			return false;
 		}
 	},
 
@@ -591,7 +592,8 @@ CalHeatMap.prototype = {
 		if (typeof (this.options.afterLoad) === "function") {
 			return this.options.afterLoad();
 		} else {
-			throw new Error("Provided callback for afterLoad is not a function.");
+			console.log("Provided callback for afterLoad is not a function.");
+			return false;
 		}
 	},
 
@@ -601,11 +603,12 @@ CalHeatMap.prototype = {
 	 * @param  Date		end		Domain end date
 	 */
 	afterLoadPreviousDomain: function(start) {
-		if (typeof (this.options.afterLoadPreviousDomain) === "function") {
+		if (typeof (this.options.afterLoadPreviousDomain) === "function") { console.log(typeof (this.options.afterLoadPreviousDomain));
 			var subDomain = this.getSubDomain(start);
 			return this.options.afterLoadPreviousDomain(subDomain.shift(), subDomain.pop());
 		} else {
-			throw new Error("Provided callback for afterLoadPreviousDomain is not a function.");
+			console.log("Provided callback for afterLoadPreviousDomain is not a function.");
+			return false;
 		}
 	},
 
@@ -619,7 +622,8 @@ CalHeatMap.prototype = {
 			var subDomain = this.getSubDomain(start);
 			return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
 		} else {
-			throw new Error("Provided callback for afterLoadNextDomain is not a function.");
+			console.log("Provided callback for afterLoadNextDomain is not a function.");
+			return false;
 		}
 	},
 
