@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.1.0 (Thu Mar 28 2013 20:01:04)
+/*! cal-heatmap v2.1.1 (Thu Mar 28 2013 22:44:17)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -116,7 +116,10 @@ var CalHeatMap = function() {
 		afterLoadNextDomain : function(start) {},
 
 		// Callback after loading the previous domain in the calendar
-		afterLoadPreviousDomain : function(start) {}
+		afterLoadPreviousDomain : function(start) {},
+
+		// Callback after finishing all actions on the calendar
+		onComplete : null
 	};
 
 
@@ -259,6 +262,8 @@ var CalHeatMap = function() {
 
 	this.svg = null;
 
+	this._completed = false;
+
 	// Record all the valid domains
 	// Each domain value is a timestamp in milliseconds
 	this._domains = [];
@@ -320,6 +325,8 @@ var CalHeatMap = function() {
 					self.getSubDomain(self._domains[self._domains.length-1]).pop()
 				),
 				self.svg);
+		} else if (typeof self.options.onComplete === "function") {
+			self.onComplete();
 		}
 
 		return true;
@@ -601,6 +608,18 @@ CalHeatMap.prototype = {
 			return this.options.afterLoad();
 		} else {
 			console.log("Provided callback for afterLoad is not a function.");
+			return false;
+		}
+	},
+
+	/**
+	 * Callback to fire at the end, when all actions on the calendar are completed
+	 */
+	onComplete : function() {
+		if (typeof (this.options.onComplete) === "function") {
+			return this.options.onComplete();
+		} else {
+			console.log("Provided callback for onComplete is not a function.");
 			return false;
 		}
 	},
@@ -1011,7 +1030,11 @@ CalHeatMap.prototype = {
 	 * @todo Add check for empty data
 	 */
 	fill: function(datas, domain) {
-		if (datas !== false) {
+		if (datas !== false && datas !== true) {
+			if (this.options.onComplete !== null && this._completed === false) {
+				this.onComplete();
+				this._completed = true;
+			}
 			return this.display(this.parseDatas(datas), domain);
 		}
 		return false;

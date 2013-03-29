@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.1 [2013-03-28]
+
+* [new] onComplete callback
+
 ## v2.1.0 [2013-03-28]
 
 * [new#5] AfterLoad callback, called when the calendar is fully drawn, but not filled with datas yet
