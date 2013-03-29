@@ -8,10 +8,13 @@
 	border-radius: 3px;
 	line-height: 12px;
 	font-size: 12px;
+	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+	text-decoration: none;
 }
 
 .graph-browse-previous:hover, .graph-browse-next:hover {
 	text-decoration: none;
+	
 }
 
 .graph-browse-previous
@@ -24,6 +27,7 @@
 	clear: both;
 	display: block;
 	margin-top: 10px;
+	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
 }
 
 .graph-label
