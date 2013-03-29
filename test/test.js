@@ -1396,29 +1396,40 @@ test("afterLoadNextDomain", function() {
 	equal(response.end.getTime(), nextDomainEnd.getTime(), "Callback return last subdomain of the date");
 });
 
-test("afterLoad is not a valid callback : null", function() {
-
+test("onClick is not a valid callback : object", function() {
 	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onClick: {}});
+	equal(cal.onClick(), false);
+});
 
-	try {
-		var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: null});
-		equal(1, 1, "No exception thrown");
-	} catch (e) {
+test("onClick is not a valid callback : string", function() {
+	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onClick: "string"});
+	equal(cal.onClick(), false);
+});
 
-	}
-
+test("afterLoad is not a valid callback : object", function() {
+	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: {}});
+	equal(cal.afterLoad(), false);
 });
 
 test("afterLoad is not a valid callback : string", function() {
-
 	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: "null"});
+	equal(cal.afterLoad(), false);
+});
 
-	try {
-		var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: "null"});
-	} catch (e) {
-		equal(1, 1, "An exception is thrown");
-	}
+test("afterLoadNextDomain is not a valid callback : string", function() {
+	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadNextDomain: "null"});
+	equal(cal.afterLoadNextDomain(), false);
+});
 
+test("afterLoadPreviousDomain is not a valid callback : string", function() {
+	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomain: "null"});
+	equal(cal.afterLoadPreviousDomain(null), false);
 });
 
 /*

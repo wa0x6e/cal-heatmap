@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.1.0 [2013-03-28]
+
+* [new#5] AfterLoad callback, called when the calendar is fully drawn, but not filled with datas yet
+* [new#6] Add options to customize all text
+* [fix] Handle not valid callback
+
+> See [documentation](http://kamisama.github.com/cal-heatmap/) for i18n usage
+
+
 ## v2.0.3 [2013-03-21]
 
 * [fix#8] Support for null values
