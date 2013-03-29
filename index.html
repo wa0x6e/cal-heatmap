@@ -575,7 +575,7 @@ calendar.init({
 		Additionally, use a custom name for the data : we're representing the number of <b>lost kittens</b> by days.</p>
 
 		<ul>
-			<li><small>Hover on a day to view the new title</small></li>
+			<li><small>Hover on a day or legend to view the new title</small></li>
 		</ul>
 
 		<div id="graph_d"></div>
@@ -589,11 +589,20 @@ calendar.init({
 				subDomain : "day",
 				range : 1,
 				scale: [40, 60, 80, 100],
-				itemName: ["lost kitten", "lost kittens"]
+				itemName: ["lost kitten", "lost kittens"],
+				cellLabel: {
+					empty: "No data for {date}",
+					filled: "There are {count} {name} {connector} {date}"
+				},
+				scaleLabel: {
+					lower: "Good day: there is less than {min} {name}",
+					inner: "Not too shabby: there are between {down} and {up} {name}",
+					upper: "Sad days with more than {max} {name}"
+				}
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/YDFyQ/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/YDFyQ/2/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_d",
@@ -601,7 +610,16 @@ calendar.init({
 	subDomain : "day",
 	range : 1,
 	scale: [40, 60, 80, 100],
-	itemName: ["lost kitten", "lost kittens"]	// Use another data name instead of the boring "items"
+	itemName: ["lost kitten", "lost kittens"],	// Use another data name instead of the boring "items"
+	cellLabel: {
+		empty: "No data for {date}",
+		filled: "There are {count} {name} {connector} {date}"
+	},
+	scaleLabel: {
+		lower: "Good day: there is less than {min} {name}",
+		inner: "Not too shabby: there are between {down} and {up} {name}",
+		upper: "Sad days with more than {max} {name}"
+	}
 });</code></pre>
 
 
