@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.1.1 (Thu Mar 28 2013 22:44:17)
+/*! cal-heatmap v2.1.2 (Tue Apr 02 2013 14:30:09)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -747,7 +747,7 @@ CalHeatMap.prototype = {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
 						return (
-						data[domainUnit].hasOwnProperty(subDomainUnit) ?
+						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
 							(parent.options.cellLabel.filled).format({
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
 								name: parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)],

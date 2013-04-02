@@ -739,7 +739,7 @@ CalHeatMap.prototype = {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
 						return (
-						data[domainUnit].hasOwnProperty(subDomainUnit) ?
+						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
 							(parent.options.cellLabel.filled).format({
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
 								name: parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)],

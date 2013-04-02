@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.2 [2013-04-02]
+ 
+* [fix#9] null values not interpreted as "empty" when rendering the title
+
 ## v2.1.1 [2013-03-28]
 
 * [new] onComplete callback
