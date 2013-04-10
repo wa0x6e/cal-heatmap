@@ -12,6 +12,8 @@
 	<link href='//fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
 	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.0"></script>
+	<script type="text/javascript" src="./js/moment.min.js"></script>
+	<script type="text/javascript" src="./js/lang.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 </head>
@@ -35,6 +37,7 @@
 
 			</div>
 			<script type="text/javascript">
+				moment.lang('fr');
 				var calendar = new CalHeatMap();
 				calendar.init({
 					data: "datas-years.json",
@@ -256,6 +259,14 @@
 							<li><code>start</code>: Start of the new domain that was loaded</li>
 							<li><code>end</code>: End of the new domain that was loaded</li>
 						</ul></td>
+				</tr>
+				<tr>
+					<td><code>onComplete</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<p>Called after finish drawing and filling the graph, or just after drawing the graph if <code>loadOnInit</code> is set to false.</p>
+					</td>
 				</tr>
 			</table>
 			</div>
@@ -639,7 +650,7 @@ calendar.init({
 	<div class="bs-docs-example">
 		<h3 id="itemname-example">By year, then by days</h3>
 	<p>Display all days of year 2000.<br/>
-		Additionally, use a custom name for the data : we're representing the number of <b>lost kittens</b> by days.</p>
+		Additionally, use a custom name for the data : we're representing the number of <b>lost kittens</b> by days, in french.</p>
 
 		<ul>
 			<li><small>Hover on a day or legend to view the new title</small></li>
@@ -647,6 +658,7 @@ calendar.init({
 
 		<div id="graph_d"></div>
 		<script type="text/javascript">
+			moment.lang("fr");
 			var calendar = new CalHeatMap();
 			calendar.init({
 				data: "datas-years.json",
@@ -656,37 +668,53 @@ calendar.init({
 				subDomain : "day",
 				range : 1,
 				scale: [40, 60, 80, 100],
-				itemName: ["lost kitten", "lost kittens"],
+				itemName: ["chat perdu", "chats perdus"],
 				cellLabel: {
-					empty: "No data for {date}",
-					filled: "There are {count} {name} {connector} {date}"
+					empty: "Aucune données pour le {date}",
+					filled: "il y a eu {count} {name} le {date}"
 				},
 				scaleLabel: {
-					lower: "Good day: there is less than {min} {name}",
-					inner: "Not too shabby: there are between {down} and {up} {name}",
-					upper: "Sad days with more than {max} {name}"
+					lower: "Belle journée, il y a eu moins de {min} {name}",
+					inner: "Pas mal, entre {down} et {up} {name}",
+					upper: "Peut faire mieux, plus de {max} {name}"
+				},
+				format: {
+					date: function(date) {
+						return moment(date).format("LL");
+					},
+					legend: null,
 				}
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/YDFyQ/2/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
-	data: "datas-years.json",
-	start: new Date(2000, 0),
-	id : "graph_d",
-	domain : "year",
-	subDomain : "day",
-	range : 1,
-	scale: [40, 60, 80, 100],
-	itemName: ["lost kitten", "lost kittens"],	// Use another data name instead of the boring "items"
-	cellLabel: {
-		empty: "No data for {date}",
-		filled: "There are {count} {name} {connector} {date}"
-	},
-	scaleLabel: {
-		lower: "Good day: there is less than {min} {name}",
-		inner: "Not too shabby: there are between {down} and {up} {name}",
-		upper: "Sad days with more than {max} {name}"
-	}
+		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/YDFyQ/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+	moment.lang("fr");
+	var calendar = new CalHeatMap();
+	calendar.init({
+		data: "datas-years.json",
+		start: new Date(2000, 0),
+		id : "graph_d",
+		domain : "year",
+		subDomain : "day",
+		range : 1,
+		scale: [40, 60, 80, 100],
+		itemName: ["chat perdu", "chats perdus"],
+		cellLabel: {
+			empty: "Aucune données pour le {date}",
+			filled: "il y a eu {count} {name} le {date}"
+		},
+		scaleLabel: {
+			lower: "Belle journée, il y a eu moins de {min} {name}",
+			inner: "Pas mal, entre {down} et {up} {name}",
+			upper: "Peut faire mieux, plus de {max} {name}"
+		},
+		format: {
+			date: function(date) {
+				return moment(date).format("LL");
+			},
+			legend: null,
+		}
+	});
 });</code></pre>
 
 
@@ -795,7 +823,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </div>
 
 
-<script type="text/javascript" src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script type="text/javascript" src="//yandex.st/highlightjs/7.3/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 <script type="text/javascript">
