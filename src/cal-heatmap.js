@@ -56,11 +56,16 @@ var CalHeatMap = function() {
 		format : {
 			// Formatting of the date when hovering an subdomain block
 			// @default : null, will use the formatting according to domain type
+			// Accept a string used as specifier by d3.time.format()
+			// or a function
 			date : null,
 
 			// Formatting of domain label
 			// @default : null, will use the formatting according to domain type
 			legend : null
+
+			// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+			// for accepted date formatting
 		},
 
 		// Name of the items to represent in the calendar
@@ -272,7 +277,12 @@ var CalHeatMap = function() {
 	 */
 	var _init = function() {
 
-		self.formatDate = d3.time.format(self.options.format.date);
+		if (typeof self.options.format.date === "function") {
+			self.formatDate = self.options.format.date;
+		} else {
+			self.formatDate = d3.time.format(self.options.format.date);
+		}
+
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
 		if (self.options.browsing) {

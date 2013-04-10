@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.3 [2013-04-09]
+ 
+* [fix#6] Can now pass a function to date formatter, to format the date using an external library like moment.js
+
 ## v2.1.2 [2013-04-02]
  
 * [fix#9] null values not interpreted as "empty" when rendering the title
