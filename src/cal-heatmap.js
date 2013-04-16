@@ -9,6 +9,10 @@ var CalHeatMap = function() {
 		// DOM ID of the container to append the graph to
 		id : "cal-heatmap",
 
+		// Whether to paint the calendar on init()
+		// Used by testsuite to reduce testing time
+		paintOnLoad : true,
+
 		// ================================================
 		// DOMAIN
 		// ================================================
@@ -306,29 +310,31 @@ var CalHeatMap = function() {
 		d3.select("#" + self.options.id).append("svg")
 			.attr("class", "graph");
 
-		self.paint();
 
+		if (self.options.paintOnLoad) {
+			self.paint();
 
-		if (self.options.afterLoad !== null) {
-			self.afterLoad();
-		}
+			if (self.options.afterLoad !== null) {
+				self.afterLoad();
+			}
 
-		// Display scale if needed
-		if (self.options.displayScale) {
-			self.displayScale();
-		}
+			// Display scale if needed
+			if (self.options.displayScale) {
+				self.displayScale();
+			}
 
-		// Fill the graph with some datas
-		if (self.options.loadOnInit) {
-			self.fill(
-				self.getDatas(
-					self.options.data,
-					new Date(self._domains[0]),
-					self.getSubDomain(self._domains[self._domains.length-1]).pop()
-				),
-				self.svg);
-		} else if (typeof self.options.onComplete === "function") {
-			self.onComplete();
+			// Fill the graph with some datas
+			if (self.options.loadOnInit) {
+				self.fill(
+					self.getDatas(
+						self.options.data,
+						new Date(self._domains[0]),
+						self.getSubDomain(self._domains[self._domains.length-1]).pop()
+					),
+					self.svg);
+			} else if (typeof self.options.onComplete === "function") {
+				self.onComplete();
+			}
 		}
 
 		return true;
@@ -632,7 +638,7 @@ CalHeatMap.prototype = {
 	 * @param  Date		end		Domain end date
 	 */
 	afterLoadPreviousDomain: function(start) {
-		if (typeof (this.options.afterLoadPreviousDomain) === "function") { console.log(typeof (this.options.afterLoadPreviousDomain));
+		if (typeof (this.options.afterLoadPreviousDomain) === "function") {
 			var subDomain = this.getSubDomain(start);
 			return this.options.afterLoadPreviousDomain(subDomain.shift(), subDomain.pop());
 		} else {
