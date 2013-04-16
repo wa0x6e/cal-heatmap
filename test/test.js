@@ -1360,6 +1360,44 @@ test("afterLoad", function() {
 	equal($("#cal-heatmap").data("test"), finalString);
 });
 
+test("onComplete", function() {
+
+	expect(1);
+
+	$("body").data("test", "Dummy Data");
+	var finalString = "Edited data";
+	var testFunction = function() { $("body").data("test", finalString); };
+
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: true});
+
+	equal($("body").data("test"), finalString);
+});
+
+test("onComplete is ran even on loadOnInit = false", function() {
+
+	expect(1);
+
+	$("body").data("test", "Dummy Data");
+	var finalString = "Edited data";
+	var testFunction = function() { $("body").data("test", finalString); };
+
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: false});
+
+	equal($("body").data("test"), finalString);
+});
+
+test("onComplete does not run with paintOnLoad = false", function() {
+
+	expect(1);
+
+	$("body").data("test", "Dummy Data");
+	var finalString = "Edited data";
+	var testFunction = function() { $("body").data("test", finalString); };
+
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: false});
+
+	equal($("body").data("test"), "Dummy Data");
+});
 
 test("afterLoadPreviousDomain", function() {
 
@@ -1432,6 +1470,19 @@ test("afterLoadPreviousDomain is not a valid callback : string", function() {
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomain: "null"});
 	equal(cal.afterLoadPreviousDomain(null), false);
 });
+
+test("onComplete is not a valid callback : object", function() {
+	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: {}, loadOnInit: true});
+	equal(cal.onComplete(), false);
+});
+
+test("onComplete is not a valid callback : string", function() {
+	expect(1);
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: "null", loadOnInit: true});
+	equal(cal.onComplete(), false);
+});
+
 
 /*
 	-----------------------------------------------------------------
@@ -1537,6 +1588,34 @@ test("Don't fill subdomain if data equal to false", function() {
 	var response = cal.fill(false, cal.svg);
 
 	equal(response, false);
+});
+
+test("Custom date formatting with d3.js internal formatter", function() {
+
+	expect(1);
+
+	var date = new Date(2000, 0, 5);
+	var datas = {};
+	datas[date.getTime/1000] = 15;
+
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {date: "==%B==", legend: ""}});
+
+	equal($("#cal-heatmap .graph rect title")[0].firstChild.data, "==January==");
+
+});
+
+test("Custom date formatting with custom function", function() {
+
+	expect(1);
+
+	var date = new Date(2000, 0, 5);
+	var datas = {};
+	datas[date.getTime/1000] = 15;
+
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {date: function(date) { return date.getTime();}, legend: ""}});
+
+	equal($("#cal-heatmap .graph rect title")[0].firstChild.data, date.getTime());
+
 });
 
 /*
