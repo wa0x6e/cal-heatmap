@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.4 [2013-04-16]
+
+[enhancement] More faster tests 
+
 ## v2.1.3 [2013-04-09]
  
 * [fix#6] Can now pass a function to date formatter, to format the date using an external library like moment.js
