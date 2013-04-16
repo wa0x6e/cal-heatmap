@@ -42,7 +42,7 @@ module.exports = function(grunt) {
         "qunit-cov": {
             test:
             {
-                minimum: 0.85,
+                minimum: 0.80,
                 srcDir: "src",
                 depDirs: ["test"],
                 outDir: "jscoverage",
@@ -76,7 +76,7 @@ module.exports = function(grunt) {
     grunt.registerTask("quick-build", ["jshint", "csslint"]);
 
     // Full build without version bump
-    grunt.registerTask("build", ["concat", "qunit", "qunit-cov", "jshint", "csslint", "uglify"]);
+    grunt.registerTask("build", ["concat", "qunit-cov", "jshint", "csslint", "uglify"]);
 
     // FOR TRAVIS
     // ==========
