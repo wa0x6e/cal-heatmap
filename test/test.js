@@ -259,7 +259,7 @@ test("get domain when domain is 1 YEAR. from a timestamp", function() {
 
 /*
 	-----------------------------------------------------------------
-	DOMAIN TESTS WHEN FOR GREATER DOMAIN RANGE
+	DOMAIN TESTS FOR GREATER DOMAIN RANGE
 	-----------------------------------------------------------------
  */
 
@@ -518,13 +518,13 @@ test("get domain when domain WEEK overlap next month", function() {
 
 	var date      = new Date(2012, 9, 31, 20, 15);
 	var weekStart = new Date(2012, 9, 29);		// Monday of the first week of the domain
-	var weekEnd   = new Date(2012, 11, 3);		// Monday of the last week of the domain
+	var weekEnd   = new Date(2012, 10, 5);		// Monday of the last week of the domain
 
-	var cal = createCalendar({domain: "week", range: 6, start : date});
+	var cal = createCalendar({domain: "week", range: 2, start : date});
 	var domain = cal.getDomain(date);
 	var domainEnd = domain[domain.length-1];
 
-	equal(domain.length, 6, "Domain size is 6 weeks");
+	equal(domain.length, 2, "Domain size is 2 weeks");
 
 	equal(domain[0].getFullYear(), weekStart.getFullYear(), "Domain start year is equal to date year");
 	equal(domain[0].getMonth(), weekStart.getMonth(), "Domain start month is equal to date month");
@@ -699,7 +699,7 @@ test("HOUR -> MIN", function() {
 
 	var date = new Date(2013, 0, 1, 10, 26);
 
-	var cal = createCalendar({start : date, domain: "hour", subDomain: "min", range: 3});
+	var cal = createCalendar({start : date, domain: "hour", subDomain: "min", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 	var subDomain = cal.getSubDomain(date);
 
@@ -731,7 +731,7 @@ test("DAY -> HOUR", function() {
 
 	var date = new Date(2013, 0, 1, 10, 26);
 
-	var cal = createCalendar({start : date, domain: "day", subDomain: "hour", range: 3});
+	var cal = createCalendar({start : date, domain: "day", subDomain: "hour", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 	var subDomain = cal.getSubDomain(date);
 
@@ -764,7 +764,7 @@ test("DAY -> MIN", function() {
 
 	var date = new Date(2013, 0, 1, 10, 26);
 
-	var cal = createCalendar({start : date, domain: "day", subDomain: "min", range: 3});
+	var cal = createCalendar({start : date, domain: "day", subDomain: "min", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 	var subDomain = cal.getSubDomain(date);
 
@@ -796,7 +796,7 @@ test("WEEK -> DAY", function() {
 
 	var date = new Date(2013, 0, 2, 15, 26); // Wednesday January 2nd, 2013
 
-	var cal = createCalendar({start : date, domain: "week", subDomain: "day", range: 3});
+	var cal = createCalendar({start : date, domain: "week", subDomain: "day", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2012, 11, 31);
@@ -832,7 +832,7 @@ test("WEEK -> HOUR", function() {
 
 	var date = new Date(2013, 0, 2, 15, 26); // Wednesday January 2nd, 2013
 
-	var cal = createCalendar({start : date, domain: "week", subDomain: "hour", range: 2});
+	var cal = createCalendar({start : date, domain: "week", subDomain: "hour", range: 2, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2012, 11, 31);
@@ -871,7 +871,7 @@ test("MONTH -> WEEK", function() {
 
 	var date = new Date(2013, 0, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "month", subDomain: "week", range: 3});
+	var cal = createCalendar({start : date, domain: "month", subDomain: "week", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
@@ -911,7 +911,7 @@ test("MONTH -> DAY", function() {
 
 	var date = new Date(2013, 0, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "month", subDomain: "day", range: 3});
+	var cal = createCalendar({start : date, domain: "month", subDomain: "day", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
@@ -944,7 +944,7 @@ test("MONTH -> HOUR", function() {
 
 	var date = new Date(2013, 0, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "month", subDomain: "hour", range: 2});
+	var cal = createCalendar({start : date, domain: "month", subDomain: "hour", range: 2, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
@@ -979,7 +979,7 @@ test("YEAR -> DAY", function() {
 
 	var date = new Date(2013, 6, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "year", subDomain: "day", range: 1});
+	var cal = createCalendar({start : date, domain: "year", subDomain: "day", range: 1, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
@@ -1009,7 +1009,7 @@ test("YEAR -> MONTH", function() {
 
 	var date = new Date(2013, 6, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "year", subDomain: "month", range: 2});
+	var cal = createCalendar({start : date, domain: "year", subDomain: "month", range: 2, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
@@ -1038,7 +1038,7 @@ test("YEAR -> WEEK", function() {
 
 	var date = new Date(2005, 6, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "year", subDomain: "week", range: 1});
+	var cal = createCalendar({start : date, domain: "year", subDomain: "week", range: 1, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(date.getFullYear(), 0);
@@ -1074,7 +1074,7 @@ test("YEAR -> DAY", function() {
 
 	var date = new Date(2013, 6, 1, 15, 26);
 
-	var cal = createCalendar({start : date, domain: "year", subDomain: "day", range: 2});
+	var cal = createCalendar({start : date, domain: "year", subDomain: "day", range: 2, paintOnLoad: true});
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
@@ -1205,17 +1205,18 @@ test("Allow only valid domain", function() {
 
 	expect(8);
 
-	var cal = createCalendar({});
+	var domains = ["hour", "day", "week", "month", "year"];
 
-	ok(cal.init({domain:"hour", loadOnInit: false}), "Hour is a valid domain");
-	ok(cal.init({domain:"day", loadOnInit: false}), "Day is a valid domain");
-	ok(cal.init({domain:"week", loadOnInit: false}), "Week is a valid domain");
-	ok(cal.init({domain:"month", loadOnInit: false}), "Month is a valid domain");
-	ok(cal.init({domain:"year", loadOnInit: false}), "Year is a valid domain");
+	for(var i = 0, total = domains.length; i < total; i++) {
+		var cal = createCalendar({range:1});
+		ok(cal.init({domain:domains[i]}), domains[i] + " is a valid domain");
+	}
 
-	equal(cal.init({domain:"min", loadOnInit: false}), false, "Min is a valid subdomain but not a valid domain");
-	equal(cal.init({domain:"notvalid", loadOnInit: false}), false, "Fail when domain is not valid");
-	equal(cal.init({domain:null, loadOnInit: false}), false, "Fail when domain is null");
+	var c = createCalendar({});
+
+	equal(c.init({domain:"min"}), false, "Min is a valid subdomain but not a valid domain");
+	equal(c.init({domain:"notvalid"}), false, "Fail when domain is not valid");
+	equal(c.init({domain:null}), false, "Fail when domain is null");
 
 });
 
@@ -1354,7 +1355,7 @@ test("afterLoad", function() {
 	var finalString = "Edited data";
 	var testFunction = function() { $("#cal-heatmap").data("test", finalString); };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: testFunction});
+	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: testFunction, paintOnLoad: true});
 
 	equal($("#cal-heatmap").data("test"), finalString);
 });
@@ -1445,10 +1446,7 @@ test("Display empty calendar", function() {
 
 	expect(4);
 
-	// Cleaning the dom
-	$("#test-container").empty();
-
-	var cal = createCalendar({});
+	var cal = createCalendar({paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph").length, 1, "Calendar was created");
 	equal($("#cal-heatmap .graph svg").length, 12, "The graph contains 12 hours");
@@ -1460,10 +1458,7 @@ test("Don't display scale", function() {
 
 	expect(1);
 
-	// Cleaning the dom
-	$("#test-container").empty();
-
-	var cal = createCalendar({displayScale: false});
+	var cal = createCalendar({displayScale: false, paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph-scale").length, 0, "The scale is not created");
 });
@@ -1473,10 +1468,7 @@ test("Display domain according to range number", function() {
 
 	expect(1);
 
-	// Cleaning the dom
-	$("#test-container").empty();
-
-	var cal = createCalendar({range: 5});
+	var cal = createCalendar({range: 5, paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph svg").length, 5, "The graph contains only 5 hours");
 
@@ -1486,13 +1478,14 @@ test("Append graph to the passed DOM ID", function() {
 
 	expect(2);
 
-	// Cleaning the dom
-	$("#test-container").empty();
+	$("body").append("<div id=test-container style='display:hidden;'></div>");
 
-	var cal = createCalendar({id: "test-container"});
+	var cal = createCalendar({id: "test-container", paintOnLoad: true});
 
 	equal($("#test-container .graph").length, 1, "The graph is added to the specified ID");
 	equal($("#cal-heatmap .graph").length, 0, "Default ID is empty");
+
+	$("#test-container").remove();
 
 });
 
@@ -1530,7 +1523,7 @@ test("Fill subdomain only if there is data", function() {
 	datas[date2] = 25;	// 25 events for 01:00
 	datas[date3] = 1;	// 01 events for 01:01
 
-	var cal = createCalendar({data: datas});
+	var cal = createCalendar({data: datas, paintOnLoad: true});
 	var response = cal.fill(datas, cal.svg);
 
 	equal(response, true);
@@ -1557,20 +1550,17 @@ module( "Data Source property parsing" );
 test("Data Source is undefined", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
 	var datas;
+	var cal = createCalendar({data: datas});
 
-	cal.init({data: datas, loadOnInit: false});
 	equal(cal.getDatas(datas), false);
 });
 
 test("Data Source is invalid : number", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
 	var datas = 2560;
-
-	cal.init({data: datas, loadOnInit: false});
+	var cal = createCalendar({data: datas});
 	equal(cal.getDatas(datas), false);
 });
 
@@ -1578,30 +1568,27 @@ test("Data Source is invalid : number", function() {
 test("Data Source is a JSON object", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
 	var datas = {test: 5};
+	var cal = createCalendar({data: datas});
 
-	cal.init({data: datas, loadOnInit: false});
 	equal(cal.getDatas(datas), datas);
 });
 
 test("Data Source is a regular string", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
 	var datas = "regular string";
+	var cal = createCalendar({data: datas});
 
-	cal.init({data: datas, loadOnInit: false});
 	equal(cal.getDatas(datas, new Date(), new Date()), true, "True is returned, datas is loaded via d3.json callback");
 });
 
 test("Data Source is a en empty string", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
 	var datas = "";
+	var cal = createCalendar({data: datas});
 
-	cal.init({data: datas, loadOnInit: false});
 	equal(cal.getDatas(datas), false);
 });
 
@@ -1616,10 +1603,9 @@ module( "Interpreting Data source template" );
 test("Data Source is an URI", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
 	var filePath = "path/to/file.json";
 
-	cal.init({data: filePath, loadOnInit: false});
+	var cal = createCalendar({data: filePath});
 	equal(
 		cal.parseURI(filePath, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])),
 		filePath
@@ -1629,7 +1615,7 @@ test("Data Source is an URI", function() {
 
 test("Data Source is a regex string, replace by timestamp", function() {
 
-	var cal = createCalendar({start: new Date(), loadOnInit: false});
+	var cal = createCalendar({start: new Date()});
 	var uri = "get?start={{t:start}}&end={{t:end}}";
 
 	var parsedUri = "get?start=" + cal._domains[0]/1000 + "&end=" + cal._domains[cal._domains.length-1]/1000;
@@ -1639,7 +1625,7 @@ test("Data Source is a regex string, replace by timestamp", function() {
 
 test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 
-	var cal = createCalendar({start: new Date(), loadOnInit: false});
+	var cal = createCalendar({start: new Date()});
 	var uri = "get?start={{d:start}}&end={{d:end}}";
 
 	var startDate = new Date(cal._domains[0]);
@@ -1733,11 +1719,18 @@ test("Filter out datas not relevant to calendar domain", function() {
 
 function createCalendar(settings) {
 
-	$("#cal-heatmap").empty();
+	$("#cal-heatmap").remove();
+
+	$("body").append("<div id=cal-heatmap style='display:none;'></div>");
 
 	var cal = new CalHeatMap();
 	settings.loadOnInit = false;
 	settings.duration = 0;
+
+	if (!settings.hasOwnProperty("paintOnLoad")) {
+		settings.paintOnLoad = false;
+	}
+
 	cal.init(settings);
 
 	return cal;
