@@ -28,12 +28,7 @@ exclude = [];
 // use dots reporter, as travis terminal does not support escaping sequences
 // possible values: "dots", "progress", "junit", "teamcity"
 // CLI --reporters progress
-reporters = ["progress", "junit"];
-
-junitReporter = {
-  // will be resolved to basePath (in the same way as files/exclude patterns)
-  outputFile: "test-results.xml"
-};
+reporters = ["progress"];
 
 // web server port
 // CLI --port 9876
@@ -81,11 +76,9 @@ reportSlowerThan = 200;
 
 // compile coffee scripts
 preprocessors = {
-  "**/*.coffee": "coffee"
 };
 
 plugins = [
-  "karma-jasmine",
   "karma-chrome-launcher",
   "karma-firefox-launcher",
   "karma-junit-reporter"
