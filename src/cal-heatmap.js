@@ -882,7 +882,7 @@ CalHeatMap.prototype = {
 	},
 
 	/**
-	 * Return a range if week number
+	 * Return a range of week number
 	 * @param  number|Date	d	A date, or timestamp in milliseconds
 	 * @return Date				The start of the hour
 	 */

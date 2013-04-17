@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.6 [2013-04-17]
+
+* [new] Add `startWeekOnMonday` to choose whether to start the week on Monday or Sunday
+
 ## v2.1.5 [2013-04-17]
 
 * [new] `x_day` subdomain to display days horizontally, grouped by week
