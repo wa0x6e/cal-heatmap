@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.5 [2013-04-17]
+
+* [new] `x_day` subdomain to display days horizontally, grouped by week
+* [new] `cellradius` property to apply rounded corner to subdomain cell
+
 ## v2.1.4 [2013-04-16]
 
 [enhancement] More faster tests 

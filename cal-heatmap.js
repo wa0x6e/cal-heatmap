@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.1.4 (Tue Apr 16 2013 15:04:29)
+/*! cal-heatmap v2.1.5 (Wed Apr 17 2013 15:04:53)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -33,6 +33,9 @@ var CalHeatMap = function() {
 
 		// Padding between each cell, in pixel
 		cellpadding : 2,
+
+		// For rounded subdomain rectangles, in pixels
+		cellradius: 0,
 
 		domainGutter : 2,
 
@@ -135,11 +138,11 @@ var CalHeatMap = function() {
 
 	this._domainType = {
 		"min" : {
-			row: 10,
+			row: function(d) {return 10;},
 			column: function(d) { return 6; },
 			position: {
-				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row); },
-				y : function(d) { return d.getMinutes() % self._domainType.min.row;}
+				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d)); },
+				y : function(d) { return d.getMinutes() % self._domainType.min.row(d);}
 			},
 			format: {
 				date: "%H:%M, %A %B %-e, %Y",
@@ -150,7 +153,7 @@ var CalHeatMap = function() {
 		},
 		"hour" : {
 			name: "hour",
-			row: 6,
+			row: function(d) {return 6;},
 			column: function(d) {
 				switch(self.options.domain) {
 					case "day" : return 4;
@@ -161,13 +164,13 @@ var CalHeatMap = function() {
 			position: {
 				x : function(d) {
 					if (self.options.domain === "month") {
-						return Math.floor(d.getHours() / self._domainType.hour.row) + (d.getDate()-1)*4;
+						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + (d.getDate()-1)*4;
 					} else if (self.options.domain === "week") {
-						return Math.floor(d.getHours() / self._domainType.hour.row) + self.getWeekDay(d)*4;
+						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + self.getWeekDay(d)*4;
 					}
-					return Math.floor(d.getHours() / self._domainType.hour.row);
+					return Math.floor(d.getHours() / self._domainType.hour.row(d));
 				},
-				y : function(d) { return d.getHours() % self._domainType.hour.row;}
+				y : function(d) { return d.getHours() % self._domainType.hour.row(d);}
 			},
 			format: {
 				date: "%Hh, %A %B %-e, %Y",
@@ -181,7 +184,7 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			name: "day",
-			row: 7,
+			row: function(d) {return 7;},
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
@@ -208,9 +211,39 @@ var CalHeatMap = function() {
 			},
 			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
 		},
+		"x_day" : {
+			name: "x_day",
+			row: function(d) {
+				switch(self.options.domain) {
+					case "year" : return 54;
+					case "month" : return 6;
+					case "week" : return 1;
+				}
+			},
+			column: function(d) {
+				return 7;
+			},
+			position: {
+				x : function(d) { return (d.getDay() === 0 ? 6 : d.getDay()-1);},
+				y : function(d) {
+					switch(self.options.domain) {
+						case "week" : return 0;
+						case "month" :
+							return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
+						case "year" : return self.getWeekNumber(d) ;
+					}
+				}
+			},
+			format: {
+				date: "%A %B %-e, %Y",
+				legend: "%e %b",
+				connector: "on"
+			},
+			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
+		},
 		"week" : {
 			name: "week",
-			row: 1,
+			row: function(d) {return 1;},
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
@@ -239,11 +272,11 @@ var CalHeatMap = function() {
 		},
 		"month" : {
 			name: "month",
-			row: 1,
+			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row); },
-				y : function(d) { return d.getMonth() % self._domainType.month.row;}
+				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
+				y : function(d) { return d.getMonth() % self._domainType.month.row(d);}
 			},
 			format: {
 				date: "%B %Y",
@@ -254,11 +287,11 @@ var CalHeatMap = function() {
 		},
 		"year" : {
 			name: "year",
-			row: 1,
+			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row); },
-				y : function(d) { return d.getFullYear() % this._domainType.year.row;}
+				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row(d)); },
+				y : function(d) { return d.getFullYear() % this._domainType.year.row(d);}
 			},
 			format: {
 				date: "%Y",
@@ -395,7 +428,7 @@ var CalHeatMap = function() {
 			reverse = false;
 		}
 
-		var graphLegendHeight = self.options.cellsize*2;
+		var graphLegendHeight = Math.max(25, self.options.cellsize*2);
 
 		// Compute the width of the domain block
 		// @param int d Domain start timestamp
@@ -404,7 +437,9 @@ var CalHeatMap = function() {
 		};
 
 		// Compute the height of the domain block
-		var h = self.options.cellsize*self._domainType[self.options.subDomain].row + self.options.cellpadding*self._domainType[self.options.subDomain].row + self.options.cellpadding;
+		var h = function(d) {
+			return self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding;
+		};
 
 		// Format the domain legend according to the domain type
 		var legendFormat = d3.time.format(self.options.format.legend);
@@ -435,7 +470,7 @@ var CalHeatMap = function() {
 
 		// Painting all the domains
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
-			.attr("height", h + 20)
+			.attr("height", function(d) { return h(d) + graphLegendHeight;})
 			.selectAll("svg")
 			.data(self._domains, function(d) { return d;});
 
@@ -464,7 +499,7 @@ var CalHeatMap = function() {
 
 				return wd;
 			})
-			.attr("height", h + graphLegendHeight)
+			.attr("height", function(d) { return h(d) + graphLegendHeight;})
 			.attr("x", function(d, i){ return positionX(i); })
 			;
 
@@ -475,11 +510,11 @@ var CalHeatMap = function() {
 
 		label
 			.enter().insert("text")
-			.attr("y", h + graphLegendHeight/1.5)
+			.attr("y", function(d) { return h(d) + graphLegendHeight/2; })
 			.attr("x", function(d, i){ return positionX(i) + w(d) / 2; })
 			.attr("class", "graph-label")
 			.attr("text-anchor", "middle")
-			.attr("vertical-align", "middle")
+			.attr("dominant-baseline", "middle")
 			.text(function(d) { return legendFormat(new Date(d)); });
 
 
@@ -492,7 +527,17 @@ var CalHeatMap = function() {
 			.attr("height", self.options.cellsize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
 			.attr("y", function(d) { return self.positionSubDomainY(d); })
+			.call(radius)
 			;
+
+		function radius(selection) {
+			if (self.options.cellradius > 0) {
+				selection
+					.attr("rx", self.options.cellradius)
+					.attr("ry", self.options.cellradius)
+				;
+			}
+		}
 
 		// Appeding a title to each subdomain
 		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
@@ -995,6 +1040,7 @@ CalHeatMap.prototype = {
 		switch(this.options.subDomain) {
 			case "min"   : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
 			case "hour"  : return this.getHourDomain(date, computeHourSubDomainSize(date, this.options.domain));
+			case "x_day" :
 			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
 			case "week"  : return this.getWeekDomain(date, computeWeekSubDomainSize(date, this.options.domain));
 			case "month" : return this.getMonthDomain(date, 12);
