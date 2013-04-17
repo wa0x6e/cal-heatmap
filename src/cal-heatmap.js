@@ -127,7 +127,7 @@ var CalHeatMap = function() {
 
 	this._domainType = {
 		"min" : {
-			row: 10,
+			row: function(d) {return 10;},
 			column: function(d) { return 6; },
 			position: {
 				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row); },
@@ -142,7 +142,7 @@ var CalHeatMap = function() {
 		},
 		"hour" : {
 			name: "hour",
-			row: 6,
+			row: function(d) {return 6;},
 			column: function(d) {
 				switch(self.options.domain) {
 					case "day" : return 4;
@@ -173,7 +173,7 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			name: "day",
-			row: 7,
+			row: function(d) {return 7;},
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
@@ -200,9 +200,39 @@ var CalHeatMap = function() {
 			},
 			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
 		},
+		"x_day" : {
+			name: "x_day",
+			row: function(d) {
+				switch(self.options.domain) {
+					case "year" : return 54;
+					case "month" : return 6;
+					case "week" : return 1;
+				}
+			},
+			column: function(d) {
+				return 6;
+			},
+			position: {
+				x : function(d) { return (d.getDay() === 0 ? 6 : d.getDay()-1);},
+				y : function(d) {
+					switch(self.options.domain) {
+						case "week" : return 0;
+						case "month" :
+							return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
+						case "year" : return self.getWeekNumber(d) ;
+					}
+				}
+			},
+			format: {
+				date: "%A %B %-e, %Y",
+				legend: "%e %b",
+				connector: "on"
+			},
+			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
+		},
 		"week" : {
 			name: "week",
-			row: 1,
+			row: function(d) {return 1;},
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
@@ -231,7 +261,7 @@ var CalHeatMap = function() {
 		},
 		"month" : {
 			name: "month",
-			row: 1,
+			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
 				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row); },
@@ -246,7 +276,7 @@ var CalHeatMap = function() {
 		},
 		"year" : {
 			name: "year",
-			row: 1,
+			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
 				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row); },
@@ -396,7 +426,9 @@ var CalHeatMap = function() {
 		};
 
 		// Compute the height of the domain block
-		var h = self.options.cellsize*self._domainType[self.options.subDomain].row + self.options.cellpadding*self._domainType[self.options.subDomain].row + self.options.cellpadding;
+		var h = function(d) {
+			return self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding;
+		};
 
 		// Format the domain legend according to the domain type
 		var legendFormat = d3.time.format(self.options.format.legend);
@@ -427,7 +459,7 @@ var CalHeatMap = function() {
 
 		// Painting all the domains
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
-			.attr("height", h + 20)
+			.attr("height", function(d) { return h(d) + 20;})
 			.selectAll("svg")
 			.data(self._domains, function(d) { return d;});
 
@@ -456,7 +488,7 @@ var CalHeatMap = function() {
 
 				return wd;
 			})
-			.attr("height", h + graphLegendHeight)
+			.attr("height", function(d) { return h(d) + graphLegendHeight;})
 			.attr("x", function(d, i){ return positionX(i); })
 			;
 
@@ -467,7 +499,7 @@ var CalHeatMap = function() {
 
 		label
 			.enter().insert("text")
-			.attr("y", h + graphLegendHeight/1.5)
+			.attr("y", function(d) { return h(d) + graphLegendHeight/1.5; })
 			.attr("x", function(d, i){ return positionX(i) + w(d) / 2; })
 			.attr("class", "graph-label")
 			.attr("text-anchor", "middle")
@@ -987,6 +1019,7 @@ CalHeatMap.prototype = {
 		switch(this.options.subDomain) {
 			case "min"   : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
 			case "hour"  : return this.getHourDomain(date, computeHourSubDomainSize(date, this.options.domain));
+			case "x_day" :
 			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
 			case "week"  : return this.getWeekDomain(date, computeWeekSubDomainSize(date, this.options.domain));
 			case "month" : return this.getMonthDomain(date, 12);
