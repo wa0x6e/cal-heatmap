@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="./css/main.css?v=2.1.0" />
 	<link href='//fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
-	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.5"></script>
+	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.6"></script>
 	<script type="text/javascript" src="./js/moment.min.js"></script>
 	<script type="text/javascript" src="./js/lang.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -468,6 +468,15 @@
 					</td>
 				</tr>
 
+				<tr>
+					<td><code>startWeekOnMonday</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">1</pre></td>
+					<td>
+						<a href="#cell-radius-example" class="example-link"><i class="icon-file"></i> Example</a>Whether to start a week on Sunday or Monday</td>
+
+				</tr>
+
 			</table>
 			</div>
 
@@ -571,7 +580,7 @@ calendar.init({
 
 	<div class="bs-docs-example">
 		<h3 id="cell-radius-example">By months, then by days horizontally</h3>
-	<p>Same as above, but with the days layered like a regular month calendar, with each column corresponding to a day, and each row to a week</p>
+	<p>Same as above, but with the days layered like a regular month calendar, with each column corresponding to a day, and each row to a week. Also start the week on Sunday.</p>
 
 <style>
 	#graph_k .graph-rect {
@@ -602,6 +611,7 @@ calendar.init({
 				cellpadding: 3,
 				cellradius: 3,
 				domainGutter: 15,
+				weekStartOnMonday: 0,
 				scale: [40, 60, 80, 100]
 			});
 		</script>
@@ -617,6 +627,7 @@ calendar.init({
 	cellpadding: 3,
 	cellradius: 5,
 	domainGutter: 15,
+	weekStartOnMonday: 0,
 	scale: [40, 60, 80, 100]
 });</code></pre>
 
