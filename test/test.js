@@ -130,9 +130,9 @@ test("get domain when domain is 1 WEEK, from a date right on beginning of the we
 
 });
 
-test("get domain when domain is 1 WEEK, from a sunday", function() {
+test("get domain when domain is 1 WEEK, starting a monday", function() {
 
-	expect(6);
+	expect(7);
 
 	var date      = new Date(2013, 1, 17, 20, 15);	// Monday : February 18th, 2013
 	var weekStart = new Date(2013, 1, 11);			// Monday : February 18th, 2013
@@ -145,6 +145,28 @@ test("get domain when domain is 1 WEEK, from a sunday", function() {
 	equal(domain[0].getFullYear(), weekStart.getFullYear(), "Domain start year is equal to the weeks monday's year");
 	equal(domain[0].getMonth(), weekStart.getMonth(), "Domain start month is equal to weeks monday's month");
 	equal(domain[0].getDate(), weekStart.getDate(), "Domain start day is equal to the weeks monday date");
+	equal(domain[0].getDay(), 1, "Domain start is a monday");
+	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+
+});
+
+test("get domain when domain is 1 WEEK, starting a sunday", function() {
+
+	expect(7);
+
+	var date      = new Date(2013, 1, 13, 20, 15);	// Wednesday : February 13th, 2013
+	var weekStart = new Date(2013, 1, 10);			// Sunday : February 10th, 2013
+
+	var cal = createCalendar({domain: "week", range: 1, start : date, weekStartOnMonday: 0});
+	var domain = cal.getDomain(date);
+
+	equal(domain.length, 1, "Domain size is 1 week");
+
+	equal(domain[0].getFullYear(), weekStart.getFullYear(), "Domain start year is equal to the weeks monday's year");
+	equal(domain[0].getMonth(), weekStart.getMonth(), "Domain start month is equal to weeks monday's month");
+	equal(domain[0].getDate(), weekStart.getDate(), "Domain start day is equal to the weeks monday date");
+	equal(domain[0].getDay(), 0, "Domain start is a sunday");
 	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
 	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
 
@@ -1192,6 +1214,23 @@ test("Get the day of the year", function() {
 	equal(cal.getDayOfYear(new Date(2016, 11, 31)), 366, "Getting the last day of (leap) year 2016");
 });
 
+
+test("Week start on Monday", function() {
+
+	expect(1);
+
+	var cal = createCalendar({weekStartOnMonday:1});
+
+	equal(cal.getWeekDay(new Date(2012, 11, 31)), 0, "Monday is first day of week");
+});
+
+test("Week start on Sunday", function() {
+
+	expect(1);
+
+	var cal = createCalendar({weekStartOnMonday:0});
+	equal(cal.getWeekDay(new Date(2012, 11, 31)), 1, "Monday is second day of week");
+});
 
 /*
 	-----------------------------------------------------------------
