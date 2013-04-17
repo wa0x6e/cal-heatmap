@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="./css/main.css?v=2.1.0" />
 	<link href='//fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
-	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.0"></script>
+	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.5"></script>
 	<script type="text/javascript" src="./js/moment.min.js"></script>
 	<script type="text/javascript" src="./js/lang.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -165,6 +165,7 @@
 							<li>min</li>
 							<li>hour</li>
 							<li>day</li>
+							<li>x_day : same as day, but with row and column inverted</li>
 							<li>week</li>
 							<li>month</li>
 						</ul>
@@ -294,6 +295,14 @@
 					<td>
 						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
 						Gutter between each subDomain cell, in pixel</td>
+				</tr>
+				<tr>
+					<td><code>cellradius</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">0</pre></td>
+					<td>
+						<a href="#cell-radius-example" class="example-link"><i class="icon-file"></i> Example</a>
+						For rounding the corner of the subdomain cell, in pixels. You have to use another value than <code>crispedges</code> for the <code>shape-rendering</code> property in your css.</td>
 				</tr>
 				<tr>
 					<td><code>domainGutter</code></td>
@@ -557,6 +566,58 @@ calendar.init({
 	subDomain : "day",		// Split each month by days
 	range : 3,			// Just display 3 months
 	scale: [40, 60, 80, 100] 	// Custom threshold for the scale
+});</code></pre>
+
+
+	<div class="bs-docs-example">
+		<h3 id="cell-radius-example">By months, then by days horizontally</h3>
+	<p>Same as above, but with the days layered like a regular month calendar, with each column corresponding to a day, and each row to a week</p>
+
+<style>
+	#graph_k .graph-rect {
+		shape-rendering: auto;
+	}
+	#graph_k .graph-rect:hover {
+		stroke-width: 2px;
+	}
+	#graph_k .graph-label {
+		text-transform: uppercase;
+		font-size: 14px;
+		font-weight: bold;
+		fill: #bbb;
+	}
+</style>
+
+		<div id="graph_k"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 5),
+				id : "graph_k",
+				domain : "month",
+				subDomain : "x_day",
+				range : 3,
+				cellsize: 15,
+				cellpadding: 3,
+				cellradius: 3,
+				domainGutter: 15,
+				scale: [40, 60, 80, 100]
+			});
+		</script>
+</div>
+		<pre class="prettyprint javascript"><code>CalHeatMap.init({
+	data: "datas-years.json",
+	start: new Date(2000, 5),
+	id : "graph_k",
+	domain : "month",
+	subDomain : "x_day",
+	range : 3,
+	cellsize: 15,
+	cellpadding: 3,
+	cellradius: 5,
+	domainGutter: 15,
+	scale: [40, 60, 80, 100]
 });</code></pre>
 
 
