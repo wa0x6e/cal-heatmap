@@ -130,8 +130,8 @@ var CalHeatMap = function() {
 			row: function(d) {return 10;},
 			column: function(d) { return 6; },
 			position: {
-				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row); },
-				y : function(d) { return d.getMinutes() % self._domainType.min.row;}
+				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d)); },
+				y : function(d) { return d.getMinutes() % self._domainType.min.row(d);}
 			},
 			format: {
 				date: "%H:%M, %A %B %-e, %Y",
@@ -153,13 +153,13 @@ var CalHeatMap = function() {
 			position: {
 				x : function(d) {
 					if (self.options.domain === "month") {
-						return Math.floor(d.getHours() / self._domainType.hour.row) + (d.getDate()-1)*4;
+						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + (d.getDate()-1)*4;
 					} else if (self.options.domain === "week") {
-						return Math.floor(d.getHours() / self._domainType.hour.row) + self.getWeekDay(d)*4;
+						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + self.getWeekDay(d)*4;
 					}
-					return Math.floor(d.getHours() / self._domainType.hour.row);
+					return Math.floor(d.getHours() / self._domainType.hour.row(d));
 				},
-				y : function(d) { return d.getHours() % self._domainType.hour.row;}
+				y : function(d) { return d.getHours() % self._domainType.hour.row(d);}
 			},
 			format: {
 				date: "%Hh, %A %B %-e, %Y",
@@ -264,8 +264,8 @@ var CalHeatMap = function() {
 			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row); },
-				y : function(d) { return d.getMonth() % self._domainType.month.row;}
+				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
+				y : function(d) { return d.getMonth() % self._domainType.month.row(d);}
 			},
 			format: {
 				date: "%B %Y",
@@ -279,8 +279,8 @@ var CalHeatMap = function() {
 			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row); },
-				y : function(d) { return d.getFullYear() % this._domainType.year.row;}
+				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row(d)); },
+				y : function(d) { return d.getFullYear() % this._domainType.year.row(d);}
 			},
 			format: {
 				date: "%Y",
