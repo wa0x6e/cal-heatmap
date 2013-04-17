@@ -35,6 +35,10 @@ var CalHeatMap = function() {
 
 		subDomain : "min",
 
+		// First day of the week is Monday
+		// 0 to start the week on Sunday
+		weekStartOnMonday : 1,
+
 		// Start date of the graph
 		// @default now
 		start : new Date(),
@@ -194,7 +198,7 @@ var CalHeatMap = function() {
 						case "year" : return self.getWeekNumber(d) ;
 					}
 				},
-				y : function(d) { return (d.getDay() === 0 ? 6 : d.getDay()-1);}
+				y : function(d) { return self.getWeekDay(d);}
 			},
 			format: {
 				date: "%A %B %-e, %Y",
@@ -216,7 +220,7 @@ var CalHeatMap = function() {
 				return 7;
 			},
 			position: {
-				x : function(d) { return (d.getDay() === 0 ? 6 : d.getDay()-1);},
+				x : function(d) { return self.getWeekDay(d);},
 				y : function(d) {
 					switch(self.options.domain) {
 						case "week" : return 0;
@@ -848,11 +852,17 @@ CalHeatMap.prototype = {
 	 * Monday as the first day of the week
 	 * @return int	Week number [0-53]
 	 */
-	getWeekNumber : d3.time.format("%W"),
+	getWeekNumber : function(d) {
+		var f = this.options.weekStartOnMonday === 1 ? d3.time.format("%W") : d3.time.format("%U");
+		return f(d);
+	},
 
 
 	getWeekDay : function(d) {
-		if (d.getDay() === 0) {
+		if (this.options.weekStartOnMonday === 0) {
+			return d.getDay();
+		}
+		else if (d.getDay() === 0) {
 			return 6;
 		}
 		return d.getDay()-1;
@@ -877,20 +887,29 @@ CalHeatMap.prototype = {
 	 * @return Date				The start of the hour
 	 */
 	getWeekDomain: function (d, range) {
-		var monday;
-		if (d.getDay() === 1) {
-			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-		} else if (d.getDay() === 0) {
-			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-			monday.setDate(monday.getDate() - 6);
+		var weekStart;
+
+		if (this.options.weekStartOnMonday === 0) {
+			weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
 		} else {
-			monday = new Date(d.getFullYear(), d.getMonth(), d.getDate()-d.getDay()+1);
+			if (d.getDay() === 1) {
+				weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+			} else if (d.getDay() === 0) {
+				weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+				weekStart.setDate(weekStart.getDate() - 6);
+			} else {
+				weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()-d.getDay()+1);
+			}
 		}
-		var endDate = new Date(monday);
+
+		var endDate = new Date(weekStart);
 
 		var stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
 
-		return d3.time.mondays(Math.min(monday, stop), Math.max(monday, stop));
+		return (this.options.weekStartOnMonday === 1) ?
+			d3.time.mondays(Math.min(weekStart, stop), Math.max(weekStart, stop)) :
+			d3.time.sundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
+		;
 	},
 
 	getYearDomain: function(d, range){
