@@ -26,6 +26,9 @@ var CalHeatMap = function() {
 		// Padding between each cell, in pixel
 		cellpadding : 2,
 
+		// For rounded subdomain rectangles, in pixels
+		cellradius: 0,
+
 		domainGutter : 2,
 
 		domain : "hour",
@@ -516,7 +519,17 @@ var CalHeatMap = function() {
 			.attr("height", self.options.cellsize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
 			.attr("y", function(d) { return self.positionSubDomainY(d); })
+			.call(radius)
 			;
+
+		function radius(selection) {
+			if (self.options.cellradius > 0) {
+				selection
+					.attr("rx", self.options.cellradius)
+					.attr("ry", self.options.cellradius)
+				;
+			}
+		}
 
 		// Appeding a title to each subdomain
 		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
