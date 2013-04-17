@@ -210,7 +210,7 @@ var CalHeatMap = function() {
 				}
 			},
 			column: function(d) {
-				return 6;
+				return 7;
 			},
 			position: {
 				x : function(d) { return (d.getDay() === 0 ? 6 : d.getDay()-1);},
@@ -417,7 +417,7 @@ var CalHeatMap = function() {
 			reverse = false;
 		}
 
-		var graphLegendHeight = self.options.cellsize*2;
+		var graphLegendHeight = Math.max(25, self.options.cellsize*2);
 
 		// Compute the width of the domain block
 		// @param int d Domain start timestamp
@@ -459,7 +459,7 @@ var CalHeatMap = function() {
 
 		// Painting all the domains
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
-			.attr("height", function(d) { return h(d) + 20;})
+			.attr("height", function(d) { return h(d) + graphLegendHeight;})
 			.selectAll("svg")
 			.data(self._domains, function(d) { return d;});
 
@@ -499,11 +499,11 @@ var CalHeatMap = function() {
 
 		label
 			.enter().insert("text")
-			.attr("y", function(d) { return h(d) + graphLegendHeight/1.5; })
+			.attr("y", function(d) { return h(d) + graphLegendHeight/2; })
 			.attr("x", function(d, i){ return positionX(i) + w(d) / 2; })
 			.attr("class", "graph-label")
 			.attr("text-anchor", "middle")
-			.attr("vertical-align", "middle")
+			.attr("dominant-baseline", "middle")
 			.text(function(d) { return legendFormat(new Date(d)); });
 
 
