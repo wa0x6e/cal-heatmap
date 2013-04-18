@@ -8,7 +8,7 @@
     "d3js",
     "heat map"
   ],
-  "main": "cal-heatmap.js",
+  "main": "cal-heatmap.min.js",
   "directories": {
     "test": "test"
   },
