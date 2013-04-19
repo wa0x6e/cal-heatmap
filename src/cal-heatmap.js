@@ -787,6 +787,11 @@ CalHeatMap.prototype = {
 						if (parent.options.onClick !== null) {
 							htmlClass += " hover_cursor";
 						}
+						
+						if (data[domainUnit][subDomainUnit] == null) {
++              					  // put an additional class on days for which there is no data (generally, future days)
++              					  htmlClass += " no-data";
++            					}
 
 						return htmlClass;
 					})
