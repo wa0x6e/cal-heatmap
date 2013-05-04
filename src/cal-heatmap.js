@@ -117,7 +117,7 @@ var CalHeatMap = function() {
 		// Callback when clicking on a time block
 		onClick : null,
 
-		// Callback when clicking on a time block
+		// Callback after painting the empty calendar
 		afterLoad : null,
 
 		// Callback after loading the next domain in the calendar
@@ -351,13 +351,13 @@ var CalHeatMap = function() {
 		if (self.options.paintOnLoad) {
 			self.paint();
 
-			if (self.options.afterLoad !== null) {
-				self.afterLoad();
-			}
-
 			// Display scale if needed
 			if (self.options.displayScale) {
 				self.displayScale();
+			}
+
+			if (self.options.afterLoad !== null) {
+				self.afterLoad();
 			}
 
 			// Fill the graph with some datas
