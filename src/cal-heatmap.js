@@ -984,6 +984,7 @@ CalHeatMap.prototype = {
 
 		switch(this.options.domain) {
 			case "hour"  : return this.getHourDomain(date, range);
+			case "x_day" :
 			case "day"   : return this.getDayDomain(date, range);
 			case "week"  : return this.getWeekDomain(date, range);
 			case "month" : return this.getMonthDomain(date, range);
@@ -1012,13 +1013,14 @@ CalHeatMap.prototype = {
 		var computeMinSubDomainSize = function(date, domain) {
 			switch (domain) {
 				case "hour" : return 60;
+				case "x_day" :
 				case "day" : return 60 * 24;
 				case "week" : return 60 * 24 * 7;
 			}
 		};
 
 		var computeHourSubDomainSize = function(date, domain) {
-			if (domain === "day") {
+			if (domain === "day" || domain === "x_day") {
 				return 24;
 			} else if (domain === "week") {
 				return 168;

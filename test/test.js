@@ -89,6 +89,25 @@ test("get domain when domain is 1 DAY, from a timestamp", function() {
 	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
 	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
 });
+test("get domain when domain is 1 X_DAY", function() {
+
+	expect(6);
+
+	var date    = new Date(2003, 10, 20, 23, 26);
+	var nextDay = new Date(2003, 10, 21);
+
+	var cal = createCalendar({domain: "x_day", range:1, start : date});
+	var domain = cal.getDomain(date);
+	var domainEnd = domain[domain.length-1];
+
+	equal(domain.length, 1, "Domain size is 1 day");
+
+	equal(domain[0].getFullYear(), date.getFullYear(), "Domain start year is equal to date year");
+	equal(domain[0].getMonth(), date.getMonth(), "Domain start month is equal to date month");
+	equal(domain[0].getDate(), date.getDate(), "Domain start day is equal to date day");
+	equal(domain[0].getHours(), "0", "Domain start hour is equal to 0");
+	equal(domain[0].getMinutes(), "0", "Domain start minutes is equal to 0");
+});
 
 test("get domain when domain is 1 WEEK, from a date in the middle of the week", function() {
 
@@ -1693,7 +1712,18 @@ test("Custom date formatting with custom function", function() {
 	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {date: function(date) { return date.getTime();}, legend: ""}});
 
 	equal($("#cal-heatmap .graph rect title")[0].firstChild.data, date.getTime());
+});
 
+test("Cell radius is applied", function() {
+
+	expect(2);
+
+	var radius = 15;
+
+	var cal = createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellradius: radius});
+
+	equal($("#cal-heatmap .graph rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellradius applied");
+	equal($("#cal-heatmap .graph rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellradius applied");
 });
 
 /*
