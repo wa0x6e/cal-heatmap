@@ -884,8 +884,47 @@ test("WEEK -> HOUR", function() {
 		equal(subDomain[0].getDay(), 1, "The week start a monday");
 		equal(subDomain[subDomain.length-1].getDay(), 0, "The week end a sunday");
 	});
-
 });
+
+test("WEEK -> MIN", function() {
+
+	expect(13);
+
+	var date = new Date(2013, 0, 2, 15, 26); // Wednesday January 2nd, 2013
+
+	var cal = createCalendar({start : date, domain: "week", subDomain: "min", range: 2, paintOnLoad: true});
+	var domain = cal.getDomain(date);
+
+	var startDate = new Date(2012, 11, 31);
+	var endDate = new Date(2013, 0, 7);
+
+	equal(domain.length, 2, "Domain is equal to 2 weeks");
+	equal(domain[0].getTime(), startDate.getTime());
+	equal(domain[domain.length-1].getTime(), endDate.getTime());
+
+	cal.svg.each(function(domainStartDate){
+		var subDomain = d3.select(this).selectAll("rect").data();
+
+		domainStartDate = new Date(domainStartDate);
+
+		var endWeek = new Date(domainStartDate);
+		endWeek.setDate(endWeek.getDate()+6);
+		endWeek.setHours(23);
+		endWeek.setMinutes(59);
+
+		var minNb = 24 * 7 * 60;
+
+		equal(subDomain.length, minNb, "The week contains " + minNb + " minutes");
+
+		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
+
+		equal(subDomain[0].getTime(), startDate.getTime(), "The week subdomain start is the first minutes of week : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].getTime(), endWeek.getTime(), "The week subdomain end is the last minute of week : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].getDay(), 1, "The week start a monday");
+		equal(subDomain[subDomain.length-1].getDay(), 0, "The week end a sunday");
+	});
+});
+
 
 test("MONTH -> WEEK", function() {
 
@@ -1786,7 +1825,6 @@ test("Grouping datas by hour>min", function() {
 	equal(calDatas[date1*1000]["0"], 15);
 	equal(calDatas[date2*1000]["0"], 25);
 	equal(calDatas[date2*1000]["1"], 1);
-
 });
 
 test("Grouping datas by day>hour", function() {

@@ -1010,12 +1010,10 @@ CalHeatMap.prototype = {
 		};
 
 		var computeMinSubDomainSize = function(date, domain) {
-			if (domain === "day") {
-				return 1440;
-			} else if (domain === "hour") {
-				return 60;
-			} else if (domain === "week") {
-				return 25200;
+			switch (domain) {
+				case "hour" : return 60;
+				case "day" : return 60 * 24;
+				case "week" : return 60 * 24 * 7;
 			}
 		};
 
