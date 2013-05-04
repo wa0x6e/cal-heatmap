@@ -28,7 +28,12 @@ exclude = [];
 // use dots reporter, as travis terminal does not support escaping sequences
 // possible values: "dots", "progress", "junit", "teamcity"
 // CLI --reporters progress
-reporters = ["progress"];
+reporters = ["progress", "coverage"];
+
+coverageReporter = {
+	type : 'html',
+	dir : 'coverage/'
+}
 
 // web server port
 // CLI --port 9876
@@ -76,6 +81,7 @@ reportSlowerThan = 200;
 
 // compile coffee scripts
 preprocessors = {
+	"src/*.js": "coverage"
 };
 
 plugins = [
