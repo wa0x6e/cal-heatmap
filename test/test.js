@@ -1317,6 +1317,26 @@ test("Allow only valid domain", function() {
 
 });
 
+test("Allow only valid data type", function() {
+	var types = ["json", "txt", "csv"];
+	expect(types.length);
+	var cal = new CalHeatMap();
+
+	for(var i = 0, total = types.length; i < total; i++) {
+		ok(cal.init({range:1, dataType: types[i], loadOnInit: false, paintOnLoad: false}), types[i] + " is a valid domain");
+	}
+});
+
+test("Don't allow not valid data type", function() {
+	var types = ["min", "html", "jpg"];
+	expect(types.length);
+	var cal = new CalHeatMap();
+
+	for(var i = 0, total = types.length; i < total; i++) {
+		equal(cal.init({dataType: types[i]}), false, types[i] + " is not a valid domain");
+	}
+});
+
 /*
 	-----------------------------------------------------------------
 	SCALE
@@ -1580,6 +1600,56 @@ test("onComplete is not a valid callback : string", function() {
 	equal(cal.onComplete(), false);
 });
 
+test("afterLoadData callback", function() {
+	expect(4);
+
+	var date = new Date(2000, 0, 1);
+	var date1 = date.getTime()/1000;
+	var date2 = date1+3600;
+	var date3 = date2+60;
+
+	var datas = [];
+	datas.push({date: date1, value: 15});	// 15 events for 00:00
+	datas.push({date: date2, value: 25});	// 25 events for 01:00
+	datas.push({date: date3, value: 1});	// 01 events for 01:01
+
+	var parser = function(data) {
+		var stats = {};
+		for (var d in data) {
+			stats[data[d].date] = data[d].value;
+		}
+		return stats;
+	};
+
+	var cal = createCalendar({data: datas, start: new Date(2000, 0, 1, 1), afterLoadData: parser, domain: "hour", subDomain: "min"});
+
+	var calDatas = cal.parseDatas(datas);
+
+	equal(Object.keys(calDatas).length, 1, "Only datas for 1 hour");
+	equal(calDatas.hasOwnProperty(date1*1000), false, "Datas for the first hour are filtered out");
+	equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
+	equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
+});
+
+test("afterLoadData is not a valid callback", function() {
+	expect(1);
+
+	var date = new Date(2000, 0, 1);
+	var date1 = date.getTime()/1000;
+	var date2 = date1+3600;
+	var date3 = date2+60;
+
+	var datas = [];
+	datas.push({date: date1, value: 15});	// 15 events for 00:00
+	datas.push({date: date2, value: 25});	// 25 events for 01:00
+	datas.push({date: date3, value: 1});	// 01 events for 01:01
+
+	var parser = "";
+	var cal = createCalendar({data: datas, start: new Date(2000, 0, 1, 1), afterLoadData: parser, domain: "hour", subDomain: "min"});
+
+	equal(true, $.isEmptyObject(cal.parseDatas(datas)), "parseDatas return an empty object");
+});
+
 
 /*
 	-----------------------------------------------------------------
@@ -1781,21 +1851,22 @@ test("Data Source is a en empty string", function() {
 
 /*
 	-----------------------------------------------------------------
-
+	DATA SOURCE PARSING
 	-----------------------------------------------------------------
  */
 
 module( "Interpreting Data source template" );
 
-test("Data Source is an URI", function() {
+test("Data Source is a string", function() {
 	expect(1);
 
-	var filePath = "path/to/file.json";
+	var filePath = "path/to/file.html";
 
 	var cal = createCalendar({data: filePath});
 	equal(
 		cal.parseURI(filePath, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])),
-		filePath
+		filePath,
+		"Data source is left as is"
 	);
 });
 
@@ -1823,10 +1894,9 @@ test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 	equal(cal.parseURI(uri, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
 });
 
-
 /*
 	-----------------------------------------------------------------
-	DATA SOURCE PARSING
+	DATA PARSING
 	-----------------------------------------------------------------
  */
 

@@ -4,6 +4,8 @@ var CalHeatMap = function() {
 
 	var self = this;
 
+	var allowedDataType = ["json", "csv", "txt"];
+
 	// Default settings
 	this.options = {
 		// DOM ID of the container to append the graph to
@@ -45,6 +47,8 @@ var CalHeatMap = function() {
 
 		// URL, where to fetch the original datas
 		data : "",
+
+		dataType: allowedDataType[0],
 
 		// Load remote data on calendar creation
 		// When false, the calendar will be left empty
@@ -127,7 +131,13 @@ var CalHeatMap = function() {
 		afterLoadPreviousDomain : function(start) {},
 
 		// Callback after finishing all actions on the calendar
-		onComplete : null
+		onComplete : null,
+
+		// Callback after fetching the datas, but before applying them to the calendar
+		// Used mainly to convert the datas if they're not formatted like expected
+		// Takes the fetched "data" object as argument, must return a json object
+		// formatted like {timestamp:count, timestamp2:count2},
+		afterLoadData : function(data) { return data; }
 	};
 
 
@@ -614,7 +624,12 @@ var CalHeatMap = function() {
 		}
 
 		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
-			console.log("The domain name is not valid");
+			console.log("The domain '" + self.options.domain + "' is not valid domain");
+			return false;
+		}
+
+		if (allowedDataType.indexOf(self.options.dataType) < 0) {
+			console.log("The data type '" + self.options.dataType + "' is not valid data type");
 			return false;
 		}
 
@@ -1125,9 +1140,23 @@ CalHeatMap.prototype = {
 				if (source === "") {
 					return false;
 				} else {
-					d3.json(this.parseURI(source, startDate, endDate), function(data) {
+
+					var fillData = function(data) {
 						parent.fill(data, domain);
-					});
+					};
+
+					switch(this.options.dataType) {
+						case "json" :
+							d3.json(this.parseURI(source, startDate, endDate), fillData);
+							break;
+						case "csv" :
+							d3.csv(this.parseURI(source, startDate, endDate), fillData);
+							break;
+						case "text" :
+							d3.text(this.parseURI(source, startDate, endDate), "text/plain", fillData);
+							break;
+					}
+
 					return true;
 				}
 				break;
@@ -1147,6 +1176,13 @@ CalHeatMap.prototype = {
 	 */
 	parseDatas: function(data) {
 		var stats = {};
+
+		if (typeof (this.options.afterLoadData) === "function") {
+			data = this.options.afterLoadData(data);
+		} else {
+			console.log("Provided callback for afterLoadData is not a function.");
+			return {};
+		}
 
 		for (var d in data) {
 			var date = new Date(d*1000);
