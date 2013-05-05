@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.0 [2013-05-05]
+
+* [new] Add `afterLoadData` callback, to apply your own conversion function when the API don't return data in the expected format
+* [new] Add `dataType` property to specify data source format type. Can use json (default), csv or txt.
+* [fix] Fix wrong number of minutes when using minutes subdomain with a week domain
+
 ## v2.1.6 [2013-04-17]
 
 * [new] Add `startWeekOnMonday` to choose whether to start the week on Monday or Sunday

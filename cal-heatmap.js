@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.1.6 (Wed Apr 17 2013 16:16:20)
+/*! cal-heatmap v2.2.0 (Sun May 05 2013 15:39:48)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -11,6 +11,8 @@ var CalHeatMap = function() {
 	"use strict";
 
 	var self = this;
+
+	var allowedDataType = ["json", "csv", "txt"];
 
 	// Default settings
 	this.options = {
@@ -53,6 +55,8 @@ var CalHeatMap = function() {
 
 		// URL, where to fetch the original datas
 		data : "",
+
+		dataType: allowedDataType[0],
 
 		// Load remote data on calendar creation
 		// When false, the calendar will be left empty
@@ -125,7 +129,7 @@ var CalHeatMap = function() {
 		// Callback when clicking on a time block
 		onClick : null,
 
-		// Callback when clicking on a time block
+		// Callback after painting the empty calendar
 		afterLoad : null,
 
 		// Callback after loading the next domain in the calendar
@@ -135,7 +139,13 @@ var CalHeatMap = function() {
 		afterLoadPreviousDomain : function(start) {},
 
 		// Callback after finishing all actions on the calendar
-		onComplete : null
+		onComplete : null,
+
+		// Callback after fetching the datas, but before applying them to the calendar
+		// Used mainly to convert the datas if they're not formatted like expected
+		// Takes the fetched "data" object as argument, must return a json object
+		// formatted like {timestamp:count, timestamp2:count2},
+		afterLoadData : function(data) { return data; }
 	};
 
 
@@ -359,13 +369,13 @@ var CalHeatMap = function() {
 		if (self.options.paintOnLoad) {
 			self.paint();
 
-			if (self.options.afterLoad !== null) {
-				self.afterLoad();
-			}
-
 			// Display scale if needed
 			if (self.options.displayScale) {
 				self.displayScale();
+			}
+
+			if (self.options.afterLoad !== null) {
+				self.afterLoad();
 			}
 
 			// Fill the graph with some datas
@@ -622,7 +632,12 @@ var CalHeatMap = function() {
 		}
 
 		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
-			console.log("The domain name is not valid");
+			console.log("The domain '" + self.options.domain + "' is not valid domain");
+			return false;
+		}
+
+		if (allowedDataType.indexOf(self.options.dataType) < 0) {
+			console.log("The data type '" + self.options.dataType + "' is not valid data type");
 			return false;
 		}
 
@@ -992,6 +1007,7 @@ CalHeatMap.prototype = {
 
 		switch(this.options.domain) {
 			case "hour"  : return this.getHourDomain(date, range);
+			case "x_day" :
 			case "day"   : return this.getDayDomain(date, range);
 			case "week"  : return this.getWeekDomain(date, range);
 			case "month" : return this.getMonthDomain(date, range);
@@ -1018,17 +1034,16 @@ CalHeatMap.prototype = {
 		};
 
 		var computeMinSubDomainSize = function(date, domain) {
-			if (domain === "day") {
-				return 1440;
-			} else if (domain === "hour") {
-				return 60;
-			} else if (domain === "week") {
-				return 25200;
+			switch (domain) {
+				case "hour" : return 60;
+				case "x_day" :
+				case "day" : return 60 * 24;
+				case "week" : return 60 * 24 * 7;
 			}
 		};
 
 		var computeHourSubDomainSize = function(date, domain) {
-			if (domain === "day") {
+			if (domain === "day" || domain === "x_day") {
 				return 24;
 			} else if (domain === "week") {
 				return 168;
@@ -1133,9 +1148,23 @@ CalHeatMap.prototype = {
 				if (source === "") {
 					return false;
 				} else {
-					d3.json(this.parseURI(source, startDate, endDate), function(data) {
+
+					var fillData = function(data) {
 						parent.fill(data, domain);
-					});
+					};
+
+					switch(this.options.dataType) {
+						case "json" :
+							d3.json(this.parseURI(source, startDate, endDate), fillData);
+							break;
+						case "csv" :
+							d3.csv(this.parseURI(source, startDate, endDate), fillData);
+							break;
+						case "text" :
+							d3.text(this.parseURI(source, startDate, endDate), "text/plain", fillData);
+							break;
+					}
+
 					return true;
 				}
 				break;
@@ -1155,6 +1184,13 @@ CalHeatMap.prototype = {
 	 */
 	parseDatas: function(data) {
 		var stats = {};
+
+		if (typeof (this.options.afterLoadData) === "function") {
+			data = this.options.afterLoadData(data);
+		} else {
+			console.log("Provided callback for afterLoadData is not a function.");
+			return {};
+		}
 
 		for (var d in data) {
 			var date = new Date(d*1000);
