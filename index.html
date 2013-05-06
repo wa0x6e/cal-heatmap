@@ -109,23 +109,50 @@
 					<td>
 						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
 						<strong>The calendar data source</strong>
-						<p>The data source is a JSON object. <code>data</code> can be a path to a <a href="#data-source">JSON file</a>, or directly a JSON object. (See <a href="#data-source">the data source section </a> for accepted format).</p>
+						<p>The data source is an object with informations used for filling the calendar.<br/>
+						It generally consists of a set of dates, associated with a value, representing the number of occurence of an event at a certain date.</p>
 
-						<p>If you're getting your data form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the start timetstamp and <b>yyy</b> is the end timestamp, <code>data</code> also accept date tokens, that will be automatically replaced by the current start and end date of the calendar.</p>
-
-						<p>Available tokens are :</p>
+						<p>Those data can be retrieved by two ways :</p>
 
 						<ul>
-							<li><code>{{t:start}}</code>: timestamp of the calendar's first date</li>
-							<li><code>{{t:end}}</code>: timestamp of the calendar's last date</li>
+							<li>By passing the datas directly, with an <b>array</b> or <b>json object</b></li>
+							<li>By passing the <b>path</b> to a file, containing those informations</li>
+						</ul>
+
+						<p>In both cases, the datas must follow a formatting standard for cal-heatmap to process them. Refer to <a href="#data-source">Date source</a> section for accepted format.</p>
+
+						<p>If you're getting your data form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the first unix timetstamp and <b>yyy</b> is the last unix timestamp of the calendar, <code>data</code> also accept date template, that will be automatically replaced by the current start and end date of the calendar.</p>
+
+						<p>Available templates are :</p>
+
+						<ul>
+							<li><code>{{t:start}}</code>: unix timestamp of the calendar's first date</li>
+							<li><code>{{t:end}}</code>: unix timestamp of the calendar's last date</li>
 							<li><code>{{d:start}}</code>: ISO-8601 formatted date of the calendar's first date</li>
 							<li><code>{{d:end}}</code>: ISO-8601 formatted date of the calendar's last date</li>
 						</ul>
 
-						<p><b>Example</b>: <code>api?start={{t:start}}&end={{d:end}}</code> will fetch
+						<p><b>Example</b>: <code>api?start={{t:start}}&end={{d:end}}</code> will fetch something like
 							<code>api?start=1362006000&end=2013-02-27T23:00:00.000Z</code></p>
 
 						<div class="alert alert-infos">All timestamp are in seconds</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>dataType</code></td>
+					<td>String</td>
+					<td>json</td>
+					<td>
+						<p>Parser engine for the data source. Sometime, we don't have a word to say about how an API return its datas. Whereas it's usually a json object (default), it also can be a simple plain text, or csv.</p>
+
+						<p>You can tell cal-heatmap which parser to use to interpret the data source response :</p>
+
+						<ul>
+							<li><code>json</code>: Default engine</li>
+							<li><code>csv</code>: Interpret the data as a csv formatted following the <a href="http://tools.ietf.org/html/rfc4180">RFC-4180</a> standard.</li>
+							<li><code>txt</code>: don't interpret the results</li>
+						</ul>
 
 					</td>
 				</tr>
@@ -267,6 +294,24 @@
 					<td>null</td>
 					<td>
 						<p>Called after finish drawing and filling the graph, or just after drawing the graph if <code>loadOnInit</code> is set to false.</p>
+					</td>
+				</tr>
+				<tr>
+					<td><code>afterLoadData</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<p>Called after fetching the data source, but before interpreting its contents. This callback takes the result of the data source as argument, after interpretation by the dataType engine. This argument can takes various format, depending on the data source.</p>
+
+						<p>This callback must return a json object, formatted like described in the data source section. This callback is used primary for converting data from various source and format to the format used by cal-heatmap.</p>
+
+						<p>If the data source is a :</p>
+
+						<ul>
+							<li><code>String</code>, it's interpreted as an URL, thus the arguments will contains the result of the remote URL. It can be anything, and depends on what the remote url is returning</li>
+							<li><code>object</code>, it stays an object</li>
+						</ul>
+
 					</td>
 				</tr>
 			</table>
@@ -847,7 +892,7 @@ calendar.init({
 
 <h2><a href="#data-source" id="data-source">Data Source</a></h2>
 
-<p>The source data file is a simple JSON file formatted like that :</p>
+<p>To display datas in the calendar, cal-heatmap takes a set of dates, associated with a count value. Those datas are grouped inside a json object, followint the convention :</p>
 
 <pre class="json"><code>{
 	"946702811" : 12,
@@ -855,11 +900,15 @@ calendar.init({
 	....
 }</code></pre>
 
+<p>The object must contains one property by date, keyname is the unix timestamp of the date (in seconds), and the value, is the count number associated to this date.</p>
+
 <p>See <a href="./datas-hours.json">the example datas-hours.json</a> file.</p>
 
-<p>Each entry is a couple <b>timestamp</b> : <b>count</b>, representing the number of occurence of an event at a certain second. </p>
+<p>It's the same formatting for all domain type, data will automatically be grouped into min/days/week/hours/month, depending on the domain type. Having a count for each seconds lets you jump to the smaller domain without losing datas.</p>
 
-<p>It's the same formatting for all domain type, data will automatically be grouped into min/days/week/hours/month, depending on the domain type.</p>
+<p>You could also grouped all the counter by hours, by using the first second of the first minutes of that hour as timestamp. You'll save a lot of bandwith if you don't plan to use subdomain smaller than "hour".</p>
+
+<p>Of course, we can expects all API to return the results following the format above, that's why there's a special callback (afterLoadData(d)) that you can use to convert your results to the required format. This function takes as argument the result of you API, after interpretation by the dataType engine, and must return a json object formatted as above.</p>
 
 <div class="alert alert-infos">All timestamp are in seconds</div>
 
