@@ -5,11 +5,10 @@
 	<title>Cal-HeatMap : Calendar Heat map with d3.js</title>
 
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css" />
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
 	<link rel="stylesheet" href="./css/cal-heatmap.css?v=2.1.0" />
 	<link rel="stylesheet" href="./css/main.css?v=2.1.0" />
-	<link href='//fonts.googleapis.com/css?family=Signika+Negative:400,700' rel='stylesheet' type='text/css'>
+	<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400:700' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
 	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.6"></script>
 	<script type="text/javascript" src="./js/moment.min.js"></script>
@@ -43,7 +42,7 @@
 					data: "datas-years.json",
 					domain: "day",
 					subDomain: "hour",
-					range: 18,
+					range: 14,
 					start : new Date(2000, 2),
 					browsing: true,
 					browsingOptions: {
@@ -68,7 +67,7 @@
 			<li>Install <a href="http://d3js.org/">d3js</a> in your app.</li>
 
 			<li>Create your first calendar:
-			<pre class="code html"><code>&lt;div id="cal-heatmap">&lt;/div>
+			<pre class="code language-markup"><code>&lt;div id="cal-heatmap">&lt;/div>
 &lt;script type="text/javascript">
 	var cal = new CalHeatMap();
 	cal.init({
@@ -108,11 +107,11 @@
 					<td>""</td>
 					<td>
 						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
-						<strong>The calendar data source</strong>
-						<p>The data source is an object with informations used for filling the calendar.<br/>
+						<p><strong>The calendar data source</strong></p>
+						<p>The data source is an object with informations used to fill the calendar.<br/>
 						It generally consists of a set of dates, associated with a value, representing the number of occurence of an event at a certain date.</p>
 
-						<p>Those data can be retrieved by two ways :</p>
+						<p>Those datas can be retrieved by two ways :</p>
 
 						<ul>
 							<li>By passing the datas directly, with an <b>array</b> or <b>json object</b></li>
@@ -121,7 +120,7 @@
 
 						<p>In both cases, the datas must follow a formatting standard for cal-heatmap to process them. Refer to <a href="#data-source">Date source</a> section for accepted format.</p>
 
-						<p>If you're getting your data form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the first unix timetstamp and <b>yyy</b> is the last unix timestamp of the calendar, <code>data</code> also accept date template, that will be automatically replaced by the current start and end date of the calendar.</p>
+						<p>If you're getting your data form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the first unix timetstamp and <b>yyy</b> is the last unix timestamp of the calendar, <code>data</code> also accept date template, which will be automatically replaced by the current start and end date of the calendar.</p>
 
 						<p>Available templates are :</p>
 
@@ -527,35 +526,34 @@
 
 		</div>
 
+
+
+
+
 		<h2><a href="#examples" id="examples">Examples</a></h2>
 
 
-		<div class="bs-docs-example">
-			<h3 id="range-example">Default values</h3>
-		<p>Display 12 hours, from midnight on January 1st, 2000. Each hours is split in 60 minutes.</p>
+		<h3 id="range-example">With Default values</h3>
+		<p>By default, cal-heatmap will always display 12 hours, split into 60 minutes each.</p>
 
+		<p>Unless you set the <code>date</code> property in <code>init()</code>, the calendar will start at the beginning of the current hour.</p>
+
+
+		<div class="bs-docs-example">
 		<div id="graph_a"></div>
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
-			calendar.init({
-				data: "datas-hours.json",
-				start : new Date(2000, 0),
-				id : "graph_a",
-			});
+			calendar.init({id : "graph_a"});
 		</script>
 		</div>
-		<pre class="prettyprint javascript"><code>var calendar = new CalHeatMap();
-calendar.init({
-	data: "data-hours.json",	// Fill the calendar with the data from datas-hours.json
-	start : new Date(2000, 0),	// Start the graph on January 2000
-	id : "graph_a" 			// Prepend the calendar to the #graph_a in the DOM
-});</code></pre>
+		<pre class="prettyprint language-javascript"><code>var calendar = new CalHeatMap();
+calendar.init({});</code></pre>
 
+
+		<h3 id="domain-example">Days > hours</h3>
+		<p>Display all the hours for 10 days, starting from January 15th, 2000.</p>
 
 		<div class="bs-docs-example">
-			<h3 id="domain-example">By days, then by hours, with browsing options</h3>
-		<p>Display all the hours for 15 days, starting from January 15th, 2000. Also enable domain browsing : click on the next and previous links to shift the calendar back or forward.</p>
-
 		<div id="graph_b"></div>
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
@@ -563,33 +561,30 @@ calendar.init({
 				data: "datas-years.json",
 				start: new Date(2000, 0, 15),
 				id : "graph_b",
-				range : 15,			// Number of days to display
+				range : 10,			// Number of days to display
 				domain : "day",		// Display days
 				subDomain : "hour",	// Split each day by hours
-				browsing : true,	// Enable browsing
-				afterLoadNextDomain : function(start, end) {
-					alert("You just loaded a new domain starting on " + start + " and ending on " + end);
-				}
+				browsing: true, // Enable browsing
+		        afterLoadNextDomain: function (start, end) {
+		            alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+		        }
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/EsN62/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
-	data: "datas-years.json",
-	start: new Date(2000, 0, 15),
+		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/EsN62/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+	data: "datas-years.json",		// Fill the graph with datas from that json file
+	start: new Date(2000, 0, 15), 	// Start the calendar on 15th January, 2000
 	id : "graph_b",
-	domain : "day",		// Group data by days
-	subDomain : "hour",	// Split each day by hours
-	range : 15,		// Number of days to display
-	browsing : true,	// Enable browsing
-	afterLoadNextDomain : function(start, end) {
-		alert("You just loaded a new domain starting on " + start + " and ending on " + end);
-	}
+	domain : "day",					// Group data by days
+	subDomain : "hour",				// Split each day by hours
+	range : 10,						// Number of days to display
+	browsing: true, 				// Enable browsing
+    afterLoadNextDomain: function (start, end) {
+        alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+    }
 });</code></pre>
 
-
-
-	<div class="bs-docs-example">
-		<h3 id="scale-example">By months, then by days</h3>
+	<h3 id="scale-example">Months > days</h3>
 	<p>Display all days, for 3 months, from February 2000.<br/>
 		Let's try changing the scale threshold, since the number of data represented in a subdomain is larger, since it's now a day instead of hour. Hover on the scale to view the new range each color is representing.</p>
 
@@ -598,6 +593,7 @@ calendar.init({
 			<li><small>The date formatting when you hover on a day is also changed, according to the subdomain</small></li>
 		</ul>
 
+	<div class="bs-docs-example">
 		<div id="graph_c"></div>
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
@@ -612,20 +608,24 @@ calendar.init({
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/4aDdJ/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/4aDdJ/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 1),
 	id : "graph_c",
-	domain : "month",		// Group data by month
-	subDomain : "day",		// Split each month by days
-	range : 3,			// Just display 3 months
+	domain : "month",			// Group data by month
+	subDomain : "day",			// Split each month by days
+	range : 3,					// Just display 3 months
 	scale: [40, 60, 80, 100] 	// Custom threshold for the scale
 });</code></pre>
 
 
-	<div class="bs-docs-example">
-		<h3 id="cell-radius-example">By months, then by days horizontally</h3>
+
+
+	<h3 id="cell-radius-example">Months > days (horizontally)</h3>
 	<p>Same as above, but with the days layered like a regular month calendar, with each column corresponding to a day, and each row to a week. Also start the week on Sunday.</p>
+
+	<div class="bs-docs-example">
+
 
 <style>
 	#graph_k .graph-rect {
@@ -661,7 +661,7 @@ calendar.init({
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-13"><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 5),
 	id : "graph_k",
@@ -677,10 +677,12 @@ calendar.init({
 });</code></pre>
 
 
-	<div class="bs-docs-example">
-		<h3 id="cell-example">By months, then by hours</h3>
+	<h3 id="cell-example">Months > hours</h3>
 	<p>Display all the hours of January 2000.<br/>
-		Also resize the cell to fit in the page</p>
+		Also resize the cell to fit in the page.</p>
+
+	<div class="bs-docs-example">
+
 
 		<div id="graph_f"></div>
 		<script type="text/javascript">
@@ -697,7 +699,7 @@ calendar.init({
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/BWvkH/2/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-9"><a href="http://jsfiddle.net/Kamisama/BWvkH/2/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_f",
@@ -708,10 +710,11 @@ calendar.init({
 	cellpadding: 1
 });</code></pre>
 
-	<div class="bs-docs-example">
-		<h3>By months, then by weeks</h3>
+
+	<h3>Months > weeks</h3>
 	<p>Display weeks for February, March and April 2000.</p>
 
+	<div class="bs-docs-example">
 		<div id="graph_j"></div>
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
@@ -726,20 +729,21 @@ calendar.init({
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/7RNS8/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/7RNS8/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 1),
 	id : "graph_c",
-	domain : "month",		// Group data by month
-	subDomain : "week",		// Split each month by week
-	range : 3,			// Just display 3 months
+	domain : "month",				// Group data by month
+	subDomain : "week",				// Split each month by week
+	range : 3,						// Just display 3 months
 	scale: [120, 400, 450, 500] 	// Custom threshold for the scale
 });</code></pre>
 
-	<div class="bs-docs-example">
-		<h3>By weeks, then by hours</h3>
+
+	<h3>Weeks > hours</h3>
 	<p>Display all the hours of the first 2 weeks of Januray 2000</p>
 
+	<div class="bs-docs-example">
 		<div id="graph_h"></div>
 		<script type="text/javascript">
 			var calendar = new CalHeatMap();
@@ -753,7 +757,7 @@ calendar.init({
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/s7qZ2/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/s7qZ2/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_h",
@@ -764,10 +768,7 @@ calendar.init({
 
 
 
-
-
-	<div class="bs-docs-example">
-		<h3 id="itemname-example">By year, then by days</h3>
+	<h3 id="itemname-example">Year > days</h3>
 	<p>Display all days of year 2000.<br/>
 		Additionally, use a custom name for the data : we're representing the number of <b>lost kittens</b> by days, in french.</p>
 
@@ -775,6 +776,9 @@ calendar.init({
 			<li><small>Hover on a day or legend to view the new title</small></li>
 		</ul>
 
+
+
+	<div class="bs-docs-example">
 		<div id="graph_d"></div>
 		<script type="text/javascript">
 			moment.lang("fr");
@@ -806,7 +810,7 @@ calendar.init({
 			});
 		</script>
 </div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/YDFyQ/4/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="2,8-27"><a href="http://jsfiddle.net/Kamisama/YDFyQ/4/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	moment.lang("fr");
 	var calendar = new CalHeatMap();
 	calendar.init({
@@ -837,14 +841,16 @@ calendar.init({
 });</code></pre>
 
 
-	<div class="bs-docs-example">
-		<h3 id="format-example">By year, then by months, with custom callback onClick</h3>
-	<p>Display 1 year, split by months, with custom legend and title formatting</p>
+
+	<h3 id="format-example">Year > months</h3>
+	<p>Display 1 year, split by months, with a custom legend and title formatting, as well as a custom callback when clicking on a month.</p>
 
 	<ul>
 		<li><small>Hover on a cell to view custom title formatting</small></li>
 		<li><small>Click on a cell to view custom onClick callback</small></li>
 	</ul>
+
+	<div class="bs-docs-example">
 
 		<div id="graph_e"></div>
 		<script type="text/javascript">
@@ -872,7 +878,7 @@ calendar.init({
 
 
 		</div>
-		<pre class="prettyprint javascript"><a href="http://jsfiddle.net/Kamisama/38JYb/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-16"><a href="http://jsfiddle.net/Kamisama/38JYb/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_e",
@@ -880,9 +886,9 @@ calendar.init({
 	domain : "year",
 	subDomain : "month",
 	scale: [1950, 2050, 2150, 2250],
-	displayScale: false,				// Don't display the scale
+	displayScale: false,					// Don't display the scale
 	format: {
-		date: "==%B==",				// Custom date format, hover on a month to view
+		date: "==%B==",						// Custom date format, hover on a month to view
 		legend: "Thy year is %Y, yeah !"	// Custom domain legend
 	},
 	onClick: function(date, count) {
@@ -892,9 +898,11 @@ calendar.init({
 
 <h2><a href="#data-source" id="data-source">Data Source</a></h2>
 
-<p>To display datas in the calendar, cal-heatmap takes a set of dates, associated with a count value. Those datas are grouped inside a json object, followint the convention :</p>
+<h3>Expected Datas format</h3>
 
-<pre class="json"><code>{
+<p>To display datas in the calendar, cal-heatmap takes a set of dates, associated with a count value. Those datas are grouped inside a json object, following the convention :</p>
+
+<pre class="language-javascript"><code>{
 	"946702811" : 12,
 	"946702812" : 53
 	....
@@ -906,9 +914,39 @@ calendar.init({
 
 <p>It's the same formatting for all domain type, data will automatically be grouped into min/days/week/hours/month, depending on the domain type. Having a count for each seconds lets you jump to the smaller domain without losing datas.</p>
 
-<p>You could also grouped all the counter by hours, by using the first second of the first minutes of that hour as timestamp. You'll save a lot of bandwith if you don't plan to use subdomain smaller than "hour".</p>
+<h3>Exotic datas format</h3>
 
-<p>Of course, we can expects all API to return the results following the format above, that's why there's a special callback (afterLoadData(d)) that you can use to convert your results to the required format. This function takes as argument the result of you API, after interpretation by the dataType engine, and must return a json object formatted as above.</p>
+<p>Of course, we can't expect all the API to return the results following the format above.</p>
+
+ <p>That's why there's a special callback (<code>afterLoadData(d)</code>) that you can use to convert your results to the required format. This function takes the result of your API as argument, after interpretation by the dataType engine, and must return a json object formatted as above.</p>
+
+<pre class="language-javascript"><code>// datas is an array of object
+var datas = [
+	{date: 946702811, value: 15},
+	{date: 946702812, value: 25},
+	{date: 946702813, value: 10}
+]
+
+var parser = function(data) {
+	var stats = {};
+	for (var d in data) {
+		stats[data[d].date] = data[d].value;
+	}
+	return stats;
+};
+// Parser will output the object
+//{
+//	"946702811": 15,
+//	"946702812": 25,
+//	"946702813": 10
+}
+
+var cal = createCalendar({
+	data: datas,
+	afterLoadData: parser
+});
+</code></pre>
+
 
 <div class="alert alert-infos">All timestamp are in seconds</div>
 
@@ -946,8 +984,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </div>
 
 
-<script type="text/javascript" src="//yandex.st/highlightjs/7.3/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
+<script src="./js/prism.js"></script>
 
 <script type="text/javascript">
 
