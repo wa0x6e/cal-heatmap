@@ -6,6 +6,7 @@
     background-color: rgb(255, 255, 255);
     border-radius: 5px 5px 0 0;
     overflow: auto;
+    border:  1px solid rgba(0,0,0,.1);
 }
 
 .bs-docs-example + .prettyprint {
@@ -16,7 +17,7 @@
 .prettyprint {
     padding: 8px;
     background-color: rgba(0,0,0,.04);
-	border: 0;
+	border:  1px solid rgba(0,0,0,.05);
 	border-top: 3px solid rgba(0,0,0,.03);
 	border-radius: 0 0 5px 5px;
 
@@ -53,7 +54,7 @@ pre.api-default {
 body
 {
 	padding-bottom: 2em;
-	font-family: "Source Sans Pro", Helvetica, Sans-serif;
+	font-family: "Droid Sans", Helvetica, Sans-serif;
 	background: url("../img/background.png");
 }
 
@@ -64,7 +65,7 @@ body
 
 .ftr
 {
-	background-color: #c3dbf0;
+	background-color: #fff;
 	padding: 2em 0;
 
 
@@ -84,6 +85,9 @@ body
 
 }
 
+h1, h2, h3, h4 {
+	font-family: helvetica, Arial, Sans-serif;
+}
 
 h2, h2 a{
 	margin-top: 2em;
@@ -106,7 +110,6 @@ h1
 {
 	font-size: 3.5em;
 	color: #b1361d;
-	text-shadow: 0 1px 1px rgba(255,255,255,0.8);
 }
 
 .example-link{
@@ -141,7 +144,6 @@ small{
 	border-radius: 3px;
 	vertical-align: middle;
 	text-align: center;
-	background-color: #c9dbee;
 	background-image: none;
 
 	i {
@@ -170,18 +172,21 @@ a.jsfiddle {
 	background-color: #406aa2;
 	color: #fff;
 	position: absolute;
-	right: 10px;
+	right: 0px;
+	z-index: 5;
 	top:  10px;
 	padding: 0.25em 0.6em;
 	font-size: 10px;
 	text-transform: uppercase;
 	border-bottom: 1px solid #fff;
 	border-top: 1px solid darken(#406aa2, 5);
+	border-radius: 3px 0 0 3px;
+	opacity: 0.5;
 }
 
 .jsfiddle:hover {
-	background: darken(#406aa2, 10);
 	text-decoration: none;
+	opacity: 1;
 }
 
 
