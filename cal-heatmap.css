@@ -93,3 +93,9 @@
 	background-color: #3b6427;
 	fill: #3b6427
 }
+
+.no-data 
+{
+	background-color: #f8f8f8;
+	fill: #f8f8f8	
+}
