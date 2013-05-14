@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+	"use strict";
+
      var headerComment = "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
                 " *  ---------------------------------------------\n" +
                 " *  <%= pkg.description %>\n" +
@@ -28,7 +30,8 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: headerComment
+                banner: headerComment,
+                sourceMap: '<%= pkg.name %>.source-map.js'
             },
             base: {
                 files: {

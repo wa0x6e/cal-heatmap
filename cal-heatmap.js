@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.2.0 (Sun May 05 2013 15:39:48)
+/*! cal-heatmap v2.2.0 (Tue May 14 2013 11:32:39)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
