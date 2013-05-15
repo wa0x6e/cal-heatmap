@@ -571,7 +571,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/EsN62/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/EsN62/3/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
 	data: "datas-years.json",		// Fill the graph with datas from that json file
 	start: new Date(2000, 0, 15), 	// Start the calendar on 15th January, 2000
 	id : "graph_b",
@@ -608,7 +609,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/4aDdJ/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/4aDdJ/1/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
 	data: "datas-years.json",
 	start: new Date(2000, 1),
 	id : "graph_c",
@@ -661,7 +663,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="5-13"><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-13"><code>var calendar = new CalHeatMap();
+calendar
 	data: "datas-years.json",
 	start: new Date(2000, 5),
 	id : "graph_k",
@@ -699,7 +702,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="5-9"><a href="http://jsfiddle.net/Kamisama/BWvkH/2/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-9"><a href="http://jsfiddle.net/Kamisama/BWvkH/2/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_f",
@@ -729,7 +733,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/7RNS8/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/7RNS8/1/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
 	data: "datas-years.json",
 	start: new Date(2000, 1),
 	id : "graph_c",
@@ -757,7 +762,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/s7qZ2/1/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/s7qZ2/1/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_h",
@@ -810,7 +816,8 @@ calendar.init({});</code></pre>
 			});
 		</script>
 </div>
-		<pre class="prettyprint language-javascript" data-line="2,8-27"><a href="http://jsfiddle.net/Kamisama/YDFyQ/4/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="2,8-27"><a href="http://jsfiddle.net/Kamisama/YDFyQ/4/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar.init({
 	moment.lang("fr");
 	var calendar = new CalHeatMap();
 	calendar.init({
@@ -878,7 +885,8 @@ calendar.init({});</code></pre>
 
 
 		</div>
-		<pre class="prettyprint language-javascript" data-line="5-16"><a href="http://jsfiddle.net/Kamisama/38JYb/3/" class="jsfiddle">JsFiddle</a><code>CalHeatMap.init({
+		<pre class="prettyprint language-javascript" data-line="5-16"><a href="http://jsfiddle.net/Kamisama/38JYb/3/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar.init({
 	data: "datas-years.json",
 	start: new Date(2000, 0),
 	id : "graph_e",
@@ -895,6 +903,77 @@ calendar.init({});</code></pre>
 		alert("Oh gosh, " + count + " things occured on " + date.toISOString());
 	}
 });</code></pre>
+
+
+	<h3 id="theme-example">Theme</h3>
+	<p>All colors can be customized via the css</p>
+
+	<p>This graph represents the number of visitors per hour for one month. <a href="ga.csv">Datas</a> are pulled from Google Analytics, in csv format. This example also highlight the datas format conversion, to transform your datas to something understandable by cal-heatmap.</p>
+
+	<div class="bs-docs-example" style="background: #2d3a47;">
+		<style>
+			#graph_l .grap-rect {fill:#35252d;}
+			#graph_l .q0 {fill:#35252d;}
+			#graph_l .q1 {fill:#fea1eb; opacity: 0.1}
+			#graph_l .q2 {fill:#fea1eb; opacity: 0.2}
+			#graph_l .q3 {fill:#fea1eb; opacity: 0.4}
+			#graph_l .q4 {fill:#fea1eb; opacity: 0.6}
+			#graph_l .q5 {fill:#fea1eb; opacity: 0.8}
+			#graph_l .q6 {fill:#fea1eb; opacity: 1}
+			#graph_l .graph-rect:hover {fill: #fff; opacity: 1; stroke-width: 0;}
+		</style>
+
+		<div id="graph_l"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				id: "graph_l",
+				data: "ga.csv",
+				dataType: "csv",
+				domain: "day",
+				subDomain: "hour",
+				range: 31,
+				cellpadding: 1,
+				itemName : ["visitor", "visitors"],
+				scale: [2, 4, 6, 8, 10],
+				start: new Date(2013, 03, 14),
+				afterLoadData: function(d) {
+					var start = +new Date(2013, 03, 14) / 1000;
+					var stats = {};
+					for (var i = 0, total = d.length; i < total; i++ ) {
+						o = d[i];
+						stats[(parseInt(o.Hour, 10) * 3600) + start] = o.Visits;
+					}
+					return stats;
+				}
+			});
+		</script>
+
+		</div>
+		<pre class="prettyprint language-javascript" data-line="4-22"><code>var calendar = new CalHeatMap();
+calendar.init({
+	id: "graph_l",
+	data: "ga.csv",
+	dataType: "csv",
+	domain: "day",
+	subDomain: "hour",
+	range: 31,
+	cellpadding: 1,
+	itemName : ["visitor", "visitors"],
+	scale: [2, 4, 6, 8, 10],
+	start: new Date(2013, 03, 14),
+	afterLoadData: function(d) {
+		var start = +new Date(2013, 03, 14) / 1000;
+		var stats = {};
+		for (var i = 0, total = d.length; i < total; i++ ) {
+			o = d[i];
+			stats[(parseInt(o.Hour, 10) * 3600) + start] = o.Visits;
+		}
+		return stats;
+	}
+});</code></pre>
+
+
 
 <h2><a href="#data-source" id="data-source">Data Source</a></h2>
 
