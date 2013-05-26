@@ -64,6 +64,9 @@ var CalHeatMap = function() {
 		// Whether to display the scale
 		displayScale : true,
 
+		// Whether to highlight the rect with today's date
+		highlightToday : false,
+
 		// ================================================
 		// TEXT FORMATTING
 		// ================================================
@@ -803,6 +806,17 @@ CalHeatMap.prototype = {
 							htmlClass += " hover_cursor";
 						}
 
+						// compare the date to see if it is today and add the today class if it is
+						// compare dates while ignoring time
+						// assuming this does not make sense to do if the subdomain is less than "day"
+						if (parent.options.highlightToday && parent.options.subDomain !== "hour" && parent.options.subDomain !== "min")
+						{
+							if (parent.isToday(d))
+							{
+								htmlClass += " today";
+							}
+						}
+
 						return htmlClass;
 					})
 					.on("click", function(d) {
@@ -835,6 +849,27 @@ CalHeatMap.prototype = {
 			}
 		);
 		return true;
+	},
+
+	/**
+	 * Returns true if the passed rectDate matches today's date.
+	 *
+	 * @param  Date d
+	 */
+	isToday: function(d) {
+		var isToday = false;
+		var today = new Date();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayYear = today.getFullYear();
+
+		if (todayDate === d.getDate() && todayMonth === d.getMonth()+1 && todayYear === d.getFullYear()
+			)
+		{
+			isToday = true;
+		}
+	
+		return isToday;
 	},
 
 	// =========================================================================//

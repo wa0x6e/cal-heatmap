@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.2.0 (Tue May 14 2013 11:32:39)
+/*! cal-heatmap v2.2.0 (Sun May 26 2013 05:10:12)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -71,6 +71,9 @@ var CalHeatMap = function() {
 
 		// Whether to display the scale
 		displayScale : true,
+
+		// Whether to highlight the rect with today's date
+		highlightToday : false,
 
 		// ================================================
 		// TEXT FORMATTING
@@ -811,6 +814,17 @@ CalHeatMap.prototype = {
 							htmlClass += " hover_cursor";
 						}
 
+						// compare the date to see if it is today and add the today class if it is
+						// compare dates while ignoring time
+						// assuming this does not make sense to do if the subdomain is less than "day"
+						if (parent.options.highlightToday && parent.options.subDomain !== "hour" && parent.options.subDomain !== "min")
+						{
+							if (parent.isToday(d))
+							{
+								htmlClass += " today";
+							}
+						}
+
 						return htmlClass;
 					})
 					.on("click", function(d) {
@@ -843,6 +857,27 @@ CalHeatMap.prototype = {
 			}
 		);
 		return true;
+	},
+
+	/**
+	 * Returns true if the passed rectDate matches today's date.
+	 *
+	 * @param  Date d
+	 */
+	isToday: function(d) {
+		var isToday = false;
+		var today = new Date();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayYear = today.getFullYear();
+
+		if (todayDate === d.getDate() && todayMonth === d.getMonth()+1 && todayYear === d.getFullYear()
+			)
+		{
+			isToday = true;
+		}
+	
+		return isToday;
 	},
 
 	// =========================================================================//
