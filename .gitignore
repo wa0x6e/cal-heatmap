@@ -1,3 +1,6 @@
 /node_modules/
 /jscoverage/
 /coverage/
+/test/
+/report/
+.DS_Store

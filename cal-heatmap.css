@@ -93,3 +93,9 @@
 	background-color: #3b6427;
 	fill: #3b6427
 }
+
+.today
+{
+	stroke:black;
+	stroke-width:1;
+}
