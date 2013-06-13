@@ -2,3 +2,5 @@
 /jscoverage/
 /coverage/
 /test/
+/report/
+.DS_Store

@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.2.0 (Sun May 26 2013 05:10:12)
+/*! cal-heatmap v2.2.0 (Wed Jun 12 2013 23:17:59)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -539,7 +539,7 @@ var CalHeatMap = function() {
 		var rect = domainSvg.selectAll("rect")
 			.data(function(d) { return self.getSubDomain(d); })
 			.enter().append("svg:rect")
-			.attr("class", "graph-rect")
+			.attr("class", function(d) { return self.getClassName(d); })
 			.attr("width", self.options.cellsize)
 			.attr("height", self.options.cellsize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
@@ -805,7 +805,7 @@ CalHeatMap.prototype = {
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						var htmlClass = "graph-rect" +
+						var htmlClass = parent.getClassName(d) +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
 							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
 						);
@@ -813,18 +813,7 @@ CalHeatMap.prototype = {
 						if (parent.options.onClick !== null) {
 							htmlClass += " hover_cursor";
 						}
-
-						// compare the date to see if it is today and add the today class if it is
-						// compare dates while ignoring time
-						// assuming this does not make sense to do if the subdomain is less than "day"
-						if (parent.options.highlightToday && parent.options.subDomain !== "hour" && parent.options.subDomain !== "min")
-						{
-							if (parent.isToday(d))
-							{
-								htmlClass += " today";
-							}
-						}
-
+						
 						return htmlClass;
 					})
 					.on("click", function(d) {
@@ -859,6 +848,36 @@ CalHeatMap.prototype = {
 		return true;
 	},
 
+	// =========================================================================//
+	// POSITIONNING																//
+	// =========================================================================//
+
+	positionSubDomainX: function(d) {
+		var index = this._domainType[this.options.subDomain].position.x(d);
+		return index * this.options.cellsize + index * this.options.cellpadding;
+	},
+
+	positionSubDomainY: function(d) {
+		var index = this._domainType[this.options.subDomain].position.y(d);
+		return index * this.options.cellsize + index * this.options.cellpadding;
+	},
+
+	getClassName: function(d)
+	{
+		var clazz = "graph-rect";
+		// compare the date to see if it is today and add the today class if it is
+		// compare dates while ignoring time
+		// assuming this does not make sense to do if the subdomain is less than "day"
+		if (this.options.highlightToday && this.options.subDomain !== "hour" && this.options.subDomain !== "min")
+		{
+			if (this.isToday(d))
+			{
+				clazz += " today";
+			}
+		}
+		return clazz;
+	},
+
 	/**
 	 * Returns true if the passed rectDate matches today's date.
 	 *
@@ -878,20 +897,6 @@ CalHeatMap.prototype = {
 		}
 	
 		return isToday;
-	},
-
-	// =========================================================================//
-	// POSITIONNING																//
-	// =========================================================================//
-
-	positionSubDomainX: function(d) {
-		var index = this._domainType[this.options.subDomain].position.x(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
-	},
-
-	positionSubDomainY: function(d) {
-		var index = this._domainType[this.options.subDomain].position.y(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
 	},
 
 	// =========================================================================//
