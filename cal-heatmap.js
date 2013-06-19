@@ -1,4 +1,4 @@
-/*! cal-heatmap v2.2.0 (Wed Jun 12 2013 23:17:59)
+/*! cal-heatmap v2.2.1 (Wed Jun 19 2013 14:14:14)
  *  ---------------------------------------------
  *  A module to create calendar heat map to visualise time data series a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -73,6 +73,7 @@ var CalHeatMap = function() {
 		displayScale : true,
 
 		// Whether to highlight the rect with today's date
+		// Only available when subdomain == day
 		highlightToday : false,
 
 		// ================================================
@@ -813,7 +814,7 @@ CalHeatMap.prototype = {
 						if (parent.options.onClick !== null) {
 							htmlClass += " hover_cursor";
 						}
-						
+
 						return htmlClass;
 					})
 					.on("click", function(d) {
@@ -833,7 +834,7 @@ CalHeatMap.prototype = {
 						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
 							(parent.options.cellLabel.filled).format({
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
-								name: parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)],
+								name: parent.options.itemName[(data[domainUnit][subDomainUnit] !== 1 ? 1 : 0)],
 								connector: parent._domainType[parent.options.subDomain].format.connector,
 								date: parent.formatDate(d)
 							}) :
@@ -895,7 +896,7 @@ CalHeatMap.prototype = {
 		{
 			isToday = true;
 		}
-	
+
 		return isToday;
 	},
 

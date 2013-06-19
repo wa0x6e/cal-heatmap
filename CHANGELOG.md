@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.2.1 [2013-06-19]
+
+* [new] Highlight today's rectangle (only available when subdomain is equal to "day")
+* [fix] Fix plurals title (Issue #14)
+
 ## v2.2.0 [2013-05-05]
 
 * [new] Add `afterLoadData` callback, to apply your own conversion function when the API don't return data in the expected format
