@@ -31,7 +31,7 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 banner: headerComment,
-                sourceMap: '<%= pkg.name %>.source-map.js'
+                sourceMap: "<%= pkg.name %>.source-map.js"
             },
             base: {
                 files: {
