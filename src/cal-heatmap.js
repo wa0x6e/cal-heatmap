@@ -65,6 +65,7 @@ var CalHeatMap = function() {
 		displayScale : true,
 
 		// Whether to highlight the rect with today's date
+		// Only available when subdomain == day
 		highlightToday : false,
 
 		// ================================================
@@ -805,7 +806,7 @@ CalHeatMap.prototype = {
 						if (parent.options.onClick !== null) {
 							htmlClass += " hover_cursor";
 						}
-						
+
 						return htmlClass;
 					})
 					.on("click", function(d) {
@@ -825,7 +826,7 @@ CalHeatMap.prototype = {
 						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
 							(parent.options.cellLabel.filled).format({
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
-								name: parent.options.itemName[(data[domainUnit][subDomainUnit] > 1 ? 1 : 0)],
+								name: parent.options.itemName[(data[domainUnit][subDomainUnit] !== 1 ? 1 : 0)],
 								connector: parent._domainType[parent.options.subDomain].format.connector,
 								date: parent.formatDate(d)
 							}) :
@@ -887,7 +888,7 @@ CalHeatMap.prototype = {
 		{
 			isToday = true;
 		}
-	
+
 		return isToday;
 	},
 
