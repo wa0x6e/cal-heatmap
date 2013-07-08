@@ -59,6 +59,10 @@ var CalHeatMap = function() {
 		// true  : display domains one under the other
 		verticalOrientation: false,
 
+		// Position of the domain label
+		// valid values : bottom, left, right
+		labelPosition: "bottom",
+
 		// ================================================
 		// SCALE
 		// ================================================
@@ -469,6 +473,34 @@ var CalHeatMap = function() {
 		// Format the domain legend according to the domain type
 		var legendFormat = d3.time.format(self.options.format.legend);
 
+
+		var labelPositionOffset = {
+			y: function(domainHeight) {
+				switch(self.options.labelPosition) {
+					case "top" : return graphLegendHeight/2;
+					case "bottom" : return domainHeight + graphLegendHeight/2;
+				}
+			},
+			x: function(domainWidth) {
+
+			}
+		};
+
+		var domainPositionOffset = {
+			y: function() {
+				var y;
+				switch(self.options.labelPosition) {
+					case "top" : y = graphLegendHeight; break;
+					case "bottom" : y = 0;
+				}
+
+				return y;
+			},
+			x: function(domainWidth) {
+
+			}
+		};
+
 		// Return the X axis position of a domain
 		var domainPositionX = function(i) {
 			if (self.options.verticalOrientation) {
@@ -486,14 +518,16 @@ var CalHeatMap = function() {
 		var domainPositionY = function(i) {
 			if (self.options.verticalOrientation) {
 				if (height === 0) {
-					return domainsHeight[i];
+					return domainsHeight[i] + domainPositionOffset.y();
 				} else {
-					return reverse ? domainsHeight[0] : domainsHeight[i+1];
+					return domainsHeight[reverse ? 0 : i+1] + domainPositionOffset.y();
 				}
 			} else {
-				return 0;
+				return domainPositionOffset.y();
 			}
 		};
+
+
 
 		var labelPositionX = function(d, i) {
 			if (self.options.verticalOrientation) {
@@ -504,10 +538,12 @@ var CalHeatMap = function() {
 		};
 
 		var labelPositionY = function(d, i) {
+			var hd = h(d);
+
 			if (self.options.verticalOrientation) {
-				return (h(d) + graphLegendHeight + self.options.domainGutter) * (i+1) - graphLegendHeight/2 - self.options.domainGutter;
+				return (hd + graphLegendHeight + self.options.domainGutter) * (i) + labelPositionOffset.y(hd);
 			} else {
-				return h(d) + graphLegendHeight/2;
+				return labelPositionOffset.y(hd);
 			}
 		};
 
@@ -528,12 +564,28 @@ var CalHeatMap = function() {
 		var domainPositionYExit = function(d, i) {
 			if (self.options.verticalOrientation) {
 				if (reverse) {
-					return height;
+					return height + domainPositionOffset.y();
 				} else {
-					return domainsHeight[1] * -1;
+					return (domainsHeight[1]) * -1 + domainPositionOffset.y();
 				}
 			} else {
-				return 0;
+				return domainPositionOffset.y();
+			}
+		};
+
+		//////////////////////
+		// Label Position //
+		//////////////////////
+
+		var labelPositionXEnter = function(d, i) {
+			if (self.options.verticalOrientation) {
+				return w(d) / 2;
+			} else {
+				if (reverse) {
+					return (self.options.domainGutter + w(d)/2) * -1;
+				} else {
+					return width + w(d)/2;
+				}
 			}
 		};
 
@@ -550,47 +602,43 @@ var CalHeatMap = function() {
 		};
 
 		var labelPositionYEnter = function(d, i) {
+			var hd = h(d);
+
 			if (self.options.verticalOrientation) {
 				if (reverse) {
-					return (graphLegendHeight/2 + self.options.domainGutter) * (-1);
+					return domainsHeight[0] + labelPositionOffset.y(hd);
 				} else {
-					return height + h(d) + graphLegendHeight/2;
+					return height + labelPositionOffset.y(hd);
 				}
 
 			} else {
-				return h(d) + graphLegendHeight/2;
-			}
-		};
-
-		var labelPositionXEnter = function(d, i) {
-			if (self.options.verticalOrientation) {
-				return w(d) / 2;
-			} else {
-				if (reverse) {
-					return (self.options.domainGutter + w(d)/2) * -1;
-				} else {
-					return width + w(d)/2;
-				}
+				return labelPositionOffset.y(hd);
 			}
 		};
 
 		var labelPositionYExit = function(d) {
+			var hd = h(d);
+
 			if (self.options.verticalOrientation) {
 				if (reverse) {
-					return height + h(d) + graphLegendHeight/2;
+					return height + labelPositionOffset.y(hd);
 				} else {
-					return (graphLegendHeight/2 + self.options.domainGutter) * (-1);
+					return domainsHeight[1] * -1 + labelPositionOffset.y(hd);
 				}
 			} else {
-				return h(d) + graphLegendHeight/2;
+				return labelPositionOffset.y(hd);
 			}
 		};
+
+
+
+
 
 		// Painting all the domains
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
 			.attr("height", function(d) {
 				if (self.options.verticalOrientation) {
-					return (h(d) + graphLegendHeight + self.options.domainGutter) * self.options.range;
+					return (h(d) + graphLegendHeight + self.options.domainGutter) * self.options.range - self.options.domainGutter;
 				} else {
 					return h(d) + graphLegendHeight;
 				}
@@ -757,9 +805,9 @@ var CalHeatMap = function() {
 			})
 			.attr("y", function(d, i){
 				if (self.options.verticalOrientation) {
-					return domainsHeight[i];
+					return domainsHeight[i] + domainPositionOffset.y();
 				} else {
-					return 0;
+					return domainPositionOffset.y();
 				}
 			})
 		;
@@ -784,7 +832,7 @@ var CalHeatMap = function() {
 			if (height === 0) {
 				height = tempHeight;
 
-				d3.select("#" + self.options.id + " .graph").attr("height", height);
+				d3.select("#" + self.options.id + " .graph").attr("height", height - self.options.domainGutter);
 			} else if (tempLastDomainHeight !== exitDomainHeight) {
 				// Compute the new height
 				var th = height + tempLastDomainHeight - exitDomainHeight;
@@ -795,7 +843,7 @@ var CalHeatMap = function() {
 
 					d3.select("#" + self.options.id + " .graph")
 						.transition().duration(self.options.duration)
-						.attr("height", height)
+						.attr("height", height  - self.options.domainGutter)
 					;
 				}
 			}
