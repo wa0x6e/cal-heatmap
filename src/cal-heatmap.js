@@ -1259,7 +1259,108 @@ CalHeatMap.prototype = {
 		str = str.replace(/\{\{d:end\}\}/g, endDate.toISOString());
 
 		return str;
+	},
+
+	exportSVG: function() {
+		var styles = {
+			//"svg": {},
+			//"rect": {},
+			//"text": {},
+			".graph": {},
+			".graph-rect": {},
+			".today": {},
+			".graph-label": {},
+			".qi": {}
+		};
+
+		for (var j = 0, total = this.options.scale.length; j < total; j++) {
+			styles[".q" + j] = {};
+		}
+
+		var root = document.getElementById(this.options.id);
+
+		var whitelistStyles = [
+			// SVG specific properties
+			"stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "stroke-linecap", "stroke-miterlimit",
+			"fill", "fill-opacity", "fill-rule",
+			"marker", "marker-start", "marker-mid", "marker-end",
+			"alignement-baseline", "baseline-shift", "dominant-baseline", "glyph-orientation-horizontal", "glyph-orientation-vertical", "kerning",
+			"shape-rendering",
+
+			// Text Specific properties
+			"text-transform", "font-family", "font", "font-size", "font-weight"
+		];
+
+		var filterStyles = function(attribute, property, value) {
+			if (whitelistStyles.indexOf(property) !== -1) {
+				styles[attribute][property] = value;
+			}
+		};
+
+		var getElement = function(e) {
+			if (e[0] === ".") {
+				return root.getElementsByClassName(e.substring(1))[0];
+			} else {
+				return root.getElementsByTagName(e)[0];
+			}
+		};
+
+		for (var element in styles) {
+
+			var dom = getElement(element);
+
+			if (typeof dom === "undefined") {
+				continue;
+			}
+
+			// The DOM Level 2 CSS way
+			if ("getComputedStyle" in window) {
+				var cs = getComputedStyle(dom, null); console.log(dom);
+				if (cs.length !== 0) {
+					for (var i = 0; i < cs.length; i++) {
+						filterStyles(element, cs.item(i), cs.getPropertyValue(cs.item(i)));
+					}
+
+				// Opera workaround. Opera doesn"t support `item`/`length`
+				// on CSSStyleDeclaration.
+				} else {
+					for (var k in cs) {
+						if (cs.hasOwnProperty(k)) {
+							filterStyles(element, k, cs[k]);
+						}
+					}
+				}
+
+			// The IE way
+			} else if ("currentStyle" in dom) {
+				var css = dom.currentStyle;
+				for (var p in css) {
+					filterStyles(element, p, css[p]);
+				}
+			}
+		}
+
+		// Get the d3js SVG element
+		var tmp  = document.getElementById(this.options.id);
+		var svg = tmp.getElementsByTagName("svg")[0];
+
+		var string = "<svg xmlns=\"http://www.w3.org/2000/svg\" "+
+		"xmlns:xlink=\"http://www.w3.org/1999/xlink\"><style type=\"text/css\"><![CDATA[ ";
+
+		for (var style in styles) {
+			string += style + " {";
+			for (var l in styles[style]) {
+				string += l + ":" + styles[style][l] + ";";
+			}
+			string += "}";
+		}
+
+		string += "]]></style>" + (new XMLSerializer).serializeToString(svg) + "</svg>";
+
+		return string;
 	}
+
+
 };
 
 /**
