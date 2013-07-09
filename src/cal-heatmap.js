@@ -65,7 +65,12 @@ var CalHeatMap = function() {
 			position: "bottom",
 
 			// Valid : left, middle, right
-			align: "center"
+			align: "center",
+
+			offset: {
+				x: 0,
+				y: 0
+			}
 		},
 
 		// ================================================
@@ -175,6 +180,20 @@ var CalHeatMap = function() {
 			},
 			extractUnit : function(d) { return d.getMinutes(); }
 		},
+		"x_min" : {
+			row: function(d) { return 6;},
+			column: function(d) { return 10; },
+			position: {
+				x : function(d) { return d.getMinutes() % self._domainType.min.row(d); },
+				y : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d));}
+			},
+			format: {
+				date: "%H:%M, %A %B %-e, %Y",
+				legend: "",
+				connector: "at"
+			},
+			extractUnit : function(d) { return d.getMinutes(); }
+		},
 		"hour" : {
 			name: "hour",
 			row: function(d) {return 6;},
@@ -195,6 +214,37 @@ var CalHeatMap = function() {
 					return Math.floor(d.getHours() / self._domainType.hour.row(d));
 				},
 				y : function(d) { return d.getHours() % self._domainType.hour.row(d);}
+			},
+			format: {
+				date: "%Hh, %A %B %-e, %Y",
+				legend: "%H:00",
+				connector: "at"
+			},
+			extractUnit : function(d) {
+				var formatHour = d3.time.format("%H");
+				return d.getFullYear() + "" +  self.getDayOfYear(d) + "" + formatHour(d);
+			}
+		},
+		"x_hour" : {
+			name: "hour",
+			column: function(d) {return 6;},
+			row: function(d) {
+				switch(self.options.domain) {
+					case "day" : return 4;
+					case "week" : return 28;
+					case "month" : return self.getEndOfMonth(d).getDate() * 4;
+				}
+			},
+			position: {
+				y : function(d) {
+					if (self.options.domain === "month") {
+						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + (d.getDate()-1)*4;
+					} else if (self.options.domain === "week") {
+						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + self.getWeekDay(d)*4;
+					}
+					return Math.floor(d.getHours() / self._domainType.hour.row(d));
+				},
+				x : function(d) { return d.getHours() % self._domainType.hour.row(d);}
 			},
 			format: {
 				date: "%Hh, %A %B %-e, %Y",
@@ -301,6 +351,21 @@ var CalHeatMap = function() {
 			position: {
 				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
 				y : function(d) { return d.getMonth() % self._domainType.month.row(d);}
+			},
+			format: {
+				date: "%B %Y",
+				legend: "%B",
+				connector: "on"
+			},
+			extractUnit : function(d) { return d.getMonth(); }
+		},
+		"x_month" : {
+			name: "month",
+			column: function(d) {return 1;},
+			row: function(d) {return 12;},
+			position: {
+				y : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
+				x : function(d) { return d.getMonth() % self._domainType.month.row(d);}
 			},
 			format: {
 				date: "%B %Y",
@@ -483,7 +548,7 @@ var CalHeatMap = function() {
 
 		// Return the height of the domain block, without the domain gutter
 		var h = function(d) {
-			return self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding;
+			return self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d);
 		};
 
 		// Format the domain legend according to the domain type
@@ -495,7 +560,7 @@ var CalHeatMap = function() {
 				switch(self.options.label.position) {
 					case "top" : return domainVerticalLabelHeight/2;
 					case "bottom" : return domainHeight + domainVerticalLabelHeight/2;
-					default : return 25;
+					default : return 0;
 				}
 			},
 			x: function(domainWidth) {
@@ -767,9 +832,12 @@ var CalHeatMap = function() {
 			.attr("x", function(d, i){ return labelPositionXEnter(d, i); })
 			.attr("dx", function(){
 				if (self.options.label.align === "right") {
-					return domainHorizontalLabelWidth;
+					return domainHorizontalLabelWidth - self.options.label.offset.x;
 				}
-				return 0;
+				return self.options.label.offset.x;
+			})
+			.attr("dy", function() {
+				return self.options.label.offset.y;
 			})
 			.attr("class", "graph-label")
 			.attr("text-anchor", function() {
@@ -974,6 +1042,28 @@ var CalHeatMap = function() {
 			self.options.format.legend = this._domainType[self.options.domain].format.legend;
 		}
 
+		// Auto-align label, depending on it's position
+		if (!self.options.label.hasOwnProperty("align")) {
+			switch(self.options.label.position) {
+				case "left" : self.options.label.align = "right"; break;
+				case "right" : self.options.label.align = "left"; break;
+				default : self.options.label.align = "center";
+			}
+		}
+
+		if (!self.options.label.hasOwnProperty("offset")) {
+			if (self.options.label.position === "left" || self.options.label.position === "right") {
+				self.options.label.offset = {
+					x: 10,
+					y: 20
+				};
+			} else {
+				self.options.label.offset = {
+					x: 0,
+					y: 0
+				};
+			}
+		}
 		return _init();
 
 	};
@@ -1366,10 +1456,12 @@ CalHeatMap.prototype = {
 		}
 
 		switch(this.options.domain) {
+			case "x_hour":
 			case "hour"  : return this.getHourDomain(date, range);
 			case "x_day" :
 			case "day"   : return this.getDayDomain(date, range);
 			case "week"  : return this.getWeekDomain(date, range);
+			case "X-month" :
 			case "month" : return this.getMonthDomain(date, range);
 			case "year"  : return this.getYearDomain(date, range);
 		}
@@ -1395,6 +1487,7 @@ CalHeatMap.prototype = {
 
 		var computeMinSubDomainSize = function(date, domain) {
 			switch (domain) {
+				case "x_hour" :
 				case "hour" : return 60;
 				case "x_day" :
 				case "day" : return 60 * 24;
@@ -1407,14 +1500,14 @@ CalHeatMap.prototype = {
 				return 24;
 			} else if (domain === "week") {
 				return 168;
-			} else if (domain === "month") {
+			} else if (domain === "month" || domain === "x_month") {
 				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
 				return endOfMonth.getDate() * 24;
 			}
 		};
 
 		var computeWeekSubDomainSize = function(date, domain) {
-			if (domain === "month") {
+			if (domain === "month" || domain === "x_month") {
 				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
 				var endWeekNb = parent.getWeekNumber(endOfMonth);
 				var startWeekNb = parent.getWeekNumber(new Date(date.getFullYear(), date.getMonth()));
@@ -1432,11 +1525,14 @@ CalHeatMap.prototype = {
 
 
 		switch(this.options.subDomain) {
+			case "x_min" :
 			case "min"   : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
+			case "x_hour":
 			case "hour"  : return this.getHourDomain(date, computeHourSubDomainSize(date, this.options.domain));
 			case "x_day" :
 			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
 			case "week"  : return this.getWeekDomain(date, computeWeekSubDomainSize(date, this.options.domain));
+			case "x_month":
 			case "month" : return this.getMonthDomain(date, 12);
 		}
 	},
@@ -1590,9 +1686,6 @@ CalHeatMap.prototype = {
 
 	exportSVG: function() {
 		var styles = {
-			//"svg": {},
-			//"rect": {},
-			//"text": {},
 			".graph": {},
 			".graph-rect": {},
 			".today": {},
@@ -1611,7 +1704,7 @@ CalHeatMap.prototype = {
 			"stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "stroke-linecap", "stroke-miterlimit",
 			"fill", "fill-opacity", "fill-rule",
 			"marker", "marker-start", "marker-mid", "marker-end",
-			"alignement-baseline", "baseline-shift", "dominant-baseline", "glyph-orientation-horizontal", "glyph-orientation-vertical", "kerning",
+			"alignement-baseline", "baseline-shift", "dominant-baseline", "glyph-orientation-horizontal", "glyph-orientation-vertical", "kerning", "text-anchor",
 			"shape-rendering",
 
 			// Text Specific properties
