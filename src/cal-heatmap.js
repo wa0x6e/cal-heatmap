@@ -59,9 +59,14 @@ var CalHeatMap = function() {
 		// true  : display domains one under the other
 		verticalOrientation: false,
 
-		// Position of the domain label
-		// valid values : bottom, left, right
-		labelPosition: "bottom",
+		// Domain Label properties
+		label: {
+			// valid : top, right, bottom, left
+			position: "bottom",
+
+			// Valid : left, middle, right
+			align: "center"
+		},
 
 		// ================================================
 		// SCALE
@@ -457,7 +462,18 @@ var CalHeatMap = function() {
 			reverse = false;
 		}
 
-		var graphLegendHeight = Math.max(25, self.options.cellsize*2);
+		var verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
+
+		var domainVerticalLabelHeight = Math.max(25, self.options.cellsize*2);
+		var domainHorizontalLabelHeight = 0;
+		var domainHorizontalLabelWidth = 0;
+
+		if (!verticalDomainLabel) {
+			domainVerticalLabelHeight = 0;
+			domainHorizontalLabelWidth = 100;
+		}
+
+
 
 		// Return the width of the domain block, without the domain gutter
 		// @param int d Domain start timestamp
@@ -476,40 +492,45 @@ var CalHeatMap = function() {
 
 		var labelPositionOffset = {
 			y: function(domainHeight) {
-				switch(self.options.labelPosition) {
-					case "top" : return graphLegendHeight/2;
-					case "bottom" : return domainHeight + graphLegendHeight/2;
+				switch(self.options.label.position) {
+					case "top" : return domainVerticalLabelHeight/2;
+					case "bottom" : return domainHeight + domainVerticalLabelHeight/2;
+					default : return 25;
 				}
 			},
 			x: function(domainWidth) {
-
+				switch(self.options.label.position) {
+					case "left" : return 0;
+					case "right" : return domainWidth;
+					default : return domainWidth/2;
+				}
 			}
 		};
 
 		var domainPositionOffset = {
 			y: function() {
-				var y;
-				switch(self.options.labelPosition) {
-					case "top" : y = graphLegendHeight; break;
-					case "bottom" : y = 0;
+				switch(self.options.label.position) {
+					case "top" : return domainVerticalLabelHeight;
+					default : return 0;
 				}
-
-				return y;
 			},
-			x: function(domainWidth) {
-
+			x: function() {
+				switch(self.options.label.position) {
+					case "left" : return domainHorizontalLabelWidth;
+					default : return 0;
+				}
 			}
 		};
 
 		// Return the X axis position of a domain
 		var domainPositionX = function(i) {
 			if (self.options.verticalOrientation) {
-				return 0;
+				return domainPositionOffset.x();
 			} else {
 				if (width === 0) {
-					return domainsWidth[i];
+					return domainsWidth[i] + domainPositionOffset.x();
 				} else {
-					return reverse ? domainsWidth[0] : domainsWidth[i+1];
+					return domainsWidth[reverse ? 0 : i+1] + domainPositionOffset.x();
 				}
 			}
 		};
@@ -527,35 +548,15 @@ var CalHeatMap = function() {
 			}
 		};
 
-
-
-		var labelPositionX = function(d, i) {
-			if (self.options.verticalOrientation) {
-				return w(d) / 2;
-			} else {
-				return domainsWidth[i] + w(d) / 2;
-			}
-		};
-
-		var labelPositionY = function(d, i) {
-			var hd = h(d);
-
-			if (self.options.verticalOrientation) {
-				return (hd + graphLegendHeight + self.options.domainGutter) * (i) + labelPositionOffset.y(hd);
-			} else {
-				return labelPositionOffset.y(hd);
-			}
-		};
-
 		// Position the hidden domain outside the calendar horizontally
 		var domainPositionXExit = function(d, i) {
 			if (self.options.verticalOrientation) {
-				return 0;
+				return domainPositionOffset.x();
 			} else {
 				if (reverse) {
-					return width;
+					return domainPositionOffset.x() + width;
 				} else {
-					return w(d) * -1 - self.options.domainGutter;
+					return domainPositionOffset.x() - domainsWidth[1];
 				}
 			}
 		};
@@ -577,26 +578,71 @@ var CalHeatMap = function() {
 		// Label Position //
 		//////////////////////
 
+		var labelPositionX = function(d, i) {
+			if (verticalDomainLabel) {
+				// Align and center the label with the domain
+				if (self.options.verticalOrientation) {
+					return w(d) / 2;
+				} else {
+					return domainsWidth[i] + w(d) / 2;
+				}
+			} else {
+				if (self.options.verticalOrientation) {
+					if (self.options.label.position === "right") {
+						return w(d);
+					} else {
+						return 0;
+					}
+				} else {
+					return domainsWidth[i] + labelPositionOffset.x(w(d));
+				}
+			}
+
+		};
+
+		var labelPositionY = function(d, i) {
+			var hd = h(d);
+			if (verticalDomainLabel) {
+				if (self.options.verticalOrientation) {
+					return (hd + domainVerticalLabelHeight + self.options.domainGutter) * (i) + labelPositionOffset.y(hd);
+				} else {
+					return labelPositionOffset.y(hd);
+				}
+			} else {
+				if (self.options.verticalOrientation) {
+					return domainsHeight[i] + labelPositionOffset.y(hd);
+				} else {
+					return labelPositionOffset.y(hd);
+				}
+			}
+		};
+
 		var labelPositionXEnter = function(d, i) {
 			if (self.options.verticalOrientation) {
+				if (!verticalDomainLabel) {
+					return labelPositionOffset.x(w(d));
+				}
 				return w(d) / 2;
 			} else {
 				if (reverse) {
-					return (self.options.domainGutter + w(d)/2) * -1;
+					return labelPositionOffset.x(w(d)) + domainsWidth[0];
 				} else {
-					return width + w(d)/2;
+					return width + labelPositionOffset.x(w(d));
 				}
 			}
 		};
 
 		var labelPositionXExit = function(d) {
 			if (self.options.verticalOrientation) {
-				return width + w(d)/2;
+				if (!verticalDomainLabel) {
+					return labelPositionOffset.x(w(d));
+				}
+				return w(d) / 2;
 			} else {
 				if (reverse) {
-					return width + w(d)/2;
+					return width + labelPositionOffset.x(w(d));
 				} else {
-					return (self.options.domainGutter + w(d)/2) * -1;
+					return labelPositionOffset.x(w(d)) - domainsWidth[1];
 				}
 			}
 		};
@@ -638,16 +684,16 @@ var CalHeatMap = function() {
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
 			.attr("height", function(d) {
 				if (self.options.verticalOrientation) {
-					return (h(d) + graphLegendHeight + self.options.domainGutter) * self.options.range - self.options.domainGutter;
+					return (h(d) + domainVerticalLabelHeight + self.options.domainGutter) * self.options.range - self.options.domainGutter;
 				} else {
-					return h(d) + graphLegendHeight;
+					return h(d) + domainVerticalLabelHeight;
 				}
 			})
 			.attr("width", function(d) {
 				if (self.options.verticalOrientation) {
-					return w(d);
+					return w(d) + domainHorizontalLabelWidth;
 				} else {
-					return (w(d) + self.options.domainGutter) * self.options.range - self.options.domainGutter;
+					return (w(d) + domainHorizontalLabelWidth + self.options.domainGutter) * self.options.range - self.options.domainGutter;
 				}
 
 			})
@@ -668,7 +714,7 @@ var CalHeatMap = function() {
 			.attr("width", function(d){
 				var wd = w(d);
 
-				tempWidth += tempLastDomainWidth = wd+self.options.domainGutter;
+				tempWidth += tempLastDomainWidth = wd + domainHorizontalLabelWidth + self.options.domainGutter;
 
 				if (width === 0) {
 					domainsWidth.push(tempWidth - tempLastDomainWidth);
@@ -687,7 +733,7 @@ var CalHeatMap = function() {
 
 				var hd = h(d);
 
-				tempHeight += tempLastDomainHeight = hd + self.options.domainGutter + graphLegendHeight;
+				tempHeight += tempLastDomainHeight = hd + self.options.domainGutter + domainVerticalLabelHeight;
 
 				if (height === 0) {
 					domainsHeight.push(tempHeight - tempLastDomainHeight);
@@ -719,9 +765,28 @@ var CalHeatMap = function() {
 			.enter().insert("text")
 			.attr("y", function(d, i) { return labelPositionYEnter(d, i); })
 			.attr("x", function(d, i){ return labelPositionXEnter(d, i); })
+			.attr("dx", function(){
+				if (self.options.label.align === "right") {
+					return domainHorizontalLabelWidth;
+				}
+				return 0;
+			})
 			.attr("class", "graph-label")
-			.attr("text-anchor", "middle")
-			.attr("dominant-baseline", "middle")
+			.attr("text-anchor", function() {
+				switch(self.options.label.align) {
+					case "start" :
+					case "left" : return "start";
+					case "end" :
+					case "right" : return "end";
+					default : return "middle";
+				}
+			})
+			.attr("dominant-baseline", function() {
+				if (verticalDomainLabel) {
+					return "middle";
+				}
+				return "top";
+			})
 			.text(function(d) { return legendFormat(new Date(d)); });
 
 
@@ -798,9 +863,9 @@ var CalHeatMap = function() {
 		domainSvg.transition().duration(self.options.duration)
 			.attr("x", function(d, i){
 				if (self.options.verticalOrientation) {
-					return 0;
+					return domainPositionOffset.x(domainsWidth[i]);
 				} else {
-					return domainsWidth[i];
+					return domainsWidth[i] + domainPositionOffset.x();
 				}
 			})
 			.attr("y", function(d, i){
@@ -843,7 +908,7 @@ var CalHeatMap = function() {
 
 					d3.select("#" + self.options.id + " .graph")
 						.transition().duration(self.options.duration)
-						.attr("height", height  - self.options.domainGutter)
+						.attr("height", height - self.options.domainGutter)
 					;
 				}
 			}
