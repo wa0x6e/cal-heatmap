@@ -100,8 +100,23 @@
 	fill: #3b6427
 }
 
-.today
+rect.highlight
 {
 	stroke:black;
 	stroke-width:1;
+}
+
+rect.now
+{
+	stroke: blue;
+}
+
+text.highlight
+{
+	fill: #000;
+}
+
+text.now
+{
+	fill: blue;
 }

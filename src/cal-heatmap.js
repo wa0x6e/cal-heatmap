@@ -85,9 +85,12 @@ var CalHeatMap = function() {
 		// Whether to display the scale
 		displayScale : true,
 
-		// Whether to highlight the rect with today's date
-		// Only available when subdomain == day
-		highlightToday : false,
+		// List of dates to highlight
+		// Valid values :
+		// - false : don't highlight anything
+		// - "now" : highlight the current date
+		// - an array of Date objects : highlight the specified dates
+		highlight : false,
 
 		// ================================================
 		// TEXT FORMATTING
@@ -878,7 +881,7 @@ var CalHeatMap = function() {
 		var rect = domainSvg.selectAll("rect")
 			.data(function(d) { return self.getSubDomain(d); })
 			.enter().append("svg:rect")
-			.attr("class", function(d) { return "graph-rect" + (self.highlightToday(d) ? " today" : ""); })
+			.attr("class", function(d) { return "graph-rect" + self.getHighlightClassName(d); })
 			.attr("width", self.options.cellsize)
 			.attr("height", self.options.cellsize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
@@ -904,7 +907,7 @@ var CalHeatMap = function() {
 				.data(function(d) { return self.getSubDomain(d); })
 				.enter().append("svg:text")
 				.attr("fill", "#000")
-				.attr("class", "subdomain-text")
+				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
 				.attr("x", function(d) { return self.positionSubDomainX(d); })
 				.attr("y", function(d) { return self.positionSubDomainY(d); })
 				.attr("dx", function(d) { return self.options.cellsize/2; })
@@ -1246,7 +1249,7 @@ CalHeatMap.prototype = {
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						var htmlClass = "graph-rect" + (parent.highlightToday(d) ? " today": "") +
+						var htmlClass = "graph-rect" + parent.getHighlightClassName(d) +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
 							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
 						);
@@ -1303,16 +1306,89 @@ CalHeatMap.prototype = {
 		return index * this.options.cellsize + index * this.options.cellpadding;
 	},
 
-	highlightToday: function(d)
+	/**
+	 * Return a classname if the specified date should be highlighted
+	 *
+	 * @param  Date d a date
+	 * @return String the highlight class
+	 */
+	getHighlightClassName: function(d)
 	{
-		// compare the date to see if it is today and add the today class if it is
-		// compare dates while ignoring time
-		// assuming this does not make sense to do if the subdomain is less than "day"
-		if (this.options.highlightToday && this.options.subDomain !== "hour" && this.options.subDomain !== "min")
-		{
-			return this.isToday(d);
+		if (this.options.highlight === false) {
+			return "";
 		}
-		return false;
+
+		var dates = [];
+
+		// @todo : Remove all duplicates values
+		if (this.options.highlight === "now") {
+			dates.push(new Date());
+		} else {
+			dates = this.options.highlight;
+
+			if (dates.indexOf("now") !== -1) {
+				dates.splice(dates.indexOf("now"), 1);
+				dates.push(new Date());
+			}
+		}
+
+		for (var i in dates) {
+			if (this.dateIsEqual(dates[i], d)) { console.log("e");
+				return " highlight" + (this.isNow(dates[i]) ? " now" : "");
+			}
+		}
+
+		return "";
+	},
+
+	/**
+	 * Return whether the specified date is now,
+	 * according to the type of subdomain
+	 *
+	 * @param  Date d The date to compare
+	 * @return bool True if the date correspond to a subdomain cell
+	 */
+	isNow: function(d) {
+		return this.dateIsEqual(d, new Date());
+	},
+
+	/**
+	 * Return whether 2 dates are equals
+	 * This function is subdomain-aware,
+	 * and dates comparison are dependent of the subdomain
+	 *
+	 * @param  Date date_a First date to compare
+	 * @param  Date date_b Secon date to compare
+	 * @return bool true if the 2 dates are equals
+	 */
+	dateIsEqual: function(date_a, date_b) {
+		switch(this.options.subDomain) {
+			case "x_min" :
+			case "min" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth() &&
+					date_a.getDate() === date_b.getDate() &&
+					date_a.getHours() === date_b.getHours() &&
+					date_a.getMinutes() === date_b.getMinutes();
+			case "x_hour" :
+			case "hour" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth() &&
+					date_a.getDate() === date_b.getDate() &&
+					date_a.getHours() === date_b.getHours();
+			case "x_day" :
+			case "day" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth() &&
+					date_a.getDate() === date_b.getDate();
+			case "x_week" :
+			case "week" :
+			case "x_month" :
+			case "month" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth();
+			default : return false;
+		}
 	},
 
 	/**
@@ -1320,7 +1396,7 @@ CalHeatMap.prototype = {
 	 *
 	 * @param  Date d
 	 */
-	isToday: function(d) {
+	/*isToday: function(d) {
 		var isToday = false;
 		var today = new Date();
 		var todayMonth = today.getMonth()+1;
@@ -1334,7 +1410,7 @@ CalHeatMap.prototype = {
 		}
 
 		return isToday;
-	},
+	},*/
 
 	// =========================================================================//
 	// DOMAIN COMPUTATION														//
