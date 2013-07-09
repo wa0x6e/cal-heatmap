@@ -14,7 +14,7 @@
 
 .graph-browse-previous:hover, .graph-browse-next:hover {
 	text-decoration: none;
-	
+
 }
 
 .graph-browse-previous
@@ -46,6 +46,12 @@
 {
 	stroke: #000;
 	stroke-width: 1px
+}
+
+.subdomain-text {
+	font-size: 9px;
+	fill: #999;
+	pointer-events: none;
 }
 
 .hover_cursor:hover {

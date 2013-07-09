@@ -64,9 +64,11 @@ var CalHeatMap = function() {
 			// valid : top, right, bottom, left
 			position: "bottom",
 
-			// Valid : left, middle, right
+			// Valid : left, center, right
+			// Also valid are the direct svg values : start, middle, end
 			align: "center",
 
+			// By default, there is no margin/padding around the label
 			offset: {
 				x: 0,
 				y: 0
@@ -92,15 +94,19 @@ var CalHeatMap = function() {
 		// ================================================
 
 		format : {
-			// Formatting of the date when hovering an subdomain block
+			// Tooltip text displayed when hovering a subdomain
 			// @default : null, will use the formatting according to domain type
 			// Accept a string used as specifier by d3.time.format()
 			// or a function
-			date : null,
+			title : null,
 
 			// Formatting of domain label
 			// @default : null, will use the formatting according to domain type
-			legend : null
+			label : null,
+
+			// Text inside the subdomain
+			// null to display nothing
+			date: null
 
 			// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
 			// for accepted date formatting
@@ -416,11 +422,19 @@ var CalHeatMap = function() {
 	 */
 	var _init = function() {
 
-		if (typeof self.options.format.date === "function") {
-			self.formatDate = self.options.format.date;
-		} else {
-			self.formatDate = d3.time.format(self.options.format.date);
-		}
+		self.formatDate = function(d, field) {
+
+			if (typeof field === "undefined") {
+				field = "title";
+			}
+
+			if (typeof self.options.format[field] === "function") {
+				return self.options.format[field];
+			} else {
+				var f = d3.time.format(self.options.format[field]);
+				return f(d);
+			}
+		};
 
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
@@ -552,7 +566,7 @@ var CalHeatMap = function() {
 		};
 
 		// Format the domain legend according to the domain type
-		var legendFormat = d3.time.format(self.options.format.legend);
+		var legendFormat = d3.time.format(self.options.format.label);
 
 
 		var labelPositionOffset = {
@@ -864,7 +878,7 @@ var CalHeatMap = function() {
 		var rect = domainSvg.selectAll("rect")
 			.data(function(d) { return self.getSubDomain(d); })
 			.enter().append("svg:rect")
-			.attr("class", function(d) { return self.getClassName(d); })
+			.attr("class", function(d) { return "graph-rect" + (self.highlightToday(d) ? " today" : ""); })
 			.attr("width", self.options.cellsize)
 			.attr("height", self.options.cellsize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
@@ -883,6 +897,23 @@ var CalHeatMap = function() {
 
 		// Appeding a title to each subdomain
 		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
+
+		// Inserting a text inside each subdomain, if enabled
+		if (self.options.format.date !== null) {
+			domainSvg.selectAll("text")
+				.data(function(d) { return self.getSubDomain(d); })
+				.enter().append("svg:text")
+				.attr("fill", "#000")
+				.attr("class", "subdomain-text")
+				.attr("x", function(d) { return self.positionSubDomainX(d); })
+				.attr("y", function(d) { return self.positionSubDomainY(d); })
+				.attr("dx", function(d) { return self.options.cellsize/2; })
+				.attr("dy", function(d) { return self.options.cellsize/2; })
+				.attr("text-anchor", "middle")
+				.attr("dominant-baseline", "central")
+				.text(function(d){ return self.formatDate(d, "date"); })
+				;
+			}
 
 		var exitDomainWidth = reverse ? (width-domainsWidth[domainsWidth.length-1]) : domainsWidth[1];
 		var exitDomainHeight = reverse ? (height-domainsHeight[domainsHeight.length-1]) : domainsHeight[1];
@@ -1034,12 +1065,12 @@ var CalHeatMap = function() {
 
 		var domain = self.getDomain(self.options.start);
 
-		if (self.options.format.date === null) {
-			self.options.format.date = this._domainType[self.options.subDomain].format.date;
+		if (self.options.format.title === null) {
+			self.options.format.title = this._domainType[self.options.subDomain].format.date;
 		}
 
-		if (self.options.format.legend === null) {
-			self.options.format.legend = this._domainType[self.options.domain].format.legend;
+		if (self.options.format.label === null) {
+			self.options.format.label = this._domainType[self.options.domain].format.legend;
 		}
 
 		// Auto-align label, depending on it's position
@@ -1215,7 +1246,7 @@ CalHeatMap.prototype = {
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						var htmlClass = parent.getClassName(d) +
+						var htmlClass = "graph-rect" + (parent.highlightToday(d) ? " today": "") +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
 							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
 						);
@@ -1272,20 +1303,16 @@ CalHeatMap.prototype = {
 		return index * this.options.cellsize + index * this.options.cellpadding;
 	},
 
-	getClassName: function(d)
+	highlightToday: function(d)
 	{
-		var clazz = "graph-rect";
 		// compare the date to see if it is today and add the today class if it is
 		// compare dates while ignoring time
 		// assuming this does not make sense to do if the subdomain is less than "day"
 		if (this.options.highlightToday && this.options.subDomain !== "hour" && this.options.subDomain !== "min")
 		{
-			if (this.isToday(d))
-			{
-				clazz += " today";
-			}
+			return this.isToday(d);
 		}
-		return clazz;
+		return false;
 	},
 
 	/**
