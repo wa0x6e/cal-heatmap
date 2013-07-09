@@ -1684,7 +1684,7 @@ CalHeatMap.prototype = {
 		return str;
 	},
 
-	exportSVG: function() {
+	getSVG: function() {
 		var styles = {
 			".graph": {},
 			".graph-rect": {},
