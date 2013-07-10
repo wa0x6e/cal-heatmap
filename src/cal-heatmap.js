@@ -663,10 +663,15 @@ var CalHeatMap = function() {
 			.attr("class", "graph-domain")
 		;
 
+		svg.append("svg:rect")
+			.attr("width", function(d, i) { return w(d) + domainHorizontalLabelWidth; })
+			.attr("height", function(d, i) { return h(d) + domainVerticalLabelHeight; })
+			;
+
 		// =========================================================================//
 		// PAINTING SUBDOMAINS														//
 		// =========================================================================//
-		var subDomainSvgGroup = domainSvg.append("svg")
+		var subDomainSvgGroup = svg.append("svg")
 			.attr("x", function(d, i) {
 				switch(self.options.label.position) {
 					case "left" : return domainHorizontalLabelWidth;
