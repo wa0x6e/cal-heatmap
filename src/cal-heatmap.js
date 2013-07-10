@@ -557,6 +557,11 @@ var CalHeatMap = function() {
 			domainHorizontalLabelWidth = 100;
 		}
 
+		// @todo : check validity
+		if (typeof self.options.domainMargin === "number") {
+			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
+		}
+
 		// Return the width of the domain block, without the domain gutter
 		// @param int d Domain start timestamp
 		var w = function(d) {
@@ -1131,7 +1136,7 @@ CalHeatMap.prototype = {
 		domain.each(function(domainUnit) {
 
 			if (data.hasOwnProperty(domainUnit)) {
-				d3.select(this).selectAll("rect")
+				d3.select(this).selectAll(".graph-subdomain-group rect")
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
