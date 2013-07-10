@@ -78,14 +78,23 @@ var CalHeatMap = function() {
 		},
 
 		// ================================================
-		// SCALE
+		// LEGEND
 		// ================================================
 
-		// Threshold for the scale
-		scale : [10,20,30,40],
+		// Threshold for the legend
+		legend : [10,20,30,40],
 
-		// Whether to display the scale
-		displayScale : true,
+		// Whether to display the legend
+		displayLegend : true,
+
+		legendCellSize: 10,
+
+		legendCellpadding: 2,
+
+
+		// ================================================
+		// HIGHLIGHT
+		// ================================================
 
 		// List of dates to highlight
 		// Valid values :
@@ -125,7 +134,7 @@ var CalHeatMap = function() {
 			filled: "{count} {name} {connector} {date}"
 		},
 
-		scaleLabel : {
+		legendLabel : {
 			lower: "less than {min} {name}",
 			inner: "between {down} and {up} {name}",
 			upper: "more than {max} {name}"
@@ -191,20 +200,6 @@ var CalHeatMap = function() {
 			},
 			extractUnit : function(d) { return d.getMinutes(); }
 		},
-		"x_min" : {
-			row: function(d) { return 6;},
-			column: function(d) { return 10; },
-			position: {
-				x : function(d) { return d.getMinutes() % self._domainType.min.row(d); },
-				y : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d));}
-			},
-			format: {
-				date: "%H:%M, %A %B %-e, %Y",
-				legend: "",
-				connector: "at"
-			},
-			extractUnit : function(d) { return d.getMinutes(); }
-		},
 		"hour" : {
 			name: "hour",
 			row: function(d) {return 6;},
@@ -225,37 +220,6 @@ var CalHeatMap = function() {
 					return Math.floor(d.getHours() / self._domainType.hour.row(d));
 				},
 				y : function(d) { return d.getHours() % self._domainType.hour.row(d);}
-			},
-			format: {
-				date: "%Hh, %A %B %-e, %Y",
-				legend: "%H:00",
-				connector: "at"
-			},
-			extractUnit : function(d) {
-				var formatHour = d3.time.format("%H");
-				return d.getFullYear() + "" +  self.getDayOfYear(d) + "" + formatHour(d);
-			}
-		},
-		"x_hour" : {
-			name: "hour",
-			column: function(d) {return 6;},
-			row: function(d) {
-				switch(self.options.domain) {
-					case "day" : return 4;
-					case "week" : return 28;
-					case "month" : return self.getEndOfMonth(d).getDate() * 4;
-				}
-			},
-			position: {
-				y : function(d) {
-					if (self.options.domain === "month") {
-						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + (d.getDate()-1)*4;
-					} else if (self.options.domain === "week") {
-						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + self.getWeekDay(d)*4;
-					}
-					return Math.floor(d.getHours() / self._domainType.hour.row(d));
-				},
-				x : function(d) { return d.getHours() % self._domainType.hour.row(d);}
 			},
 			format: {
 				date: "%Hh, %A %B %-e, %Y",
@@ -288,36 +252,6 @@ var CalHeatMap = function() {
 					}
 				},
 				y : function(d) { return self.getWeekDay(d);}
-			},
-			format: {
-				date: "%A %B %-e, %Y",
-				legend: "%e %b",
-				connector: "on"
-			},
-			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
-		},
-		"x_day" : {
-			name: "x_day",
-			row: function(d) {
-				switch(self.options.domain) {
-					case "year" : return 54;
-					case "month" : return 6;
-					case "week" : return 1;
-				}
-			},
-			column: function(d) {
-				return 7;
-			},
-			position: {
-				x : function(d) { return self.getWeekDay(d);},
-				y : function(d) {
-					switch(self.options.domain) {
-						case "week" : return 0;
-						case "month" :
-							return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
-						case "year" : return self.getWeekNumber(d) ;
-					}
-				}
 			},
 			format: {
 				date: "%A %B %-e, %Y",
@@ -370,21 +304,6 @@ var CalHeatMap = function() {
 			},
 			extractUnit : function(d) { return d.getMonth(); }
 		},
-		"x_month" : {
-			name: "month",
-			column: function(d) {return 1;},
-			row: function(d) {return 12;},
-			position: {
-				y : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
-				x : function(d) { return d.getMonth() % self._domainType.month.row(d);}
-			},
-			format: {
-				date: "%B %Y",
-				legend: "%B",
-				connector: "on"
-			},
-			extractUnit : function(d) { return d.getMonth(); }
-		},
 		"year" : {
 			name: "year",
 			row: function(d) {return 1;},
@@ -401,6 +320,23 @@ var CalHeatMap = function() {
 			extractUnit : function(d) { return d.getFullYear(); }
 		}
 	};
+
+	for (var type in this._domainType) {
+		this._domainType["x_" + type] = {};
+		this._domainType["x_" + type].name = "x_" + type;
+		this._domainType["x_" + type].row = this._domainType[type].column;
+		this._domainType["x_" + type].column = this._domainType[type].row;
+		this._domainType["x_" + type].position = {};
+		this._domainType["x_" + type].position.x = this._domainType[type].position.y;
+		this._domainType["x_" + type].position.y = this._domainType[type].position.x;
+		this._domainType["x_" + type].format = this._domainType[type].format;
+		this._domainType["x_" + type].extractUnit = this._domainType[type].extractUnit;
+	}
+
+	// Exception : always return the maximum number of weeks
+	// to align the label
+	this._domainType.x_day.row = function(d) { return 6; };
+
 
 	this.svg = null;
 
@@ -468,9 +404,9 @@ var CalHeatMap = function() {
 		if (self.options.paintOnLoad) {
 			self.paint();
 
-			// Display scale if needed
-			if (self.options.displayScale) {
-				self.displayScale();
+			// Display legend if needed
+			if (self.options.displayLegend) {
+				self.displayLegend();
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -578,21 +514,6 @@ var CalHeatMap = function() {
 
 		// Painting all the domains
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
-			.attr("height", function(d) {
-				if (self.options.verticalOrientation) {
-					return (h(d) + domainVerticalLabelHeight + self.options.domainGutter + self.options.domainMargin[0] + self.options.domainMargin[2]) * self.options.range - self.options.domainGutter;
-				} else {
-					return h(d) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
-				}
-			})
-			.attr("width", function(d) {
-				if (self.options.verticalOrientation) {
-					return w(d) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3];
-				} else {
-					return (w(d) + domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3]) * self.options.range - self.options.domainGutter;
-				}
-
-			})
 			.selectAll("svg.graph-domain")
 			.data(self._domains, function(d) { return d;})
 		;
@@ -860,6 +781,7 @@ var CalHeatMap = function() {
 			if (height === 0) {
 				height = tempHeight;
 
+				d3.select("#" + self.options.id + " .graph").attr("width", domainsWidth[1] - self.options.domainGutter);
 				d3.select("#" + self.options.id + " .graph").attr("height", height - self.options.domainGutter);
 			} else if (tempLastDomainHeight !== exitDomainHeight) {
 				// Compute the new height
@@ -878,6 +800,8 @@ var CalHeatMap = function() {
 		} else {
 			if (width === 0) {
 				width = tempWidth;
+
+				d3.select("#" + self.options.id + " .graph").attr("height", domainsHeight[1] - self.options.domainGutter);
 				d3.select("#" + self.options.id + " .graph").attr("width", width);
 			} else if (tempLastDomainWidth !== exitDomainWidth) {
 				// Compute the new width
@@ -989,6 +913,7 @@ var CalHeatMap = function() {
 				};
 			}
 		}
+
 		return _init();
 
 	};
@@ -1075,47 +1000,47 @@ CalHeatMap.prototype = {
 	formatNumber: d3.format(",g"),
 
 	// =========================================================================//
-	// PAINTING : SCALE															//
+	// PAINTING : LEGEND															//
 	// =========================================================================//
 
-	displayScale: function() {
+	displayLegend: function() {
 
 		var parent = this;
 
-		var scale = d3.select("#" + this.options.id)
+		var legend = d3.select("#" + this.options.id)
 			.append("svg:svg")
-			.attr("class", "graph-scale")
-			.attr("height", this.options.cellsize + (this.options.cellpadding*2))
-			.selectAll().data(d3.range(0, this.options.scale.length+1));
+			.attr("class", "graph-legend")
+			.attr("height", this.options.legendCellSize + (this.options.legendCellpadding*2))
+			.selectAll().data(d3.range(0, this.options.legend.length+1));
 
-		var scaleItem = scale
+		var legendItem = legend
 			.enter()
 			.append("svg:rect")
-			.attr("width", this.options.cellsize)
-			.attr("height", this.options.cellsize)
+			.attr("width", this.options.legendCellSize)
+			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
-			.attr("transform", function(d) { return "translate(" + (d * (parent.options.cellsize + parent.options.cellpadding))  + ", " + parent.options.cellpadding + ")"; })
+			.attr("transform", function(d) { return "translate(" + (d * (parent.options.legendCellSize + parent.options.legendCellpadding))  + ", " + parent.options.legendCellpadding + ")"; })
 			.attr("fill-opacity", 0)
 			;
 
-		scaleItem.transition().delay(function(d, i) { return parent.options.duration * i/10;}).attr("fill-opacity", 1);
+		legendItem.transition().delay(function(d, i) { return parent.options.duration * i/10;}).attr("fill-opacity", 1);
 
-		scaleItem
+		legendItem
 			.append("svg:title")
 			.text(function(d) {
-				var nextThreshold = parent.options.scale[d+1];
+				var nextThreshold = parent.options.legend[d+1];
 				if (d === 0) {
-					return (parent.options.scaleLabel.lower).format({
-						min: parent.options.scale[d],
+					return (parent.options.legendLabel.lower).format({
+						min: parent.options.legend[d],
 						name: parent.options.itemName[1]});
-				} else if (d === parent.options.scale.length) {
-					return (parent.options.scaleLabel.upper).format({
-						max: parent.options.scale[d-1],
+				} else if (d === parent.options.legend.length) {
+					return (parent.options.legendLabel.upper).format({
+						max: parent.options.legend[d-1],
 						name: parent.options.itemName[1]});
 				} else {
-					return (parent.options.scaleLabel.inner).format({
-						down: parent.options.scale[d-1],
-						up: parent.options.scale[d],
+					return (parent.options.legendLabel.inner).format({
+						down: parent.options.legend[d-1],
+						up: parent.options.legend[d],
 						name: parent.options.itemName[1]});
 				}
 			})
@@ -1142,7 +1067,7 @@ CalHeatMap.prototype = {
 
 						var htmlClass = "graph-rect" + parent.getHighlightClassName(d) +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
-							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
+							(" " + parent.legend(data[domainUnit][subDomainUnit])) : ""
 						);
 
 						if (parent.options.onClick !== null) {
@@ -1519,12 +1444,12 @@ CalHeatMap.prototype = {
 	},
 
 	/**
-	 * Return the classname on the scale for the specified value
+	 * Return the classname on the legend for the specified value
 	 *
 	 * @param  Item count n Number of items for that perdiod of time
-	 * @return string		Classname according to the scale
+	 * @return string		Classname according to the legend
 	 */
-	scale: function(n) {
+	legend: function(n) {
 
 		if (isNaN(n)) {
 			return "qi";
@@ -1532,19 +1457,19 @@ CalHeatMap.prototype = {
 			return "";
 		}
 
-		for (var i = 0, total = this.options.scale.length-1; i <= total; i++) {
+		for (var i = 0, total = this.options.legend.length-1; i <= total; i++) {
 
-			if (n === 0 && this.options.scale[0] > 0) {
+			if (n === 0 && this.options.legend[0] > 0) {
 				return "";
-			} else if (this.options.scale[0] > 0 && n < 0) {
+			} else if (this.options.legend[0] > 0 && n < 0) {
 				return "qi";
 			}
 
-			if (n <= this.options.scale[i]) {
+			if (n <= this.options.legend[i]) {
 				return "q" + (i+1);
 			}
 		}
-		return "q" + (this.options.scale.length + 1);
+		return "q" + (this.options.legend.length + 1);
 	},
 
 	// =========================================================================//
@@ -1666,7 +1591,7 @@ CalHeatMap.prototype = {
 			".qi": {}
 		};
 
-		for (var j = 0, total = this.options.scale.length; j < total; j++) {
+		for (var j = 0, total = this.options.legend.length; j < total; j++) {
 			styles[".q" + j] = {};
 		}
 
