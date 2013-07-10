@@ -660,12 +660,24 @@ var CalHeatMap = function() {
 					return 0;
 				}
 			})
-			.attr("class", "graph-domain")
+			.attr("class", function(d) {
+				var classname = "graph-domain";
+				var date = new Date(d);
+				switch(self.options.domain) {
+					case "hour" : classname += " h_" + date.getHours();
+					case "day" : classname += " d_" + date.getDate();
+					case "week" : classname += " w_" + self.getWeekNumber(date);
+					case "month" : classname += " m_" + date.getMonth();
+					case "year" : classname += " y_" + date.getFullYear();
+				}
+				return classname;
+			})
 		;
 
 		svg.append("svg:rect")
 			.attr("width", function(d, i) { return w(d) + domainHorizontalLabelWidth; })
 			.attr("height", function(d, i) { return h(d) + domainVerticalLabelHeight; })
+			.attr("class", "domain-background")
 			;
 
 		// =========================================================================//
