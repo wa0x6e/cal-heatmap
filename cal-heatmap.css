@@ -49,7 +49,7 @@
 }
 
 .subdomain-text {
-	font-size: 9px;
+	font-size: 8px;
 	fill: #999;
 	pointer-events: none;
 }
@@ -120,3 +120,9 @@ text.now
 {
 	fill: blue;
 }
+
+.domain-background {
+	fill: none;
+	shape-rendering: crispedges;
+}
+

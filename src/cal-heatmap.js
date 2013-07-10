@@ -33,6 +33,8 @@ var CalHeatMap = function() {
 
 		domainGutter : 2,
 
+		domainMargin: [5,5,5,5],
+
 		domain : "hour",
 
 		subDomain : "min",
@@ -573,16 +575,16 @@ var CalHeatMap = function() {
 		var domainSvg = d3.select("#" + self.options.id + " .graph")
 			.attr("height", function(d) {
 				if (self.options.verticalOrientation) {
-					return (h(d) + domainVerticalLabelHeight + self.options.domainGutter) * self.options.range - self.options.domainGutter;
+					return (h(d) + domainVerticalLabelHeight + self.options.domainGutter + self.options.domainMargin[0] + self.options.domainMargin[2]) * self.options.range - self.options.domainGutter;
 				} else {
-					return h(d) + domainVerticalLabelHeight;
+					return h(d) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
 				}
 			})
 			.attr("width", function(d) {
 				if (self.options.verticalOrientation) {
-					return w(d) + domainHorizontalLabelWidth;
+					return w(d) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3];
 				} else {
-					return (w(d) + domainHorizontalLabelWidth + self.options.domainGutter) * self.options.range - self.options.domainGutter;
+					return (w(d) + domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3]) * self.options.range - self.options.domainGutter;
 				}
 
 			})
@@ -604,7 +606,7 @@ var CalHeatMap = function() {
 			.attr("width", function(d){
 				var wd = w(d);
 
-				tempWidth += tempLastDomainWidth = wd + domainHorizontalLabelWidth + self.options.domainGutter;
+				tempWidth += tempLastDomainWidth = wd + domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
 
 				if (width === 0) {
 					domainsWidth.push(tempWidth - tempLastDomainWidth);
@@ -623,7 +625,7 @@ var CalHeatMap = function() {
 
 				var hd = h(d);
 
-				tempHeight += tempLastDomainHeight = hd + self.options.domainGutter + domainVerticalLabelHeight;
+				tempHeight += tempLastDomainHeight = hd + self.options.domainGutter + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
 
 				if (height === 0) {
 					domainsHeight.push(tempHeight - tempLastDomainHeight);
@@ -675,9 +677,11 @@ var CalHeatMap = function() {
 		;
 
 		svg.append("svg:rect")
-			.attr("width", function(d, i) { return w(d) + domainHorizontalLabelWidth; })
-			.attr("height", function(d, i) { return h(d) + domainVerticalLabelHeight; })
+			.attr("width", function(d, i) { return w(d) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3] - self.options.cellpadding; })
+			.attr("height", function(d, i) { return h(d) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2] - self.options.cellpadding; })
 			.attr("class", "domain-background")
+			.attr("rx", 5)
+			.attr("ry", 5)
 			;
 
 		// =========================================================================//
@@ -686,14 +690,14 @@ var CalHeatMap = function() {
 		var subDomainSvgGroup = svg.append("svg")
 			.attr("x", function(d, i) {
 				switch(self.options.label.position) {
-					case "left" : return domainHorizontalLabelWidth;
-					default : return 0;
+					case "left" : return domainHorizontalLabelWidth + self.options.domainMargin[1];
+					default : return self.options.domainMargin[1];
 				}
 			})
 			.attr("y", function(d, i) {
 				switch(self.options.label.position) {
-					case "top" : return domainVerticalLabelHeight;
-					default : return 0;
+					case "top" : return domainVerticalLabelHeight + self.options.domainMargin[0];
+					default : return self.options.domainMargin[0];
 				}
 			})
 			.attr("class", "graph-subdomain-group")
@@ -734,16 +738,16 @@ var CalHeatMap = function() {
 			.attr("class", "graph-label")
 			.attr("y", function(d, i) {
 				switch(self.options.label.position) {
-					case "top" : return domainVerticalLabelHeight/2;
-					case "bottom" : return h(d) + domainVerticalLabelHeight/2;
-					default : return 0;
+					case "top" : return domainVerticalLabelHeight/2 + self.options.domainMargin[0];
+					case "bottom" : return h(d) + domainVerticalLabelHeight/2 + self.options.domainMargin[0];
+					default : return self.options.domainMargin[0];
 				}
 			})
 			.attr("x", function(d, i){
 				switch(self.options.label.position) {
-					case "left" : return 0;
-					case "right" : return w(d);
-					default : return w(d)/2;
+					case "left" : return  + self.options.domainMargin[1];
+					case "right" : return w(d) + self.options.domainMargin[1];
+					default : return w(d)/2 + self.options.domainMargin[1];
 				}
 			})
 			.attr("dx", function(){
