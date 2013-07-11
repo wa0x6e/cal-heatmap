@@ -95,8 +95,13 @@ var CalHeatMap = function() {
 
 		legendMargin: [0, 0, 0, 0],
 
+		// Legend vertical position
+		// top : place legend above calendar
+		// bottom: place legend below the calendar
 		legendVerticalPosition: "bottom",
 
+		// Legend horizontal position
+		// accepted values : left, center, right
 		legendHorizontalPosition: "left",
 
 
@@ -669,11 +674,10 @@ var CalHeatMap = function() {
 		svg.append("svg:text")
 			.attr("class", "graph-label")
 			.attr("y", function(d, i) {
-				var y = 0;
+				var y = self.options.domainMargin[0];
 				switch(self.options.label.position) {
-					case "top" : y = domainVerticalLabelHeight/2 + self.options.domainMargin[0]; break;
-					case "bottom" : y = h(d) + domainVerticalLabelHeight/2 + self.options.domainMargin[0]; break;
-					default : y = self.options.domainMargin[0];
+					case "top" : y = domainVerticalLabelHeight/2; break;
+					case "bottom" : y = h(d) + domainVerticalLabelHeight/2;
 				}
 
 				return y + self.options.label.offset.y *
@@ -684,11 +688,11 @@ var CalHeatMap = function() {
 				);
 			})
 			.attr("x", function(d, i){
-				var x = 0;
+				var x = self.options.domainMargin[1];
 				switch(self.options.label.position) {
-					case "left" : x = self.options.domainMargin[1]; break;
-					case "right" : x = w(d) + self.options.domainMargin[1]; break;
-					default : x = w(d)/2 + self.options.domainMargin[1];
+					case "right" : x = w(d); break;
+					case "bottom" :
+					case "top" : x = w(d)/2;
 				}
 
 				if (self.options.label.align === "right") {
@@ -707,12 +711,7 @@ var CalHeatMap = function() {
 					default : return "middle";
 				}
 			})
-			.attr("dominant-baseline", function() {
-				if (verticalDomainLabel) {
-					return "middle";
-				}
-				return "top";
-			})
+			.attr("dominant-baseline", function() { return verticalDomainLabel ? "middle" : "top"; })
 			.text(function(d, i) { return legendFormat(new Date(self._domains[i])); })
 			.call(domainRotate)
 		;
@@ -1070,10 +1069,11 @@ CalHeatMap.prototype = {
 			.attr("width", graphWidth)
 			.append("svg:g")
 			.attr("transform", function(d) {
-				if (parent.options.legendHorizontalPosition === "right") {
-					return "translate(" + (graphWidth - legendWidth) + ")";
-				} else {
-					return "translate(" + parent.options.legendMargin[3] + ")";
+				switch(parent.options.legendHorizontalPosition) {
+					case "right" : return "translate(" + (graphWidth - legendWidth) + ")";
+					case "middle" :
+					case "center" : return "translate(" + (graphWidth/2 - legendWidth/2) + ")";
+					default : return "translate(" + parent.options.legendMargin[3] + ")";
 				}
 			})
 			.attr("y", this.options.legendMargin[0])
