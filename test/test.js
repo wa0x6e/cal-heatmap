@@ -751,7 +751,7 @@ test("HOUR -> MIN", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 60, "The hour subdomain contains 60 minutes");
 
@@ -783,7 +783,7 @@ test("DAY -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 24, "The day subdomain contains 24 hours");
 
@@ -816,7 +816,7 @@ test("DAY -> MIN", function() {
 	equal(domain[0].getTime(), startDate.getTime(), "First domain start is midnight of first day");
 	equal(domain[domain.length-1].getTime(), endDate.getTime(), "Last domain start is midnight of last day");
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 1440, "The day subdomain contains 1440 minutes");
 
@@ -847,7 +847,7 @@ test("WEEK -> DAY", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -883,7 +883,7 @@ test("WEEK -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -921,7 +921,7 @@ test("WEEK -> MIN", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -961,7 +961,7 @@ test("MONTH -> WEEK", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1001,7 +1001,7 @@ test("MONTH -> DAY", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1034,7 +1034,7 @@ test("MONTH -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1068,7 +1068,7 @@ test("YEAR -> DAY", function() {
 	equal(domain.length, 1, "Domain is equal to 1 year");
 	equal(domain[0].getTime(), startDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1099,7 +1099,7 @@ test("YEAR -> MONTH", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1127,7 +1127,7 @@ test("YEAR -> WEEK", function() {
 	equal(domain.length, 1, "Domain is equal to 1 year");
 	equal(domain[0].getTime(), startDate.getTime(), "Domain start the monday of the first week of the week");
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1164,7 +1164,7 @@ test("YEAR -> DAY", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1339,78 +1339,78 @@ test("Don't allow not valid data type", function() {
 
 /*
 	-----------------------------------------------------------------
-	SCALE
+	LEGEND
 	-----------------------------------------------------------------
  */
 
-module( "Scale" );
+module( "Legend" );
 
-test("Basic default scale", function() {
+test("Basic default legend", function() {
 
 	expect(8);
 
 	var cal = createCalendar({});
 
-	equal(cal.scale(0), "");
-	equal(cal.scale(5), "q1");
-	equal(cal.scale(10), "q1");
-	equal(cal.scale(15), "q2");
-	equal(cal.scale(20), "q2");
-	equal(cal.scale(25), "q3");
-	equal(cal.scale(30), "q3");
-	equal(cal.scale(35), "q4");
+	equal(cal.legend(0), "");
+	equal(cal.legend(5), "q1");
+	equal(cal.legend(10), "q1");
+	equal(cal.legend(15), "q2");
+	equal(cal.legend(20), "q2");
+	equal(cal.legend(25), "q3");
+	equal(cal.legend(30), "q3");
+	equal(cal.legend(35), "q4");
 
 });
 
-test("Positive custom scale", function() {
+test("Positive custom legend", function() {
 
 	expect(8);
 
-	var cal = createCalendar({scale: [100, 200, 300, 400]});
+	var cal = createCalendar({legend: [100, 200, 300, 400]});
 
-	equal(cal.scale(0), "");
-	equal(cal.scale(50), "q1");
-	equal(cal.scale(100), "q1");
-	equal(cal.scale(150), "q2");
-	equal(cal.scale(200), "q2");
-	equal(cal.scale(250), "q3");
-	equal(cal.scale(300), "q3");
-	equal(cal.scale(350), "q4");
+	equal(cal.legend(0), "");
+	equal(cal.legend(50), "q1");
+	equal(cal.legend(100), "q1");
+	equal(cal.legend(150), "q2");
+	equal(cal.legend(200), "q2");
+	equal(cal.legend(250), "q3");
+	equal(cal.legend(300), "q3");
+	equal(cal.legend(350), "q4");
 
 });
 
-test("Positive and negative custom scale", function() {
+test("Positive and negative custom legend", function() {
 
 	expect(8);
 
-	var cal = createCalendar({scale: [-100, 0, 100, 200, 300, 400]});
+	var cal = createCalendar({legend: [-100, 0, 100, 200, 300, 400]});
 
-	equal(cal.scale(-200), "q1");
-	equal(cal.scale(-100), "q1");
-	equal(cal.scale(-50), "q2");
-	equal(cal.scale(0), "q2");
-	equal(cal.scale(50), "q3");
-	equal(cal.scale(100), "q3");
-	equal(cal.scale(150), "q4");
-	equal(cal.scale(200), "q4");
+	equal(cal.legend(-200), "q1");
+	equal(cal.legend(-100), "q1");
+	equal(cal.legend(-50), "q2");
+	equal(cal.legend(0), "q2");
+	equal(cal.legend(50), "q3");
+	equal(cal.legend(100), "q3");
+	equal(cal.legend(150), "q4");
+	equal(cal.legend(200), "q4");
 
 });
 
-test("Float value custom scale", function() {
+test("Float value custom legend", function() {
 
 	expect(9);
 
-	var cal = createCalendar({scale: [0.1, 0.2, 0.3]});
+	var cal = createCalendar({legend: [0.1, 0.2, 0.3]});
 
-	equal(cal.scale(-100), "qi");
-	equal(cal.scale(0), "");
-	equal(cal.scale(0.1), "q1");
-	equal(cal.scale(0.15), "q2");
-	equal(cal.scale(0.2), "q2");
-	equal(cal.scale(0.25), "q3");
-	equal(cal.scale(0.3), "q3");
-	equal(cal.scale(0.35), "q4", "Classes top at q3, since scale contains only 3 items");
-	equal(cal.scale(0.4), "q4", "Classes top at q3, since scale contains only 3 items");
+	equal(cal.legend(-100), "qi");
+	equal(cal.legend(0), "");
+	equal(cal.legend(0.1), "q1");
+	equal(cal.legend(0.15), "q2");
+	equal(cal.legend(0.2), "q2");
+	equal(cal.legend(0.25), "q3");
+	equal(cal.legend(0.3), "q3");
+	equal(cal.legend(0.35), "q4", "Classes top at q3, since legend contains only 3 items");
+	equal(cal.legend(0.4), "q4", "Classes top at q3, since legend contains only 3 items");
 
 });
 
@@ -1420,9 +1420,9 @@ test("Null value", function() {
 
 	var cal = createCalendar({});
 
-	equal(cal.scale(null), "");
-	equal(cal.scale(0), "");
-	equal(cal.scale(1), "q1");
+	equal(cal.legend(null), "");
+	equal(cal.legend(0), "");
+	equal(cal.legend(1), "q1");
 
 });
 
@@ -1432,10 +1432,10 @@ test("Not a number", function() {
 
 	var cal = createCalendar({});
 
-	equal(cal.scale("Hello"), "qi");
-	equal(cal.scale({}), "qi");
-	equal(cal.scale(0), "");
-	equal(cal.scale(1), "q1");
+	equal(cal.legend("Hello"), "qi");
+	equal(cal.legend({}), "qi");
+	equal(cal.legend(0), "");
+	equal(cal.legend(1), "q1");
 
 });
 
@@ -1667,18 +1667,18 @@ test("Display empty calendar", function() {
 	var cal = createCalendar({paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph").length, 1, "Calendar was created");
-	equal($("#cal-heatmap .graph svg").length, 12, "The graph contains 12 hours");
-	equal($("#cal-heatmap .graph svg rect").length, 60*12, "The graph contains 720 minutes");
-	equal($("#cal-heatmap .graph-scale").length, 1, "A scale is created");
+	equal($("#cal-heatmap .graph .graph-subdomain-group").length, 12, "The graph contains 12 hours");
+	equal($("#cal-heatmap .graph .graph-subdomain-group rect").length, 60*12, "The graph contains 720 minutes");
+	equal($("#cal-heatmap .graph-legend").length, 1, "A legend is created");
 });
 
-test("Don't display scale", function() {
+test("Don't display legend", function() {
 
 	expect(1);
 
-	var cal = createCalendar({displayScale: false, paintOnLoad: true});
+	var cal = createCalendar({displayLegend: false, paintOnLoad: true});
 
-	equal($("#cal-heatmap .graph-scale").length, 0, "The scale is not created");
+	equal($("#cal-heatmap .graph-legend").length, 0, "The legend is not created");
 });
 
 
@@ -1688,7 +1688,7 @@ test("Display domain according to range number", function() {
 
 	var cal = createCalendar({range: 5, paintOnLoad: true});
 
-	equal($("#cal-heatmap .graph svg").length, 5, "The graph contains only 5 hours");
+	equal($("#cal-heatmap .graph .graph-subdomain-group").length, 5, "The graph contains only 5 hours");
 
 });
 
@@ -1763,11 +1763,11 @@ test("Custom date formatting with d3.js internal formatter", function() {
 
 	var date = new Date(2000, 0, 5);
 	var datas = {};
-	datas[date.getTime/1000] = 15;
+	datas[date.getTime()/1000] = 15;
 
-	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {date: "==%B==", legend: ""}});
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {title: "==%B==", label: "", date: ""}});
 
-	equal($("#cal-heatmap .graph rect title")[0].firstChild.data, "==January==");
+	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, "==January==");
 
 });
 
@@ -1777,11 +1777,11 @@ test("Custom date formatting with custom function", function() {
 
 	var date = new Date(2000, 0, 5);
 	var datas = {};
-	datas[date.getTime/1000] = 15;
+	datas[date.getTime()/1000] = 15;
 
-	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {date: function(date) { return date.getTime();}, legend: ""}});
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {title: function(date) { return date.getTime();}, label: "", date: ""}});
 
-	equal($("#cal-heatmap .graph rect title")[0].firstChild.data, date.getTime());
+	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, date.getTime());
 });
 
 test("Cell radius is applied", function() {
@@ -1792,8 +1792,8 @@ test("Cell radius is applied", function() {
 
 	var cal = createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellradius: radius});
 
-	equal($("#cal-heatmap .graph rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellradius applied");
-	equal($("#cal-heatmap .graph rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellradius applied");
+	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellradius applied");
+	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellradius applied");
 });
 
 /*
@@ -1822,14 +1822,6 @@ test("Data Source is invalid : number", function() {
 });
 
 
-test("Data Source is a JSON object", function() {
-	expect(1);
-
-	var datas = {test: 5};
-	var cal = createCalendar({data: datas});
-
-	equal(cal.getDatas(datas), datas);
-});
 
 test("Data Source is a regular string", function() {
 	expect(1);
