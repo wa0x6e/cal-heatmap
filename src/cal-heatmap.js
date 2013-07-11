@@ -93,6 +93,12 @@ var CalHeatMap = function() {
 
 		legendCellpadding: 2,
 
+		legendMargin: [0, 0, 0, 0],
+
+		legendVerticalPosition: "bottom",
+
+		legendHorizontalPosition: "left",
+
 
 		// ================================================
 		// HIGHLIGHT
@@ -408,7 +414,7 @@ var CalHeatMap = function() {
 
 			// Display legend if needed
 			if (self.options.displayLegend) {
-				self.displayLegend();
+				self.displayLegend(width - self.options.domainGutter - self.options.cellpadding);
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -608,8 +614,6 @@ var CalHeatMap = function() {
 			.attr("width", function(d, i) { return w(d) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3] - self.options.cellpadding; })
 			.attr("height", function(d, i) { return h(d) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2] - self.options.cellpadding; })
 			.attr("class", "domain-background")
-			.attr("rx", 5)
-			.attr("ry", 5)
 			;
 
 		// =========================================================================//
@@ -1046,14 +1050,34 @@ CalHeatMap.prototype = {
 	// PAINTING : LEGEND														//
 	// =========================================================================//
 
-	displayLegend: function() {
+	displayLegend: function(graphWidth) {
 
 		var parent = this;
+		var legend = d3.select("#" + this.options.id);
 
-		var legend = d3.select("#" + this.options.id)
-			.append("svg:svg")
+		switch(this.options.legendVerticalPosition) {
+			case "top" : legend = legend.insert("svg:svg", ".graph"); break;
+			default : legend = legend.append("svg:svg");
+		}
+
+		var legendWidth =
+			this.options.legendCellSize * (this.options.legend.length+1) +
+			this.options.legendCellpadding * (this.options.legend.length+1) +
+			this.options.legendMargin[3] + this.options.legendMargin[1];
+
+		legend = legend
 			.attr("class", "graph-legend")
-			.attr("height", this.options.legendCellSize + (this.options.legendCellpadding*2))
+			.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
+			.attr("width", graphWidth)
+			.append("svg:g")
+			.attr("transform", function(d) {
+				if (parent.options.legendHorizontalPosition === "right") {
+					return "translate(" + (graphWidth - legendWidth) + ")";
+				} else {
+					return "translate(" + parent.options.legendMargin[3] + ")";
+				}
+			})
+			.attr("y", this.options.legendMargin[0])
 			.selectAll().data(d3.range(0, this.options.legend.length+1));
 
 		var legendItem = legend
@@ -1062,7 +1086,10 @@ CalHeatMap.prototype = {
 			.attr("width", this.options.legendCellSize)
 			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
-			.attr("transform", function(d) { return "translate(" + (d * (parent.options.legendCellSize + parent.options.legendCellpadding))  + ", " + parent.options.legendCellpadding + ")"; })
+			.attr("x", function(d) {
+				return d * (parent.options.legendCellSize + parent.options.legendCellpadding);
+			})
+			.attr("y", this.options.legendMargin[0])
 			.attr("fill-opacity", 0)
 			;
 
@@ -1088,6 +1115,7 @@ CalHeatMap.prototype = {
 				}
 			})
 		;
+
 	},
 
 	// =========================================================================//
