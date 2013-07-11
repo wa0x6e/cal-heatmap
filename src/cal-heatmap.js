@@ -153,22 +153,8 @@ var CalHeatMap = function() {
 			upper: "more than {max} {name}"
 		},
 
-		// ================================================
-		// BROWSING
-		// ================================================
-
-		// Animation duration
+		// Animation duration, in ms
 		duration : 500,
-
-		// Domain browsing
-		// Dynamically change calendar domain by loading
-		// next/previous domain
-		browsing: false,
-
-		browsingOptions: {
-			nextLabel : "Next",
-			previousLabel : "Previous"
-		},
 
 		// ================================================
 		// CALLBACK
@@ -347,7 +333,7 @@ var CalHeatMap = function() {
 	}
 
 	// Exception : always return the maximum number of weeks
-	// to align the label
+	// to align the label vertically
 	this._domainType.x_day.row = function(d) { return 6; };
 
 
@@ -376,39 +362,7 @@ var CalHeatMap = function() {
 	 */
 	var _init = function() {
 
-		self.formatDate = function(d, field) {
-
-			if (typeof field === "undefined") {
-				field = "title";
-			}
-
-			if (typeof self.options.format[field] === "function") {
-				return self.options.format[field];
-			} else {
-				var f = d3.time.format(self.options.format[field]);
-				return f(d);
-			}
-		};
-
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
-
-		if (self.options.browsing) {
-			d3.select("#" + self.options.id).append("a")
-			.attr("href", "#")
-			.attr("rel", "prev")
-			.attr("class", "graph-browse-previous")
-			.attr("title", "Load previous " + self._domainType[self.options.domain].name)
-			.on("click", function(d) { self.loadPreviousDomain(); })
-			.html(self.options.browsingOptions.previousLabel);
-
-			d3.select("#" + self.options.id).append("a")
-			.attr("href", "#")
-			.attr("rel", "next")
-			.attr("class", "graph-browse-next")
-			.attr("title", "Load next " + self._domainType[self.options.domain].name)
-			.on("click", function(d) { self.loadNextDomain(); })
-			.html(self.options.browsingOptions.nextLabel);
-		}
 
 		d3.select("#" + self.options.id).append("svg")
 			.attr("class", "graph");
@@ -441,47 +395,6 @@ var CalHeatMap = function() {
 		}
 
 		return true;
-	};
-
-	this.loadNextDomain = function() {
-		if (d3.event) {
-			d3.event.preventDefault();
-		}
-
-		self._domains.push(self.getNextDomain().getTime());
-		self._domains.shift();
-
-		self.paint();
-
-		self.getDatas(
-			self.options.data,
-			new Date(self._domains[self._domains.length-1]),
-			self.getSubDomain(self._domains[self._domains.length-1]).pop(),
-			self.svg
-		);
-
-		self.afterLoadNextDomain(new Date(self._domains[self._domains.length-1]));
-
-	};
-
-	this.loadPreviousDomain = function() {
-		if (d3.event) {
-			d3.event.preventDefault();
-		}
-
-		self._domains.unshift(self.getPreviousDomain().getTime());
-		self._domains.pop();
-
-		self.paint(true);
-
-		self.getDatas(
-			self.options.data,
-			new Date(self._domains[0]),
-			self.getSubDomain(self._domains[0]).pop(),
-			self.svg
-		);
-
-		self.afterLoadPreviousDomain(new Date(self._domains[0]));
 	};
 
 	/**
@@ -1044,6 +957,62 @@ CalHeatMap.prototype = {
 
 	formatNumber: d3.format(",g"),
 
+	formatDate: function(d, field) {
+		if (typeof field === "undefined") {
+			field = "title";
+		}
+
+		if (typeof this.options.format[field] === "function") {
+			return this.options.format[field](d);
+		} else {
+			var f = d3.time.format(this.options.format[field]);
+			return f(d);
+		}
+	},
+
+	// =========================================================================//
+	// DOMAIN NAVIGATION														//
+	// =========================================================================//
+	next: function() {
+		return this.loadNextDomain();
+	},
+
+	previous: function() {
+		return this.loadPreviousDomain();
+	},
+
+	loadNextDomain: function() {
+		this._domains.push(this.getNextDomain().getTime());
+		this._domains.shift();
+
+		this.paint();
+
+		this.getDatas(
+			this.options.data,
+			new Date(this._domains[this._domains.length-1]),
+			this.getSubDomain(this._domains[this._domains.length-1]).pop(),
+			this.svg
+		);
+
+		this.afterLoadNextDomain(new Date(this._domains[this._domains.length-1]));
+	},
+
+	loadPreviousDomain: function() {
+		this._domains.unshift(this.getPreviousDomain().getTime());
+		this._domains.pop();
+
+		this.paint(true);
+
+		this.getDatas(
+			this.options.data,
+			new Date(this._domains[0]),
+			this.getSubDomain(this._domains[0]).pop(),
+			this.svg
+		);
+
+		this.afterLoadPreviousDomain(new Date(this._domains[0]));
+	},
+
 	// =========================================================================//
 	// PAINTING : LEGEND														//
 	// =========================================================================//
@@ -1560,6 +1529,9 @@ CalHeatMap.prototype = {
 		return false;
 	},
 
+	/**
+	 * Interpret the data property
+	 */
 	getDatas: function(source, startDate, endDate, domain) {
 		var parent = this;
 
