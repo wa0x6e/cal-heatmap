@@ -820,8 +820,8 @@ var CalHeatMap = function() {
 			if (height === 0) {
 				height = tempHeight;
 
-				d3.select("#" + self.options.id + " .graph").attr("width", domainsWidth[1] - self.options.domainGutter);
-				d3.select("#" + self.options.id + " .graph").attr("height", height - self.options.domainGutter);
+				d3.select("#" + self.options.id + " .graph").attr("width", domainsWidth[1] - self.options.domainGutter - self.options.cellpadding);
+				d3.select("#" + self.options.id + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
 			} else if (tempLastDomainHeight !== exitDomainHeight) {
 				// Compute the new height
 				var th = height + tempLastDomainHeight - exitDomainHeight;
@@ -840,8 +840,8 @@ var CalHeatMap = function() {
 			if (width === 0) {
 				width = tempWidth;
 
-				d3.select("#" + self.options.id + " .graph").attr("height", domainsHeight[1] - self.options.domainGutter);
-				d3.select("#" + self.options.id + " .graph").attr("width", width);
+				d3.select("#" + self.options.id + " .graph").attr("height", domainsHeight[1] - self.options.domainGutter - self.options.cellpadding);
+				d3.select("#" + self.options.id + " .graph").attr("width", width -  self.options.domainGutter - self.options.cellpadding);
 			} else if (tempLastDomainWidth !== exitDomainWidth) {
 				// Compute the new width
 				var tw = width + tempLastDomainWidth - exitDomainWidth;
@@ -1043,7 +1043,7 @@ CalHeatMap.prototype = {
 	formatNumber: d3.format(",g"),
 
 	// =========================================================================//
-	// PAINTING : LEGEND															//
+	// PAINTING : LEGEND														//
 	// =========================================================================//
 
 	displayLegend: function() {
