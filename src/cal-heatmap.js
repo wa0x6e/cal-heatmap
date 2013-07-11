@@ -669,33 +669,34 @@ var CalHeatMap = function() {
 		svg.append("svg:text")
 			.attr("class", "graph-label")
 			.attr("y", function(d, i) {
+				var y = 0;
 				switch(self.options.label.position) {
-					case "top" : return domainVerticalLabelHeight/2 + self.options.domainMargin[0];
-					case "bottom" : return h(d) + domainVerticalLabelHeight/2 + self.options.domainMargin[0];
-					default : return self.options.domainMargin[0];
+					case "top" : y = domainVerticalLabelHeight/2 + self.options.domainMargin[0]; break;
+					case "bottom" : y = h(d) + domainVerticalLabelHeight/2 + self.options.domainMargin[0]; break;
+					default : y = self.options.domainMargin[0];
 				}
-			})
-			.attr("x", function(d, i){
-				switch(self.options.label.position) {
-					case "left" : return self.options.domainMargin[1];
-					case "right" : return w(d) + self.options.domainMargin[1];
-					default : return w(d)/2 + self.options.domainMargin[1];
-				}
-			})
-			.attr("dx", function(){
-				if (self.options.label.align === "right") {
-					return domainHorizontalLabelWidth - self.options.label.offset.x *
-					(self.options.label.rotate === "right" ? -1 : 1);
-				}
-				return self.options.label.offset.x;
-			})
-			.attr("dy", function() {
-				return self.options.label.offset.y *
+
+				return y + self.options.label.offset.y *
 				(
 					((self.options.label.rotate === "right" && self.options.label.position === "right") ||
 					(self.options.label.rotate === "left" && self.options.label.position === "left")) ?
 					-1 : 1
 				);
+			})
+			.attr("x", function(d, i){
+				var x = 0;
+				switch(self.options.label.position) {
+					case "left" : x = self.options.domainMargin[1]; break;
+					case "right" : x = w(d) + self.options.domainMargin[1]; break;
+					default : x = w(d)/2 + self.options.domainMargin[1];
+				}
+
+				if (self.options.label.align === "right") {
+					return x + domainHorizontalLabelWidth - self.options.label.offset.x *
+					(self.options.label.rotate === "right" ? -1 : 1);
+				}
+				return x + self.options.label.offset.x;
+
 			})
 			.attr("text-anchor", function() {
 				switch(self.options.label.align) {
