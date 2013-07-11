@@ -758,10 +758,8 @@ var CalHeatMap = function() {
 			rect
 				.append("text")
 				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
-				.attr("x", function(d) { return self.positionSubDomainX(d); })
-				.attr("y", function(d) { return self.positionSubDomainY(d); })
-				.attr("dx", function(d) { return self.options.cellsize/2; })
-				.attr("dy", function(d) { return self.options.cellsize/2; })
+				.attr("x", function(d) { return self.positionSubDomainX(d) + self.options.cellsize/2; })
+				.attr("y", function(d) { return self.positionSubDomainY(d) + self.options.cellsize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
 				.text(function(d){ return self.formatDate(d, "date"); })
