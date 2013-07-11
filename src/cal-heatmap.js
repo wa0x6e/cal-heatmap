@@ -33,7 +33,7 @@ var CalHeatMap = function() {
 
 		domainGutter : 2,
 
-		domainMargin: [5,5,5,5],
+		domainMargin: [0,0,0,0],
 
 		domain : "hour",
 
@@ -74,7 +74,9 @@ var CalHeatMap = function() {
 			offset: {
 				x: 0,
 				y: 0
-			}
+			},
+
+			rotate: null
 		},
 
 		// ================================================
@@ -658,7 +660,7 @@ var CalHeatMap = function() {
 
 
 		// =========================================================================//
-		// PAINTING DOMAIN LABEL													//
+		// PAINTING LABEL															//
 		// =========================================================================//
 		svg.append("svg:text")
 			.attr("class", "graph-label")
@@ -671,19 +673,25 @@ var CalHeatMap = function() {
 			})
 			.attr("x", function(d, i){
 				switch(self.options.label.position) {
-					case "left" : return  + self.options.domainMargin[1];
+					case "left" : return self.options.domainMargin[1];
 					case "right" : return w(d) + self.options.domainMargin[1];
 					default : return w(d)/2 + self.options.domainMargin[1];
 				}
 			})
 			.attr("dx", function(){
 				if (self.options.label.align === "right") {
-					return domainHorizontalLabelWidth - self.options.label.offset.x;
+					return domainHorizontalLabelWidth - self.options.label.offset.x *
+					(self.options.label.rotate === "right" ? -1 : 1);
 				}
 				return self.options.label.offset.x;
 			})
 			.attr("dy", function() {
-				return self.options.label.offset.y;
+				return self.options.label.offset.y *
+				(
+					((self.options.label.rotate === "right" && self.options.label.position === "right") ||
+					(self.options.label.rotate === "left" && self.options.label.position === "left")) ?
+					-1 : 1
+				);
 			})
 			.attr("text-anchor", function() {
 				switch(self.options.label.align) {
@@ -701,7 +709,38 @@ var CalHeatMap = function() {
 				return "top";
 			})
 			.text(function(d, i) { return legendFormat(new Date(self._domains[i])); })
+			.call(domainRotate)
 		;
+
+		function domainRotate(selection) {
+			switch (self.options.label.rotate) {
+				case "right" :
+					selection
+					.attr("transform", function(d) {
+						var s = "rotate(90), ";
+						switch(self.options.label.position) {
+							case "right" : s += "translate(-" + w(d) + " , -" + w(d) + ")"; break;
+							case "left" : s += "translate(-" + domainHorizontalLabelWidth + ", -" + domainHorizontalLabelWidth + ")"; break;
+						}
+
+						return s;
+					})
+					.attr("text-anchor", "start")
+					; break;
+				case "left" :
+					selection
+					.attr("transform", function(d) {
+						var s = "rotate(270), ";
+						switch(self.options.label.position) {
+							case "right" : s += "translate(-" + (w(d) + domainHorizontalLabelWidth) + " , " + w(d) + ")"; break;
+							case "left" : s += "translate(-" + domainHorizontalLabelWidth + " , " + domainHorizontalLabelWidth + ")"; break;
+						}
+
+						return s;
+					})
+					.attr("text-anchor", "end"); break;
+			}
+		}
 
 
 		// Appending a title to each subdomain
@@ -898,13 +937,17 @@ var CalHeatMap = function() {
 				case "right" : self.options.label.align = "left"; break;
 				default : self.options.label.align = "center";
 			}
+
+			if (self.options.label.rotate === "left") {
+				self.options.label.align = "right";
+			}
 		}
 
 		if (!self.options.label.hasOwnProperty("offset")) {
 			if (self.options.label.position === "left" || self.options.label.position === "right") {
 				self.options.label.offset = {
 					x: 10,
-					y: 20
+					y: 15
 				};
 			} else {
 				self.options.label.offset = {
