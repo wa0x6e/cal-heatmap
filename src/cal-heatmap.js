@@ -376,7 +376,7 @@ var CalHeatMap = function() {
 			self.paint();
 
 			// Display legend if needed
-			if (self.options.displayLegend) {
+			if (self.options.displayLegend) { console.log(width);
 				self.displayLegend(width - self.options.domainGutter - self.options.cellpadding);
 			}
 
@@ -753,7 +753,9 @@ var CalHeatMap = function() {
 			if (height === 0) {
 				height = tempHeight;
 
-				d3.select(self.options.itemSelector + " .graph").attr("width", domainsWidth[1] - self.options.domainGutter - self.options.cellpadding);
+				width = domainsWidth[1] - self.options.domainGutter - self.options.cellpadding;
+
+				d3.select(self.options.itemSelector + " .graph").attr("width", width);
 				d3.select(self.options.itemSelector + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
 			} else if (tempLastDomainHeight !== exitDomainHeight) {
 				// Compute the new height
@@ -773,7 +775,9 @@ var CalHeatMap = function() {
 			if (width === 0) {
 				width = tempWidth;
 
-				d3.select(self.options.itemSelector + " .graph").attr("height", domainsHeight[1] - self.options.domainGutter - self.options.cellpadding);
+				height = domainsHeight[1] - self.options.domainGutter - self.options.cellpadding;
+
+				d3.select(self.options.itemSelector + " .graph").attr("height", height);
 				d3.select(self.options.itemSelector + " .graph").attr("width", width -  self.options.domainGutter - self.options.cellpadding);
 			} else if (tempLastDomainWidth !== exitDomainWidth) {
 				// Compute the new width
