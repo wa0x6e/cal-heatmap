@@ -9,7 +9,7 @@ var CalHeatMap = function() {
 	// Default settings
 	this.options = {
 		// DOM ID of the container to append the graph to
-		id : "cal-heatmap",
+		itemSelector : "cal-heatmap",
 
 		// Whether to paint the calendar on init()
 		// Used by testsuite to reduce testing time
@@ -154,7 +154,7 @@ var CalHeatMap = function() {
 		},
 
 		// Animation duration, in ms
-		duration : 500,
+		animationDuration : 500,
 
 		nextSelector: false,
 
@@ -368,7 +368,7 @@ var CalHeatMap = function() {
 
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
-		d3.select("#" + self.options.id).append("svg")
+		d3.select(self.options.itemSelector).append("svg")
 			.attr("class", "graph");
 
 
@@ -443,7 +443,7 @@ var CalHeatMap = function() {
 		var legendFormat = d3.time.format(self.options.format.label);
 
 		// Painting all the domains
-		var domainSvg = d3.select("#" + self.options.id + " .graph")
+		var domainSvg = d3.select(self.options.itemSelector + " .graph")
 			.selectAll("svg.graph-domain")
 			.data(self._domains, function(d) { return d;})
 		;
@@ -753,8 +753,8 @@ var CalHeatMap = function() {
 			if (height === 0) {
 				height = tempHeight;
 
-				d3.select("#" + self.options.id + " .graph").attr("width", domainsWidth[1] - self.options.domainGutter - self.options.cellpadding);
-				d3.select("#" + self.options.id + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
+				d3.select(self.options.itemSelector + " .graph").attr("width", domainsWidth[1] - self.options.domainGutter - self.options.cellpadding);
+				d3.select(self.options.itemSelector + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
 			} else if (tempLastDomainHeight !== exitDomainHeight) {
 				// Compute the new height
 				var th = height + tempLastDomainHeight - exitDomainHeight;
@@ -763,8 +763,8 @@ var CalHeatMap = function() {
 				if (th !== height) {
 					height = th;
 
-					d3.select("#" + self.options.id + " .graph")
-						.transition().duration(self.options.duration)
+					d3.select(self.options.itemSelector + " .graph")
+						.transition().duration(self.options.animationDuration)
 						.attr("height", height - self.options.domainGutter)
 					;
 				}
@@ -773,8 +773,8 @@ var CalHeatMap = function() {
 			if (width === 0) {
 				width = tempWidth;
 
-				d3.select("#" + self.options.id + " .graph").attr("height", domainsHeight[1] - self.options.domainGutter - self.options.cellpadding);
-				d3.select("#" + self.options.id + " .graph").attr("width", width -  self.options.domainGutter - self.options.cellpadding);
+				d3.select(self.options.itemSelector + " .graph").attr("height", domainsHeight[1] - self.options.domainGutter - self.options.cellpadding);
+				d3.select(self.options.itemSelector + " .graph").attr("width", width -  self.options.domainGutter - self.options.cellpadding);
 			} else if (tempLastDomainWidth !== exitDomainWidth) {
 				// Compute the new width
 				var tw = width + tempLastDomainWidth - exitDomainWidth;
@@ -782,8 +782,8 @@ var CalHeatMap = function() {
 				// If the new width is different, resize the graph
 				if (tw !== width) {
 					width = tw;
-					d3.select("#" + self.options.id + " .graph")
-						.transition().duration(self.options.duration)
+					d3.select(self.options.itemSelector + " .graph")
+						.transition().duration(self.options.animationDuration)
 						.attr("width", width)
 					;
 				}
@@ -793,7 +793,7 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// ANIMATION																//
 		// =========================================================================//
-		domainSvg.transition().duration(self.options.duration)
+		domainSvg.transition().duration(self.options.animationDuration)
 			.attr("x", function(d, i){
 				return self.options.verticalOrientation ? 0 : domainsWidth[i];
 			})
@@ -802,7 +802,7 @@ var CalHeatMap = function() {
 			})
 		;
 
-		domainSvg.exit().transition().duration(self.options.duration)
+		domainSvg.exit().transition().duration(self.options.animationDuration)
 			.attr("x", function(d){
 				if (self.options.verticalOrientation) {
 					return 0;
@@ -824,7 +824,7 @@ var CalHeatMap = function() {
 		if (self.svg === null) {
 			self.svg = svg;
 		} else {
-			self.svg = d3.select("#" + self.options.id + " .graph").selectAll("svg")
+			self.svg = d3.select(self.options.itemSelector + " .graph").selectAll("svg")
 			.data(self._domains, function(d) {return d;});
 		}
 	};
@@ -1030,7 +1030,7 @@ CalHeatMap.prototype = {
 	displayLegend: function(graphWidth) {
 
 		var parent = this;
-		var legend = d3.select("#" + this.options.id);
+		var legend = d3.select(this.options.itemSelector);
 
 		switch(this.options.legendVerticalPosition) {
 			case "top" : legend = legend.insert("svg:svg", ".graph"); break;
@@ -1071,7 +1071,7 @@ CalHeatMap.prototype = {
 			.attr("fill-opacity", 0)
 			;
 
-		legendItem.transition().delay(function(d, i) { return parent.options.duration * i/10;}).attr("fill-opacity", 1);
+		legendItem.transition().delay(function(d, i) { return parent.options.animationDuration * i/10;}).attr("fill-opacity", 1);
 
 		legendItem
 			.append("svg:title")
@@ -1659,7 +1659,7 @@ CalHeatMap.prototype = {
 			styles[".q" + j] = {};
 		}
 
-		var root = document.getElementById(this.options.id);
+		var root = document.getElementById(this.options.itemSelector);
 
 		var whitelistStyles = [
 			// SVG specific properties
@@ -1723,7 +1723,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Get the d3js SVG element
-		var tmp  = document.getElementById(this.options.id);
+		var tmp  = document.getElementById(this.options.itemSelector);
 		var svg = tmp.getElementsByTagName("svg")[0];
 
 		var string = "<svg xmlns=\"http://www.w3.org/2000/svg\" "+
