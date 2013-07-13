@@ -156,6 +156,10 @@ var CalHeatMap = function() {
 		// Animation duration, in ms
 		duration : 500,
 
+		nextSelector: false,
+
+		previousSelector: false,
+
 		// ================================================
 		// CALLBACK
 		// ================================================
@@ -679,8 +683,22 @@ var CalHeatMap = function() {
 			;
 		}
 
+		// =========================================================================//
+		// ATTACHING DOMAIN NAVIGATION EVENT										//
+		// =========================================================================//
+		if (self.options.nextSelector !== false) {
+			d3.select("#next").on("click", function(d) {
+				d3.event.preventDefault();
+				self.loadNextDomain();
+			});
+		}
 
-
+		if (self.options.previousSelector !== false) {
+			d3.select(self.options.previousSelector).on("click", function(d) {
+				d3.event.preventDefault();
+				self.loadPreviousDomain();
+			});
+		}
 
 		// =========================================================================//
 		// DYNAMIC HEIGHT/WIDTH COMPUTATION											//
@@ -973,14 +991,6 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 	// DOMAIN NAVIGATION														//
 	// =========================================================================//
-	next: function() {
-		return this.loadNextDomain();
-	},
-
-	previous: function() {
-		return this.loadPreviousDomain();
-	},
-
 	loadNextDomain: function() {
 		this._domains.push(this.getNextDomain().getTime());
 		this._domains.shift();
@@ -1624,6 +1634,18 @@ CalHeatMap.prototype = {
 		return str;
 	},
 
+	// =========================================================================//
+	// PUBLIC API																	//
+	// =========================================================================//
+
+	next: function() {
+		return this.loadNextDomain();
+	},
+
+	previous: function() {
+		return this.loadPreviousDomain();
+	},
+
 	getSVG: function() {
 		var styles = {
 			".graph": {},
@@ -1719,8 +1741,6 @@ CalHeatMap.prototype = {
 
 		return string;
 	}
-
-
 };
 
 /**
