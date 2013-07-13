@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.2.3 [2013-07-12]
+
+* [fix] Fix data lost when browsing, when directly passing a json object to the `data` option
+
 ## v2.2.1 [2013-06-19]
 
 * [new] Highlight today's rectangle (only available when subdomain is equal to "day")

@@ -1203,7 +1203,7 @@ CalHeatMap.prototype = {
 				break;
 			case "object" :
 				// @todo Check that it's a valid JSON object
-				return source;
+				return parent.fill(source, domain);
 		}
 
 		return false;
