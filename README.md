@@ -7,3 +7,7 @@ This module will help you to create a calendar graph, like the *[contribution ca
 ![image](http://kamisama.github.com/cal-heatmap/img/screenshot.png)
 
 See [documentation](http://kamisama.github.com/cal-heatmap/) to see some examples, and how to use.
+
+##WARNING
+
+The current master branch is for the 3.0.0 version, with a lot of new features, but different API, not documented yet. Use at your own risk.
