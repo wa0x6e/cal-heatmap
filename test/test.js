@@ -1698,7 +1698,7 @@ test("Append graph to the passed DOM ID", function() {
 
 	$("body").append("<div id=test-container style='display:hidden;'></div>");
 
-	var cal = createCalendar({id: "test-container", paintOnLoad: true});
+	var cal = createCalendar({itemSelector: "#test-container", paintOnLoad: true});
 
 	equal($("#test-container .graph").length, 1, "The graph is added to the specified ID");
 	equal($("#cal-heatmap .graph").length, 0, "Default ID is empty");
@@ -1707,25 +1707,23 @@ test("Append graph to the passed DOM ID", function() {
 
 });
 
-test("Paint Next and Previous link", function() {
+test("Attach events to next and previous selector", function() {
 
 	expect(2);
 
-	var cal = createCalendar({browsing: true});
+	$("body").append("<a id='next'></a>");
+	$("body").append("<a id='previous'></a>");
 
-	equal($("#cal-heatmap .graph-browse-next").length, 1, "Next link exists");
-	equal($("#cal-heatmap .graph-browse-previous").length, 1, "Previous link exists");
+	var cal = createCalendar({
+		paintOnLoad: true,
+		nextSelector: "#next",
+		previousSelector: "#previous"
+	});
+
+	equal(typeof d3.select("#next").on("click"), "function", "loadNextDomain is attached to nextSelector");
+	equal(typeof d3.select("#previous").on("click"), "function", "loadPreviousDomain is attached to previousSelector");
 });
 
-test("Don't paint Next and Previous link", function() {
-
-	expect(2);
-
-	var cal = createCalendar({});
-
-	equal($("#cal-heatmap .graph-browse-next").length, 0, "Next link don't exists");
-	equal($("#cal-heatmap .graph-browse-previous").length, 0, "Previous link don't exists");
-});
 
 test("Fill subdomain only if there is data", function() {
 
@@ -1969,11 +1967,11 @@ function createCalendar(settings) {
 
 	$("#cal-heatmap").remove();
 
-	$("body").append("<div id=cal-heatmap style='display:none;'></div>");
+	$("body").append("<div id='cal-heatmap' style='display:none;'></div>");
 
 	var cal = new CalHeatMap();
 	settings.loadOnInit = false;
-	settings.duration = 0;
+	settings.animationDuration = 0;
 
 	if (!settings.hasOwnProperty("paintOnLoad")) {
 		settings.paintOnLoad = false;
