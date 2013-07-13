@@ -9,7 +9,7 @@ var CalHeatMap = function() {
 	// Default settings
 	this.options = {
 		// DOM ID of the container to append the graph to
-		itemSelector : "cal-heatmap",
+		itemSelector : "#cal-heatmap",
 
 		// Whether to paint the calendar on init()
 		// Used by testsuite to reduce testing time
