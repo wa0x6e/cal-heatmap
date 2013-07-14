@@ -160,6 +160,9 @@ var CalHeatMap = function() {
 
 		previousSelector: false,
 
+		itemNamespace: "cal-heatmap",
+
+
 		// ================================================
 		// CALLBACK
 		// ================================================
@@ -267,12 +270,11 @@ var CalHeatMap = function() {
 			name: "week",
 			row: function(d) {return 1;},
 			column: function(d) {
-				d = new Date(d);
 				switch(self.options.domain) {
 					case "year" : return 54;
-					case "month" : return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d);
+					case "month" : return 6;
+					default: return 1;
 				}
-				return 1;
 			},
 			position: {
 				x: function(d) {
@@ -360,6 +362,9 @@ var CalHeatMap = function() {
 
 	var domainsHeight = [];
 
+	this.NAVIGATE_LEFT = 1;
+	this.NAVIGATE_RIGHT = 2;
+
 	/**
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
@@ -376,7 +381,7 @@ var CalHeatMap = function() {
 			self.paint();
 
 			// Display legend if needed
-			if (self.options.displayLegend) { console.log(width);
+			if (self.options.displayLegend) {
 				self.displayLegend(width - self.options.domainGutter - self.options.cellpadding);
 			}
 
@@ -401,15 +406,16 @@ var CalHeatMap = function() {
 		return true;
 	};
 
+
 	/**
 	 *
 	 *
 	 * @param bool reverse True if prepending a domain
 	 */
-	this.paint = function(reverse) {
+	this.paint = function(navigationDir) {
 
-		if (typeof reverse === "undefined") {
-			reverse = false;
+		if (typeof navigationDir === "undefined") {
+			navigationDir = false;
 		}
 
 		var verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
@@ -430,13 +436,21 @@ var CalHeatMap = function() {
 
 		// Return the width of the domain block, without the domain gutter
 		// @param int d Domain start timestamp
-		var w = function(d) {
-			return self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
+		var w = function(d, outer) {
+			var width = self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
+			if (typeof outer !== "undefined" && outer === true) {
+				return width += domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
+			}
+			return width;
 		};
 
 		// Return the height of the domain block, without the domain gutter
-		var h = function(d) {
-			return self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d);
+		var h = function(d, outer) {
+			var height = self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d);
+			if (typeof outer !== "undefined" && outer === true) {
+				height += self.options.domainGutter + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
+			}
+			return height;
 		};
 
 		// Format the domain legend according to the domain type
@@ -456,63 +470,42 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// PAINTING DOMAIN															//
 		// =========================================================================//
+
 		var svg = domainSvg
 			.enter()
 			.insert("svg:svg")
-			.attr("width", function(d){
-				var wd = w(d);
-
-				tempWidth += tempLastDomainWidth = wd + domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
-
-				if (width === 0) {
-					domainsWidth.push(tempWidth - tempLastDomainWidth);
-				} else {
-					if (reverse) {
-						domainsWidth.unshift(tempLastDomainWidth * -1);
-					} else {
-						domainsWidth.push(width);
-					}
-
+			.attr("width", function(d, i){
+				var domainWidth = w(d, true);
+				if (navigationDir === false) {
+					width = domainWidth + (self.options.verticalOrientation ? 0 : width);
 				}
-
-				return tempLastDomainWidth;
+				return domainWidth;
 			})
 			.attr("height", function(d) {
-
-				var hd = h(d);
-
-				tempHeight += tempLastDomainHeight = hd + self.options.domainGutter + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
-
-				if (height === 0) {
-					domainsHeight.push(tempHeight - tempLastDomainHeight);
-				} else {
-					if (reverse) {
-						domainsHeight.unshift(tempLastDomainHeight * -1);
-					} else {
-						domainsHeight.push(height);
-					}
-
+				var domainHeight = h(d, true);
+				if (navigationDir === false) {
+					height = domainHeight + (self.options.verticalOrientation ? height : 0);
 				}
-
-				return tempLastDomainHeight;
+				return domainHeight;
 			})
 			.attr("x", function(d, i) {
 				if (self.options.verticalOrientation) {
 					return 0;
 				} else {
-					if (width === 0) {
-						return domainsWidth[i];
-					} else {
-						return domainsWidth[reverse ? 0 : i+1];
+					switch(navigationDir) {
+						case false : return w(d, true) * i;
+						case self.NAVIGATE_RIGHT : return w(d, true) * (i+1);
+						case self.NAVIGATE_LEFT : return w(d, true) * (i-1);
 					}
+
 				}
 			})
 			.attr("y", function(d, i) {
 				if (self.options.verticalOrientation) {
-					if (height === 0) {
-						return domainsHeight[i];
-					} else {
-						return domainsHeight[reverse ? 0 : i+1];
+					switch(navigationDir) {
+						case false : return h(d, true) * i;
+						case self.NAVIGATE_RIGHT : return h(d, true) * (i+1);
+						case self.NAVIGATE_LEFT : return h(d, true) * (i-1);
 					}
 				} else {
 					return 0;
@@ -532,9 +525,12 @@ var CalHeatMap = function() {
 			})
 		;
 
+		d3.select(self.options.itemSelector + " .graph").attr("width", width - self.options.domainGutter - self.options.cellpadding);
+		d3.select(self.options.itemSelector + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
+
 		svg.append("svg:rect")
-			.attr("width", function(d, i) { return w(d) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3] - self.options.cellpadding; })
-			.attr("height", function(d, i) { return h(d) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2] - self.options.cellpadding; })
+			.attr("width", function(d, i) { return w(d, true) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3] - self.options.cellpadding; })
+			.attr("height", function(d, i) { return h(d, true) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2] - self.options.cellpadding; })
 			.attr("class", "domain-background")
 			;
 
@@ -687,143 +683,53 @@ var CalHeatMap = function() {
 		// ATTACHING DOMAIN NAVIGATION EVENT										//
 		// =========================================================================//
 		if (self.options.nextSelector !== false) {
-			d3.select("#next").on("click", function(d) {
+			d3.select("#next").on("click." + self.options.itemNamespace, function(d) {
 				d3.event.preventDefault();
 				self.loadNextDomain();
 			});
 		}
 
 		if (self.options.previousSelector !== false) {
-			d3.select(self.options.previousSelector).on("click", function(d) {
+			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(d) {
 				d3.event.preventDefault();
 				self.loadPreviousDomain();
 			});
 		}
 
-		// =========================================================================//
-		// DYNAMIC HEIGHT/WIDTH COMPUTATION											//
-		// =========================================================================//
-		var exitDomainWidth = reverse ? (width-domainsWidth[domainsWidth.length-1]) : domainsWidth[1];
-		var exitDomainHeight = reverse ? (height-domainsHeight[domainsHeight.length-1]) : domainsHeight[1];
-
-		// Vertical position
-		if (self.options.verticalOrientation) {
-			if (height !== 0) {
-				var i = domainsHeight.length-1;
-				while (i >= 0) {
-					if (reverse) {
-						domainsHeight[i] -= domainsHeight[0];
-					} else if (i >= 1) {
-						domainsHeight[i] -= domainsHeight[1];
-					}
-
-					i--;
-				}
-				if (reverse) {
-					domainsHeight.pop() ;
-				} else {
-					domainsHeight.shift();
-				}
-			}
-
-		// Horizontal position
-		} else {
-			if (width !== 0) {
-				var j = domainsWidth.length-1;
-				while (j >= 0) {
-					if (reverse) {
-						domainsWidth[j] -= domainsWidth[0];
-					} else if (j >= 1) {
-						domainsWidth[j] -= domainsWidth[1];
-					}
-
-					j--;
-				}
-				if (reverse) {
-					domainsWidth.pop() ;
-				} else {
-					domainsWidth.shift();
-				}
-			}
-		}
-
-
-
-		if (self.options.verticalOrientation) {
-			if (height === 0) {
-				height = tempHeight;
-
-				width = domainsWidth[1] - self.options.domainGutter - self.options.cellpadding;
-
-				d3.select(self.options.itemSelector + " .graph").attr("width", width);
-				d3.select(self.options.itemSelector + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
-			} else if (tempLastDomainHeight !== exitDomainHeight) {
-				// Compute the new height
-				var th = height + tempLastDomainHeight - exitDomainHeight;
-
-				// If the new height is different, resize the graph
-				if (th !== height) {
-					height = th;
-
-					d3.select(self.options.itemSelector + " .graph")
-						.transition().duration(self.options.animationDuration)
-						.attr("height", height - self.options.domainGutter)
-					;
-				}
-			}
-		} else {
-			if (width === 0) {
-				width = tempWidth;
-
-				height = domainsHeight[1] - self.options.domainGutter - self.options.cellpadding;
-
-				d3.select(self.options.itemSelector + " .graph").attr("height", height);
-				d3.select(self.options.itemSelector + " .graph").attr("width", width -  self.options.domainGutter - self.options.cellpadding);
-			} else if (tempLastDomainWidth !== exitDomainWidth) {
-				// Compute the new width
-				var tw = width + tempLastDomainWidth - exitDomainWidth;
-
-				// If the new width is different, resize the graph
-				if (tw !== width) {
-					width = tw;
-					d3.select(self.options.itemSelector + " .graph")
-						.transition().duration(self.options.animationDuration)
-						.attr("width", width)
-					;
-				}
-			}
-		}
 
 		// =========================================================================//
 		// ANIMATION																//
 		// =========================================================================//
 		domainSvg.transition().duration(self.options.animationDuration)
 			.attr("x", function(d, i){
-				return self.options.verticalOrientation ? 0 : domainsWidth[i];
+				return self.options.verticalOrientation ? 0 : (w(d, true) * i);
 			})
 			.attr("y", function(d, i){
-				return self.options.verticalOrientation ? domainsHeight[i] : 0;
+				return self.options.verticalOrientation ? (h(d, true) * i) : 0;
 			})
 		;
 
+		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
 		domainSvg.exit().transition().duration(self.options.animationDuration)
-			.attr("x", function(d){
+			.attr("x", function(d, i){
 				if (self.options.verticalOrientation) {
 					return 0;
 				} else {
-					return reverse ? width : -domainsWidth[1];
+					switch(navigationDir) {
+						case self.NAVIGATE_LEFT : return width;
+						case self.NAVIGATE_RIGHT : return -w(d, true);
+					}
 				}
 			})
 			.attr("y", function(d){
 				if (self.options.verticalOrientation) {
-					return reverse ? height : -domainsHeight[1];
+					return navigationDir === self.NAVIGATE_LEFT ? height : -h(d, true);
 				} else {
 					return 0;
 				}
 			})
 			.remove()
 		;
-
 
 		if (self.svg === null) {
 			self.svg = svg;
@@ -999,7 +905,7 @@ CalHeatMap.prototype = {
 		this._domains.push(this.getNextDomain().getTime());
 		this._domains.shift();
 
-		this.paint();
+		this.paint(this.NAVIGATE_RIGHT);
 
 		this.getDatas(
 			this.options.data,
@@ -1015,7 +921,7 @@ CalHeatMap.prototype = {
 		this._domains.unshift(this.getPreviousDomain().getTime());
 		this._domains.pop();
 
-		this.paint(true);
+		this.paint(this.NAVIGATE_LEFT);
 
 		this.getDatas(
 			this.options.data,
