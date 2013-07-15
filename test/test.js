@@ -1707,7 +1707,7 @@ test("Append graph to the passed DOM ID", function() {
 
 });
 
-test("Attach events to next and previous selector", function() {
+test("Attach events to next and previous selector on default namespace", function() {
 
 	expect(2);
 
@@ -1720,8 +1720,35 @@ test("Attach events to next and previous selector", function() {
 		previousSelector: "#previous"
 	});
 
-	equal(typeof d3.select("#next").on("click"), "function", "loadNextDomain is attached to nextSelector");
-	equal(typeof d3.select("#previous").on("click"), "function", "loadPreviousDomain is attached to previousSelector");
+	equal(typeof d3.select("#next").on("click." + cal.options.itemNamespace), "function", "loadNextDomain is attached to nextSelector");
+	equal(typeof d3.select("#previous").on("click." + cal.options.itemNamespace), "function", "loadPreviousDomain is attached to previousSelector");
+});
+
+
+test("Attach events to next and previous selector on custom namespace", function() {
+
+	expect(4);
+
+	$("body").append("<a id='next'></a>");
+	$("body").append("<a id='previous'></a>");
+
+	var cal = createCalendar({
+		paintOnLoad: true,
+		nextSelector: "#next",
+		previousSelector: "#previous"
+	});
+
+	var cal2 = createCalendar({
+		paintOnLoad: true,
+		nextSelector: "#next",
+		previousSelector: "#previous",
+		itemNamespace: "ns2"
+	});
+
+	equal(typeof d3.select("#next").on("click." + cal.options.itemNamespace), "function", "loadNextDomain is attached to nextSelector on default namespace");
+	equal(typeof d3.select("#previous").on("click." + cal.options.itemNamespace), "function", "loadPreviousDomain is attached to previousSelector on default namespace");
+	equal(typeof d3.select("#next").on("click.ns2"), "function", "loadNextDomain is attached to nextSelector on custom namespace");
+	equal(typeof d3.select("#previous").on("click.ns2"), "function", "loadPreviousDomain is attached to previousSelector on custom namespace");
 });
 
 
