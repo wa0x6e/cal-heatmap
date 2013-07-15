@@ -379,7 +379,6 @@ var CalHeatMap = function() {
 		self.root.append("svg")
 			.attr("class", "graph");
 
-
 		if (self.options.paintOnLoad) {
 
 			self.paint();
@@ -792,6 +791,11 @@ var CalHeatMap = function() {
 		if (d3.select(self.options.itemSelector)[0][0] === null) {
 			console.log("The node specified in itemSelector does not exists");
 			return false;
+		}
+
+		if (typeof self.options.itemNamespace !== "string" || self.options.itemNamespace === "") {
+			console.log("itemNamespace can not be empty, falling back to cal-heatmap");
+			self.options.itemNamespace = "cal-heatmap";
 		}
 
 		return _init();
