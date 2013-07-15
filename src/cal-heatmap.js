@@ -9,7 +9,8 @@ var CalHeatMap = function() {
 	// Default settings
 	this.options = {
 		// selector string of the container to append the graph to
-		// Accept any string value accepted by document.querySelector
+		// Accept any string value accepted by document.querySelector or CSS3
+		// or an Element object
 		itemSelector : "#cal-heatmap",
 
 		// Whether to paint the calendar on init()
@@ -380,7 +381,25 @@ var CalHeatMap = function() {
 
 
 		if (self.options.paintOnLoad) {
+
 			self.paint();
+
+			// =========================================================================//
+			// ATTACHING DOMAIN NAVIGATION EVENT										//
+			// =========================================================================//
+			if (self.options.nextSelector !== false) {
+				d3.select("#next").on("click." + self.options.itemNamespace, function(d) {
+					d3.event.preventDefault();
+					self.loadNextDomain();
+				});
+			}
+
+			if (self.options.previousSelector !== false) {
+				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(d) {
+					d3.event.preventDefault();
+					self.loadPreviousDomain();
+				});
+			}
 
 			// Display legend if needed
 			if (self.options.displayLegend) {
@@ -674,24 +693,6 @@ var CalHeatMap = function() {
 				.text(function(d){ return self.formatDate(d, "date"); })
 			;
 		}
-
-		// =========================================================================//
-		// ATTACHING DOMAIN NAVIGATION EVENT										//
-		// =========================================================================//
-		if (self.options.nextSelector !== false) {
-			d3.select("#next").on("click." + self.options.itemNamespace, function(d) {
-				d3.event.preventDefault();
-				self.loadNextDomain();
-			});
-		}
-
-		if (self.options.previousSelector !== false) {
-			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(d) {
-				d3.event.preventDefault();
-				self.loadPreviousDomain();
-			});
-		}
-
 
 		// =========================================================================//
 		// ANIMATION																//
