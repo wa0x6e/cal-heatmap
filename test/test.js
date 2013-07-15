@@ -1766,8 +1766,7 @@ test("Attach events to next and previous selector on default namespace", functio
 
 	equal(typeof d3.select("#next").on("click." + cal.options.itemNamespace), "function", "loadNextDomain is attached to nextSelector");
 	equal(typeof d3.select("#previous").on("click." + cal.options.itemNamespace), "function", "loadPreviousDomain is attached to previousSelector");
-});
-
+})
 
 test("Attach events to next and previous selector on custom namespace", function() {
 
@@ -1795,6 +1794,23 @@ test("Attach events to next and previous selector on custom namespace", function
 	equal(typeof d3.select("#previous").on("click.ns2"), "function", "loadPreviousDomain is attached to previousSelector on custom namespace");
 });
 
+test("Attach events to not-valid namespace fallback to default namespace", function() {
+
+	expect(2);
+
+	$("body").append("<a id='next'></a>");
+	$("body").append("<a id='previous'></a>");
+
+	var cal = createCalendar({
+		paintOnLoad: true,
+		nextSelector: "#next",
+		previousSelector: "#previous",
+		itemSelector: ""
+	});
+
+	equal(typeof d3.select("#next").on("click.cal-heatmap"), "function", "loadNextDomain is attached to defaultNamespace");
+	equal(typeof d3.select("#previous").on("click.cal-heatmap"), "function", "loadPreviousDomain is attached to defaultNamespace");
+});
 
 test("Fill subdomain only if there is data", function() {
 
