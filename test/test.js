@@ -1766,7 +1766,7 @@ test("Attach events to next and previous selector on default namespace", functio
 
 	equal(typeof d3.select("#next").on("click." + cal.options.itemNamespace), "function", "loadNextDomain is attached to nextSelector");
 	equal(typeof d3.select("#previous").on("click." + cal.options.itemNamespace), "function", "loadPreviousDomain is attached to previousSelector");
-})
+});
 
 test("Attach events to next and previous selector on custom namespace", function() {
 
