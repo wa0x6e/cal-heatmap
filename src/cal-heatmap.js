@@ -1555,8 +1555,13 @@ CalHeatMap.prototype = {
 		var styles = {
 			".graph": {},
 			".graph-rect": {},
-			".today": {},
+			"rect.highlight": {},
+			"rect.now": {},
+			"text.highlight": {},
+			"text.now": {},
+			".domain-background": {},
 			".graph-label": {},
+			".subdomain-text": {},
 			".qi": {}
 		};
 
@@ -1585,24 +1590,20 @@ CalHeatMap.prototype = {
 		};
 
 		var getElement = function(e) {
-			if (e[0] === ".") {
-				return root.getElementsByClassName(e.substring(1))[0];
-			} else {
-				return root.getElementsByTagName(e)[0];
-			}
+			return root.select(e)[0][0];
 		};
 
 		for (var element in styles) {
 
 			var dom = getElement(element);
 
-			if (typeof dom === "undefined") {
+			if (dom === null) {
 				continue;
 			}
 
 			// The DOM Level 2 CSS way
 			if ("getComputedStyle" in window) {
-				var cs = getComputedStyle(dom, null); console.log(dom);
+				var cs = getComputedStyle(dom, null);
 				if (cs.length !== 0) {
 					for (var i = 0; i < cs.length; i++) {
 						filterStyles(element, cs.item(i), cs.getPropertyValue(cs.item(i)));
@@ -1627,21 +1628,23 @@ CalHeatMap.prototype = {
 			}
 		}
 
-		// Get the d3js SVG element
-		var svg = this.root.select("svg");
+
 
 		var string = "<svg xmlns=\"http://www.w3.org/2000/svg\" "+
 		"xmlns:xlink=\"http://www.w3.org/1999/xlink\"><style type=\"text/css\"><![CDATA[ ";
 
 		for (var style in styles) {
-			string += style + " {";
+			string += style + " {\n";
 			for (var l in styles[style]) {
-				string += l + ":" + styles[style][l] + ";";
+				string += "\t" + l + ":" + styles[style][l] + ";\n";
 			}
-			string += "}";
+			string += "}\n";
 		}
 
-		string += "]]></style>" + (new XMLSerializer).serializeToString(svg) + "</svg>";
+		string += "]]></style>";
+		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][0]);
+		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][1]);
+		string += "</svg>";
 
 		return string;
 	}
