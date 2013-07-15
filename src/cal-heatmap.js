@@ -76,7 +76,9 @@ var CalHeatMap = function() {
 				y: 0
 			},
 
-			rotate: null
+			rotate: null,
+
+			width: 100
 		},
 
 		// ================================================
@@ -357,11 +359,6 @@ var CalHeatMap = function() {
 	// Total height of the graph
 	var height = 0;
 
-	// Save domains width
-	var domainsWidth = [];
-
-	var domainsHeight = [];
-
 	this.NAVIGATE_LEFT = 1;
 	this.NAVIGATE_RIGHT = 2;
 
@@ -369,7 +366,7 @@ var CalHeatMap = function() {
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
 	 */
-	var _init = function() {
+	function _init() {
 
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
@@ -404,13 +401,13 @@ var CalHeatMap = function() {
 		}
 
 		return true;
-	};
+	}
 
 
 	/**
 	 *
 	 *
-	 * @param bool reverse True if prepending a domain
+	 * @param int navigationDir
 	 */
 	this.paint = function(navigationDir) {
 
@@ -421,12 +418,11 @@ var CalHeatMap = function() {
 		var verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
 
 		var domainVerticalLabelHeight = Math.max(25, self.options.cellsize*2);
-		var domainHorizontalLabelHeight = 0;
 		var domainHorizontalLabelWidth = 0;
 
 		if (!verticalDomainLabel) {
 			domainVerticalLabelHeight = 0;
-			domainHorizontalLabelWidth = 100;
+			domainHorizontalLabelWidth = self.options.label.width;
 		}
 
 		// @todo : check validity
@@ -462,18 +458,13 @@ var CalHeatMap = function() {
 			.data(self._domains, function(d) { return d;})
 		;
 
-		var tempWidth = 0;
-		var tempHeight = 0;
-		var tempLastDomainWidth = 0;
-		var tempLastDomainHeight = 0;
-
 		// =========================================================================//
 		// PAINTING DOMAIN															//
 		// =========================================================================//
 
 		var svg = domainSvg
 			.enter()
-			.insert("svg:svg")
+			.insert("svg")
 			.attr("width", function(d, i){
 				var domainWidth = w(d, true);
 				if (navigationDir === false) {
@@ -528,9 +519,9 @@ var CalHeatMap = function() {
 		d3.select(self.options.itemSelector + " .graph").attr("width", width - self.options.domainGutter - self.options.cellpadding);
 		d3.select(self.options.itemSelector + " .graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
 
-		svg.append("svg:rect")
-			.attr("width", function(d, i) { return w(d, true) + domainHorizontalLabelWidth + self.options.domainMargin[1] + self.options.domainMargin[3] - self.options.cellpadding; })
-			.attr("height", function(d, i) { return h(d, true) + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2] - self.options.cellpadding; })
+		svg.append("rect")
+			.attr("width", function(d, i) { return w(d, true) - self.options.domainGutter - self.options.cellpadding; })
+			.attr("height", function(d, i) { return h(d, true) - self.options.domainGutter - self.options.cellpadding; })
 			.attr("class", "domain-background")
 			;
 
@@ -540,8 +531,8 @@ var CalHeatMap = function() {
 		var subDomainSvgGroup = svg.append("svg")
 			.attr("x", function(d, i) {
 				switch(self.options.label.position) {
-					case "left" : return domainHorizontalLabelWidth + self.options.domainMargin[1];
-					default : return self.options.domainMargin[1];
+					case "left" : return domainHorizontalLabelWidth + self.options.domainMargin[3];
+					default : return self.options.domainMargin[3];
 				}
 			})
 			.attr("y", function(d, i) {
@@ -557,11 +548,11 @@ var CalHeatMap = function() {
 			.selectAll("svg")
 			.data(function(d) { return self.getSubDomain(d); })
 			.enter()
-			.append("svg:g")
+			.append("g")
 		;
 
 		rect
-			.append("svg:rect")
+			.append("rect")
 			.attr("class", function(d) { return "graph-rect" + self.getHighlightClassName(d); })
 			.attr("width", self.options.cellsize)
 			.attr("height", self.options.cellsize)
@@ -584,7 +575,7 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// PAINTING LABEL															//
 		// =========================================================================//
-		svg.append("svg:text")
+		svg.append("text")
 			.attr("class", "graph-label")
 			.attr("y", function(d, i) {
 				var y = self.options.domainMargin[0];
@@ -650,7 +641,7 @@ var CalHeatMap = function() {
 						var s = "rotate(270), ";
 						switch(self.options.label.position) {
 							case "right" : s += "translate(-" + (w(d) + domainHorizontalLabelWidth) + " , " + w(d) + ")"; break;
-							case "left" : s += "translate(-" + domainHorizontalLabelWidth + " , " + domainHorizontalLabelWidth + ")"; break;
+							case "left" : s += "translate(-" + (domainHorizontalLabelWidth) + " , " + domainHorizontalLabelWidth + ")"; break;
 						}
 
 						return s;
@@ -661,7 +652,7 @@ var CalHeatMap = function() {
 
 
 		// Appending a title to each subdomain
-		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
+		rect.append("title").text(function(d){ return self.formatDate(d); });
 
 
 		// =========================================================================//
@@ -707,6 +698,7 @@ var CalHeatMap = function() {
 			.attr("y", function(d, i){
 				return self.options.verticalOrientation ? (h(d, true) * i) : 0;
 			})
+			.attr("width", function(d) { return w(d, true); })
 		;
 
 		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
@@ -742,16 +734,7 @@ var CalHeatMap = function() {
 
 	this.init = function(settings) {
 
-		// Merge settings with default
-		if ( settings !== null && settings !== undefined && settings !== "undefined" ){
-				for ( var opt in self.options ) {
-					if ( settings[ opt ] !== null &&
-						settings[ opt ] !== undefined &&
-						settings[ opt ] !== "undefined" ){
-							self.options[ opt ] = settings[ opt ];
-				}
-			}
-		}
+		self.options = mergeRecursive(self.options, settings);
 
 		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
 			console.log("The domain '" + self.options.domain + "' is not valid domain");
@@ -774,7 +757,7 @@ var CalHeatMap = function() {
 		}
 
 		// Auto-align label, depending on it's position
-		if (!self.options.label.hasOwnProperty("align")) {
+		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("align"))) {
 			switch(self.options.label.position) {
 				case "left" : self.options.label.align = "right"; break;
 				case "right" : self.options.label.align = "left"; break;
@@ -786,16 +769,11 @@ var CalHeatMap = function() {
 			}
 		}
 
-		if (!self.options.label.hasOwnProperty("offset")) {
+		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
 			if (self.options.label.position === "left" || self.options.label.position === "right") {
 				self.options.label.offset = {
 					x: 10,
 					y: 15
-				};
-			} else {
-				self.options.label.offset = {
-					x: 0,
-					y: 0
 				};
 			}
 		}
@@ -943,8 +921,8 @@ CalHeatMap.prototype = {
 		var legend = d3.select(this.options.itemSelector);
 
 		switch(this.options.legendVerticalPosition) {
-			case "top" : legend = legend.insert("svg:svg", ".graph"); break;
-			default : legend = legend.append("svg:svg");
+			case "top" : legend = legend.insert("svg", ".graph"); break;
+			default : legend = legend.append("svg");
 		}
 
 		var legendWidth =
@@ -956,7 +934,7 @@ CalHeatMap.prototype = {
 			.attr("class", "graph-legend")
 			.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
 			.attr("width", graphWidth)
-			.append("svg:g")
+			.append("g")
 			.attr("transform", function(d) {
 				switch(parent.options.legendHorizontalPosition) {
 					case "right" : return "translate(" + (graphWidth - legendWidth) + ")";
@@ -970,7 +948,7 @@ CalHeatMap.prototype = {
 
 		var legendItem = legend
 			.enter()
-			.append("svg:rect")
+			.append("rect")
 			.attr("width", this.options.legendCellSize)
 			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
@@ -984,7 +962,7 @@ CalHeatMap.prototype = {
 		legendItem.transition().delay(function(d, i) { return parent.options.animationDuration * i/10;}).attr("fill-opacity", 1);
 
 		legendItem
-			.append("svg:title")
+			.append("title")
 			.text(function(d) {
 				var nextThreshold = parent.options.legend[d+1];
 				if (d === 0) {
@@ -1313,12 +1291,9 @@ CalHeatMap.prototype = {
 		}
 
 		switch(this.options.domain) {
-			case "x_hour":
 			case "hour"  : return this.getHourDomain(date, range);
-			case "x_day" :
 			case "day"   : return this.getDayDomain(date, range);
 			case "week"  : return this.getWeekDomain(date, range);
-			case "X-month" :
 			case "month" : return this.getMonthDomain(date, range);
 			case "year"  : return this.getYearDomain(date, range);
 		}
@@ -1355,7 +1330,7 @@ CalHeatMap.prototype = {
 		var computeHourSubDomainSize = function(date, domain) {
 			if (domain === "day" || domain === "x_day") {
 				return 24;
-			} else if (domain === "week") {
+			} else if (domain === "week" || domain === "x_week") {
 				return 168;
 			} else if (domain === "month" || domain === "x_month") {
 				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
@@ -1556,7 +1531,7 @@ CalHeatMap.prototype = {
 		return this.loadPreviousDomain();
 	},
 
-	getSVG: function() {
+	get function() {
 		var styles = {
 			".graph": {},
 			".graph-rect": {},
@@ -1666,6 +1641,28 @@ String.prototype.format = function () {
 	}
 	return formatted;
 };
+
+/**
+ * #source http://stackoverflow.com/a/383245/805649
+ */
+function mergeRecursive(obj1, obj2) {
+
+	for (var p in obj2) {
+		try {
+			// Property in destination object set; update its value.
+			if (obj2[p].constructor === Object) {
+				obj1[p] = mergeRecursive(obj1[p], obj2[p]);
+			} else {
+				obj1[p] = obj2[p];
+			}
+		} catch(e) {
+			// Property in destination object not set; create it and set its value.
+			obj1[p] = obj2[p];
+		}
+	}
+
+	return obj1;
+}
 
 /**
  * AMD Loader
