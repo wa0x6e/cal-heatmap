@@ -1300,6 +1300,38 @@ test("Allow only valid domain", function() {
 
 });
 
+test("Allow only known subDomain", function() {
+
+	expect(13);
+
+	var subDomains = ["min", "x_min", "hour", "x_hour", "day", "x_day", "week", "x_week", "month", "x_month"];
+
+	for(var i = 0, total = subDomains.length; i < total; i++) {
+		var cal = createCalendar({range:1});
+		ok(cal.init({subDomain:subDomains[i], domain: "year"}), subDomains[i] + " is a valid subDomain");
+	}
+
+	var c = createCalendar({});
+
+	equal(c.init({subDomain:"year", domain: "year"}), false, "Min is a valid domain but not a valid subdomain");
+	equal(c.init({subDomain:"notvalid", domain: "month"}), false, "Fail when subdomain is not valid");
+	equal(c.init({subDomain:null, domain: "month"}), false, "Fail when subdomain is null");
+
+});
+
+test("SubDomain must be smaller than domain", function() {
+
+	expect(3);
+
+	var c = createCalendar({});
+
+	equal(c.init({subDomain:"min", domain: "month"}), true, "VALID : subdomain is lower level than domain");
+	equal(c.init({subDomain:"month", domain: "month"}), false, "NOT VALID : subdomain is same level than domain");
+	equal(c.init({subDomain:"year", domain: "month"}), false, "NOT VALID : subdomain is greater level than domain");
+
+
+});
+
 test("Set default domain and subDomain", function() {
 	expect(2);
 

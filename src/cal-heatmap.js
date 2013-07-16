@@ -197,6 +197,8 @@ var CalHeatMap = function() {
 
 	this._domainType = {
 		"min" : {
+			name: "minute",
+			level: 10,
 			row: function(d) {return 10;},
 			column: function(d) { return 6; },
 			position: {
@@ -212,6 +214,7 @@ var CalHeatMap = function() {
 		},
 		"hour" : {
 			name: "hour",
+			level: 20,
 			row: function(d) {return 6;},
 			column: function(d) {
 				switch(self.options.domain) {
@@ -243,6 +246,7 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			name: "day",
+			level: 30,
 			row: function(d) {return 7;},
 			column: function(d) {
 				d = new Date(d);
@@ -272,6 +276,7 @@ var CalHeatMap = function() {
 		},
 		"week" : {
 			name: "week",
+			level: 40,
 			row: function(d) {return 1;},
 			column: function(d) {
 				switch(self.options.domain) {
@@ -300,6 +305,7 @@ var CalHeatMap = function() {
 		},
 		"month" : {
 			name: "month",
+			level: 50,
 			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
@@ -315,6 +321,7 @@ var CalHeatMap = function() {
 		},
 		"year" : {
 			name: "year",
+			level: 60,
 			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
@@ -333,6 +340,7 @@ var CalHeatMap = function() {
 	for (var type in this._domainType) {
 		this._domainType["x_" + type] = {};
 		this._domainType["x_" + type].name = "x_" + type;
+		this._domainType["x_" + type].level = this._domainType[type].level;
 		this._domainType["x_" + type].row = this._domainType[type].column;
 		this._domainType["x_" + type].column = this._domainType[type].row;
 		this._domainType["x_" + type].position = {};
@@ -749,10 +757,11 @@ var CalHeatMap = function() {
 			return false;
 		}
 
-		if (allowedDataType.indexOf(self.options.dataType) < 0) {
-			console.log("The data type '" + self.options.dataType + "' is not valid data type");
+		if (this._domainType[self.options.domain].level <= this._domainType[self.options.subDomain].level) {
+			console.log("'" + self.options.subDomain + "' is not a valid subDomain to '" + self.options.domain +  "'");
 			return false;
 		}
+
 
 		// Set the most suitable subdomain for the domain
 		// if subDomain is not explicitly specified
@@ -764,6 +773,11 @@ var CalHeatMap = function() {
 				case "day" :  self.options.subDomain = "hour"; break;
 				default : self.options.subDomain = "min";
 			}
+		}
+
+		if (allowedDataType.indexOf(self.options.dataType) < 0) {
+			console.log("The data type '" + self.options.dataType + "' is not valid data type");
+			return false;
 		}
 
 		if (self.options.format.title === null) {
