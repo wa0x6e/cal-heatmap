@@ -1381,6 +1381,31 @@ test("itemSelector does not accept invalid values", function() {
 	equal(cal.init({itemSelector: function() {}, paintOnLoad: false}), false, "Function is not a valid itemSelector");
 });
 
+test("Domain Margin can takes various format", function() {
+	expect(6);
+
+	var a = [0, 2, 3, 4];
+
+	var cal = createCalendar({domainMargin: a});
+	equal(cal.options.domainMargin, a, "Array of 4");
+
+	cal.init({domainMargin: 5, paintOnLoad: false});
+	equal(cal.options.domainMargin.toString(), [5,5,5,5].toString(), "Fill the array with the specified values");
+
+	cal.init({domainMargin: [5], paintOnLoad: false});
+	equal(cal.options.domainMargin.toString(), [5,5,5,5].toString(), "Copy first values of array to the other 3");
+
+	cal.init({domainMargin: [5, 10], paintOnLoad: false});
+	equal(cal.options.domainMargin.toString(), [5,10,5,10].toString(), "Array of 2 values is expanded to 4");
+
+	cal.init({domainMargin: [5, 10, 15], paintOnLoad: false});
+	equal(cal.options.domainMargin.toString(), [5,10,15,10].toString(), "Array of 3 values is expanded to 4");
+
+	cal.init({domainMargin: [0,0,0,0,0], paintOnLoad: false});
+	equal(cal.options.domainMargin.toString(), [0,0,0,0].toString(), "Values in array length greater than 4 are ignored");
+});
+
+
 /*
 	-----------------------------------------------------------------
 	LEGEND

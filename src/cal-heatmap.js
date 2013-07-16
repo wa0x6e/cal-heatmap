@@ -798,6 +798,21 @@ var CalHeatMap = function() {
 			self.options.itemNamespace = "cal-heatmap";
 		}
 
+		if (typeof self.options.domainMargin === "number") {
+			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
+		}
+
+		if (Array.isArray(self.options.domainMargin)) {
+			switch(self.options.domainMargin.length) {
+				case 0 : self.options.domainMargin = [0, 0, 0, 0]; break;
+				case 1 : self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin]; break;
+				case 2 : self.options.domainMargin = [self.options.domainMargin[0], self.options.domainMargin[1], self.options.domainMargin[0], self.options.domainMargin[1]]; break;
+				case 3 : self.options.domainMargin = [self.options.domainMargin[0], self.options.domainMargin[1], self.options.domainMargin[2], self.options.domainMargin[1]]; break;
+				case 4 : self.options.domainMargin = self.options.domainMargin; break;
+				default : self.options.domainMargin.splice(4);
+			}
+		}
+
 		return _init();
 
 	};
