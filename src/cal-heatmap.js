@@ -376,8 +376,7 @@ var CalHeatMap = function() {
 
 		self.root = d3.select(self.options.itemSelector);
 
-		self.root.append("svg")
-			.attr("class", "graph");
+		self.root.append("svg").attr("class", "graph");
 
 		if (self.options.paintOnLoad) {
 
@@ -651,13 +650,12 @@ var CalHeatMap = function() {
 						var s = "rotate(90), ";
 						switch(self.options.label.position) {
 							case "right" : s += "translate(-" + w(d) + " , -" + w(d) + ")"; break;
-							case "left" : s += "translate(-" + domainHorizontalLabelWidth + ", -" + domainHorizontalLabelWidth + ")"; break;
+							case "left" : s += "translate(0, -" + domainHorizontalLabelWidth + ")"; break;
 						}
 
 						return s;
-					})
-					.attr("text-anchor", "start")
-					; break;
+					});
+					break;
 				case "left" :
 					selection
 					.attr("transform", function(d) {
@@ -668,8 +666,8 @@ var CalHeatMap = function() {
 						}
 
 						return s;
-					})
-					.attr("text-anchor", "end"); break;
+					});
+					break;
 			}
 		}
 
@@ -769,9 +767,13 @@ var CalHeatMap = function() {
 				default : self.options.label.align = "center";
 			}
 
+
 			if (self.options.label.rotate === "left") {
 				self.options.label.align = "right";
+			} else if (self.options.label.rotate === "right") {
+				self.options.label.align = "left";
 			}
+
 		}
 
 		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
