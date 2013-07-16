@@ -3,10 +3,8 @@
 
 .graph
 {
-
 	clear: both;
 	display: block;
-	margin-top: 10px;
 	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
 }
 
@@ -82,23 +80,24 @@
 
 rect.highlight
 {
-	stroke:black;
+	stroke:#444;
 	stroke-width:1;
-}
-
-rect.now
-{
-	stroke: blue;
 }
 
 text.highlight
 {
-	fill: #000;
+	fill: #444;
+}
+
+rect.now
+{
+	stroke: red;
 }
 
 text.now
 {
-	fill: blue;
+	fill: red;
+	font-weight: 800;
 }
 
 .domain-background {
