@@ -1381,8 +1381,15 @@ test("itemSelector does not accept invalid values", function() {
 	equal(cal.init({itemSelector: function() {}, paintOnLoad: false}), false, "Function is not a valid itemSelector");
 });
 
+test("itemSelector target does not exists", function() {
+	expect(1);
+
+	var cal = new CalHeatMap();
+	equal(cal.init({itemSelector: "#test", paintOnLoad: false}), false, "Die when target itemSelector does not exists");
+});
+
 test("Domain Margin can takes various format", function() {
-	expect(6);
+	expect(7);
 
 	var a = [0, 2, 3, 4];
 
@@ -1391,6 +1398,9 @@ test("Domain Margin can takes various format", function() {
 
 	cal.init({domainMargin: 5, paintOnLoad: false});
 	equal(cal.options.domainMargin.toString(), [5,5,5,5].toString(), "Fill the array with the specified values");
+
+	cal.init({domainMargin: [], paintOnLoad: false});
+	equal(cal.options.domainMargin.toString(), [0,0,0,0].toString(), "Fill array with 0");
 
 	cal.init({domainMargin: [5], paintOnLoad: false});
 	equal(cal.options.domainMargin.toString(), [5,5,5,5].toString(), "Copy first values of array to the other 3");
@@ -1403,6 +1413,61 @@ test("Domain Margin can takes various format", function() {
 
 	cal.init({domainMargin: [0,0,0,0,0], paintOnLoad: false});
 	equal(cal.options.domainMargin.toString(), [0,0,0,0].toString(), "Values in array length greater than 4 are ignored");
+});
+
+test("Auto align domain label horizontally", function() {
+	expect(4);
+
+	var cal = new CalHeatMap();
+
+	cal.init({label: {position: "top"}, paintOnLoad: false});
+	equal(cal.options.label.align, "center", "Auto center label when positioned on top");
+
+	cal.init({label: {position: "bottom"}, paintOnLoad: false});
+	equal(cal.options.label.align, "center", "Auto center label when positioned on bottom");
+
+	cal.init({label: {position: "left"}, paintOnLoad: false});
+	equal(cal.options.label.align, "right", "Auto align label on the right when positioned on the left");
+
+	cal.init({label: {position: "right"}, paintOnLoad: false});
+	equal(cal.options.label.align, "left", "Auto align label on the right when positioned on the right");
+});
+
+test("Auto align domain label horizontally when rotated", function() {
+	expect(2);
+
+	var cal = new CalHeatMap();
+
+	cal.init({label: {rotate: "left"}, paintOnLoad: false});
+	equal(cal.options.label.align, "right", "Auto align on the right when rotated to the left");
+
+	cal.init({label: {rotate: "right"}, paintOnLoad: false});
+	equal(cal.options.label.align, "left", "Auto align on the left when rotated to the right");
+
+});
+
+test("Setting namespace", function() {
+	expect(6);
+
+	var cal = new CalHeatMap();
+
+	cal.init({paintOnLoad: false});
+	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not specified");
+
+	cal.init({itemNamespace: "test", paintOnLoad: false});
+	equal(cal.options.itemNamespace, "test", "Namespace can be set via init()");
+
+	cal.init({itemNamespace: "", paintOnLoad: false});
+	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not empty");
+
+	cal.init({itemNamespace: [], paintOnLoad: false});
+	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (array)");
+
+	cal.init({itemNamespace: {}, paintOnLoad: false});
+	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (object)");
+
+	cal.init({itemNamespace: 100, paintOnLoad: false});
+	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (number)");
 });
 
 
