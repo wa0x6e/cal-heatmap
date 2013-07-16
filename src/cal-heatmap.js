@@ -97,7 +97,7 @@ var CalHeatMap = function() {
 
 		legendCellpadding: 2,
 
-		legendMargin: [0, 0, 0, 0],
+		legendMargin: [10, 0, 0, 0],
 
 		// Legend vertical position
 		// top : place legend above calendar
@@ -853,6 +853,13 @@ var CalHeatMap = function() {
 				default : self.options.domainMargin.splice(4);
 			}
 		}
+
+		if (typeof self.options.itemName === "string") {
+			self.options.itemName = [self.options.itemName, self.options.itemName + "s"];
+		} else if (Array.isArray(self.options.itemName) && self.options.itemName.length === 1) {
+			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
+		}
+
 
 		function validateSelector(selector) {
 			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");

@@ -1531,7 +1531,20 @@ test("Setting namespace", function() {
 	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (number)");
 });
 
+test("Set itemName from a string", function() {
+	expect(3);
 
+	var cal = new CalHeatMap();
+
+	cal.init({paintOnLoad: false});
+	equal(cal.options.itemName.toString(), ["item", "items"].toString(), "Setting default itemName");
+
+	cal.init({itemName: "car", paintOnLoad: false});
+	equal(cal.options.itemName.toString(), ["car", "cars"].toString(), "Expanding itemName from a string");
+
+	cal.init({itemName: ["car"], paintOnLoad: false});
+	equal(cal.options.itemName.toString(), ["car", "cars"].toString(), "Expanding itemName from an array");
+});
 
 
 
