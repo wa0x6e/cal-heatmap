@@ -814,13 +814,23 @@ var CalHeatMap = function() {
 			}
 		}
 
-		if ((!(self.options.itemSelector instanceof Element) && typeof self.options.itemSelector !== "string") || self.options.itemSelector === "") {
+		if (validateSelector(self.options.itemSelector)) {
 			console.log("The itemSelector is invalid");
 			return false;
 		}
 
 		if (d3.select(self.options.itemSelector)[0][0] === null) {
 			console.log("The node specified in itemSelector does not exists");
+			return false;
+		}
+
+		if (self.options.nextSelector !== false && validateSelector(self.options.nextSelector)) {
+			console.log("The nextSelector is invalid");
+			return false;
+		}
+
+		if (self.options.previousSelector !== false && validateSelector(self.options.previousSelector)) {
+			console.log("The previousSelector is invalid");
 			return false;
 		}
 
@@ -842,6 +852,10 @@ var CalHeatMap = function() {
 				case 4 : self.options.domainMargin = self.options.domainMargin; break;
 				default : self.options.domainMargin.splice(4);
 			}
+		}
+
+		function validateSelector(selector) {
+			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
 		}
 
 		return _init();
