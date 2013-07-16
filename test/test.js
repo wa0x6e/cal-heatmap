@@ -1282,7 +1282,7 @@ module( "Settings" );
 
 test("Allow only valid domain", function() {
 
-	expect(8);
+	expect(9);
 
 	var domains = ["hour", "day", "week", "month", "year"];
 
@@ -1294,9 +1294,38 @@ test("Allow only valid domain", function() {
 	var c = createCalendar({});
 
 	equal(c.init({domain:"min"}), false, "Min is a valid subdomain but not a valid domain");
+	equal(c.init({domain:"x_hour"}), false, "x_hour is a valid subdomain but not a valid domain");
 	equal(c.init({domain:"notvalid"}), false, "Fail when domain is not valid");
 	equal(c.init({domain:null}), false, "Fail when domain is null");
 
+});
+
+test("Set default domain and subDomain", function() {
+	expect(2);
+
+	var cal = createCalendar({});
+
+	equal(cal.options.domain, "hour", "Default domain is HOUR");
+	equal(cal.options.subDomain, "min", "Default subDomain is MIN");
+});
+
+test("Set default subDomain according to domain", function() {
+	expect(5);
+
+	var cal = createCalendar({domain: "hour"});
+	equal(cal.options.subDomain, "min", "HOUR default subDomain is MIN");
+
+	cal = createCalendar({domain: "day"});
+	equal(cal.options.subDomain, "hour", "DAY default subDomain is HOUR");
+
+	cal = createCalendar({domain: "week"});
+	equal(cal.options.subDomain, "day", "WEEK default subDomain is DAY");
+
+	cal = createCalendar({domain: "month"});
+	equal(cal.options.subDomain, "day", "MONTH default subDomain is DAY");
+
+	cal = createCalendar({domain: "year"});
+	equal(cal.options.subDomain, "month", "YEAR default subDomain is MONTH");
 });
 
 test("Allow only valid data type", function() {
@@ -1469,6 +1498,9 @@ test("Setting namespace", function() {
 	cal.init({itemNamespace: 100, paintOnLoad: false});
 	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (number)");
 });
+
+
+
 
 
 /*

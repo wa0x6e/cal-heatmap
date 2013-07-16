@@ -739,8 +739,13 @@ var CalHeatMap = function() {
 
 		self.options = mergeRecursive(self.options, settings);
 
-		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
-			console.log("The domain '" + self.options.domain + "' is not valid domain");
+		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min" || self.options.domain.substring(0, 2) === "x_") {
+			console.log("The domain '" + self.options.domain + "' is not valid");
+			return false;
+		}
+
+		if (!this._domainType.hasOwnProperty(self.options.subDomain) || self.options.subDomain === "year") {
+			console.log("The subDomain '" + self.options.subDomain + "' is not valid");
 			return false;
 		}
 
@@ -749,7 +754,17 @@ var CalHeatMap = function() {
 			return false;
 		}
 
-		var domain = self.getDomain(self.options.start);
+		// Set the most suitable subdomain for the domain
+		// if subDomain is not explicitly specified
+		if (!settings.hasOwnProperty("subDomain")) {
+			switch(self.options.domain) {
+				case "year" :  self.options.subDomain = "month"; break;
+				case "month" : self.options.subDomain = "day"; break;
+				case "week" :  self.options.subDomain = "day"; break;
+				case "day" :  self.options.subDomain = "hour"; break;
+				default : self.options.subDomain = "min";
+			}
+		}
 
 		if (self.options.format.title === null) {
 			self.options.format.title = this._domainType[self.options.subDomain].format.date;
