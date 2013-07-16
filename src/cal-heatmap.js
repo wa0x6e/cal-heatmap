@@ -1387,39 +1387,35 @@ CalHeatMap.prototype = {
 		var parent = this;
 
 		var computeDaySubDomainSize = function(date, domain) {
-			if (domain === "year") {
-				return parent.getDayOfYear(new Date(date.getFullYear()+1, 0, 0));
-			} else if (domain === "month") {
-				var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
-				return lastDayOfMonth.getDate();
-			} else if (domain === "week") {
-				return 7;
+			switch(domain) {
+				case "year" : return parent.getDayOfYear(new Date(date.getFullYear()+1, 0, 0));
+				case "month" :
+					var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
+					return lastDayOfMonth.getDate();
+				case "week" : return 7;
 			}
 		};
 
 		var computeMinSubDomainSize = function(date, domain) {
 			switch (domain) {
-				case "x_hour" :
 				case "hour" : return 60;
-				case "x_day" :
 				case "day" : return 60 * 24;
 				case "week" : return 60 * 24 * 7;
 			}
 		};
 
 		var computeHourSubDomainSize = function(date, domain) {
-			if (domain === "day" || domain === "x_day") {
-				return 24;
-			} else if (domain === "week" || domain === "x_week") {
-				return 168;
-			} else if (domain === "month" || domain === "x_month") {
-				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
-				return endOfMonth.getDate() * 24;
+			switch(domain) {
+				case "day" : return 24;
+				case "week" : return 168;
+				case "month" :
+					var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
+					return endOfMonth.getDate() * 24;
 			}
 		};
 
 		var computeWeekSubDomainSize = function(date, domain) {
-			if (domain === "month" || domain === "x_month") {
+			if (domain === "month") {
 				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
 				var endWeekNb = parent.getWeekNumber(endOfMonth);
 				var startWeekNb = parent.getWeekNumber(new Date(date.getFullYear(), date.getMonth()));
@@ -1600,7 +1596,7 @@ CalHeatMap.prototype = {
 	},
 
 	// =========================================================================//
-	// PUBLIC API																	//
+	// PUBLIC API																//
 	// =========================================================================//
 
 	next: function() {
