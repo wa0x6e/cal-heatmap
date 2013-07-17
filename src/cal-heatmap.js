@@ -583,11 +583,18 @@ var CalHeatMap = function() {
 
 		rect
 			.append("rect")
-			.attr("class", function(d) { return "graph-rect" + self.getHighlightClassName(d); })
+			.attr("class", function(d) {
+				return "graph-rect" + self.getHighlightClassName(d) + (self.options.onClick !== null ? " hover_cursor" : "");
+			})
 			.attr("width", self.options.cellSize)
 			.attr("height", self.options.cellSize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
 			.attr("y", function(d) { return self.positionSubDomainY(d); })
+			.on("click", function(d) {
+				if (self.options.onClick !== null) {
+					return self.onClick(d, null);
+				}
+			})
 			.call(radius)
 		;
 
@@ -860,6 +867,8 @@ var CalHeatMap = function() {
 			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
 		}
 
+		self.options.data = settings.data;
+
 
 		function validateSelector(selector) {
 			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
@@ -1105,7 +1114,7 @@ CalHeatMap.prototype = {
 							var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 							return parent.onClick(
 								d,
-								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
+								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : null)
 							);
 						}
 					})
