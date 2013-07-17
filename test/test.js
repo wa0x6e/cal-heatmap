@@ -2042,10 +2042,10 @@ test("Cell radius is applied", function() {
 
 	var radius = 15;
 
-	var cal = createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellradius: radius});
+	var cal = createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellRadius: radius});
 
-	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellradius applied");
-	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellradius applied");
+	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellRadius applied");
+	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellRadius applied");
 });
 
 /*
