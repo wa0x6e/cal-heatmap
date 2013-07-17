@@ -25,13 +25,13 @@ var CalHeatMap = function() {
 		range : 12,
 
 		// Size of each cell, in pixel
-		cellsize : 10,
+		cellSize : 10,
 
 		// Padding between each cell, in pixel
-		cellpadding : 2,
+		cellPadding : 2,
 
 		// For rounded subdomain rectangles, in pixels
-		cellradius: 0,
+		cellRadius: 0,
 
 		domainGutter : 2,
 
@@ -95,7 +95,7 @@ var CalHeatMap = function() {
 
 		legendCellSize: 10,
 
-		legendCellpadding: 2,
+		legendCellPadding: 2,
 
 		legendMargin: [10, 0, 0, 0],
 
@@ -409,7 +409,7 @@ var CalHeatMap = function() {
 
 			// Display legend if needed
 			if (self.options.displayLegend) {
-				self.displayLegend(width - self.options.domainGutter - self.options.cellpadding);
+				self.displayLegend(width - self.options.domainGutter - self.options.cellPadding);
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -447,7 +447,7 @@ var CalHeatMap = function() {
 
 		var verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
 
-		var domainVerticalLabelHeight = Math.max(25, self.options.cellsize*2);
+		var domainVerticalLabelHeight = Math.max(25, self.options.cellSize*2);
 		var domainHorizontalLabelWidth = 0;
 
 		if (!verticalDomainLabel) {
@@ -463,7 +463,7 @@ var CalHeatMap = function() {
 		// Return the width of the domain block, without the domain gutter
 		// @param int d Domain start timestamp
 		var w = function(d, outer) {
-			var width = self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
+			var width = self.options.cellSize*self._domainType[self.options.subDomain].column(d) + self.options.cellPadding*self._domainType[self.options.subDomain].column(d);
 			if (typeof outer !== "undefined" && outer === true) {
 				return width += domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
 			}
@@ -472,7 +472,7 @@ var CalHeatMap = function() {
 
 		// Return the height of the domain block, without the domain gutter
 		var h = function(d, outer) {
-			var height = self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d);
+			var height = self.options.cellSize*self._domainType[self.options.subDomain].row(d) + self.options.cellPadding*self._domainType[self.options.subDomain].row(d);
 			if (typeof outer !== "undefined" && outer === true) {
 				height += self.options.domainGutter + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
 			}
@@ -546,12 +546,12 @@ var CalHeatMap = function() {
 			})
 		;
 
-		self.root.select(".graph").attr("width", width - self.options.domainGutter - self.options.cellpadding);
-		self.root.select(".graph").attr("height", height - self.options.domainGutter - self.options.cellpadding);
+		self.root.select(".graph").attr("width", width - self.options.domainGutter - self.options.cellPadding);
+		self.root.select(".graph").attr("height", height - self.options.domainGutter - self.options.cellPadding);
 
 		svg.append("rect")
-			.attr("width", function(d, i) { return w(d, true) - self.options.domainGutter - self.options.cellpadding; })
-			.attr("height", function(d, i) { return h(d, true) - self.options.domainGutter - self.options.cellpadding; })
+			.attr("width", function(d, i) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
+			.attr("height", function(d, i) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
 			.attr("class", "domain-background")
 			;
 
@@ -584,18 +584,18 @@ var CalHeatMap = function() {
 		rect
 			.append("rect")
 			.attr("class", function(d) { return "graph-rect" + self.getHighlightClassName(d); })
-			.attr("width", self.options.cellsize)
-			.attr("height", self.options.cellsize)
+			.attr("width", self.options.cellSize)
+			.attr("height", self.options.cellSize)
 			.attr("x", function(d) { return self.positionSubDomainX(d); })
 			.attr("y", function(d) { return self.positionSubDomainY(d); })
 			.call(radius)
 		;
 
 		function radius(selection) {
-			if (self.options.cellradius > 0) {
+			if (self.options.cellRadius > 0) {
 				selection
-					.attr("rx", self.options.cellradius)
-					.attr("ry", self.options.cellradius)
+					.attr("rx", self.options.cellRadius)
+					.attr("ry", self.options.cellRadius)
 				;
 			}
 		}
@@ -691,8 +691,8 @@ var CalHeatMap = function() {
 			rect
 				.append("text")
 				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
-				.attr("x", function(d) { return self.positionSubDomainX(d) + self.options.cellsize/2; })
-				.attr("y", function(d) { return self.positionSubDomainY(d) + self.options.cellsize/2; })
+				.attr("x", function(d) { return self.positionSubDomainX(d) + self.options.cellSize/2; })
+				.attr("y", function(d) { return self.positionSubDomainY(d) + self.options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
 				.text(function(d){ return self.formatDate(d, "date"); })
@@ -1014,7 +1014,7 @@ CalHeatMap.prototype = {
 
 		var legendWidth =
 			this.options.legendCellSize * (this.options.legend.length+1) +
-			this.options.legendCellpadding * (this.options.legend.length+1) +
+			this.options.legendCellPadding * (this.options.legend.length+1) +
 			this.options.legendMargin[3] + this.options.legendMargin[1];
 
 		legend = legend
@@ -1040,7 +1040,7 @@ CalHeatMap.prototype = {
 			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
 			.attr("x", function(d) {
-				return d * (parent.options.legendCellSize + parent.options.legendCellpadding);
+				return d * (parent.options.legendCellSize + parent.options.legendCellPadding);
 			})
 			.attr("y", this.options.legendMargin[0])
 			.attr("fill-opacity", 0)
@@ -1138,12 +1138,12 @@ CalHeatMap.prototype = {
 
 	positionSubDomainX: function(d) {
 		var index = this._domainType[this.options.subDomain].position.x(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
+		return index * this.options.cellSize + index * this.options.cellPadding;
 	},
 
 	positionSubDomainY: function(d) {
 		var index = this._domainType[this.options.subDomain].position.y(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
+		return index * this.options.cellSize + index * this.options.cellPadding;
 	},
 
 	/**
