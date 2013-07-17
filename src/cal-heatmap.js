@@ -124,6 +124,9 @@ var CalHeatMap = function() {
 		// TEXT FORMATTING
 		// ================================================
 
+		// Name of the items to represent in the calendar
+		itemName : ["item", "items"],
+
 		format : {
 			// Tooltip text displayed when hovering a subdomain
 			// @default : null, will use the formatting according to domain type
@@ -143,15 +146,12 @@ var CalHeatMap = function() {
 			// for accepted date formatting
 		},
 
-		// Name of the items to represent in the calendar
-		itemName : ["item", "items"],
-
-		cellLabel : {
+		subDomainTitleFormat : {
 			empty: "{date}",
 			filled: "{count} {name} {connector} {date}"
 		},
 
-		legendLabel : {
+		legendTitleFormat : {
 			lower: "less than {min} {name}",
 			inner: "between {down} and {up} {name}",
 			upper: "more than {max} {name}"
@@ -886,7 +886,7 @@ CalHeatMap.prototype = {
 	 * @param  int		itemNb	Number of items in that date
 	 */
 	onClick : function(d, itemNb) {
-		if (typeof (this.options.onClick) === "function") {
+		if (typeof this.options.onClick === "function") {
 			return this.options.onClick(d, itemNb);
 		} else {
 			console.log("Provided callback for onClick is not a function.");
@@ -1053,15 +1053,15 @@ CalHeatMap.prototype = {
 			.text(function(d) {
 				var nextThreshold = parent.options.legend[d+1];
 				if (d === 0) {
-					return (parent.options.legendLabel.lower).format({
+					return (parent.options.legendTitleFormat.lower).format({
 						min: parent.options.legend[d],
 						name: parent.options.itemName[1]});
 				} else if (d === parent.options.legend.length) {
-					return (parent.options.legendLabel.upper).format({
+					return (parent.options.legendTitleFormat.upper).format({
 						max: parent.options.legend[d-1],
 						name: parent.options.itemName[1]});
 				} else {
-					return (parent.options.legendLabel.inner).format({
+					return (parent.options.legendTitleFormat.inner).format({
 						down: parent.options.legend[d-1],
 						up: parent.options.legend[d],
 						name: parent.options.itemName[1]});
@@ -1115,13 +1115,13 @@ CalHeatMap.prototype = {
 
 						return (
 						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
-							(parent.options.cellLabel.filled).format({
+							(parent.options.subDomainTitleFormat.filled).format({
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
 								name: parent.options.itemName[(data[domainUnit][subDomainUnit] !== 1 ? 1 : 0)],
 								connector: parent._domainType[parent.options.subDomain].format.connector,
 								date: parent.formatDate(d)
 							}) :
-							(parent.options.cellLabel.empty).format({
+							(parent.options.subDomainTitleFormat.empty).format({
 								date: parent.formatDate(d)
 							})
 						);
