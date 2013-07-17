@@ -867,7 +867,9 @@ var CalHeatMap = function() {
 			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
 		}
 
-		self.options.data = settings.data;
+		if (settings.hasOwnProperty("data")) {
+			self.options.data = settings.data;
+		}
 
 
 		function validateSelector(selector) {
