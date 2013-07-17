@@ -394,7 +394,7 @@ var CalHeatMap = function() {
 			// ATTACHING DOMAIN NAVIGATION EVENT										//
 			// =========================================================================//
 			if (self.options.nextSelector !== false) {
-				d3.select("#next").on("click." + self.options.itemNamespace, function(d) {
+				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function(d) {
 					d3.event.preventDefault();
 					self.loadNextDomain();
 				});
