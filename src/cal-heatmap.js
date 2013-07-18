@@ -624,8 +624,8 @@ var CalHeatMap = function() {
 			.attr("y", function(d, i) {
 				var y = self.options.domainMargin[0];
 				switch(self.options.label.position) {
-					case "top" : y = domainVerticalLabelHeight/2; break;
-					case "bottom" : y = h(d) + domainVerticalLabelHeight/2;
+					case "top" : y += domainVerticalLabelHeight/2; break;
+					case "bottom" : y += h(d) + domainVerticalLabelHeight/2;
 				}
 
 				return y + self.options.label.offset.y *
@@ -636,11 +636,11 @@ var CalHeatMap = function() {
 				);
 			})
 			.attr("x", function(d, i){
-				var x = self.options.domainMargin[1];
+				var x = self.options.domainMargin[3];
 				switch(self.options.label.position) {
-					case "right" : x = w(d); break;
+					case "right" : x += w(d); break;
 					case "bottom" :
-					case "top" : x = w(d)/2;
+					case "top" : x += w(d)/2;
 				}
 
 				if (self.options.label.align === "right") {
