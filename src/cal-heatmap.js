@@ -115,10 +115,10 @@ var CalHeatMap = function() {
 
 		// List of dates to highlight
 		// Valid values :
-		// - false : don't highlight anything
+		// - [] : don't highlight anything
 		// - "now" : highlight the current date
 		// - an array of Date objects : highlight the specified dates
-		highlight : false,
+		highlight : [],
 
 		// ================================================
 		// TEXT FORMATTING
@@ -871,6 +871,20 @@ var CalHeatMap = function() {
 			self.options.data = settings.data;
 		}
 
+		if (typeof self.options.highlight === "string") {
+			if (self.options.highlight === "now") {
+				self.options.highlight = [new Date()];
+			} else {
+				self.options.highlight = [];
+			}
+		} else if (Array.isArray(self.options.highlight)) {
+			var i = self.options.highlight.indexOf("now");
+			if (i !== -1) {
+				self.options.highlight.splice(i, 1);
+				self.options.highlight.push(new Date());
+			}
+		}
+
 
 		function validateSelector(selector) {
 			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
@@ -1165,30 +1179,13 @@ CalHeatMap.prototype = {
 	 */
 	getHighlightClassName: function(d)
 	{
-		if (this.options.highlight === false) {
-			return "";
-		}
-
-		var dates = [];
-
-		// @todo : Remove all duplicates values
-		if (this.options.highlight === "now") {
-			dates.push(new Date());
-		} else {
-			dates = this.options.highlight;
-
-			if (dates.indexOf("now") !== -1) {
-				dates.splice(dates.indexOf("now"), 1);
-				dates.push(new Date());
+		if (this.options.highlight.length > 0) {
+			for (var i in this.options.highlight) {
+				if (this.options.highlight[i] instanceof Date && this.dateIsEqual(this.options.highlight[i], d)) {
+					return " highlight" + (this.isNow(this.options.highlight[i]) ? " now" : "");
+				}
 			}
 		}
-
-		for (var i in dates) {
-			if (this.dateIsEqual(dates[i], d)) {
-				return " highlight" + (this.isNow(dates[i]) ? " now" : "");
-			}
-		}
-
 		return "";
 	},
 

@@ -1548,6 +1548,28 @@ test("Set itemName from a string", function() {
 
 
 
+test("Highlight consider 'now' string as now", function() {
+	expect(6);
+
+	var cal = new CalHeatMap();
+
+	cal.init({paintOnLoad: false, highlight: "now"});
+	var arr = cal.options.highlight;
+	equal(arr.length, 1, "Convert the string 'now' into an array");
+	equal(arr[0] instanceof Date, true, "'now' is converted to a Date");
+
+	var now = new Date();
+	cal.init({paintOnLoad: false, highlight: ["now", now]});
+	arr = cal.options.highlight;
+	equal(arr.length, 2, "Convert the string 'now' into an array");
+	equal(arr[0] instanceof Date, true, "Date 1 is a Date");
+	equal(arr[1] instanceof Date, true, "Date 2 is a Date");
+	equal(arr[0].getTime(), now.getTime());
+
+
+});
+
+
 /*
 	-----------------------------------------------------------------
 	LEGEND
