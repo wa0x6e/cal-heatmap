@@ -4,7 +4,7 @@ var CalHeatMap = function() {
 
 	var self = this;
 
-	var allowedDataType = ["json", "csv", "txt"];
+	var allowedDataType = ["json", "csv", "tsv", "txt"];
 
 	// Default settings
 	this.options = {
@@ -1548,6 +1548,9 @@ CalHeatMap.prototype = {
 							break;
 						case "csv" :
 							d3.csv(this.parseURI(source, startDate, endDate), fillData);
+							break;
+						case "tsv" :
+							d3.tsv(this.parseURI(source, startDate, endDate), fillData);
 							break;
 						case "text" :
 							d3.text(this.parseURI(source, startDate, endDate), "text/plain", fillData);
