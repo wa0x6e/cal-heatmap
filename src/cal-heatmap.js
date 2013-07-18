@@ -43,7 +43,7 @@ var CalHeatMap = function() {
 
 		// First day of the week is Monday
 		// 0 to start the week on Sunday
-		weekStartOnMonday : 1,
+		weekStartOnMonday : true,
 
 		// Start date of the graph
 		// @default now
@@ -1263,13 +1263,13 @@ CalHeatMap.prototype = {
 	 * @return int	Week number [0-53]
 	 */
 	getWeekNumber : function(d) {
-		var f = this.options.weekStartOnMonday === 1 ? d3.time.format("%W") : d3.time.format("%U");
+		var f = this.options.weekStartOnMonday === true ? d3.time.format("%W") : d3.time.format("%U");
 		return f(d);
 	},
 
 
 	getWeekDay : function(d) {
-		if (this.options.weekStartOnMonday === 0) {
+		if (this.options.weekStartOnMonday === false) {
 			return d.getDay();
 		}
 		else if (d.getDay() === 0) {
@@ -1299,7 +1299,7 @@ CalHeatMap.prototype = {
 	getWeekDomain: function (d, range) {
 		var weekStart;
 
-		if (this.options.weekStartOnMonday === 0) {
+		if (this.options.weekStartOnMonday === false) {
 			weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
 		} else {
 			if (d.getDay() === 1) {
@@ -1316,7 +1316,7 @@ CalHeatMap.prototype = {
 
 		var stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
 
-		return (this.options.weekStartOnMonday === 1) ?
+		return (this.options.weekStartOnMonday === true) ?
 			d3.time.mondays(Math.min(weekStart, stop), Math.max(weekStart, stop)) :
 			d3.time.sundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
 		;
