@@ -49,7 +49,7 @@ module.exports = function(grunt) {
                     coberturaReport: "report/"
                 }
             },
-            all: ["test/*.html"]
+            all: ["test/index.html", "test/index-amd.html"]
         },
         concat: {
             options: {
