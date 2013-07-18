@@ -1,5 +1,23 @@
 # Changelog
 
+## v3.0.0 [2013-07-18]
+
+> v3 is a major release, a lot of changes are not backward compatible with v2.  
+> See the [migration guide](http://kamisama.github.io/cal-heatmap/#migrating-from-2x) for update process.
+
+* [new] Add Vertical orientation
+* [new] Add option to display a date inside subDomain cells
+* [new] Replace `id` with `itemSelector`, and accept any kind of CSS3 selector string
+* [new] subDomain highlighting can highlight more that today
+* [new] domain highlighting
+* [new] `nextSelector` and `previousSelector` to attach domain navigation to any DOM Element
+* [new] Add `tsv` to accepted dataType
+* [new] More control about legend position and size
+* [new] More control about domain label position and size
+* [new] Label rotation, to display text vertically
+* [new] `getSVG()` method to export SVG code
+
+
 ## v2.2.1 [2013-06-19]
 
 * [new] Highlight today's rectangle (only available when subdomain is equal to "day")

@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "description": "A module to create calendar heat map to visualise time data series a la github contribution graph",
   "keywords": [
     "calendar",
