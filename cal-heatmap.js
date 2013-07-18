@@ -1,6 +1,6 @@
-/*! cal-heatmap v2.2.1 (Wed Jun 19 2013 14:14:14)
+/*! cal-heatmap v3.0.0 (Thu Jul 18 2013 18:57:07)
  *  ---------------------------------------------
- *  A module to create calendar heat map to visualise time data series a la github contribution graph
+ *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
  *  Licensed under the MIT license
  *  Copyright 2013 Wan Qi Chen
@@ -12,12 +12,14 @@ var CalHeatMap = function() {
 
 	var self = this;
 
-	var allowedDataType = ["json", "csv", "txt"];
+	var allowedDataType = ["json", "csv", "tsv", "txt"];
 
 	// Default settings
 	this.options = {
-		// DOM ID of the container to append the graph to
-		id : "cal-heatmap",
+		// selector string of the container to append the graph to
+		// Accept any string value accepted by document.querySelector or CSS3
+		// or an Element object
+		itemSelector : "#cal-heatmap",
 
 		// Whether to paint the calendar on init()
 		// Used by testsuite to reduce testing time
@@ -31,15 +33,17 @@ var CalHeatMap = function() {
 		range : 12,
 
 		// Size of each cell, in pixel
-		cellsize : 10,
+		cellSize : 10,
 
 		// Padding between each cell, in pixel
-		cellpadding : 2,
+		cellPadding : 2,
 
 		// For rounded subdomain rectangles, in pixels
-		cellradius: 0,
+		cellRadius: 0,
 
 		domainGutter : 2,
+
+		domainMargin: [0,0,0,0],
 
 		domain : "hour",
 
@@ -47,7 +51,7 @@ var CalHeatMap = function() {
 
 		// First day of the week is Monday
 		// 0 to start the week on Sunday
-		weekStartOnMonday : 1,
+		weekStartOnMonday : true,
 
 		// Start date of the graph
 		// @default now
@@ -62,69 +66,124 @@ var CalHeatMap = function() {
 		// When false, the calendar will be left empty
 		loadOnInit : true,
 
-		// ================================================
-		// SCALE
-		// ================================================
+		// Calendar orientation
+		// false : display domains side by side
+		// true  : display domains one under the other
+		verticalOrientation: false,
 
-		// Threshold for the scale
-		scale : [10,20,30,40],
+		// Domain Label properties
+		label: {
+			// valid : top, right, bottom, left
+			position: "bottom",
 
-		// Whether to display the scale
-		displayScale : true,
+			// Valid : left, center, right
+			// Also valid are the direct svg values : start, middle, end
+			align: "center",
 
-		// Whether to highlight the rect with today's date
-		// Only available when subdomain == day
-		highlightToday : false,
+			// By default, there is no margin/padding around the label
+			offset: {
+				x: 0,
+				y: 0
+			},
 
-		// ================================================
-		// TEXT FORMATTING
-		// ================================================
+			rotate: null,
 
-		format : {
-			// Formatting of the date when hovering an subdomain block
-			// @default : null, will use the formatting according to domain type
-			// Accept a string used as specifier by d3.time.format()
-			// or a function
-			date : null,
-
-			// Formatting of domain label
-			// @default : null, will use the formatting according to domain type
-			legend : null
-
-			// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-			// for accepted date formatting
+			width: 100
 		},
+
+		// ================================================
+		// LEGEND
+		// ================================================
+
+		// Threshold for the legend
+		legend : [10,20,30,40],
+
+		// Whether to display the legend
+		displayLegend : true,
+
+		legendCellSize: 10,
+
+		legendCellPadding: 2,
+
+		legendMargin: [10, 0, 0, 0],
+
+		// Legend vertical position
+		// top : place legend above calendar
+		// bottom: place legend below the calendar
+		legendVerticalPosition: "bottom",
+
+		// Legend horizontal position
+		// accepted values : left, center, right
+		legendHorizontalPosition: "left",
+
+
+		// ================================================
+		// HIGHLIGHT
+		// ================================================
+
+		// List of dates to highlight
+		// Valid values :
+		// - [] : don't highlight anything
+		// - "now" : highlight the current date
+		// - an array of Date objects : highlight the specified dates
+		highlight : [],
+
+		// ================================================
+		// TEXT FORMATTING / i18n
+		// ================================================
 
 		// Name of the items to represent in the calendar
 		itemName : ["item", "items"],
 
-		cellLabel : {
+		// Formatting of the domain label
+		// @default: null, will use the formatting according to domain type
+		// Accept a string used as specifier by d3.time.format()
+		// or a function
+		//
+		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+		// for accepted date formatting used by d3.time.format()
+		domainLabelFormat: null,
+
+		// Formatting of the title displayed when hovering a subDomain cell
+		subDomainTitleFormat : {
 			empty: "{date}",
 			filled: "{count} {name} {connector} {date}"
 		},
 
-		scaleLabel : {
+		// Formatting of the {date} used in subDomainTitleFormat
+		// @default : null, will use the formatting according to subDomain type
+		// Accept a string used as specifier by d3.time.format()
+		// or a function
+		//
+		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+		// for accepted date formatting used by d3.time.format()
+		subDomainDateFormat: null,
+
+		// Formatting of the text inside each subDomain cell
+		// @default: null, no text
+		// Accept a string used as specifier by d3.time.format()
+		// or a function
+		//
+		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+		// for accepted date formatting used by d3.time.format()
+		subDomainTextFormat: null,
+
+		// Formatting of the title displayed when hovering a legend cell
+		legendTitleFormat : {
 			lower: "less than {min} {name}",
 			inner: "between {down} and {up} {name}",
 			upper: "more than {max} {name}"
 		},
 
-		// ================================================
-		// BROWSING
-		// ================================================
+		// Animation duration, in ms
+		animationDuration : 500,
 
-		// Animation duration
-		duration : 500,
+		nextSelector: false,
 
-		// Domain browsing
-		// Dynamically change calendar domain by loading
-		// next/previous domain
-		browsing: false,
+		previousSelector: false,
 
-		browsingOptions: {
-			nextLabel : "Next",
-			previousLabel : "Previous"
-		},
+		itemNamespace: "cal-heatmap",
+
 
 		// ================================================
 		// CALLBACK
@@ -156,6 +215,8 @@ var CalHeatMap = function() {
 
 	this._domainType = {
 		"min" : {
+			name: "minute",
+			level: 10,
 			row: function(d) {return 10;},
 			column: function(d) { return 6; },
 			position: {
@@ -171,6 +232,7 @@ var CalHeatMap = function() {
 		},
 		"hour" : {
 			name: "hour",
+			level: 20,
 			row: function(d) {return 6;},
 			column: function(d) {
 				switch(self.options.domain) {
@@ -202,6 +264,7 @@ var CalHeatMap = function() {
 		},
 		"day" : {
 			name: "day",
+			level: 30,
 			row: function(d) {return 7;},
 			column: function(d) {
 				d = new Date(d);
@@ -229,46 +292,16 @@ var CalHeatMap = function() {
 			},
 			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
 		},
-		"x_day" : {
-			name: "x_day",
-			row: function(d) {
+		"week" : {
+			name: "week",
+			level: 40,
+			row: function(d) {return 1;},
+			column: function(d) {
 				switch(self.options.domain) {
 					case "year" : return 54;
 					case "month" : return 6;
-					case "week" : return 1;
+					default: return 1;
 				}
-			},
-			column: function(d) {
-				return 7;
-			},
-			position: {
-				x : function(d) { return self.getWeekDay(d);},
-				y : function(d) {
-					switch(self.options.domain) {
-						case "week" : return 0;
-						case "month" :
-							return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
-						case "year" : return self.getWeekNumber(d) ;
-					}
-				}
-			},
-			format: {
-				date: "%A %B %-e, %Y",
-				legend: "%e %b",
-				connector: "on"
-			},
-			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
-		},
-		"week" : {
-			name: "week",
-			row: function(d) {return 1;},
-			column: function(d) {
-				d = new Date(d);
-				switch(self.options.domain) {
-					case "year" : return 54;
-					case "month" : return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d);
-				}
-				return 1;
 			},
 			position: {
 				x: function(d) {
@@ -290,6 +323,7 @@ var CalHeatMap = function() {
 		},
 		"month" : {
 			name: "month",
+			level: 50,
 			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
@@ -305,6 +339,7 @@ var CalHeatMap = function() {
 		},
 		"year" : {
 			name: "year",
+			level: 60,
 			row: function(d) {return 1;},
 			column: function(d) {return 12;},
 			position: {
@@ -320,6 +355,24 @@ var CalHeatMap = function() {
 		}
 	};
 
+	for (var type in this._domainType) {
+		this._domainType["x_" + type] = {};
+		this._domainType["x_" + type].name = "x_" + type;
+		this._domainType["x_" + type].level = this._domainType[type].level;
+		this._domainType["x_" + type].row = this._domainType[type].column;
+		this._domainType["x_" + type].column = this._domainType[type].row;
+		this._domainType["x_" + type].position = {};
+		this._domainType["x_" + type].position.x = this._domainType[type].position.y;
+		this._domainType["x_" + type].position.y = this._domainType[type].position.x;
+		this._domainType["x_" + type].format = this._domainType[type].format;
+		this._domainType["x_" + type].extractUnit = this._domainType[type].extractUnit;
+	}
+
+	// Exception : always return the maximum number of weeks
+	// to align the label vertically
+	this._domainType.x_day.row = function(d) { return 6; };
+
+
 	this.svg = null;
 
 	this._completed = false;
@@ -331,51 +384,50 @@ var CalHeatMap = function() {
 	// Total width of the graph
 	var width = 0;
 
-	// Save domains width
-	var domainsWidth = [];
+	// Total height of the graph
+	var height = 0;
+
+	this.NAVIGATE_LEFT = 1;
+	this.NAVIGATE_RIGHT = 2;
+
+	this.root = null;
 
 	/**
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
 	 */
-	var _init = function() {
-
-		if (typeof self.options.format.date === "function") {
-			self.formatDate = self.options.format.date;
-		} else {
-			self.formatDate = d3.time.format(self.options.format.date);
-		}
+	function _init() {
 
 		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
 
-		if (self.options.browsing) {
-			d3.select("#" + self.options.id).append("a")
-			.attr("href", "#")
-			.attr("rel", "prev")
-			.attr("class", "graph-browse-previous")
-			.attr("title", "Load previous " + self._domainType[self.options.domain].name)
-			.on("click", function(d) { self.loadPreviousDomain(); })
-			.html(self.options.browsingOptions.previousLabel);
+		self.root = d3.select(self.options.itemSelector);
 
-			d3.select("#" + self.options.id).append("a")
-			.attr("href", "#")
-			.attr("rel", "next")
-			.attr("class", "graph-browse-next")
-			.attr("title", "Load next " + self._domainType[self.options.domain].name)
-			.on("click", function(d) { self.loadNextDomain(); })
-			.html(self.options.browsingOptions.nextLabel);
-		}
-
-		d3.select("#" + self.options.id).append("svg")
-			.attr("class", "graph");
-
+		self.root.append("svg").attr("class", "graph");
 
 		if (self.options.paintOnLoad) {
+
 			self.paint();
 
-			// Display scale if needed
-			if (self.options.displayScale) {
-				self.displayScale();
+			// =========================================================================//
+			// ATTACHING DOMAIN NAVIGATION EVENT										//
+			// =========================================================================//
+			if (self.options.nextSelector !== false) {
+				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function(d) {
+					d3.event.preventDefault();
+					self.loadNextDomain();
+				});
+			}
+
+			if (self.options.previousSelector !== false) {
+				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(d) {
+					d3.event.preventDefault();
+					self.loadPreviousDomain();
+				});
+			}
+
+			// Display legend if needed
+			if (self.options.displayLegend) {
+				self.displayLegend(width - self.options.domainGutter - self.options.cellPadding);
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -397,226 +449,317 @@ var CalHeatMap = function() {
 		}
 
 		return true;
-	};
+	}
 
-	this.loadNextDomain = function() {
-		if (d3.event) {
-			d3.event.preventDefault();
+
+	/**
+	 *
+	 *
+	 * @param int navigationDir
+	 */
+	this.paint = function(navigationDir) {
+
+		if (typeof navigationDir === "undefined") {
+			navigationDir = false;
 		}
 
-		self._domains.push(self.getNextDomain().getTime());
-		self._domains.shift();
+		var verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
 
-		self.paint();
+		var domainVerticalLabelHeight = Math.max(25, self.options.cellSize*2);
+		var domainHorizontalLabelWidth = 0;
 
-		self.getDatas(
-			self.options.data,
-			new Date(self._domains[self._domains.length-1]),
-			self.getSubDomain(self._domains[self._domains.length-1]).pop(),
-			self.svg
-		);
-
-		self.afterLoadNextDomain(new Date(self._domains[self._domains.length-1]));
-
-	};
-
-	this.loadPreviousDomain = function() {
-		if (d3.event) {
-			d3.event.preventDefault();
+		if (!verticalDomainLabel) {
+			domainVerticalLabelHeight = 0;
+			domainHorizontalLabelWidth = self.options.label.width;
 		}
 
-		self._domains.unshift(self.getPreviousDomain().getTime());
-		self._domains.pop();
-
-		self.paint(true);
-
-		self.getDatas(
-			self.options.data,
-			new Date(self._domains[0]),
-			self.getSubDomain(self._domains[0]).pop(),
-			self.svg
-		);
-
-		self.afterLoadPreviousDomain(new Date(self._domains[0]));
-	};
-
-	this.paint = function(reverse) {
-
-		if (typeof reverse === "undefined") {
-			reverse = false;
+		// @todo : check validity
+		if (typeof self.options.domainMargin === "number") {
+			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
 		}
 
-		var graphLegendHeight = Math.max(25, self.options.cellsize*2);
-
-		// Compute the width of the domain block
+		// Return the width of the domain block, without the domain gutter
 		// @param int d Domain start timestamp
-		var w = function(d) {
-			return self.options.cellsize*self._domainType[self.options.subDomain].column(d) + self.options.cellpadding*self._domainType[self.options.subDomain].column(d);
-		};
-
-		// Compute the height of the domain block
-		var h = function(d) {
-			return self.options.cellsize*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding*self._domainType[self.options.subDomain].row(d) + self.options.cellpadding;
-		};
-
-		// Format the domain legend according to the domain type
-		var legendFormat = d3.time.format(self.options.format.legend);
-
-		var positionX = function(i) {
-			if (width === 0) {
-				return domainsWidth[i];
-			} else {
-				return reverse ? domainsWidth[0] : domainsWidth[i+1];
+		var w = function(d, outer) {
+			var width = self.options.cellSize*self._domainType[self.options.subDomain].column(d) + self.options.cellPadding*self._domainType[self.options.subDomain].column(d);
+			if (typeof outer !== "undefined" && outer === true) {
+				return width += domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
 			}
+			return width;
 		};
 
-		var domainPositionXExit = function(d) {
-			if (reverse) {
-				return width;
-			} else {
-				return w(d) * -1 - self.options.domainGutter;
+		// Return the height of the domain block, without the domain gutter
+		var h = function(d, outer) {
+			var height = self.options.cellSize*self._domainType[self.options.subDomain].row(d) + self.options.cellPadding*self._domainType[self.options.subDomain].row(d);
+			if (typeof outer !== "undefined" && outer === true) {
+				height += self.options.domainGutter + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
 			}
-		};
-
-		var labelPositionXExit = function(d) {
-			if (reverse) {
-				return width + w(d)/2;
-			} else {
-				return (self.options.domainGutter + w(d)/2) * -1;
-			}
+			return height;
 		};
 
 		// Painting all the domains
-		var domainSvg = d3.select("#" + self.options.id + " .graph")
-			.attr("height", function(d) { return h(d) + graphLegendHeight;})
-			.selectAll("svg")
-			.data(self._domains, function(d) { return d;});
+		var domainSvg = self.root.select(".graph")
+			.selectAll("svg.graph-domain")
+			.data(self._domains, function(d) { return d;})
+		;
 
-		var tempWidth = 0;
-		var tempLastDomainWidth = 0;
-
+		// =========================================================================//
+		// PAINTING DOMAIN															//
+		// =========================================================================//
 
 		var svg = domainSvg
 			.enter()
-			.insert("svg:svg")
-			.attr("width", function(d){
-				var wd = w(d);
-
-				tempWidth += tempLastDomainWidth = wd+self.options.domainGutter;
-
-				if (width === 0) {
-					domainsWidth.push(tempWidth - tempLastDomainWidth);
+			.insert("svg")
+			.attr("width", function(d, i){
+				var domainWidth = w(d, true);
+				if (navigationDir === false) {
+					width = domainWidth + (self.options.verticalOrientation ? 0 : width);
+				}
+				return domainWidth;
+			})
+			.attr("height", function(d) {
+				var domainHeight = h(d, true);
+				if (navigationDir === false) {
+					height = domainHeight + (self.options.verticalOrientation ? height : 0);
+				}
+				return domainHeight;
+			})
+			.attr("x", function(d, i) {
+				if (self.options.verticalOrientation) {
+					return 0;
 				} else {
-					if (reverse) {
-						domainsWidth.unshift(tempLastDomainWidth * -1);
-					} else {
-						domainsWidth.push(width);
+					switch(navigationDir) {
+						case false : return w(d, true) * i;
+						case self.NAVIGATE_RIGHT : return w(d, true) * (i+1);
+						case self.NAVIGATE_LEFT : return w(d, true) * (i-1);
 					}
 
 				}
-
-				return wd;
 			})
-			.attr("height", function(d) { return h(d) + graphLegendHeight;})
-			.attr("x", function(d, i){ return positionX(i); })
-			;
-
-
-		// Appending a label to each domain
-		var label = d3.select("#" + self.options.id + " .graph").selectAll("text")
-			.data(self._domains, function(d) { return d;});
-
-		label
-			.enter().insert("text")
-			.attr("y", function(d) { return h(d) + graphLegendHeight/2; })
-			.attr("x", function(d, i){ return positionX(i) + w(d) / 2; })
-			.attr("class", "graph-label")
-			.attr("text-anchor", "middle")
-			.attr("dominant-baseline", "middle")
-			.text(function(d) { return legendFormat(new Date(d)); });
-
-
-		// Drawing the sudomain inside each domain
-		var rect = domainSvg.selectAll("rect")
-			.data(function(d) { return self.getSubDomain(d); })
-			.enter().append("svg:rect")
-			.attr("class", function(d) { return self.getClassName(d); })
-			.attr("width", self.options.cellsize)
-			.attr("height", self.options.cellsize)
-			.attr("x", function(d) { return self.positionSubDomainX(d); })
-			.attr("y", function(d) { return self.positionSubDomainY(d); })
-			.call(radius)
-			;
-
-		function radius(selection) {
-			if (self.options.cellradius > 0) {
-				selection
-					.attr("rx", self.options.cellradius)
-					.attr("ry", self.options.cellradius)
-				;
-			}
-		}
-
-		// Appeding a title to each subdomain
-		rect.append("svg:title").text(function(d){ return self.formatDate(d); });
-
-
-		var exitDomainWidth = reverse ? (width-domainsWidth[domainsWidth.length-1]) : domainsWidth[1];
-
-		if (width !== 0) {
-			var i = domainsWidth.length-1;
-			while (i >= 0) {
-				if (reverse) {
-					domainsWidth[i] -= domainsWidth[0];
-				} else if (i >= 1) {
-					domainsWidth[i] -= domainsWidth[1];
+			.attr("y", function(d, i) {
+				if (self.options.verticalOrientation) {
+					switch(navigationDir) {
+						case false : return h(d, true) * i;
+						case self.NAVIGATE_RIGHT : return h(d, true) * (i+1);
+						case self.NAVIGATE_LEFT : return h(d, true) * (i-1);
+					}
+				} else {
+					return 0;
 				}
-
-				i--;
-			}
-			if (reverse) {
-				domainsWidth.pop() ;
-			} else {
-				domainsWidth.shift();
-			}
-		}
-
-		domainSvg.transition().duration(self.options.duration)
-			.attr("x", function(d, i){ return domainsWidth[i]; })
+			})
+			.attr("class", function(d) {
+				var classname = "graph-domain";
+				var date = new Date(d);
+				switch(self.options.domain) {
+					case "hour" : classname += " h_" + date.getHours();
+					case "day" : classname += " d_" + date.getDate();
+					case "week" : classname += " w_" + self.getWeekNumber(date);
+					case "month" : classname += " m_" + date.getMonth();
+					case "year" : classname += " y_" + date.getFullYear();
+				}
+				return classname;
+			})
 		;
 
-		domainSvg.exit().transition().duration(self.options.duration)
-		.attr("x", function(d){ return domainPositionXExit(d); })
-		.remove();
+		self.root.select(".graph").attr("width", width - self.options.domainGutter - self.options.cellPadding);
+		self.root.select(".graph").attr("height", height - self.options.domainGutter - self.options.cellPadding);
 
-		label.transition().duration(self.options.duration)
-		.attr("x", function(d, i){ return domainsWidth[i] + w(d) / 2; });
+		svg.append("rect")
+			.attr("width", function(d, i) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
+			.attr("height", function(d, i) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
+			.attr("class", "domain-background")
+			;
 
-		label.exit().transition().duration(self.options.duration)
-			.attr("x", function(d){ return labelPositionXExit(d); })
-			.remove();
+		// =========================================================================//
+		// PAINTING SUBDOMAINS														//
+		// =========================================================================//
+		var subDomainSvgGroup = svg.append("svg")
+			.attr("x", function(d, i) {
+				switch(self.options.label.position) {
+					case "left" : return domainHorizontalLabelWidth + self.options.domainMargin[3];
+					default : return self.options.domainMargin[3];
+				}
+			})
+			.attr("y", function(d, i) {
+				switch(self.options.label.position) {
+					case "top" : return domainVerticalLabelHeight + self.options.domainMargin[0];
+					default : return self.options.domainMargin[0];
+				}
+			})
+			.attr("class", "graph-subdomain-group")
+		;
 
-		if (width === 0) {
-			width = tempWidth;
-			d3.select("#" + self.options.id + " .graph").attr("width", width);
-		} else if (tempLastDomainWidth !== exitDomainWidth) {
-			// Compute the new width
-			var tw = width + tempLastDomainWidth - exitDomainWidth;
+		var rect = subDomainSvgGroup
+			.selectAll("svg")
+			.data(function(d) { return self.getSubDomain(d); })
+			.enter()
+			.append("g")
+		;
 
-			// If the new width is different, resize the graph
-			if (tw !== width) {
-				width = tw;
-				d3.select("#" + self.options.id + " .graph")
-					.transition().duration(self.options.duration)
-					.attr("width", width)
+		rect
+			.append("rect")
+			.attr("class", function(d) {
+				return "graph-rect" + self.getHighlightClassName(d) + (self.options.onClick !== null ? " hover_cursor" : "");
+			})
+			.attr("width", self.options.cellSize)
+			.attr("height", self.options.cellSize)
+			.attr("x", function(d) { return self.positionSubDomainX(d); })
+			.attr("y", function(d) { return self.positionSubDomainY(d); })
+			.on("click", function(d) {
+				if (self.options.onClick !== null) {
+					return self.onClick(d, null);
+				}
+			})
+			.call(radius)
+		;
+
+		function radius(selection) {
+			if (self.options.cellRadius > 0) {
+				selection
+					.attr("rx", self.options.cellRadius)
+					.attr("ry", self.options.cellRadius)
 				;
 			}
 		}
+
+
+
+		// =========================================================================//
+		// PAINTING LABEL															//
+		// =========================================================================//
+		svg.append("text")
+			.attr("class", "graph-label")
+			.attr("y", function(d, i) {
+				var y = self.options.domainMargin[0];
+				switch(self.options.label.position) {
+					case "top" : y += domainVerticalLabelHeight/2; break;
+					case "bottom" : y += h(d) + domainVerticalLabelHeight/2;
+				}
+
+				return y + self.options.label.offset.y *
+				(
+					((self.options.label.rotate === "right" && self.options.label.position === "right") ||
+					(self.options.label.rotate === "left" && self.options.label.position === "left")) ?
+					-1 : 1
+				);
+			})
+			.attr("x", function(d, i){
+				var x = self.options.domainMargin[3];
+				switch(self.options.label.position) {
+					case "right" : x += w(d); break;
+					case "bottom" :
+					case "top" : x += w(d)/2;
+				}
+
+				if (self.options.label.align === "right") {
+					return x + domainHorizontalLabelWidth - self.options.label.offset.x *
+					(self.options.label.rotate === "right" ? -1 : 1);
+				}
+				return x + self.options.label.offset.x;
+
+			})
+			.attr("text-anchor", function() {
+				switch(self.options.label.align) {
+					case "start" :
+					case "left" : return "start";
+					case "end" :
+					case "right" : return "end";
+					default : return "middle";
+				}
+			})
+			.attr("dominant-baseline", function() { return verticalDomainLabel ? "middle" : "top"; })
+			.text(function(d, i) { return self.formatDate(new Date(self._domains[i]), self.options.domainLabelFormat); })
+			.call(domainRotate)
+		;
+
+		function domainRotate(selection) {
+			switch (self.options.label.rotate) {
+				case "right" :
+					selection
+					.attr("transform", function(d) {
+						var s = "rotate(90), ";
+						switch(self.options.label.position) {
+							case "right" : s += "translate(-" + w(d) + " , -" + w(d) + ")"; break;
+							case "left" : s += "translate(0, -" + domainHorizontalLabelWidth + ")"; break;
+						}
+
+						return s;
+					});
+					break;
+				case "left" :
+					selection
+					.attr("transform", function(d) {
+						var s = "rotate(270), ";
+						switch(self.options.label.position) {
+							case "right" : s += "translate(-" + (w(d) + domainHorizontalLabelWidth) + " , " + w(d) + ")"; break;
+							case "left" : s += "translate(-" + (domainHorizontalLabelWidth) + " , " + domainHorizontalLabelWidth + ")"; break;
+						}
+
+						return s;
+					});
+					break;
+			}
+		}
+
+
+		// Appending a title to each subdomain
+		rect.append("title").text(function(d){ return self.formatDate(d, self.options.subDomainDateFormat); });
+
+
+		// =========================================================================//
+		// PAINTING DOMAIN SUBDOMAIN CONTENT										//
+		// =========================================================================//
+		if (self.options.subDomainTextFormat !== null) {
+			rect
+				.append("text")
+				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
+				.attr("x", function(d) { return self.positionSubDomainX(d) + self.options.cellSize/2; })
+				.attr("y", function(d) { return self.positionSubDomainY(d) + self.options.cellSize/2; })
+				.attr("text-anchor", "middle")
+				.attr("dominant-baseline", "central")
+				.text(function(d){ return self.formatDate(d, self.options.subDomainTextFormat); })
+			;
+		}
+
+		// =========================================================================//
+		// ANIMATION																//
+		// =========================================================================//
+		domainSvg.transition().duration(self.options.animationDuration)
+			.attr("x", function(d, i){
+				return self.options.verticalOrientation ? 0 : (w(d, true) * i);
+			})
+			.attr("y", function(d, i){
+				return self.options.verticalOrientation ? (h(d, true) * i) : 0;
+			})
+			.attr("width", function(d) { return w(d, true); })
+		;
+
+		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
+		domainSvg.exit().transition().duration(self.options.animationDuration)
+			.attr("x", function(d, i){
+				if (self.options.verticalOrientation) {
+					return 0;
+				} else {
+					switch(navigationDir) {
+						case self.NAVIGATE_LEFT : return width;
+						case self.NAVIGATE_RIGHT : return -w(d, true);
+					}
+				}
+			})
+			.attr("y", function(d){
+				if (self.options.verticalOrientation) {
+					return navigationDir === self.NAVIGATE_LEFT ? height : -h(d, true);
+				} else {
+					return 0;
+				}
+			})
+			.remove()
+		;
 
 		if (self.svg === null) {
 			self.svg = svg;
 		} else {
-			self.svg = d3.select("#" + self.options.id + " .graph").selectAll("svg")
+			self.svg = self.root.select(".graph").selectAll("svg")
 			.data(self._domains, function(d) {return d;});
 		}
 	};
@@ -624,20 +767,34 @@ var CalHeatMap = function() {
 
 	this.init = function(settings) {
 
-		// Merge settings with default
-		if ( settings !== null && settings !== undefined && settings !== "undefined" ){
-				for ( var opt in self.options ) {
-					if ( settings[ opt ] !== null &&
-						settings[ opt ] !== undefined &&
-						settings[ opt ] !== "undefined" ){
-							self.options[ opt ] = settings[ opt ];
-				}
-			}
+		self.options = mergeRecursive(self.options, settings);
+
+		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min" || self.options.domain.substring(0, 2) === "x_") {
+			console.log("The domain '" + self.options.domain + "' is not valid");
+			return false;
 		}
 
-		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min") {
-			console.log("The domain '" + self.options.domain + "' is not valid domain");
+		if (!this._domainType.hasOwnProperty(self.options.subDomain) || self.options.subDomain === "year") {
+			console.log("The subDomain '" + self.options.subDomain + "' is not valid");
 			return false;
+		}
+
+		if (this._domainType[self.options.domain].level <= this._domainType[self.options.subDomain].level) {
+			console.log("'" + self.options.subDomain + "' is not a valid subDomain to '" + self.options.domain +  "'");
+			return false;
+		}
+
+
+		// Set the most suitable subdomain for the domain
+		// if subDomain is not explicitly specified
+		if (!settings.hasOwnProperty("subDomain")) {
+			switch(self.options.domain) {
+				case "year" :  self.options.subDomain = "month"; break;
+				case "month" : self.options.subDomain = "day"; break;
+				case "week" :  self.options.subDomain = "day"; break;
+				case "day" :  self.options.subDomain = "hour"; break;
+				default : self.options.subDomain = "min";
+			}
 		}
 
 		if (allowedDataType.indexOf(self.options.dataType) < 0) {
@@ -645,14 +802,107 @@ var CalHeatMap = function() {
 			return false;
 		}
 
-		var domain = self.getDomain(self.options.start);
-
-		if (self.options.format.date === null) {
-			self.options.format.date = this._domainType[self.options.subDomain].format.date;
+		if (self.options.subDomainDateFormat === null) {
+			self.options.subDomainDateFormat = this._domainType[self.options.subDomain].format.date;
 		}
 
-		if (self.options.format.legend === null) {
-			self.options.format.legend = this._domainType[self.options.domain].format.legend;
+		if (self.options.domainLabelFormat === null) {
+			self.options.domainLabelFormat = this._domainType[self.options.domain].format.legend;
+		}
+
+		// Auto-align label, depending on it's position
+		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("align"))) {
+			switch(self.options.label.position) {
+				case "left" : self.options.label.align = "right"; break;
+				case "right" : self.options.label.align = "left"; break;
+				default : self.options.label.align = "center";
+			}
+
+
+			if (self.options.label.rotate === "left") {
+				self.options.label.align = "right";
+			} else if (self.options.label.rotate === "right") {
+				self.options.label.align = "left";
+			}
+
+		}
+
+		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
+			if (self.options.label.position === "left" || self.options.label.position === "right") {
+				self.options.label.offset = {
+					x: 10,
+					y: 15
+				};
+			}
+		}
+
+		if (validateSelector(self.options.itemSelector)) {
+			console.log("The itemSelector is invalid");
+			return false;
+		}
+
+		if (d3.select(self.options.itemSelector)[0][0] === null) {
+			console.log("The node specified in itemSelector does not exists");
+			return false;
+		}
+
+		if (self.options.nextSelector !== false && validateSelector(self.options.nextSelector)) {
+			console.log("The nextSelector is invalid");
+			return false;
+		}
+
+		if (self.options.previousSelector !== false && validateSelector(self.options.previousSelector)) {
+			console.log("The previousSelector is invalid");
+			return false;
+		}
+
+		if (typeof self.options.itemNamespace !== "string" || self.options.itemNamespace === "") {
+			console.log("itemNamespace can not be empty, falling back to cal-heatmap");
+			self.options.itemNamespace = "cal-heatmap";
+		}
+
+		if (typeof self.options.domainMargin === "number") {
+			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
+		}
+
+		if (Array.isArray(self.options.domainMargin)) {
+			switch(self.options.domainMargin.length) {
+				case 0 : self.options.domainMargin = [0, 0, 0, 0]; break;
+				case 1 : self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin]; break;
+				case 2 : self.options.domainMargin = [self.options.domainMargin[0], self.options.domainMargin[1], self.options.domainMargin[0], self.options.domainMargin[1]]; break;
+				case 3 : self.options.domainMargin = [self.options.domainMargin[0], self.options.domainMargin[1], self.options.domainMargin[2], self.options.domainMargin[1]]; break;
+				case 4 : self.options.domainMargin = self.options.domainMargin; break;
+				default : self.options.domainMargin.splice(4);
+			}
+		}
+
+		if (typeof self.options.itemName === "string") {
+			self.options.itemName = [self.options.itemName, self.options.itemName + "s"];
+		} else if (Array.isArray(self.options.itemName) && self.options.itemName.length === 1) {
+			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
+		}
+
+		if (settings.hasOwnProperty("data")) {
+			self.options.data = settings.data;
+		}
+
+		if (typeof self.options.highlight === "string") {
+			if (self.options.highlight === "now") {
+				self.options.highlight = [new Date()];
+			} else {
+				self.options.highlight = [];
+			}
+		} else if (Array.isArray(self.options.highlight)) {
+			var i = self.options.highlight.indexOf("now");
+			if (i !== -1) {
+				self.options.highlight.splice(i, 1);
+				self.options.highlight.push(new Date());
+			}
+		}
+
+
+		function validateSelector(selector) {
+			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
 		}
 
 		return _init();
@@ -676,7 +926,7 @@ CalHeatMap.prototype = {
 	 * @param  int		itemNb	Number of items in that date
 	 */
 	onClick : function(d, itemNb) {
-		if (typeof (this.options.onClick) === "function") {
+		if (typeof this.options.onClick === "function") {
 			return this.options.onClick(d, itemNb);
 		} else {
 			console.log("Provided callback for onClick is not a function.");
@@ -740,52 +990,125 @@ CalHeatMap.prototype = {
 
 	formatNumber: d3.format(",g"),
 
+	formatDate: function(d, format) {
+		if (typeof format === "undefined") {
+			format = "title";
+		}
+
+		if (typeof format === "function") {
+			return format(d);
+		} else {
+			var f = d3.time.format(format);
+			return f(d);
+		}
+	},
+
 	// =========================================================================//
-	// PAINTING : SCALE															//
+	// DOMAIN NAVIGATION														//
+	// =========================================================================//
+	loadNextDomain: function() {
+		this._domains.push(this.getNextDomain().getTime());
+		this._domains.shift();
+
+		this.paint(this.NAVIGATE_RIGHT);
+
+		this.getDatas(
+			this.options.data,
+			new Date(this._domains[this._domains.length-1]),
+			this.getSubDomain(this._domains[this._domains.length-1]).pop(),
+			this.svg
+		);
+
+		this.afterLoadNextDomain(new Date(this._domains[this._domains.length-1]));
+	},
+
+	loadPreviousDomain: function() {
+		this._domains.unshift(this.getPreviousDomain().getTime());
+		this._domains.pop();
+
+		this.paint(this.NAVIGATE_LEFT);
+
+		this.getDatas(
+			this.options.data,
+			new Date(this._domains[0]),
+			this.getSubDomain(this._domains[0]).pop(),
+			this.svg
+		);
+
+		this.afterLoadPreviousDomain(new Date(this._domains[0]));
+	},
+
+	// =========================================================================//
+	// PAINTING : LEGEND														//
 	// =========================================================================//
 
-	displayScale: function() {
+	displayLegend: function(graphWidth) {
 
 		var parent = this;
+		var legend = this.root;
 
-		var scale = d3.select("#" + this.options.id)
-			.append("svg:svg")
-			.attr("class", "graph-scale")
-			.attr("height", this.options.cellsize + (this.options.cellpadding*2))
-			.selectAll().data(d3.range(0, this.options.scale.length+1));
+		switch(this.options.legendVerticalPosition) {
+			case "top" : legend = legend.insert("svg", ".graph"); break;
+			default : legend = legend.append("svg");
+		}
 
-		var scaleItem = scale
+		var legendWidth =
+			this.options.legendCellSize * (this.options.legend.length+1) +
+			this.options.legendCellPadding * (this.options.legend.length+1) +
+			this.options.legendMargin[3] + this.options.legendMargin[1];
+
+		legend = legend
+			.attr("class", "graph-legend")
+			.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
+			.attr("width", graphWidth)
+			.append("g")
+			.attr("transform", function(d) {
+				switch(parent.options.legendHorizontalPosition) {
+					case "right" : return "translate(" + (graphWidth - legendWidth) + ")";
+					case "middle" :
+					case "center" : return "translate(" + (graphWidth/2 - legendWidth/2) + ")";
+					default : return "translate(" + parent.options.legendMargin[3] + ")";
+				}
+			})
+			.attr("y", this.options.legendMargin[0])
+			.selectAll().data(d3.range(0, this.options.legend.length+1));
+
+		var legendItem = legend
 			.enter()
-			.append("svg:rect")
-			.attr("width", this.options.cellsize)
-			.attr("height", this.options.cellsize)
+			.append("rect")
+			.attr("width", this.options.legendCellSize)
+			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
-			.attr("transform", function(d) { return "translate(" + (d * (parent.options.cellsize + parent.options.cellpadding))  + ", " + parent.options.cellpadding + ")"; })
+			.attr("x", function(d) {
+				return d * (parent.options.legendCellSize + parent.options.legendCellPadding);
+			})
+			.attr("y", this.options.legendMargin[0])
 			.attr("fill-opacity", 0)
 			;
 
-		scaleItem.transition().delay(function(d, i) { return parent.options.duration * i/10;}).attr("fill-opacity", 1);
+		legendItem.transition().delay(function(d, i) { return parent.options.animationDuration * i/10;}).attr("fill-opacity", 1);
 
-		scaleItem
-			.append("svg:title")
+		legendItem
+			.append("title")
 			.text(function(d) {
-				var nextThreshold = parent.options.scale[d+1];
+				var nextThreshold = parent.options.legend[d+1];
 				if (d === 0) {
-					return (parent.options.scaleLabel.lower).format({
-						min: parent.options.scale[d],
+					return (parent.options.legendTitleFormat.lower).format({
+						min: parent.options.legend[d],
 						name: parent.options.itemName[1]});
-				} else if (d === parent.options.scale.length) {
-					return (parent.options.scaleLabel.upper).format({
-						max: parent.options.scale[d-1],
+				} else if (d === parent.options.legend.length) {
+					return (parent.options.legendTitleFormat.upper).format({
+						max: parent.options.legend[d-1],
 						name: parent.options.itemName[1]});
 				} else {
-					return (parent.options.scaleLabel.inner).format({
-						down: parent.options.scale[d-1],
-						up: parent.options.scale[d],
+					return (parent.options.legendTitleFormat.inner).format({
+						down: parent.options.legend[d-1],
+						up: parent.options.legend[d],
 						name: parent.options.itemName[1]});
 				}
 			})
 		;
+
 	},
 
 	// =========================================================================//
@@ -802,13 +1125,13 @@ CalHeatMap.prototype = {
 		domain.each(function(domainUnit) {
 
 			if (data.hasOwnProperty(domainUnit)) {
-				d3.select(this).selectAll("rect")
+				d3.select(this).selectAll(".graph-subdomain-group rect")
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						var htmlClass = parent.getClassName(d) +
+						var htmlClass = "graph-rect" + parent.getHighlightClassName(d) +
 						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
-							(" " + parent.scale(data[domainUnit][subDomainUnit])) : ""
+							(" " + parent.legend(data[domainUnit][subDomainUnit])) : ""
 						);
 
 						if (parent.options.onClick !== null) {
@@ -822,7 +1145,7 @@ CalHeatMap.prototype = {
 							var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 							return parent.onClick(
 								d,
-								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : 0)
+								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : null)
 							);
 						}
 					})
@@ -832,14 +1155,14 @@ CalHeatMap.prototype = {
 
 						return (
 						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
-							(parent.options.cellLabel.filled).format({
+							(parent.options.subDomainTitleFormat.filled).format({
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
 								name: parent.options.itemName[(data[domainUnit][subDomainUnit] !== 1 ? 1 : 0)],
 								connector: parent._domainType[parent.options.subDomain].format.connector,
-								date: parent.formatDate(d)
+								date: parent.formatDate(d, parent.options.subDomainDateFormat)
 							}) :
-							(parent.options.cellLabel.empty).format({
-								date: parent.formatDate(d)
+							(parent.options.subDomainTitleFormat.empty).format({
+								date: parent.formatDate(d, parent.options.subDomainDateFormat)
 							})
 						);
 					});
@@ -855,49 +1178,80 @@ CalHeatMap.prototype = {
 
 	positionSubDomainX: function(d) {
 		var index = this._domainType[this.options.subDomain].position.x(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
+		return index * this.options.cellSize + index * this.options.cellPadding;
 	},
 
 	positionSubDomainY: function(d) {
 		var index = this._domainType[this.options.subDomain].position.y(d);
-		return index * this.options.cellsize + index * this.options.cellpadding;
-	},
-
-	getClassName: function(d)
-	{
-		var clazz = "graph-rect";
-		// compare the date to see if it is today and add the today class if it is
-		// compare dates while ignoring time
-		// assuming this does not make sense to do if the subdomain is less than "day"
-		if (this.options.highlightToday && this.options.subDomain !== "hour" && this.options.subDomain !== "min")
-		{
-			if (this.isToday(d))
-			{
-				clazz += " today";
-			}
-		}
-		return clazz;
+		return index * this.options.cellSize + index * this.options.cellPadding;
 	},
 
 	/**
-	 * Returns true if the passed rectDate matches today's date.
+	 * Return a classname if the specified date should be highlighted
 	 *
-	 * @param  Date d
+	 * @param  Date d a date
+	 * @return String the highlight class
 	 */
-	isToday: function(d) {
-		var isToday = false;
-		var today = new Date();
-		var todayMonth = today.getMonth()+1;
-		var todayDate = today.getDate();
-		var todayYear = today.getFullYear();
-
-		if (todayDate === d.getDate() && todayMonth === d.getMonth()+1 && todayYear === d.getFullYear()
-			)
-		{
-			isToday = true;
+	getHighlightClassName: function(d)
+	{
+		if (this.options.highlight.length > 0) {
+			for (var i in this.options.highlight) {
+				if (this.options.highlight[i] instanceof Date && this.dateIsEqual(this.options.highlight[i], d)) {
+					return " highlight" + (this.isNow(this.options.highlight[i]) ? " now" : "");
+				}
+			}
 		}
+		return "";
+	},
 
-		return isToday;
+	/**
+	 * Return whether the specified date is now,
+	 * according to the type of subdomain
+	 *
+	 * @param  Date d The date to compare
+	 * @return bool True if the date correspond to a subdomain cell
+	 */
+	isNow: function(d) {
+		return this.dateIsEqual(d, new Date());
+	},
+
+	/**
+	 * Return whether 2 dates are equals
+	 * This function is subdomain-aware,
+	 * and dates comparison are dependent of the subdomain
+	 *
+	 * @param  Date date_a First date to compare
+	 * @param  Date date_b Secon date to compare
+	 * @return bool true if the 2 dates are equals
+	 */
+	dateIsEqual: function(date_a, date_b) {
+		switch(this.options.subDomain) {
+			case "x_min" :
+			case "min" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth() &&
+					date_a.getDate() === date_b.getDate() &&
+					date_a.getHours() === date_b.getHours() &&
+					date_a.getMinutes() === date_b.getMinutes();
+			case "x_hour" :
+			case "hour" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth() &&
+					date_a.getDate() === date_b.getDate() &&
+					date_a.getHours() === date_b.getHours();
+			case "x_day" :
+			case "day" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth() &&
+					date_a.getDate() === date_b.getDate();
+			case "x_week" :
+			case "week" :
+			case "x_month" :
+			case "month" :
+				return date_a.getFullYear() === date_b.getFullYear() &&
+					date_a.getMonth() === date_b.getMonth();
+			default : return false;
+		}
 	},
 
 	// =========================================================================//
@@ -917,13 +1271,13 @@ CalHeatMap.prototype = {
 	 * @return int	Week number [0-53]
 	 */
 	getWeekNumber : function(d) {
-		var f = this.options.weekStartOnMonday === 1 ? d3.time.format("%W") : d3.time.format("%U");
+		var f = this.options.weekStartOnMonday === true ? d3.time.format("%W") : d3.time.format("%U");
 		return f(d);
 	},
 
 
 	getWeekDay : function(d) {
-		if (this.options.weekStartOnMonday === 0) {
+		if (this.options.weekStartOnMonday === false) {
 			return d.getDay();
 		}
 		else if (d.getDay() === 0) {
@@ -953,7 +1307,7 @@ CalHeatMap.prototype = {
 	getWeekDomain: function (d, range) {
 		var weekStart;
 
-		if (this.options.weekStartOnMonday === 0) {
+		if (this.options.weekStartOnMonday === false) {
 			weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
 		} else {
 			if (d.getDay() === 1) {
@@ -970,7 +1324,7 @@ CalHeatMap.prototype = {
 
 		var stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
 
-		return (this.options.weekStartOnMonday === 1) ?
+		return (this.options.weekStartOnMonday === true) ?
 			d3.time.mondays(Math.min(weekStart, stop), Math.max(weekStart, stop)) :
 			d3.time.sundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
 		;
@@ -1048,7 +1402,6 @@ CalHeatMap.prototype = {
 
 		switch(this.options.domain) {
 			case "hour"  : return this.getHourDomain(date, range);
-			case "x_day" :
 			case "day"   : return this.getDayDomain(date, range);
 			case "week"  : return this.getWeekDomain(date, range);
 			case "month" : return this.getMonthDomain(date, range);
@@ -1064,33 +1417,30 @@ CalHeatMap.prototype = {
 		var parent = this;
 
 		var computeDaySubDomainSize = function(date, domain) {
-			if (domain === "year") {
-				return parent.getDayOfYear(new Date(date.getFullYear()+1, 0, 0));
-			} else if (domain === "month") {
-				var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
-				return lastDayOfMonth.getDate();
-			} else if (domain === "week") {
-				return 7;
+			switch(domain) {
+				case "year" : return parent.getDayOfYear(new Date(date.getFullYear()+1, 0, 0));
+				case "month" :
+					var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
+					return lastDayOfMonth.getDate();
+				case "week" : return 7;
 			}
 		};
 
 		var computeMinSubDomainSize = function(date, domain) {
 			switch (domain) {
 				case "hour" : return 60;
-				case "x_day" :
 				case "day" : return 60 * 24;
 				case "week" : return 60 * 24 * 7;
 			}
 		};
 
 		var computeHourSubDomainSize = function(date, domain) {
-			if (domain === "day" || domain === "x_day") {
-				return 24;
-			} else if (domain === "week") {
-				return 168;
-			} else if (domain === "month") {
-				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
-				return endOfMonth.getDate() * 24;
+			switch(domain) {
+				case "day" : return 24;
+				case "week" : return 168;
+				case "month" :
+					var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
+					return endOfMonth.getDate() * 24;
 			}
 		};
 
@@ -1113,11 +1463,14 @@ CalHeatMap.prototype = {
 
 
 		switch(this.options.subDomain) {
+			case "x_min" :
 			case "min"   : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
+			case "x_hour":
 			case "hour"  : return this.getHourDomain(date, computeHourSubDomainSize(date, this.options.domain));
 			case "x_day" :
 			case "day"   : return this.getDayDomain(date, computeDaySubDomainSize(date, this.options.domain));
 			case "week"  : return this.getWeekDomain(date, computeWeekSubDomainSize(date, this.options.domain));
+			case "x_month":
 			case "month" : return this.getMonthDomain(date, 12);
 		}
 	},
@@ -1131,12 +1484,12 @@ CalHeatMap.prototype = {
 	},
 
 	/**
-	 * Return the classname on the scale for the specified value
+	 * Return the classname on the legend for the specified value
 	 *
 	 * @param  Item count n Number of items for that perdiod of time
-	 * @return string		Classname according to the scale
+	 * @return string		Classname according to the legend
 	 */
-	scale: function(n) {
+	legend: function(n) {
 
 		if (isNaN(n)) {
 			return "qi";
@@ -1144,19 +1497,19 @@ CalHeatMap.prototype = {
 			return "";
 		}
 
-		for (var i = 0, total = this.options.scale.length-1; i <= total; i++) {
+		for (var i = 0, total = this.options.legend.length-1; i <= total; i++) {
 
-			if (n === 0 && this.options.scale[0] > 0) {
+			if (n === 0 && this.options.legend[0] > 0) {
 				return "";
-			} else if (this.options.scale[0] > 0 && n < 0) {
+			} else if (this.options.legend[0] > 0 && n < 0) {
 				return "qi";
 			}
 
-			if (n <= this.options.scale[i]) {
+			if (n <= this.options.legend[i]) {
 				return "q" + (i+1);
 			}
 		}
-		return "q" + (this.options.scale.length + 1);
+		return "q" + (this.options.legend.length + 1);
 	},
 
 	// =========================================================================//
@@ -1177,6 +1530,9 @@ CalHeatMap.prototype = {
 		return false;
 	},
 
+	/**
+	 * Interpret the data property
+	 */
 	getDatas: function(source, startDate, endDate, domain) {
 		var parent = this;
 
@@ -1201,6 +1557,9 @@ CalHeatMap.prototype = {
 						case "csv" :
 							d3.csv(this.parseURI(source, startDate, endDate), fillData);
 							break;
+						case "tsv" :
+							d3.tsv(this.parseURI(source, startDate, endDate), fillData);
+							break;
 						case "text" :
 							d3.text(this.parseURI(source, startDate, endDate), "text/plain", fillData);
 							break;
@@ -1211,7 +1570,7 @@ CalHeatMap.prototype = {
 				break;
 			case "object" :
 				// @todo Check that it's a valid JSON object
-				return source;
+				return parent.fill(source, domain);
 		}
 
 		return false;
@@ -1267,6 +1626,116 @@ CalHeatMap.prototype = {
 		str = str.replace(/\{\{d:end\}\}/g, endDate.toISOString());
 
 		return str;
+	},
+
+	// =========================================================================//
+	// PUBLIC API																//
+	// =========================================================================//
+
+	next: function() {
+		return this.loadNextDomain();
+	},
+
+	previous: function() {
+		return this.loadPreviousDomain();
+	},
+
+	getSVG: function() {
+		var styles = {
+			".graph": {},
+			".graph-rect": {},
+			"rect.highlight": {},
+			"rect.now": {},
+			"text.highlight": {},
+			"text.now": {},
+			".domain-background": {},
+			".graph-label": {},
+			".subdomain-text": {},
+			".qi": {}
+		};
+
+		for (var j = 0, total = this.options.legend.length; j < total; j++) {
+			styles[".q" + j] = {};
+		}
+
+		var root = this.root;
+
+		var whitelistStyles = [
+			// SVG specific properties
+			"stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "stroke-dashoffset", "stroke-linecap", "stroke-miterlimit",
+			"fill", "fill-opacity", "fill-rule",
+			"marker", "marker-start", "marker-mid", "marker-end",
+			"alignement-baseline", "baseline-shift", "dominant-baseline", "glyph-orientation-horizontal", "glyph-orientation-vertical", "kerning", "text-anchor",
+			"shape-rendering",
+
+			// Text Specific properties
+			"text-transform", "font-family", "font", "font-size", "font-weight"
+		];
+
+		var filterStyles = function(attribute, property, value) {
+			if (whitelistStyles.indexOf(property) !== -1) {
+				styles[attribute][property] = value;
+			}
+		};
+
+		var getElement = function(e) {
+			return root.select(e)[0][0];
+		};
+
+		for (var element in styles) {
+
+			var dom = getElement(element);
+
+			if (dom === null) {
+				continue;
+			}
+
+			// The DOM Level 2 CSS way
+			if ("getComputedStyle" in window) {
+				var cs = getComputedStyle(dom, null);
+				if (cs.length !== 0) {
+					for (var i = 0; i < cs.length; i++) {
+						filterStyles(element, cs.item(i), cs.getPropertyValue(cs.item(i)));
+					}
+
+				// Opera workaround. Opera doesn"t support `item`/`length`
+				// on CSSStyleDeclaration.
+				} else {
+					for (var k in cs) {
+						if (cs.hasOwnProperty(k)) {
+							filterStyles(element, k, cs[k]);
+						}
+					}
+				}
+
+			// The IE way
+			} else if ("currentStyle" in dom) {
+				var css = dom.currentStyle;
+				for (var p in css) {
+					filterStyles(element, p, css[p]);
+				}
+			}
+		}
+
+
+
+		var string = "<svg xmlns=\"http://www.w3.org/2000/svg\" "+
+		"xmlns:xlink=\"http://www.w3.org/1999/xlink\"><style type=\"text/css\"><![CDATA[ ";
+
+		for (var style in styles) {
+			string += style + " {\n";
+			for (var l in styles[style]) {
+				string += "\t" + l + ":" + styles[style][l] + ";\n";
+			}
+			string += "}\n";
+		}
+
+		string += "]]></style>";
+		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][0]);
+		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][1]);
+		string += "</svg>";
+
+		return string;
 	}
 };
 
@@ -1283,6 +1752,28 @@ String.prototype.format = function () {
 	}
 	return formatted;
 };
+
+/**
+ * #source http://stackoverflow.com/a/383245/805649
+ */
+function mergeRecursive(obj1, obj2) {
+
+	for (var p in obj2) {
+		try {
+			// Property in destination object set; update its value.
+			if (obj2[p].constructor === Object) {
+				obj1[p] = mergeRecursive(obj1[p], obj2[p]);
+			} else {
+				obj1[p] = obj2[p];
+			}
+		} catch(e) {
+			// Property in destination object not set; create it and set its value.
+			obj1[p] = obj2[p];
+		}
+	}
+
+	return obj1;
+}
 
 /**
  * AMD Loader

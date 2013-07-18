@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.1 [2013-07-18]
+
+* [fix] Add missing files
+
 ## v3.0.0 [2013-07-18]
 
 > v3 is a major release, a lot of changes are not backward compatible with v2.  
