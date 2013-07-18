@@ -159,7 +159,7 @@ test("get domain when domain is 1 WEEK, starting a sunday", function() {
 	var date      = new Date(2013, 1, 13, 20, 15);	// Wednesday : February 13th, 2013
 	var weekStart = new Date(2013, 1, 10);			// Sunday : February 10th, 2013
 
-	var cal = createCalendar({domain: "week", range: 1, start : date, weekStartOnMonday: 0});
+	var cal = createCalendar({domain: "week", range: 1, start : date, weekStartOnMonday: false});
 	var domain = cal.getDomain(date);
 
 	equal(domain.length, 1, "Domain size is 1 week");
@@ -1259,7 +1259,7 @@ test("Week start on Monday", function() {
 
 	expect(1);
 
-	var cal = createCalendar({weekStartOnMonday:1});
+	var cal = createCalendar({weekStartOnMonday: true});
 
 	equal(cal.getWeekDay(new Date(2012, 11, 31)), 0, "Monday is first day of week");
 });
@@ -1268,7 +1268,7 @@ test("Week start on Sunday", function() {
 
 	expect(1);
 
-	var cal = createCalendar({weekStartOnMonday:0});
+	var cal = createCalendar({weekStartOnMonday: false});
 	equal(cal.getWeekDay(new Date(2012, 11, 31)), 1, "Monday is second day of week");
 });
 
