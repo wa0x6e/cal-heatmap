@@ -121,36 +121,46 @@ var CalHeatMap = function() {
 		highlight : [],
 
 		// ================================================
-		// TEXT FORMATTING
+		// TEXT FORMATTING / i18n
 		// ================================================
 
 		// Name of the items to represent in the calendar
 		itemName : ["item", "items"],
 
-		format : {
-			// Tooltip text displayed when hovering a subdomain
-			// @default : null, will use the formatting according to domain type
-			// Accept a string used as specifier by d3.time.format()
-			// or a function
-			title : null,
+		// Formatting of the domain label
+		// @default: null, will use the formatting according to domain type
+		// Accept a string used as specifier by d3.time.format()
+		// or a function
+		//
+		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+		// for accepted date formatting used by d3.time.format()
+		domainLabelFormat: null,
 
-			// Formatting of domain label
-			// @default : null, will use the formatting according to domain type
-			label : null,
-
-			// Text inside the subdomain
-			// null to display nothing
-			date: null
-
-			// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-			// for accepted date formatting
-		},
-
+		// Formatting of the title displayed when hovering a subDomain cell
 		subDomainTitleFormat : {
 			empty: "{date}",
 			filled: "{count} {name} {connector} {date}"
 		},
 
+		// Formatting of the {date} used in subDomainTitleFormat
+		// @default : null, will use the formatting according to subDomain type
+		// Accept a string used as specifier by d3.time.format()
+		// or a function
+		//
+		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+		// for accepted date formatting used by d3.time.format()
+		subDomainDateFormat: null,
+
+		// Formatting of the text inside each subDomain cell
+		// @default: null, no text
+		// Accept a string used as specifier by d3.time.format()
+		// or a function
+		//
+		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
+		// for accepted date formatting used by d3.time.format()
+		subDomainTextFormat: null,
+
+		// Formatting of the title displayed when hovering a legend cell
 		legendTitleFormat : {
 			lower: "less than {min} {name}",
 			inner: "between {down} and {up} {name}",
@@ -479,9 +489,6 @@ var CalHeatMap = function() {
 			return height;
 		};
 
-		// Format the domain legend according to the domain type
-		var legendFormat = d3.time.format(self.options.format.label);
-
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
 			.selectAll("svg.graph-domain")
@@ -653,7 +660,7 @@ var CalHeatMap = function() {
 				}
 			})
 			.attr("dominant-baseline", function() { return verticalDomainLabel ? "middle" : "top"; })
-			.text(function(d, i) { return legendFormat(new Date(self._domains[i])); })
+			.text(function(d, i) { return self.formatDate(new Date(self._domains[i]), self.options.domainLabelFormat); })
 			.call(domainRotate)
 		;
 
@@ -688,13 +695,13 @@ var CalHeatMap = function() {
 
 
 		// Appending a title to each subdomain
-		rect.append("title").text(function(d){ return self.formatDate(d); });
+		rect.append("title").text(function(d){ return self.formatDate(d, self.options.subDomainDateFormat); });
 
 
 		// =========================================================================//
 		// PAINTING DOMAIN SUBDOMAIN CONTENT										//
 		// =========================================================================//
-		if (self.options.format.date !== null) {
+		if (self.options.subDomainTextFormat !== null) {
 			rect
 				.append("text")
 				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
@@ -702,7 +709,7 @@ var CalHeatMap = function() {
 				.attr("y", function(d) { return self.positionSubDomainY(d) + self.options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
-				.text(function(d){ return self.formatDate(d, "date"); })
+				.text(function(d){ return self.formatDate(d, self.options.subDomainTextFormat); })
 			;
 		}
 
@@ -787,12 +794,12 @@ var CalHeatMap = function() {
 			return false;
 		}
 
-		if (self.options.format.title === null) {
-			self.options.format.title = this._domainType[self.options.subDomain].format.date;
+		if (self.options.subDomainDateFormat === null) {
+			self.options.subDomainDateFormat = this._domainType[self.options.subDomain].format.date;
 		}
 
-		if (self.options.format.label === null) {
-			self.options.format.label = this._domainType[self.options.domain].format.legend;
+		if (self.options.domainLabelFormat === null) {
+			self.options.domainLabelFormat = this._domainType[self.options.domain].format.legend;
 		}
 
 		// Auto-align label, depending on it's position
@@ -975,15 +982,15 @@ CalHeatMap.prototype = {
 
 	formatNumber: d3.format(",g"),
 
-	formatDate: function(d, field) {
-		if (typeof field === "undefined") {
-			field = "title";
+	formatDate: function(d, format) {
+		if (typeof format === "undefined") {
+			format = "title";
 		}
 
-		if (typeof this.options.format[field] === "function") {
-			return this.options.format[field](d);
+		if (typeof format === "function") {
+			return format(d);
 		} else {
-			var f = d3.time.format(this.options.format[field]);
+			var f = d3.time.format(format);
 			return f(d);
 		}
 	},
@@ -1144,10 +1151,10 @@ CalHeatMap.prototype = {
 								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
 								name: parent.options.itemName[(data[domainUnit][subDomainUnit] !== 1 ? 1 : 0)],
 								connector: parent._domainType[parent.options.subDomain].format.connector,
-								date: parent.formatDate(d)
+								date: parent.formatDate(d, parent.options.subDomainDateFormat)
 							}) :
 							(parent.options.subDomainTitleFormat.empty).format({
-								date: parent.formatDate(d)
+								date: parent.formatDate(d, parent.options.subDomainDateFormat)
 							})
 						);
 					});

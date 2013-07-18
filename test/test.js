@@ -1547,7 +1547,6 @@ test("Set itemName from a string", function() {
 });
 
 
-
 test("Highlight consider 'now' string as now", function() {
 	expect(6);
 
@@ -2039,7 +2038,7 @@ test("Custom date formatting with d3.js internal formatter", function() {
 	var datas = {};
 	datas[date.getTime()/1000] = 15;
 
-	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {title: "==%B==", label: "", date: ""}});
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: "==%B=="});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, "==January==");
 
@@ -2053,7 +2052,7 @@ test("Custom date formatting with custom function", function() {
 	var datas = {};
 	datas[date.getTime()/1000] = 15;
 
-	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, format: {title: function(date) { return date.getTime();}, label: "", date: ""}});
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: function(date) { return date.getTime();}});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, date.getTime());
 });
