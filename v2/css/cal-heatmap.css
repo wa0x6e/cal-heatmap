@@ -1,10 +1,32 @@
 /* Cal-HeatMap CSS */
 
+.graph-browse-previous, .graph-browse-next
+{
+	padding: 5px;
+	background-image: linear-gradient(to bottom, rgb(255, 255, 255), rgb(230, 230, 230));
+	border: 1px solid #999;
+	border-radius: 3px;
+	line-height: 12px;
+	font-size: 12px;
+	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+	text-decoration: none;
+}
+
+.graph-browse-previous:hover, .graph-browse-next:hover {
+	text-decoration: none;
+	
+}
+
+.graph-browse-previous
+{
+	margin-right: 5px;
+}
 
 .graph
 {
 	clear: both;
 	display: block;
+	margin-top: 10px;
 	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
 }
 
@@ -24,12 +46,6 @@
 {
 	stroke: #000;
 	stroke-width: 1px
-}
-
-.subdomain-text {
-	font-size: 8px;
-	fill: #999;
-	pointer-events: none;
 }
 
 .hover_cursor:hover {
@@ -77,31 +93,3 @@
 	background-color: #3b6427;
 	fill: #3b6427
 }
-
-rect.highlight
-{
-	stroke:#444;
-	stroke-width:1;
-}
-
-text.highlight
-{
-	fill: #444;
-}
-
-rect.now
-{
-	stroke: red;
-}
-
-text.now
-{
-	fill: red;
-	font-weight: 800;
-}
-
-.domain-background {
-	fill: none;
-	shape-rendering: crispedges;
-}
-

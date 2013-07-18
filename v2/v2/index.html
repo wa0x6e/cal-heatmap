@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Cal-HeatMap : Calendar Heat map with d3.js</title>
+
+	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" href="./css/cal-heatmap.css?v=2.1.0" />
+	<link rel="stylesheet" href="./css/main.css?v=2.1.0" />
+	<link href='//fonts.googleapis.com/css?family=Droid+Sans:400:700' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript" src="./js/cal-heatmap.min.js?v=2.1.6"></script>
+	<script type="text/javascript" src="./js/moment.min.js"></script>
+	<script type="text/javascript" src="./js/lang.min.js"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<a href="https://github.com/kamisama/cal-heatmap"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+
+	<div class="ftr">
+		<div class="container">
+
+			<h1>Calendar Heat Map</h1>
+
+			<p>
+				<def>Cal-Heatmap</def> is a javascript plugin to help create a calendar heat map, to visualize your time series data a la <a href="https://github.com/blog/1360-introducing-contributions">GitHub contribution graph</a>.
+			</p>
+
+			<div class="bs-docs-example">
+
+
+			<div id="cal-heatmap">
+
+			</div>
+			<script type="text/javascript">
+				moment.lang('fr');
+				var calendar = new CalHeatMap();
+				calendar.init({
+					data: "datas-years.json",
+					domain: "day",
+					subDomain: "hour",
+					range: 14,
+					start : new Date(2000, 2),
+					browsing: true,
+					browsingOptions: {
+						previousLabel : "<i class=\"icon-chevron-left\"></i>",
+						nextLabel: "<i class=\"icon-chevron-right\"></i>"
+					},
+					scale: [4, 6, 8, 11]
+				});
+			</script>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="container">
+
+		<h2><a href="#setup" id="setup">Setup</a></h2>
+
+		<ol>
+			<li><a href="https://github.com/kamisama/cal-heatmap/archive/master.zip">Download the plugin</a> and copy <b>cal-heatmap.min.js</b> and <b>cal-heatmap.css</b> to your app.</li>
+
+			<li>Install <a href="http://d3js.org/">d3js</a> in your app.</li>
+
+			<li>Create your first calendar:
+			<pre class="code language-markup"><code>&lt;div id="cal-heatmap">&lt;/div>
+&lt;script type="text/javascript">
+	var cal = new CalHeatMap();
+	cal.init({
+		data: "datas.json"
+	});
+&lt;/script></code></pre>
+		</li>
+		</ol>
+
+		<p>This will insert a new calendar into #cal-heatmap in your page, and fill it with data from <code>datas.json</code>.</p>
+
+		<p>By default, the calendar will display 12 hours, divided into 60 minutes.</p>
+
+		<p>There's a lot of other settings available to customize your calendar.</p>
+
+		<h2><a href="#api" id="api">API</a></h2>
+
+		    <ul class="nav nav-tabs">
+			    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+			    <li><a href="#callback" data-toggle="tab">Callback</a></li>
+			    <li><a href="#formatting" data-toggle="tab">Formatting</a></li>
+		    </ul>
+
+		<div class="tab-content">
+
+			<div class="tab-pane active" id="general">
+			<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Default</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>data</code></td>
+					<td>String|Object</td>
+					<td>""</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<p><strong>The calendar data source</strong></p>
+						<p>The data source is an object with informations used to fill the calendar.<br/>
+						It generally consists of a set of dates, associated with a value, representing the number of occurence of an event at a certain date.</p>
+
+						<p>Those datas can be retrieved by two ways :</p>
+
+						<ul>
+							<li>By passing the datas directly, with an <b>array</b> or <b>json object</b></li>
+							<li>By passing the <b>path</b> to a file, containing those informations</li>
+						</ul>
+
+						<p>In both cases, the datas must follow a formatting standard for cal-heatmap to process them. Refer to <a href="#data-source">Date source</a> section for accepted format.</p>
+
+						<p>If you're getting your data form an API, with an URL like <code>api?start=xxx&end=yyy</code> where <b>xxx</b> is the first unix timetstamp and <b>yyy</b> is the last unix timestamp of the calendar, <code>data</code> also accept date template, which will be automatically replaced by the current start and end date of the calendar.</p>
+
+						<p>Available templates are :</p>
+
+						<ul>
+							<li><code>{{t:start}}</code>: unix timestamp of the calendar's first date</li>
+							<li><code>{{t:end}}</code>: unix timestamp of the calendar's last date</li>
+							<li><code>{{d:start}}</code>: ISO-8601 formatted date of the calendar's first date</li>
+							<li><code>{{d:end}}</code>: ISO-8601 formatted date of the calendar's last date</li>
+						</ul>
+
+						<p><b>Example</b>: <code>api?start={{t:start}}&end={{d:end}}</code> will fetch something like
+							<code>api?start=1362006000&end=2013-02-27T23:00:00.000Z</code></p>
+
+						<div class="alert alert-infos">All timestamp are in seconds</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>dataType</code></td>
+					<td>String</td>
+					<td>json</td>
+					<td>
+						<p>Parser engine for the data source. Sometime, we don't have a word to say about how an API return its datas. Whereas it's usually a json object (default), it also can be a simple plain text, or csv.</p>
+
+						<p>You can tell cal-heatmap which parser to use to interpret the data source response :</p>
+
+						<ul>
+							<li><code>json</code>: Default engine</li>
+							<li><code>csv</code>: Interpret the data as a csv formatted following the <a href="http://tools.ietf.org/html/rfc4180">RFC-4180</a> standard.</li>
+							<li><code>txt</code>: don't interpret the results</li>
+						</ul>
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>id</code></td>
+					<td>String</td>
+					<td>#cal-heatmap</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						ID of the element to insert the calendar to</td>
+				</tr>
+				<tr>
+					<td><code>domain</code></td>
+					<td>String</td>
+					<td>hour</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Type of time unit for the domain</strong>
+						<p>Can take one of the following values :</p>
+						<ul>
+							<li>hour</li>
+							<li>day</li>
+							<li>week</li>
+							<li>month</li>
+							<li>year</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>subDomain</code></td>
+					<td>String</td>
+					<td>min</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Time division inside the domain</strong>
+						<p>Can take one of the following values :</p>
+						<ul>
+							<li>min</li>
+							<li>hour</li>
+							<li>day</li>
+							<li>x_day : same as day, but with row and column inverted</li>
+							<li>week</li>
+							<li>month</li>
+						</ul>
+
+						<div class="alert">Obviously, the subDomain must be "smaller" than the domain. A <strong>day</strong> domain can only accept an <strong>hour</strong> or <strong>min</strong> subDomain, not day, week, month or year.</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>range</code></td>
+					<td>integer</td>
+					<td>12</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Number of domain to display</td>
+				</tr>
+				<tr>
+					<td><code>start</code></td>
+					<td>Date</td>
+					<td>new Date()</td>
+					<td>
+						<a href="#range-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Start Date of the calendar</strong>
+						<p>Default is the current date.<br/>
+						Note that the calendar does not start at this date, but at the beginning of the domain of the date. If the domain is a day, the calendar will start at 00:00 on this date, if it's a month, it will start at the 1 of the month of the date.
+						</p></td>
+				</tr>
+
+
+				<tr>
+					<td><code>loadOnInit</code></td>
+					<td>Boolean</td>
+					<td>true</td>
+					<td><strong>Whether to fill the calendar with the data, on calendar creation</strong>
+						<p>Passing <code>false</code> will create a blank calendar.</p></td>
+				</tr>
+
+			</table>
+		</div>
+
+			<div class="tab-pane"  id="callback">
+			<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Default</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>afterLoad</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<strong>Called after drawing the empty calendar, with no datas in it yet</strong>
+					</td>
+				</tr>
+				<tr>
+					<td><code>onClick</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Called when clicking on a subdomain cell</strong>
+						<p>2 arguments is passed to the callback :</p>
+						<ul>
+							<li><code>date</code>: Date of the cell that was clicked</li>
+							<li><code>itemNb</code>: Number of items at this date</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>afterLoadPreviousDomain</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Called after loading the previous domain</strong>
+						<p>2 arguments is passed to the callback :</p>
+						<ul>
+							<li><code>start</code>: Start of the new domain that was loaded</li>
+							<li><code>end</code>: End of the new domain that was loaded</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>afterLoadNextDomain</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Called after loading the next domain</strong>
+						<p>2 arguments is passed to the callback :</p>
+						<ul>
+							<li><code>start</code>: Start of the new domain that was loaded</li>
+							<li><code>end</code>: End of the new domain that was loaded</li>
+						</ul></td>
+				</tr>
+				<tr>
+					<td><code>onComplete</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<p>Called after finish drawing and filling the graph, or just after drawing the graph if <code>loadOnInit</code> is set to false.</p>
+					</td>
+				</tr>
+				<tr>
+					<td><code>afterLoadData</code></td>
+					<td>callback</td>
+					<td>null</td>
+					<td>
+						<p>Called after fetching the data source, but before interpreting its contents. This callback takes the result of the data source as argument, after interpretation by the dataType engine. This argument can takes various format, depending on the data source.</p>
+
+						<p>This callback must return a json object, formatted like described in the data source section. This callback is used primary for converting data from various source and format to the format used by cal-heatmap.</p>
+
+						<p>If the data source is a :</p>
+
+						<ul>
+							<li><code>String</code>, it's interpreted as an URL, thus the arguments will contains the result of the remote URL. It can be anything, and depends on what the remote url is returning</li>
+							<li><code>object</code>, it stays an object</li>
+						</ul>
+
+					</td>
+				</tr>
+			</table>
+			</div>
+
+			<div class="tab-pane" id="formatting">
+			<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Default</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>cellsize</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">10</pre></td>
+					<td>
+						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Size of each subDomain cell, in pixel</td>
+				</tr>
+				<tr>
+					<td><code>cellpadding</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">2</pre></td>
+					<td>
+						<a href="#cell-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Gutter between each subDomain cell, in pixel</td>
+				</tr>
+				<tr>
+					<td><code>cellradius</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">0</pre></td>
+					<td>
+						<a href="#cell-radius-example" class="example-link"><i class="icon-file"></i> Example</a>
+						For rounding the corner of the subdomain cell, in pixels. You have to use another value than <code>crispedges</code> for the <code>shape-rendering</code> property in your css.</td>
+				</tr>
+				<tr>
+					<td><code>domainGutter</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">2</pre></td>
+					<td>
+						Gutter between each domain.</td>
+				</tr>
+				<tr>
+					<td><code>scale</code></td>
+					<td>Array</td>
+					<td><pre class="api-default">[10, 20, 30, 40]</pre></td>
+					<td><a href="#scale-example" class="example-link"><i class="icon-file"></i> Example</a>
+					<strong>Threshold for the scale</strong>
+					<p>Each couple of values represent a color on the calendar :</p>
+
+					<ul>
+						<li>0</li>
+						<li>1 -> 9</li>
+						<li>10 -> 19</li>
+						<li>20 -> 29</li>
+						<li>30 -> 39</li>
+						<li>More than 40</li>
+					</ul>
+
+					<p>It also accepts negative and float values.</p>
+
+					<p>You can set more than 4 threshold. Each threshold correspond to 1 class in the css file. By default, the css support only 4 thresholds. Add the corresponding class to the css.</p>
+					</td>
+				</tr>
+				<tr>
+					<td><code>displayScale</code></td>
+					<td>Boolean</td>
+					<td><pre class="api-default">true</pre></td>
+					<td>
+						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Whether to display the scale</td>
+				</tr>
+				<tr>
+					<td><code>scaleLabel</code></td>
+					<td>Object</td>
+					<td>
+<pre class="api-default">{
+  lower: "less than {min} {name}",
+  inner: "between {down} and {up} {name}",
+  upper: "more than {max} {name}"
+}</pre>
+		</td>
+					<td>
+						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<p>Template for the title when hovering on a scale/legend</p>
+
+						<p>See <a href="#itemname-example">Example</a> for usage</p>
+
+						<p><code>lower</code> is used to format the title of the most left cell of the scale, and <code>upper</code> the most right cell. <code>inner</code> is used for all the cells in between.</p>
+
+						<p>Strings can take various tokens, that are replaced on runtime.</p>
+
+						<ul>
+							<li><code>{min}</code>: smallest value of the scale</li>
+							<li><code>{max}</code>: biggest value of the scale</li>
+							<li><code>{down}</code>: lower bound of the current stop</li>
+							<li><code>{up}</code>: upper bound of the current stop</li>
+							<li><code>{name}</code>: Refer to the item name, defined by <code>itemName</code> property below</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td><code>itemName</code></td>
+					<td>Array</td>
+					<td><pre class="api-default">["item", "items"]</pre></td>
+					<td>
+						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Name of the data type you're representing on the calendar</strong>
+						<p>First index is the singular form, second index is the plural form.</p></td>
+				</tr>
+				<tr>
+					<td><code>cellLabel</code></td>
+					<td>Object</td>
+					<td>
+<pre class="api-default">{
+  empty: "{date}",
+  filled: "{count} {name} {connector} {date}"
+}</pre>
+					</td>
+					<td>
+						<a href="#itemname-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<p>Template for the title when hovering on date cell</p>
+
+						<p>See <a href="#itemname-example">Example</a> for usage</p>
+
+						<p><code>empty</code> is used to format the title of the date cell when it's empty, and <code>filled</code> when the cell contains datas.</p>
+
+						<p>Strings can take various tokens, that are replaced on runtime.</p>
+
+						<ul>
+							<li><code>{count}</code>: the cell value</li>
+							<li><code>{name}</code>: Item name, defined by <code>itemName</code> property</li>
+							<li><code>{connector}</code>: an english preposition (at, on) before the date. Its default value depends on the subdomain, whether it's an hour (e.g: <strong>at</strong> 15:53) or what's left (e.g: <strong>on</strong> Monday)</li>
+							<li><code>{date}</code>: the cell date, formatted as defined by the <code>format</code> property below</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td><code>format</code></td>
+					<td>Object</td>
+					<td><pre class="api-default">{}</pre></td>
+					<td>
+						<a href="#format-example" class="example-link"><i class="icon-file"></i> Example</a>
+						<strong>Custom formatting of dates and labels</strong>
+						<p>This object has two properties :</p>
+						<ul>
+							<li><code>date</code> : Formatting of the date displayed when hovering a subDomain cell</li>
+							<li><code>label</code> : Formatting of the domain label, displayed below each domain</li>
+						</ul>
+
+					<p>Refer to <a href="https://github.com/mbostock/d3/wiki/Time-Formatting">d3.js time formatting documentation</a> for accepted format.</p>
+
+					<p>You can also pass a function to <code>date</code>, that will take a Date object as parameter, if you wish to use an external/more powerfull library to format the date. (see <a href="#itemname-example">example</a>)</p>
+
+					<p>You have to always set the 2 properties, even you wish to only change one. They're by default null, and depends on the domain and subdomain used.</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td><code>browsing</code></td>
+					<td>boolean</td>
+					<td><pre class="api-default">false</pre></td>
+					<td>
+						<a href="#domain-example" class="example-link"><i class="icon-file"></i> Example</a>
+						Whether to enable domain browsing. Will display 2 links to shift the calendar one domain back or forward.</td>
+				</tr>
+
+				<tr>
+					<td><code>browsingOptions</code></td>
+					<td>Object</td>
+					<td>
+<pre class="api-default">{
+  nextLabel: "Next",
+  previousLabel: "Previous"
+}</pre></td>
+					<td>Text to display inside the links for browsing domains. Can also accept html.
+
+					<p>By default, will display links like in the <a href="#domain-example">second example</a>.</p>
+
+					<p>You can customize the text and the css to have more beautiful buttons, like in the <a href="#cal-heatmap">main example</a>.</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td><code>duration</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">500</pre></td>
+					<td>Duration of the animation in milliseconds. Two things are animated in the calendar :
+
+					<ul>
+						<li>When displaying the scale</li>
+						<li>When browsing the calendar</li>
+					</ul>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td><code>startWeekOnMonday</code></td>
+					<td>integer</td>
+					<td><pre class="api-default">1</pre></td>
+					<td>
+						<a href="#cell-radius-example" class="example-link"><i class="icon-file"></i> Example</a>Whether to start a week on Sunday or Monday</td>
+
+				</tr>
+
+			</table>
+			</div>
+
+		</div>
+
+
+
+
+
+		<h2><a href="#examples" id="examples">Examples</a></h2>
+
+
+		<h3 id="range-example">With Default values</h3>
+		<p>By default, cal-heatmap will always display 12 hours, split into 60 minutes each.</p>
+
+		<p>Unless you set the <code>date</code> property in <code>init()</code>, the calendar will start at the beginning of the current hour.</p>
+
+
+		<div class="bs-docs-example">
+		<div id="graph_a"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({id : "graph_a"});
+		</script>
+		</div>
+		<pre class="prettyprint language-javascript"><code>var calendar = new CalHeatMap();
+calendar.init({});</code></pre>
+
+
+		<h3 id="domain-example">Days > hours</h3>
+		<p>Display all the hours for 10 days, starting from January 15th, 2000.</p>
+
+		<div class="bs-docs-example">
+		<div id="graph_b"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 0, 15),
+				id : "graph_b",
+				range : 10,			// Number of days to display
+				domain : "day",		// Display days
+				subDomain : "hour",	// Split each day by hours
+				browsing: true, // Enable browsing
+		        afterLoadNextDomain: function (start, end) {
+		            alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+		        }
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/EsN62/3/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
+	data: "datas-years.json",		// Fill the graph with datas from that json file
+	start: new Date(2000, 0, 15), 	// Start the calendar on 15th January, 2000
+	id : "graph_b",
+	domain : "day",					// Group data by days
+	subDomain : "hour",				// Split each day by hours
+	range : 10,						// Number of days to display
+	browsing: true, 				// Enable browsing
+    afterLoadNextDomain: function (start, end) {
+        alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+    }
+});</code></pre>
+
+	<h3 id="scale-example">Months > days</h3>
+	<p>Display all days, for 3 months, from February 2000.<br/>
+		Let's try changing the scale threshold, since the number of data represented in a subdomain is larger, since it's now a day instead of hour. Hover on the scale to view the new range each color is representing.</p>
+
+		<ul>
+			<li><small>Hover on the scale to notice that each color is now representing a different range than the previous calendar</small></li>
+			<li><small>The date formatting when you hover on a day is also changed, according to the subdomain</small></li>
+		</ul>
+
+	<div class="bs-docs-example">
+		<div id="graph_c"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 1),
+				id : "graph_c",
+				domain : "month",
+				subDomain : "day",
+				range : 3,
+				scale: [40, 60, 80, 100]
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/4aDdJ/1/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
+	data: "datas-years.json",
+	start: new Date(2000, 1),
+	id : "graph_c",
+	domain : "month",			// Group data by month
+	subDomain : "day",			// Split each month by days
+	range : 3,					// Just display 3 months
+	scale: [40, 60, 80, 100] 	// Custom threshold for the scale
+});</code></pre>
+
+
+
+
+	<h3 id="cell-radius-example">Months > days (horizontally)</h3>
+	<p>Same as above, but with the days layered like a regular month calendar, with each column corresponding to a day, and each row to a week. Also start the week on Sunday.</p>
+
+	<div class="bs-docs-example">
+
+
+<style>
+	#graph_k .graph-rect {
+		shape-rendering: auto;
+	}
+	#graph_k .graph-rect:hover {
+		stroke-width: 2px;
+	}
+	#graph_k .graph-label {
+		text-transform: uppercase;
+		font-size: 14px;
+		font-weight: bold;
+		fill: #bbb;
+	}
+</style>
+
+		<div id="graph_k"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 5),
+				id : "graph_k",
+				domain : "month",
+				subDomain : "x_day",
+				range : 3,
+				cellsize: 15,
+				cellpadding: 3,
+				cellradius: 3,
+				domainGutter: 15,
+				weekStartOnMonday: 0,
+				scale: [40, 60, 80, 100]
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="5-13"><code>var calendar = new CalHeatMap();
+calendar
+	data: "datas-years.json",
+	start: new Date(2000, 5),
+	id : "graph_k",
+	domain : "month",
+	subDomain : "x_day",
+	range : 3,
+	cellsize: 15,
+	cellpadding: 3,
+	cellradius: 5,
+	domainGutter: 15,
+	weekStartOnMonday: 0,
+	scale: [40, 60, 80, 100]
+});</code></pre>
+
+
+	<h3 id="cell-example">Months > hours</h3>
+	<p>Display all the hours of January 2000.<br/>
+		Also resize the cell to fit in the page.</p>
+
+	<div class="bs-docs-example">
+
+
+		<div id="graph_f"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 0),
+				id : "graph_f",
+				domain : "month",
+				subDomain : "hour",
+				range : 1,
+				cellsize: 6,
+				cellpadding: 1
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="5-9"><a href="http://jsfiddle.net/Kamisama/BWvkH/2/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
+	data: "datas-years.json",
+	start: new Date(2000, 0),
+	id : "graph_f",
+	domain : "month",
+	subDomain : "hour",
+	range : 1,
+	cellsize: 6,
+	cellpadding: 1
+});</code></pre>
+
+
+	<h3>Months > weeks</h3>
+	<p>Display weeks for February, March and April 2000.</p>
+
+	<div class="bs-docs-example">
+		<div id="graph_j"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 1),
+				id : "graph_j",
+				domain : "month",
+				subDomain : "week",
+				range : 3,
+				scale: [120, 400, 450, 500]
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="5-8"><a href="http://jsfiddle.net/Kamisama/7RNS8/1/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
+	data: "datas-years.json",
+	start: new Date(2000, 1),
+	id : "graph_c",
+	domain : "month",				// Group data by month
+	subDomain : "week",				// Split each month by week
+	range : 3,						// Just display 3 months
+	scale: [120, 400, 450, 500] 	// Custom threshold for the scale
+});</code></pre>
+
+
+	<h3>Weeks > hours</h3>
+	<p>Display all the hours of the first 2 weeks of Januray 2000</p>
+
+	<div class="bs-docs-example">
+		<div id="graph_h"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 0),
+				id : "graph_h",
+				domain : "week",
+				subDomain : "hour",
+				range : 2
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="5-7"><a href="http://jsfiddle.net/Kamisama/s7qZ2/1/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar
+	data: "datas-years.json",
+	start: new Date(2000, 0),
+	id : "graph_h",
+	domain : "week",
+	subDomain : "hour",
+	range : 2
+});</code></pre>
+
+
+
+	<h3 id="itemname-example">Year > days</h3>
+	<p>Display all days of year 2000.<br/>
+		Additionally, use a custom name for the data : we're representing the number of <b>lost kittens</b> by days, in french.</p>
+
+		<ul>
+			<li><small>Hover on a day or legend to view the new title</small></li>
+		</ul>
+
+
+
+	<div class="bs-docs-example">
+		<div id="graph_d"></div>
+		<script type="text/javascript">
+			moment.lang("fr");
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 0),
+				id : "graph_d",
+				domain : "year",
+				subDomain : "day",
+				range : 1,
+				scale: [40, 60, 80, 100],
+				itemName: ["chat perdu", "chats perdus"],
+				cellLabel: {
+					empty: "Aucune données pour le {date}",
+					filled: "il y a eu {count} {name} le {date}"
+				},
+				scaleLabel: {
+					lower: "Belle journée, il y a eu moins de {min} {name}",
+					inner: "Pas mal, entre {down} et {up} {name}",
+					upper: "Peut faire mieux, plus de {max} {name}"
+				},
+				format: {
+					date: function(date) {
+						return moment(date).format("LL");
+					},
+					legend: null,
+				}
+			});
+		</script>
+</div>
+		<pre class="prettyprint language-javascript" data-line="2,8-27"><a href="http://jsfiddle.net/Kamisama/YDFyQ/4/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar.init({
+	moment.lang("fr");
+	var calendar = new CalHeatMap();
+	calendar.init({
+		data: "datas-years.json",
+		start: new Date(2000, 0),
+		id : "graph_d",
+		domain : "year",
+		subDomain : "day",
+		range : 1,
+		scale: [40, 60, 80, 100],
+		itemName: ["chat perdu", "chats perdus"],
+		cellLabel: {
+			empty: "Aucune données pour le {date}",
+			filled: "il y a eu {count} {name} le {date}"
+		},
+		scaleLabel: {
+			lower: "Belle journée, il y a eu moins de {min} {name}",
+			inner: "Pas mal, entre {down} et {up} {name}",
+			upper: "Peut faire mieux, plus de {max} {name}"
+		},
+		format: {
+			date: function(date) {
+				return moment(date).format("LL");
+			},
+			legend: null,
+		}
+	});
+});</code></pre>
+
+
+
+	<h3 id="format-example">Year > months</h3>
+	<p>Display 1 year, split by months, with a custom legend and title formatting, as well as a custom callback when clicking on a month.</p>
+
+	<ul>
+		<li><small>Hover on a cell to view custom title formatting</small></li>
+		<li><small>Click on a cell to view custom onClick callback</small></li>
+	</ul>
+
+	<div class="bs-docs-example">
+
+		<div id="graph_e"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				data: "datas-years.json",
+				start: new Date(2000, 0),
+				id : "graph_e",
+				range : 1,
+				domain : "year",
+				subDomain : "month",
+				scale: [1950, 2050, 2150, 2250],
+				displayScale: false,
+				format: {
+					date: "==%B==",
+					legend: "Thy year is %Y, yeah !"
+				},
+				onClick: function(date, count) {
+					alert("Oh gosh, " + count + " things occured on " + date.toISOString());
+				}
+			});
+		</script>
+
+
+
+
+		</div>
+		<pre class="prettyprint language-javascript" data-line="5-16"><a href="http://jsfiddle.net/Kamisama/38JYb/3/" class="jsfiddle">JsFiddle</a><code>var calendar = new CalHeatMap();
+calendar.init({
+	data: "datas-years.json",
+	start: new Date(2000, 0),
+	id : "graph_e",
+	range : 1,
+	domain : "year",
+	subDomain : "month",
+	scale: [1950, 2050, 2150, 2250],
+	displayScale: false,					// Don't display the scale
+	format: {
+		date: "==%B==",						// Custom date format, hover on a month to view
+		legend: "Thy year is %Y, yeah !"	// Custom domain legend
+	},
+	onClick: function(date, count) {
+		alert("Oh gosh, " + count + " things occured on " + date.toISOString());
+	}
+});</code></pre>
+
+
+	<h3 id="theme-example">Theme</h3>
+	<p>All colors can be customized via the css</p>
+
+	<p>This graph represents the number of visitors per hour for one month. <a href="ga.csv">Datas</a> are pulled from Google Analytics, in csv format. This example also highlight the datas format conversion, to transform your datas to something understandable by cal-heatmap.</p>
+
+	<div class="bs-docs-example" style="background: #2d3a47;">
+		<style>
+			#graph_l .grap-rect {fill:#35252d;}
+			#graph_l .q0 {fill:#35252d;}
+			#graph_l .q1 {fill:#fea1eb; opacity: 0.1}
+			#graph_l .q2 {fill:#fea1eb; opacity: 0.2}
+			#graph_l .q3 {fill:#fea1eb; opacity: 0.4}
+			#graph_l .q4 {fill:#fea1eb; opacity: 0.6}
+			#graph_l .q5 {fill:#fea1eb; opacity: 0.8}
+			#graph_l .q6 {fill:#fea1eb; opacity: 1}
+			#graph_l .graph-rect:hover {fill: #fff; opacity: 1; stroke-width: 0;}
+		</style>
+
+		<div id="graph_l"></div>
+		<script type="text/javascript">
+			var calendar = new CalHeatMap();
+			calendar.init({
+				id: "graph_l",
+				data: "ga.csv",
+				dataType: "csv",
+				domain: "day",
+				subDomain: "hour",
+				range: 31,
+				cellpadding: 1,
+				itemName : ["visitor", "visitors"],
+				scale: [2, 4, 6, 8, 10],
+				start: new Date(2013, 03, 14),
+				afterLoadData: function(d) {
+					var start = +new Date(2013, 03, 14) / 1000;
+					var stats = {};
+					for (var i = 0, total = d.length; i < total; i++ ) {
+						o = d[i];
+						stats[(parseInt(o.Hour, 10) * 3600) + start] = o.Visits;
+					}
+					return stats;
+				}
+			});
+		</script>
+
+		</div>
+		<pre class="prettyprint language-javascript" data-line="4-22"><code>var calendar = new CalHeatMap();
+calendar.init({
+	id: "graph_l",
+	data: "ga.csv",
+	dataType: "csv",
+	domain: "day",
+	subDomain: "hour",
+	range: 31,
+	cellpadding: 1,
+	itemName : ["visitor", "visitors"],
+	scale: [2, 4, 6, 8, 10],
+	start: new Date(2013, 03, 14),
+	afterLoadData: function(d) {
+		var start = +new Date(2013, 03, 14) / 1000;
+		var stats = {};
+		for (var i = 0, total = d.length; i < total; i++ ) {
+			o = d[i];
+			stats[(parseInt(o.Hour, 10) * 3600) + start] = o.Visits;
+		}
+		return stats;
+	}
+});</code></pre>
+
+
+
+<h2><a href="#data-source" id="data-source">Data Source</a></h2>
+
+<h3>Expected Datas format</h3>
+
+<p>To display datas in the calendar, cal-heatmap takes a set of dates, associated with a count value. Those datas are grouped inside a json object, following the convention :</p>
+
+<pre class="language-javascript"><code>{
+	"946702811" : 12,
+	"946702812" : 53
+	....
+}</code></pre>
+
+<p>The object must contains one property by date, keyname is the unix timestamp of the date (in seconds), and the value, is the count number associated to this date.</p>
+
+<p>See <a href="./datas-hours.json">the example datas-hours.json</a> file.</p>
+
+<p>It's the same formatting for all domain type, data will automatically be grouped into min/days/week/hours/month, depending on the domain type. Having a count for each seconds lets you jump to the smaller domain without losing datas.</p>
+
+<h3>Exotic datas format</h3>
+
+<p>Of course, we can't expect all the API to return the results following the format above.</p>
+
+ <p>That's why there's a special callback (<code>afterLoadData(d)</code>) that you can use to convert your results to the required format. This function takes the result of your API as argument, after interpretation by the dataType engine, and must return a json object formatted as above.</p>
+
+<pre class="language-javascript"><code>// datas is an array of object
+var datas = [
+	{date: 946702811, value: 15},
+	{date: 946702812, value: 25},
+	{date: 946702813, value: 10}
+]
+
+var parser = function(data) {
+	var stats = {};
+	for (var d in data) {
+		stats[data[d].date] = data[d].value;
+	}
+	return stats;
+};
+// Parser will output the object
+//{
+//	"946702811": 15,
+//	"946702812": 25,
+//	"946702813": 10
+}
+
+var cal = createCalendar({
+	data: datas,
+	afterLoadData: parser
+});
+</code></pre>
+
+
+<div class="alert alert-infos">All timestamp are in seconds</div>
+
+<h2><A href="#support" id="support">Support</a></h2>
+
+<p>Support and bug reports are on tracked with the project <a href="https://github.com/kamisama/cal-heatmap/issues">github issues</a></p>
+
+<p>Faq : <a href="https://github.com/kamisama/cal-heatmap/wiki/FAQ">https://github.com/kamisama/cal-heatmap/wiki/FAQ</a></p>
+
+
+
+<h2><a href="#authors" id="authors">Authors</a></h2>
+
+<p>Wan Qi Chen</p>
+
+<ul>
+	<li><b>Github</b>: <a href="https://github.com/kamisama">https://github.com/kamisama</a></li>
+	<li><b>Email</b> : kami@kamisama.me</li>
+	<li><a href="https://plus.google.com/116246394244628198627?rel=author" rel="author">Google+</a></li>
+</ul>
+
+<h2><a href="#licence" id="licence">Licence</a></h2>
+
+<p>CalHeatMap is released under the MIT License</p>
+
+<pre>
+Copyright (c) 2013 Wan Qi Chen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+
+</div>
+
+
+<script src="./js/prism.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38672186-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
