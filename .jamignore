@@ -1,4 +1,10 @@
 /build.cal-heatmap.min.js
-/jscoverage/
 /node_modules/
-/test-results.xml
+/.DS_Store
+/src/
+/test/
+/report/
+/coverage/
+/temp/
+/Gruntfile.js
+/karma.conf.js
