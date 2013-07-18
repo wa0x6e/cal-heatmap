@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "main": ["./cal-heatmap.js", "./cal-heatmap.css"],
   "dependencies": {
     "d3": "~v3.0.6"
