@@ -142,7 +142,7 @@
 
 	<p><def>Cal-Heatmap</def> is a javascript module to create a calendar heatmap, a la github contribution graph.</p>
 
-	<div class="pull-right" style="margin-bottom: 10px; margin-right: 3px">
+	<div class="" style="padding-top: 10px; margin-right: 3px">
 		<a href="#" id="ftr-demo-previous"><i class="icon icon-chevron-left"></i></a>
 		<a href="#" id="ftr-demo-next"><i class="icon icon-chevron-right"></i></a>
 	</div>
@@ -2038,12 +2038,11 @@ cal.init({
 var start;
 var end;
 
-$("#afterLoad-init").on("click",
-		function(e) {
+$("#afterLoad-init").on("click", function(e) {
 	start = Date.now();
 	$("#afterLoad-placeholder").empty().append("- Start drawing the calendar");
-	init();
 	$(this).remove();
+	init();
 
 });
 
@@ -2158,17 +2157,17 @@ cal.init({
 					<p></p>
 					<script>
 						(function() {
-var start = Date.now();
-var end;
 
-$("#onComplete-init").on("click",
-		function(e) {
-	init();
+
+$("#onComplete-init").on("click", function(e) {
 	$(this).remove();
-
+	init();
 });
 
 function init() {
+	var start = Date.now();
+	var end;
+
 	var cal = new CalHeatMap();
 	cal.init({
 		itemSelector: "#onComplete-a",
@@ -2182,9 +2181,9 @@ function init() {
 
 			$("#onComplete-placeholder").append("<br>- The calendar height is " + $("#onComplete-a").height() + " pixels");
 			$("#onComplete-placeholder").append("<br>- The calendar width is " + $("#onComplete-a").width() + " pixels");
-			$("#onComplete-placeholder").append("<br>- Setting the opacity of the calendar to 0.5, with 2 seconds animation");
+			$("#onComplete-placeholder").append("<br>- Setting the opacity of the calendar to 0.5, with 3 seconds animation");
 
-			$("#onComplete-a").animate({opacity: 0.5}, 2000, function() {
+			$("#onComplete-a").animate({opacity: 0.5}, 3000, function() {
 				$("#onComplete-placeholder").append("<br/>- Animation complete");
 			});
 		}
