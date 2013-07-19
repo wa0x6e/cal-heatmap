@@ -1525,8 +1525,7 @@ CalHeatMap.prototype = {
 	 * @return bool True if the calendar was filled with the passed data
 	 */
 	fill: function(datas, domain) {
-		var response = datas === true ? true : this.display(this.parseDatas(datas), domain);
-		this.onComplete();
+		var response = this.display(this.parseDatas(datas), domain);
 		return response;
 	},
 
@@ -1544,6 +1543,7 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
+					this.onComplete();
 					return true;
 				} else {
 
