@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.0.2 (Thu Jul 18 2013 22:36:45)
+/*! cal-heatmap v3.0.2 (Thu Jul 18 2013 22:58:09)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -883,8 +883,13 @@ var CalHeatMap = function() {
 			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
 		}
 
-		if (settings.hasOwnProperty("data")) {
-			self.options.data = settings.data;
+		// Don't touch these settings
+		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
+
+		for (var k in s) {
+			if (settings.hasOwnProperty(s[k])) {
+				self.options[s[k]] = settings[s[k]];
+			}
 		}
 
 		if (typeof self.options.highlight === "string") {
@@ -955,7 +960,6 @@ CalHeatMap.prototype = {
 
 		this._completed = true;
 		if (typeof (this.options.onComplete) === "function") {
-
 			return this.options.onComplete();
 		} else {
 			console.log("Provided callback for onComplete is not a function.");
@@ -1533,7 +1537,7 @@ CalHeatMap.prototype = {
 	 * @return bool True if the calendar was filled with the passed data
 	 */
 	fill: function(datas, domain) {
-		var response = datas === true ? true : this.display(this.parseDatas(datas), domain);
+		var response = this.display(this.parseDatas(datas), domain);
 		this.onComplete();
 		return response;
 	},
@@ -1552,6 +1556,7 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
+					this.onComplete();
 					return true;
 				} else {
 

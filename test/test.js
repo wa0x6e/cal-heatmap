@@ -2014,21 +2014,15 @@ test("Fill subdomain only if there is data", function() {
 	datas[date2] = 25;	// 25 events for 01:00
 	datas[date3] = 1;	// 01 events for 01:01
 
+	var complete = false;
+	var setComplete = function(){ complete = true; };
+
 	var cal = createCalendar({data: datas, paintOnLoad: true});
-	var response = cal.fill(datas, cal.svg);
+	var response = cal.fill(datas, cal.svg, setComplete);
 
 	equal(response, true);
 });
 
-test("Don't fill subdomain if data equal to false", function() {
-
-	expect(1);
-
-	var cal = createCalendar({data: false});
-	var response = cal.fill(false, cal.svg);
-
-	equal(response, false);
-});
 
 test("Custom date formatting with d3.js internal formatter", function() {
 
@@ -2083,7 +2077,7 @@ test("Data Source is undefined", function() {
 	var datas;
 	var cal = createCalendar({data: datas});
 
-	equal(cal.getDatas(datas), false);
+	equal(cal.getDatas(datas), true, "getDatas() returns true: datas loading is not asynchronous");
 });
 
 test("Data Source is invalid : number", function() {
@@ -2091,7 +2085,7 @@ test("Data Source is invalid : number", function() {
 
 	var datas = 2560;
 	var cal = createCalendar({data: datas});
-	equal(cal.getDatas(datas), false);
+	equal(cal.getDatas(datas), true, "getDatas() return true: datas load is not asynchronous");
 });
 
 
@@ -2102,7 +2096,7 @@ test("Data Source is a regular string", function() {
 	var datas = "regular string";
 	var cal = createCalendar({data: datas});
 
-	equal(cal.getDatas(datas, new Date(), new Date()), true, "True is returned, datas is loaded via d3.json callback");
+	equal(cal.getDatas(datas, new Date(), new Date()), false, "getDatas() return false: datas load is asynchronous");
 });
 
 test("Data Source is a en empty string", function() {
@@ -2111,7 +2105,7 @@ test("Data Source is a en empty string", function() {
 	var datas = "";
 	var cal = createCalendar({data: datas});
 
-	equal(cal.getDatas(datas), false);
+	equal(cal.getDatas(datas), true, "getDatas() return true: datas load is not asynchronous");
 });
 
 /*

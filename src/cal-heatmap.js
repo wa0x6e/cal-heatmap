@@ -875,8 +875,13 @@ var CalHeatMap = function() {
 			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
 		}
 
-		if (settings.hasOwnProperty("data")) {
-			self.options.data = settings.data;
+		// Don't touch these settings
+		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
+
+		for (var k in s) {
+			if (settings.hasOwnProperty(s[k])) {
+				self.options[s[k]] = settings[s[k]];
+			}
 		}
 
 		if (typeof self.options.highlight === "string") {
@@ -947,7 +952,6 @@ CalHeatMap.prototype = {
 
 		this._completed = true;
 		if (typeof (this.options.onComplete) === "function") {
-
 			return this.options.onComplete();
 		} else {
 			console.log("Provided callback for onComplete is not a function.");
@@ -1526,6 +1530,7 @@ CalHeatMap.prototype = {
 	 */
 	fill: function(datas, domain) {
 		var response = this.display(this.parseDatas(datas), domain);
+		this.onComplete();
 		return response;
 	},
 
