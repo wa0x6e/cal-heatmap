@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.2 [2013-07-18]
+
+* [fix] Fix `onComplete()` event not firing when loading data from a json object in `data` option
+
 ## v3.0.1 [2013-07-18]
 
 * [fix] Add missing files
