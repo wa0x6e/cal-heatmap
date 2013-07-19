@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.0.0 (Thu Jul 18 2013 18:57:07)
+/*! cal-heatmap v3.0.2 (Thu Jul 18 2013 22:36:45)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -436,14 +436,15 @@ var CalHeatMap = function() {
 
 			// Fill the graph with some datas
 			if (self.options.loadOnInit) {
-				self.fill(
-					self.getDatas(
-						self.options.data,
-						new Date(self._domains[0]),
-						self.getSubDomain(self._domains[self._domains.length-1]).pop()
-					),
-					self.svg);
-			} else if (typeof self.options.onComplete === "function") {
+				self.getDatas(
+					self.options.data,
+					new Date(self._domains[0]),
+					self.getSubDomain(self._domains[self._domains.length-1]).pop(),
+					function(data) {
+						self.fill(data, self.svg);
+					}
+				);
+			} else {
 				self.onComplete();
 			}
 		}
@@ -911,8 +912,6 @@ var CalHeatMap = function() {
 
 };
 
-
-
 CalHeatMap.prototype = {
 
 
@@ -950,7 +949,13 @@ CalHeatMap.prototype = {
 	 * Callback to fire at the end, when all actions on the calendar are completed
 	 */
 	onComplete : function() {
+		if (this.options.onComplete === null || this._completed === true) {
+			return true;
+		}
+
+		this._completed = true;
 		if (typeof (this.options.onComplete) === "function") {
+
 			return this.options.onComplete();
 		} else {
 			console.log("Provided callback for onComplete is not a function.");
@@ -1007,6 +1012,7 @@ CalHeatMap.prototype = {
 	// DOMAIN NAVIGATION														//
 	// =========================================================================//
 	loadNextDomain: function() {
+		var parent = this;
 		this._domains.push(this.getNextDomain().getTime());
 		this._domains.shift();
 
@@ -1016,13 +1022,16 @@ CalHeatMap.prototype = {
 			this.options.data,
 			new Date(this._domains[this._domains.length-1]),
 			this.getSubDomain(this._domains[this._domains.length-1]).pop(),
-			this.svg
+			function(data) {
+				parent.fill(data, parent.svg);
+			}
 		);
 
 		this.afterLoadNextDomain(new Date(this._domains[this._domains.length-1]));
 	},
 
 	loadPreviousDomain: function() {
+		var parent = this;
 		this._domains.unshift(this.getPreviousDomain().getTime());
 		this._domains.pop();
 
@@ -1032,7 +1041,9 @@ CalHeatMap.prototype = {
 			this.options.data,
 			new Date(this._domains[0]),
 			this.getSubDomain(this._domains[0]).pop(),
-			this.svg
+			function(data) {
+				parent.fill(data, parent.svg);
+			}
 		);
 
 		this.afterLoadPreviousDomain(new Date(this._domains[0]));
@@ -1518,62 +1529,56 @@ CalHeatMap.prototype = {
 
 	/**
 	 * @todo Add check for empty data
+	 *
+	 * @return bool True if the calendar was filled with the passed data
 	 */
 	fill: function(datas, domain) {
-		if (datas !== false && datas !== true) {
-			if (this.options.onComplete !== null && this._completed === false) {
-				this.onComplete();
-				this._completed = true;
-			}
-			return this.display(this.parseDatas(datas), domain);
-		}
-		return false;
+		var response = datas === true ? true : this.display(this.parseDatas(datas), domain);
+		this.onComplete();
+		return response;
 	},
 
 	/**
 	 * Interpret the data property
+	 *
+	 * @return mixed
+	 * - True if no data to load
+	 * - False if data is loaded asynchornously
+	 * - json object
 	 */
-	getDatas: function(source, startDate, endDate, domain) {
+	getDatas: function(source, startDate, endDate, callback) {
 		var parent = this;
-
-		if (typeof domain === "undefined") {
-			domain = parent.svg;
-		}
 
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
-					return false;
+					return true;
 				} else {
-
-					var fillData = function(data) {
-						parent.fill(data, domain);
-					};
 
 					switch(this.options.dataType) {
 						case "json" :
-							d3.json(this.parseURI(source, startDate, endDate), fillData);
+							d3.json(this.parseURI(source, startDate, endDate), callback);
 							break;
 						case "csv" :
-							d3.csv(this.parseURI(source, startDate, endDate), fillData);
+							d3.csv(this.parseURI(source, startDate, endDate), callback);
 							break;
 						case "tsv" :
-							d3.tsv(this.parseURI(source, startDate, endDate), fillData);
+							d3.tsv(this.parseURI(source, startDate, endDate), callback);
 							break;
 						case "text" :
-							d3.text(this.parseURI(source, startDate, endDate), "text/plain", fillData);
+							d3.text(this.parseURI(source, startDate, endDate), "text/plain", callback);
 							break;
 					}
 
-					return true;
+					return false;
 				}
 				break;
 			case "object" :
 				// @todo Check that it's a valid JSON object
-				return parent.fill(source, domain);
+				callback(source);
 		}
 
-		return false;
+		return true;
 	},
 
 	/**
