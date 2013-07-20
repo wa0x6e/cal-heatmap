@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.0.3 (Fri Jul 19 2013 23:57:21)
+/*! cal-heatmap v3.0.3 (Sat Jul 20 2013 17:42:26)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -500,7 +500,7 @@ var CalHeatMap = function() {
 
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
-			.selectAll("svg.graph-domain")
+			.selectAll(".graph-domain")
 			.data(self._domains, function(d) { return d;})
 		;
 
@@ -510,7 +510,7 @@ var CalHeatMap = function() {
 
 		var svg = domainSvg
 			.enter()
-			.insert("svg")
+			.append("svg")
 			.attr("width", function(d, i){
 				var domainWidth = w(d, true);
 				if (navigationDir === false) {

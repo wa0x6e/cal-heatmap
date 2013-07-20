@@ -492,7 +492,7 @@ var CalHeatMap = function() {
 
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
-			.selectAll("svg.graph-domain")
+			.selectAll(".graph-domain")
 			.data(self._domains, function(d) { return d;})
 		;
 
@@ -502,7 +502,7 @@ var CalHeatMap = function() {
 
 		var svg = domainSvg
 			.enter()
-			.insert("svg")
+			.append("svg")
 			.attr("width", function(d, i){
 				var domainWidth = w(d, true);
 				if (navigationDir === false) {
