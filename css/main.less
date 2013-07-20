@@ -1,14 +1,11 @@
 
 pre{
 	background-color: #f0f0f0;
-	position: relative;
 	border: 0;
 }
 
 pre code {
 	background: transparent;
-
-
 }
 
 code {
@@ -25,15 +22,15 @@ a:hover code {
 }
 
 a:hover {
-		text-decoration: none;
+	text-decoration: none;
 }
 
-@menuMargin : 240px;
+@menuMargin : 260px;
 
 body
 {
 	font-size: 16px;
-	margin-left: @menuMargin;
+	padding-left: @menuMargin;
 	font-family: "Titillium Web", Helvetica, Sans-serif;
 	background: url("../img/background.png");
 }
@@ -63,20 +60,14 @@ body
 
 }
 
-#ftr-demo-previous {
-
-}
-
-ftr-demo-next {
-
-}
-
 nav {
 	width: 200px;
-	margin-left: -@menuMargin;
+
 	background: rgba(0,0,0,0.03);
 	border-bottom: 1px solid rgba(255,255,255,.8);
 	position: fixed;
+	top:0;
+	left: 0;
 	overflow: auto;
 	height: 100%;
 	padding: 0 20px;
@@ -84,17 +75,16 @@ nav {
 
 	.title {
 		margin-top: 20px;
-		font-family: "Exo";
+		font-family: "Exo", "Titillium Web", Helvetica, Arial;
 		font-weight: 800;
 		font-size: 1.8em;
 		color: #fff;
 		text-align: center;
 		background: red;
 		display: block;
-		padding: 20px 10px;
+		padding: 20px 0;
 
 		border-radius: 3px;
-		font-family: "Exo";
 	}
 
 	.subtitle {
@@ -175,7 +165,6 @@ ul {
 	float: left;
 	font-size: 24px;
 }
-
 
 
 .option-type {
@@ -269,18 +258,8 @@ ul {
 	margin-bottom: 20px;
 }
 
-h2, h2 a{
-	margin-top: 2em;
-	color: #333;
-	text-decoration: none;
-	font-family: "Exo";
-}
-
-
-h3
-{
-	color: #444;
-	margin-top: 2.5em;
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Exo", "Titillium Web", Helvetica, Arial;
 }
 
 h1
@@ -288,6 +267,19 @@ h1
 	font-size: 3.5em;
 	color: #b1361d;
 }
+
+h2, h2 a{
+	margin-top: 2.5em;
+	color: #333;
+	text-decoration: none;
+}
+
+h3
+{
+	color: #444;
+	margin-top: 2.5em;
+}
+
 
 h4 {
 	margin: 2.5em 0 0;
