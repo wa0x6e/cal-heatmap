@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.0.4 [2013-07-20]
+
+* [Fix] Fix calendar crashing in IE when using d3.js >= v3.2.4
+* [Fix] Fix overflow when adding/removing domains dynamically in IE
+
 ## v3.0.3 [2013-07-19]
 
 * [fix] Fix `subDomainTitleFormat` not applying to subDomain with data
