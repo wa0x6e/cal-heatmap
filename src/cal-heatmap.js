@@ -1155,11 +1155,11 @@ CalHeatMap.prototype = {
 								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : null)
 							);
 						}
-					})
-					.select("title")
+					});
+
+				d3.select(this).selectAll(".graph-subdomain-group title")
 					.text(function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-
 						return (
 						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
 							(parent.options.subDomainTitleFormat.filled).format({
@@ -1173,6 +1173,8 @@ CalHeatMap.prototype = {
 							})
 						);
 					});
+
+
 				}
 			}
 		);

@@ -2029,10 +2029,8 @@ test("Custom date formatting with d3.js internal formatter", function() {
 	expect(1);
 
 	var date = new Date(2000, 0, 5);
-	var datas = {};
-	datas[date.getTime()/1000] = 15;
 
-	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: "==%B=="});
+	var cal = createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: "==%B=="});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, "==January==");
 
@@ -2043,12 +2041,33 @@ test("Custom date formatting with custom function", function() {
 	expect(1);
 
 	var date = new Date(2000, 0, 5);
+
+	var cal = createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: function(date) { return date.getTime();}});
+
+	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, date.getTime());
+});
+
+test("Cell label have different title formatting depending on whether it's filled or not", function() {
+
+	expect(2);
+
+	var date = new Date(2000, 0, 1);
 	var datas = {};
 	datas[date.getTime()/1000] = 15;
 
-	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: function(date) { return date.getTime();}});
+	var title = {
+		empty: "this is an empty cell",
+		filled: "this is a filled cell"
+	};
 
-	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, date.getTime());
+	var cal = createCalendar({data: datas, start: date, loadOnInit: true, paintOnLoad: true,
+		domain: "year",
+		subDomain: "month",
+		range: 1,
+		subDomainTitleFormat: title});
+
+	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, title.filled);
+	equal($("#cal-heatmap .graph .graph-subdomain-group title")[1].firstChild.data, title.empty);
 });
 
 test("Cell radius is applied", function() {
@@ -2239,7 +2258,10 @@ function createCalendar(settings) {
 	$("body").append("<div id='cal-heatmap' style='display:none;'></div>");
 
 	var cal = new CalHeatMap();
-	settings.loadOnInit = false;
+	if (!settings.hasOwnProperty("loadOnInit")) {
+		settings.loadOnInit = false;
+	}
+
 	settings.animationDuration = 0;
 
 	if (!settings.hasOwnProperty("paintOnLoad")) {
