@@ -3,7 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Cal-HeatMap : Calendar Heat map with d3.js</title>
-
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 	<link rel="stylesheet" href="./css/cal-heatmap.css?v=2.1.0" />
@@ -18,6 +20,9 @@
 	<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
+	<!--[if lt IE 7]>
+		<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+	<![endif]-->
 
 <nav>
 	<span class="title">Cal-heatmap</span>
@@ -2340,7 +2345,7 @@ cal.init({
 
 	<h2 id="migrating-from-2x">Migrating from 2.x</h2>
 
-	<p class="alert">v2 documentation is still available at <a href="http://kamisama.github.io/cal-heatmap/">http://kamisama.github.io/cal-heatmap/v2</a></p>
+	<p class="alert">v2 documentation is still available at <a href="http://kamisama.github.io/cal-heatmap/v2/">http://kamisama.github.io/cal-heatmap/v2</a></p>
 
 	<p>There's a lot of changes coming with the 3.x branch. You should read the full documentation to use all the new features. Intruction below are only to migrate your v2 code to the v3 version.</p>
 
@@ -2445,12 +2450,18 @@ cal.init({
 					$(this).remove();
 				});
 			}
-
-
-
 		});
 
 	});
+</script>
+
+<script>
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+    e.src='//www.google-analytics.com/analytics.js';
+    r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-38672186-1');ga('send','pageview');
 </script>
 
 </body>
