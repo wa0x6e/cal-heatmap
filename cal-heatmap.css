@@ -6,6 +6,7 @@
 	clear: both;
 	display: block;
 	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+	overflow: hidden;
 }
 
 .graph-label
