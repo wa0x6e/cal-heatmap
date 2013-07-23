@@ -262,7 +262,7 @@ var CalHeatMap = function() {
 				d = new Date(d);
 				switch(self.options.domain) {
 					case "year" : return 54;
-					case "month" : return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1;
+					case "month" : return 6; //return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1;
 					case "week" : return 1;
 				}
 			},
