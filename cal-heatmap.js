@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.0.5 (Tue Jul 23 2013 14:56:14)
+/*! cal-heatmap v3.0.5 (Wed Jul 24 2013 01:26:55)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -270,7 +270,7 @@ var CalHeatMap = function() {
 				d = new Date(d);
 				switch(self.options.domain) {
 					case "year" : return 54;
-					case "month" : return 6; //return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1;
+					case "month" : return self.options.verticalOrientation ? 6 : (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1);
 					case "week" : return 1;
 				}
 			},
@@ -297,9 +297,10 @@ var CalHeatMap = function() {
 			level: 40,
 			row: function(d) {return 1;},
 			column: function(d) {
+				d = new Date(d);
 				switch(self.options.domain) {
 					case "year" : return 54;
-					case "month" : return 6;
+					case "month" : return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d);
 					default: return 1;
 				}
 			},
@@ -370,7 +371,14 @@ var CalHeatMap = function() {
 
 	// Exception : always return the maximum number of weeks
 	// to align the label vertically
-	this._domainType.x_day.row = function(d) { return 6; };
+	this._domainType.x_day.row = function(d) {
+		d = new Date(d);
+		switch(self.options.domain) {
+			case "year" : return 54;
+			case "month" : return !self.options.verticalOrientation ? 6 : (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1);
+			case "week" : return 1;
+		}
+	};
 
 
 	this.svg = null;
@@ -391,6 +399,8 @@ var CalHeatMap = function() {
 	this.NAVIGATE_RIGHT = 2;
 
 	this.root = null;
+
+	var domainPosition = [];
 
 	/**
 	 * Display the graph for the first time
@@ -504,6 +514,10 @@ var CalHeatMap = function() {
 			.data(self._domains, function(d) { return d;})
 		;
 
+		var enteringDomainDim = 0;
+		var exitingDomainDim = 0;
+
+
 		// =========================================================================//
 		// PAINTING DOMAIN															//
 		// =========================================================================//
@@ -512,39 +526,70 @@ var CalHeatMap = function() {
 			.enter()
 			.append("svg")
 			.attr("width", function(d, i){
-				var domainWidth = w(d, true);
-				if (navigationDir === false) {
-					width = domainWidth + (self.options.verticalOrientation ? 0 : width);
-				}
-				return domainWidth;
+				return w(d, true);
 			})
 			.attr("height", function(d) {
-				var domainHeight = h(d, true);
-				if (navigationDir === false) {
-					height = domainHeight + (self.options.verticalOrientation ? height : 0);
-				}
-				return domainHeight;
+				return h(d, true);
 			})
 			.attr("x", function(d, i) {
 				if (self.options.verticalOrientation) {
+					width = w(d, true);
 					return 0;
 				} else {
+					var tmp = 0;
 					switch(navigationDir) {
-						case false : return w(d, true) * i;
-						case self.NAVIGATE_RIGHT : return w(d, true) * (i+1);
-						case self.NAVIGATE_LEFT : return w(d, true) * (i-1);
-					}
+						case false :
+							if (i > 0) {
+								tmp = width;
+							}
 
+							width += w(d, true);
+							domainPosition.push(tmp);
+							return tmp;
+
+						case self.NAVIGATE_RIGHT :
+							domainPosition.push(width);
+							enteringDomainDim = w(d, true);
+							exitingDomainDim = domainPosition[1];
+							return width;
+
+						case self.NAVIGATE_LEFT :
+							tmp = -w(d, true);
+							enteringDomainDim = -tmp;
+							exitingDomainDim = width - domainPosition[domainPosition.length-1];
+							domainPosition.unshift(tmp);
+							return tmp;
+					}
 				}
 			})
 			.attr("y", function(d, i) {
 				if (self.options.verticalOrientation) {
+					var tmp = 0;
 					switch(navigationDir) {
-						case false : return h(d, true) * i;
-						case self.NAVIGATE_RIGHT : return h(d, true) * (i+1);
-						case self.NAVIGATE_LEFT : return h(d, true) * (i-1);
+						case false :
+							if (i > 0) {
+								tmp = height;
+							}
+
+							height += h(d, true);
+							domainPosition.push(tmp);
+							return tmp;
+
+						case self.NAVIGATE_RIGHT :
+							domainPosition.push(height);
+							enteringDomainDim = h(d, true);
+							exitingDomainDim = domainPosition[1];
+							return height;
+
+						case self.NAVIGATE_LEFT :
+							tmp = -h(d, true);
+							enteringDomainDim = -tmp;
+							exitingDomainDim = height - domainPosition[domainPosition.length-1];
+							domainPosition.unshift(tmp);
+							return tmp;
 					}
 				} else {
+					height = h(d, true);
 					return 0;
 				}
 			})
@@ -561,9 +606,6 @@ var CalHeatMap = function() {
 				return classname;
 			})
 		;
-
-		self.root.select(".graph").attr("width", width - self.options.domainGutter - self.options.cellPadding);
-		self.root.select(".graph").attr("height", height - self.options.domainGutter - self.options.cellPadding);
 
 		svg.append("rect")
 			.attr("width", function(d, i) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
@@ -725,15 +767,51 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// ANIMATION																//
 		// =========================================================================//
-		domainSvg.transition().duration(self.options.animationDuration)
-			.attr("x", function(d, i){
-				return self.options.verticalOrientation ? 0 : (w(d, true) * i);
-			})
-			.attr("y", function(d, i){
-				return self.options.verticalOrientation ? (h(d, true) * i) : 0;
-			})
-			.attr("width", function(d) { return w(d, true); })
-		;
+
+		if (navigationDir !== false) {
+			for(var i in domainPosition) {
+				if (navigationDir === self.NAVIGATE_RIGHT) {
+					domainPosition[i] -= exitingDomainDim;
+				} else if (navigationDir === self.NAVIGATE_LEFT) {
+					domainPosition[i] += enteringDomainDim;
+				}
+			}
+
+			if (navigationDir === self.NAVIGATE_RIGHT) {
+				domainPosition.shift();
+			} else {
+				domainPosition.pop();
+			}
+		}
+
+
+		if (navigationDir !== false) {
+			domainSvg.transition().duration(self.options.animationDuration)
+				.attr("x", function(d, i){
+					if (self.options.verticalOrientation) {
+						return 0;
+					} else {
+						return domainPosition[i];
+					}
+				})
+				.attr("y", function(d, i){
+					if (self.options.verticalOrientation) {
+						return domainPosition[i];
+					} else {
+						return 0;
+					}
+				})
+			;
+		}
+
+		var tempWidth = width;
+		var tempHeight = height;
+
+		if (self.options.verticalOrientation) {
+			height += enteringDomainDim - exitingDomainDim;
+		} else {
+			width += enteringDomainDim - exitingDomainDim;
+		}
 
 		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
 		domainSvg.exit().transition().duration(self.options.animationDuration)
@@ -742,19 +820,28 @@ var CalHeatMap = function() {
 					return 0;
 				} else {
 					switch(navigationDir) {
-						case self.NAVIGATE_LEFT : return width;
+						case self.NAVIGATE_LEFT : return Math.min(width, tempWidth);
 						case self.NAVIGATE_RIGHT : return -w(d, true);
 					}
 				}
 			})
 			.attr("y", function(d){
 				if (self.options.verticalOrientation) {
-					return navigationDir === self.NAVIGATE_LEFT ? height : -h(d, true);
+					switch(navigationDir) {
+						case self.NAVIGATE_LEFT : return Math.min(height, tempHeight);
+						case self.NAVIGATE_RIGHT : return -h(d, true);
+					}
 				} else {
 					return 0;
 				}
 			})
 			.remove()
+		;
+
+		// Resize the graph
+		self.root.select(".graph").transition().duration(self.options.animationDuration)
+			.attr("width", function() { return width - self.options.domainGutter - self.options.cellPadding; })
+			.attr("height", function() { return height - self.options.domainGutter - self.options.cellPadding; })
 		;
 
 		if (self.svg === null) {
@@ -1057,7 +1144,7 @@ CalHeatMap.prototype = {
 	// PAINTING : LEGEND														//
 	// =========================================================================//
 
-	displayLegend: function(graphWidth) {
+	displayLegend: function(width) {
 
 		var parent = this;
 		var legend = this.root;
@@ -1075,13 +1162,13 @@ CalHeatMap.prototype = {
 		legend = legend
 			.attr("class", "graph-legend")
 			.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
-			.attr("width", graphWidth)
+			.attr("width", width)
 			.append("g")
 			.attr("transform", function(d) {
 				switch(parent.options.legendHorizontalPosition) {
-					case "right" : return "translate(" + (graphWidth - legendWidth) + ")";
+					case "right" : return "translate(" + (width - legendWidth) + ")";
 					case "middle" :
-					case "center" : return "translate(" + (graphWidth/2 - legendWidth/2) + ")";
+					case "center" : return "translate(" + (width/2 - legendWidth/2) + ")";
 					default : return "translate(" + parent.options.legendMargin[3] + ")";
 				}
 			})
