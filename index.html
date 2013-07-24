@@ -49,14 +49,15 @@
 							<span class="head">Presentation</span>
 							<ul>
 								<li><a href="#itemSelector">itemSelector</a></li>
+								<li><a href="#domain">domain</a></li>
+								<li><a href="#subDomain">subDomain</a></li>
 								<li><a href="#range">range</a></li>
 								<li><a href="#cellSize">cellSize</a></li>
 								<li><a href="#cellPadding">cellPadding</a></li>
 								<li><a href="#cellRadius">cellRadius</a></li>
 								<li><a href="#domainGutter">domainGutter</a></li>
 								<li><a href="#domainMargin">domainMargin</a></li>
-								<li><a href="#domain">domain</a></li>
-								<li><a href="#subDomain">subDomain</a></li>
+								<li><a href="#domainDynamicDimension">domainDynamicDimension</a></li>
 								<li><a href="#verticalOrientation">verticalOrientation</a></li>
 								<li><a href="#label">label</a></li>
 								<li>
@@ -624,6 +625,73 @@ cal.init({
 			</div>
 
 			<p class="alert alert-info"><code>domainMargin</code> is specially useful when coupled with the domain highlighting function.</p>
+
+
+			<h4 id="domainDynamicDimension">domainDynamicDimension</h4> <strong class="version-added">3.0.6+</strong>
+			<div class="option-type">boolean</div>
+			<div class="option-default"><code>true</code></div>
+
+			<p>Whether to enable domain dynamic width and height.</p>
+
+			<p>Some <em>domain>subdomain</em> couple, like <em>month>days</em>, doesn't always have the same number of subDomain cells. Some months have 6 weeks, some only 4.</p>
+
+			<p>With dynamic dimension enabled, the domain width and height will be adjusted to fit the domain content, whereas when it's disabled, all domains will have the same dimension : the biggest.</p>
+
+			<div class="example clearfix empty-calendar">
+				<div style="float:none;margin-bottom: 20px;">
+					<button class="btn" id="domainDynamicDimension-previous">Previous</button>
+					<button class="btn" id="domainDynamicDimension-next">Next</button>
+				</div>
+
+				<style>
+					#domainDynamicDimension-a .graph, #domainDynamicDimension-b .graph {
+						border: 2px solid #fff;
+						outline: 1px solid #ccc;
+					}
+				</style>
+
+				<div>
+					<div id="domainDynamicDimension-a"></div>
+					<p>Dynamic dimensions enabled.<br/>
+						Browse with the next/previous buttons, and note that the whole calendar is also resized to fit the domains width</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#domainDynamicDimension-a",
+	domain: "month",
+	range: 5,
+	cellSize: 8,
+	displayLegend: false,
+	nextSelector: "#domainDynamicDimension-next",
+	previousSelector: "#domainDynamicDimension-previous"
+});
+						})();
+					</script>
+				</div>
+				<div>
+					<div id="domainDynamicDimension-b"></div>
+					<p>Dynamic dimensions disabled. <br/>Notice that, sometimes, there's a gap between domains, when the month has less than 6 weeks</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#domainDynamicDimension-b",
+	domain: "month",
+	range: 5,
+	cellSize: 8,
+	displayLegend: false,
+	domainDynamicDimension: false,
+	nextSelector: "#domainDynamicDimension-next",
+	previousSelector: "#domainDynamicDimension-previous",
+	itemNamespace: "domainDynamicDimension"
+});
+						})();
+					</script>
+				</div>
+			</div>
+
+
 
 			<h4 id="verticalOrientation">verticalOrientation</h4>
 			<div class="option-type">boolean</div>
