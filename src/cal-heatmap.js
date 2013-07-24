@@ -261,7 +261,7 @@ var CalHeatMap = function() {
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
-					case "year" : return 54;
+					case "year" : return self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) - self.getWeekNumber(new Date(d.getFullYear(), 0)) + 1;
 					case "month" : return self.options.verticalOrientation ? 6 : (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1);
 					case "week" : return 1;
 				}
