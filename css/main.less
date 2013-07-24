@@ -242,7 +242,7 @@ ul {
 		margin-left: 4%;
 	}
 
-	p {
+	& > div > p {
 
 		color: darken(#fff, 50);
 		margin-top: 10px;
@@ -256,6 +256,12 @@ ul {
 		width: 100%;
 		padding: 0 0 20px;
 	}
+}
+
+.example.full-width > div {
+	width: 100%;
+	float: none;
+	margin: 0
 }
 
 .empty-calendar .graph .graph-rect {

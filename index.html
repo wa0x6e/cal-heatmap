@@ -137,6 +137,7 @@
 			</ul>
 		</li>
 		<li><a href="#migrating-from-2x">Migrating from 2.x</a></li>
+		<li><a href="#examples">Examples</a></li>
 		<li><a href="#faq">FAQ</a></li>
 		<li><a href="https://github.com/kamisama/cal-heatmap">GitHub</a></li>
 		<li><a href="https://github.com/kamisama/cal-heatmap/issues?state=open">Issues/Bug report</a></li>
@@ -2355,6 +2356,10 @@ cal.init({
 			<td>Day of the month</td>
 		</tr>
 		<tr>
+			<td><code>dy_0</code> to <code>dy_6</code></td>
+			<td>Day of the week, Sunday is 0 and Saturday is 6 <strong class="version-added">3.0.7+</strong></td>
+		</tr>
+		<tr>
 			<td><code>h_0</code> to <code>h_23</code></td>
 			<td>From 00h to 23h</td>
 		</tr>
@@ -2491,6 +2496,350 @@ cal.init({
 	<p>Previously, calendar width was dynamic, when using the month domain, coupled with the x_week subDomain, as a month not always contains the same number of weeks. Domain width was adjusted to the number of weeks to avoid blank space.</p>
 
 	<p>This function has been removed in v3, the domains will now always have the same width, so there'll be a blank space on some months with fewer weeks. This will avoid complex calculation, and allow smoother animation when navigating between domains.</p>
+
+
+	<h2 id="examples">Examples</h2>
+
+
+
+	<p class="alert alert-info">All examples are using the <a href="./datas-hours.json">datas-hours</a> and <a href="datas-years.json">datas-years</a> data source.</p>
+
+	<p>Read the page source for the examples' complete code, as the stylesheet is not visible via the <em>View code</em> buttons.</p>
+
+	<div class="example clearfix full-width">
+		<p>Localized in french, this graph is displaying the number of flies falling in Master Lao Zhi's living room because of his suffocating ki energy.</p>
+
+		<p>Hover over the subDomain and legend cells to view the new customized title.</p>
+
+		<div>
+			<button id="example-a-PreviousDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-left"></i></button>
+			<button id="example-a-NextDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-right"></i></button>
+			<div id="example-a"></div>
+			<p></p>
+			<script>
+				(function() {
+moment.lang("fr"); // Set current local to French
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-a",
+	domain: "hour",
+	data: "datas-hours.json",
+	start: new Date(2000, 0),
+	cellSize: 9,
+	range: 10,
+	previousSelector: "#example-a-PreviousDomain-selector",
+	nextSelector: "#example-a-NextDomain-selector",
+
+	itemName: ["moustique tuée", "moustiques tuées"],
+	subDomainTitleFormat: {
+		empty: "Aucune données pour le {date}",
+		filled: "il y a eu {count} {name} le {date}"
+	},
+	legendTitleFormat: {
+		lower: "Moins de {min} {name}, Master Lao Zhi a du prendre une pause",
+		inner: "Entre {down} et {up} {name}, pas mal",
+		upper: "Plus de {max} {name}, fuyez !"
+	},
+	domainLabelFormat: "%H\h",
+	subDomainDateFormat:  function(date) {
+		return moment(date).format("LL"); // Use moment.js library to translate date
+	}
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+
+
+	<div class="example clearfix full-width">
+		<p>Let's try other calendar view (month > day), and re-calibrate the legend colors for our data.</p>
+
+		<div>
+			<button id="example-b-PreviousDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-left"></i></button>
+			<button id="example-b-NextDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-right"></i></button>
+			<div id="example-b"></div>
+			<p></p>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-b",
+	domain: "day",
+	data: "datas-years.json",
+	start: new Date(2000, 0),
+	cellSize: 9,
+	range: 15,
+	previousSelector: "#example-b-PreviousDomain-selector",
+	nextSelector: "#example-b-NextDomain-selector",
+
+	legend: [2, 4, 6, 8]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+
+	<div class="example clearfix full-width">
+		<p>Week > hour view.</p>
+
+		<div>
+			<button id="example-c-PreviousDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-left"></i></button>
+			<button id="example-c-NextDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-right"></i></button>
+			<div id="example-c"></div>
+			<p></p>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-c",
+	domain: "week",
+	subDomain: "hour",
+	data: "datas-years.json",
+	start: new Date(2000, 0, 5),
+	cellSize: 10,
+	range: 2,
+	previousSelector: "#example-c-PreviousDomain-selector",
+	nextSelector: "#example-c-NextDomain-selector",
+
+	legend: [2, 4, 6, 8]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+	<div class="example clearfix full-width">
+		<p>Year > day view.</p>
+
+		<div>
+			<div id="example-d"></div>
+			<p></p>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-d",
+	domain: "year",
+	subDomain: "day",
+	data: "datas-years.json",
+	start: new Date(2000, 0),
+	cellSize: 10,
+	range: 1,
+	legend: [20, 40, 60, 80]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+
+	<div class="example clearfix full-width">
+		<p>Year > Month view.</p>
+
+		<div>
+			<div id="example-e"></div>
+			<p></p>
+			<style>
+				#example-e .subdomain-text {
+					fill: #fff;
+				}
+			</style>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-e",
+	domain: "year",
+	subDomain: "month",
+	data: "datas-years.json",
+	start: new Date(2000, 0),
+	cellSize: 25,
+	range: 1,
+	subDomainTextFormat: "%m",
+	legend: [1900, 2000, 2100, 2200]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+	<div class="example clearfix full-width">
+		<p>Week > day view, vertically.
+			<br/>Dynamic domain dimension was disabled to avoid page height "fluctuation".
+			<br/>Pass domain label to an external function to uppercase it.
+		</p>
+
+		<div>
+			<button id="example-f-PreviousDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-left"></i></button>
+			<button id="example-f-NextDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-right"></i></button>
+			<div id="example-f"></div>
+			<p></p>
+			<style>
+				#example-f .graph-label {
+					font-weight: bold;
+				}
+			</style>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-f",
+	domain: "month",
+	subDomain: "x_day",
+	data: "datas-years.json",
+	start: new Date(2000, 0, 5),
+	cellSize: 10,
+	range: 2,
+	verticalOrientation: true,
+	domainDynamicDimension: false,
+	previousSelector: "#example-f-PreviousDomain-selector",
+	nextSelector: "#example-f-NextDomain-selector",
+	label: {
+		position: "right",
+		rotate: "left",
+		offset: {
+			x: 0,
+			y: 15
+		}
+	},
+	domainLabelFormat: function(date) {
+		moment.lang("en");
+		return moment(date).format("MMMM").toUpperCase();
+	},
+	legend: [20, 40, 60, 80]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+
+	<div class="example clearfix full-width">
+		<p>Week > day view</p>
+
+		<p>Hover on a subDomain cell to view the date</p>
+
+		<div>
+			<button id="example-g-PreviousDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-left"></i></button>
+			<button id="example-g-NextDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-right"></i></button>
+			<div id="example-g"></div>
+			<p></p>
+			<style>
+				#example-g .graph-label {
+					font-weight: bold;
+					font-size: 18px;
+				}
+
+
+				#example-g .subdomain-text {
+					fill: #fff;
+					opacity: 0;
+				}
+
+				#example-g g:hover .subdomain-text {
+					opacity: 1;
+				}
+
+			</style>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-g",
+	domain: "month",
+	subDomain: "x_day",
+	data: "datas-years.json",
+	start: new Date(2000, 0, 5),
+	cellSize: 20,
+	cellPadding: 5,
+	domainGutter: 20,
+	range: 2,
+	domainDynamicDimension: false,
+	previousSelector: "#example-g-PreviousDomain-selector",
+	nextSelector: "#example-g-NextDomain-selector",
+	domainLabelFormat: function(date) {
+		moment.lang("en");
+		return moment(date).format("MMMM").toUpperCase();
+	},
+	subDomainTextFormat: "%d",
+	legend: [20, 40, 60, 80]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+
+	<div class="example clearfix full-width">
+		<p>Give another background color for all February.</p>
+		<div>
+			<button id="example-h-PreviousDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-left"></i></button>
+			<button id="example-h-NextDomain-selector" style="margin-bottom: 10px;" class="btn"><i class="icon icon-chevron-right"></i></button>
+			<div id="example-h"></div>
+			<p></p>
+			<style>
+				#example-h .graph-label {
+					font-weight: bold;
+					font-size: 18px;
+					fill: #fff;
+				}
+
+				#example-h .domain-background {
+					fill: #2d3a47;
+				}
+
+				#example-h .graph-domain.m_2 .domain-background {
+					fill: red;
+				}
+
+				#example-h .grap-rect {fill:#35252d;}
+				#example-h .q0 {fill:#35252d;}
+				#example-h .q1 {fill:#fea1eb; opacity: 0.1}
+				#example-h .q2 {fill:#fea1eb; opacity: 0.2}
+				#example-h .q3 {fill:#fea1eb; opacity: 0.4}
+				#example-h .q4 {fill:#fea1eb; opacity: 0.6}
+				#example-h .q5 {fill:#fea1eb; opacity: 0.8}
+				#example-h .q6 {fill:#fea1eb; opacity: 1}
+				#example-h .graph-rect:hover {fill: #fff; opacity: 1; stroke-width: 0;}
+
+
+			</style>
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-h",
+	domain: "month",
+	subDomain: "x_day",
+	data: "datas-years.json",
+	start: new Date(2000, 0, 5),
+	cellSize: 15,
+	cellRadius: 3,
+	cellPadding: 5,
+	range: 1,
+	domainMargin: 20,
+	animationDuration: 800,
+	domainDynamicDimension: false,
+	previousSelector: "#example-h-PreviousDomain-selector",
+	nextSelector: "#example-h-NextDomain-selector",
+	label: {
+		position: "left",
+		offset: {
+			x: 20,
+			y: 35
+		},
+		width: 110
+	},
+	legend: [20, 40, 60, 80]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+
 
 	<h2 id="faq">FAQ</h2>
 
