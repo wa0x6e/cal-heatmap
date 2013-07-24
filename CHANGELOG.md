@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.6 [2013-07-24]
+
+* [fix] Bring back the dynamic domain width/height
+* [fix] Fix `day` subdomains displaying garbage when using domain other than `month`
+* [new] Add `domainDynamicDimension` to disable dynamic domain width/height (default: true)
+
 ## v3.0.5 [2013-07-23]
 
 * [fix] Fix domain month when using day subDomain
