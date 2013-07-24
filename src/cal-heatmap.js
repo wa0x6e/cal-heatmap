@@ -557,9 +557,9 @@ var CalHeatMap = function() {
 				var date = new Date(d);
 				switch(self.options.domain) {
 					case "hour" : classname += " h_" + date.getHours();
-					case "day" : classname += " d_" + date.getDate();
+					case "day" : classname += " d_" + date.getDate() + " dy_" + date.getDay();
 					case "week" : classname += " w_" + self.getWeekNumber(date);
-					case "month" : classname += " m_" + date.getMonth();
+					case "month" : classname += " m_" + (date.getMonth() + 1);
 					case "year" : classname += " y_" + date.getFullYear();
 				}
 				return classname;

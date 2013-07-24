@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.0.7 [2013-07-24]
+
+* [fix] Fix domain month class (`m_x`) beginning at `m_0` insted of `m_1`
+* [new] Add new domain class: `dy_x` for the day of the week
+
 ## v3.0.6 [2013-07-24]
 
 * [fix] Bring back the dynamic domain width/height
