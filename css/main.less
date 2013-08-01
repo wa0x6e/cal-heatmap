@@ -233,6 +233,8 @@ ul {
 	margin-top: 20px;
 	margin-bottom: 20px;
 
+
+
 	&>div {
 		width: 48%;
 		float: left;
@@ -255,6 +257,17 @@ ul {
 		clear: both;
 		width: 100%;
 		padding: 0 0 20px;
+	}
+
+	.expandable-source pre {
+		width: 96%;
+		transition: width .5s;
+	}
+
+	&>div.expandable-source pre:hover {
+		z-index: 99;
+		position: relative;
+		width: 200%;
 	}
 }
 
