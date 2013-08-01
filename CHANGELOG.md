@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.8 [2013-08-01]
+
+* [new] Add `minDate`, `startDate` to limit domain navigation beyond certain dates
+* [new] Add `onMaxDomainReached()` and `onMinDomainReached()` events, triggered when navigation is hitting the lower/upper domain limit
+* [change] `next()` and `previous()` will now always return `true`, as long as there is more domain to load
+
 ## v3.0.7 [2013-07-24]
 
 * [fix] Fix domain month class (`m_x`) beginning at `m_0` insted of `m_1`
