@@ -74,6 +74,7 @@
 								<li><a href="#weekStartOnMonday">weekStartOnMonday</a></li>
 								<li><a href="#minDate">minDate</a></li>
 								<li><a href="#maxDate">maxDate</a></li>
+								<li><a href="#considerMissingDataAsZero">considerMissingDataAsZero</a></li>
 							</ul>
 						</li>
 						<li>
@@ -577,7 +578,7 @@ cal.init({
 			</div>
 
 			<h4 id="domainMargin">domainMargin</h4>
-			<div class="option-type">integrer or Array</div>
+			<div class="option-type">integer or Array</div>
 			<div class="option-default"><code>[0, 0, 0, 0]</code></div>
 
 			<p>Margin around each domain, in pixel.</p>
@@ -746,7 +747,7 @@ cal.init({
 			<div class="option-type">object</div>
 
 
-			<p>Position and alignement of the domain label.</p>
+			<p>Position and alignment of the domain label.</p>
 
 			<p>It takes an object with up to 5 properties:</p>
 
@@ -1062,7 +1063,7 @@ cal.init({
 				</tr>
 			</table>
 
-			<p>The first time, the first subDomain cell will be the one in the first domain, and the last subDomain cell, the one in the last domain, so that, if your calendar have 5 domains, it'll get the datas for the 5 domains.</p>
+			<p>The first time, the first subDomain cell will be the one in the first domain, and the last subDomain cell, the one in the last domain, so that, if your calendar have 5 domains, it'll get the data for the 5 domains.</p>
 
 			<p>For each subsequent call, like when loading new domains dynamically with <a href="#next"><code>next()</code></a> and <a href="#previous"><code>previous()</code></a>, the first and last subDomain cell will only be the ones inside the newly loaded domain.</p>
 
@@ -1315,6 +1316,17 @@ $("#minDate-next").on("click", function(e) {
 
 			<p>Same as <a href="#minDate"><code>minDate</code></a>, but for the upper limit. Refer to <a href="#minDate"><code>minDate</code></a> documentation.</p>
 
+			<h4 id="considerMissingDataAsZero">considerMissingDataAsZero</h4> <strong class="version-added">3.0.9+</strong>
+			<div class="option-type">boolean</div>
+			<div class="option-default"><code>false</code></div>
+
+			<p>Whether to consider missing date:value couple in the data source as equal to 0.</p>
+
+			<p>By default, when the a date is not associated to a value, it's considered as null, and rendered as a no value cell.</p>
+
+			<p>You should ask yourself, if the API is not returning result for a date, is it because there is really no value associated to this date, or because it's supposed to be equal to 0, and it's skipped in order to save bandwidth ?</p>
+
+
 			<div class="section-head">Legend</div>
 
 			<h4 id="legend">legend</h4>
@@ -1323,7 +1335,7 @@ $("#minDate-next").on("click", function(e) {
 
 			<p>Assign each color in the heatmap to a range of values.</p>
 
-			<p>It accepts an array of any number of arguments, as long as they are number, and in ascendent order.<br/>
+			<p>It accepts an array of any number of arguments, as long as they are number, and in ascendant order.<br/>
 			An array of n values will generate a legend of 5 colors. Each colors correspond to a css class, formatted like <code>q{n}</code>.
 			</p>
 
@@ -1361,7 +1373,7 @@ $("#minDate-next").on("click", function(e) {
 				</table>
 			</div>
 
-			<p>By default, the CSS only cames with 5 <em>.q{n}</em> class. You're free to add your own if needed, and modify the colors of the existing one.</p>
+			<p>By default, the CSS only come with 5 <em>.q{n}</em> class. You're free to add your own if needed, and modify the colors of the existing one.</p>
 
 			<div class="example clearfix empty-calendar">
 				<span class="tips">Hover on a legend cell to see the associated range</span>
@@ -1396,7 +1408,7 @@ cal.init({
 			</div>
 
 			<p class="alert alert-success"><strong><i class="icon icon-magic"></i>Styling tips</strong><br/>
-				<code>.graph-rect</code> style is applied to all subDomain cells, and used by default when the cell os not associated to a value.</p>
+				<code>.graph-rect</code> style is applied to all subDomain cells, and used by default when the cell is not associated to a value.</p>
 
 
 			<h4 id="displayLegend">displayLegend</h4>
@@ -1747,7 +1759,7 @@ cal.init({
 				</tr>
 				<tr>
 					<td><code>{connector}</code></td>
-					<td>An english preposition placed before a datetime (<em>on</em> Monday, <em>at</em> 15:00, etc..). Each subDomain have their own default connector, corresponding to the default date format.</td>
+					<td>An English preposition placed before a datetime (<em>on</em> Monday, <em>at</em> 15:00, etc..). Each subDomain have their own default connector, corresponding to the default date format.</td>
 				</tr>
 
 			</table>
@@ -2182,7 +2194,7 @@ cal.init({
 			</div>
 
 			<p class="alert alert-success"><strong><i class="icon icon-magic"></i>Styling tips</strong><br/>
-				<code>.hover_cursor</code> style is applied to all clickable cells.
+				<code>.hover_cursor</code> style is applied to all click-able cells.
 			</p>
 
 			<h4 id="afterLoad">afterLoad()</h4>
@@ -2432,7 +2444,7 @@ cal.init({
 			$("#onMinDomainReached-previous").attr("disabled", "disabled");
 		} else {
 			$("#onMinDomainReached-placeholder").append(
-				"<li>Reenabling <strong>PREVIOUS</strong> button</li>"
+				"<li>Re-enabling <strong>PREVIOUS</strong> button</li>"
 			);
 			$("#onMinDomainReached-previous").attr("disabled", false);
 		}
@@ -2445,7 +2457,7 @@ cal.init({
 			$("#onMinDomainReached-next").attr("disabled", "disabled");
 		} else {
 			$("#onMinDomainReached-placeholder").append(
-				"<li>Reenabling <strong>NEXT</strong> button</li>"
+				"<li>Re-enabling <strong>NEXT</strong> button</li>"
 			);
 			$("#onMinDomainReached-next").attr("disabled", false);
 		}
@@ -2476,7 +2488,7 @@ cal.init({
 
 	<h2 id="data-format">Data Format</h2>
 
-	<p>Cal-Heatmap only undestand data formatted in a JSON object like:</p>
+	<p>Cal-Heatmap only understand data formatted in a JSON object like:</p>
 
 <pre><code class="language-javascript">{
 	"timestamp": value,
@@ -2486,7 +2498,7 @@ cal.init({
 
 	<p class="alert"><code>timestamp</code> is in seconds.</p>
 
-	<p>All timestamps belonging to the same subDomain will be stacked together, and all subDomains with no associated data will be considered as empty (no data), and <strong>does not fallback to value = 0</strong>.</p>
+	<p>All timestamps belonging to the same subDomain will be stacked together, and all subDomains with no associated data will be considered as empty (no data), and <strong>does not fall back to value = 0</strong>.</p>
 
 
 	<h2 id="domain-highlight">Domain Highlighting</h2>
@@ -2586,7 +2598,7 @@ cal.init({
 
 	<p class="alert">v2 documentation is still available at <a href="http://kamisama.github.io/cal-heatmap/v2/">http://kamisama.github.io/cal-heatmap/v2</a></p>
 
-	<p>There's a lot of changes coming with the 3.x branch. You should read the full documentation to use all the new features. Intruction below are only to migrate your v2 code to the v3 version.</p>
+	<p>There's a lot of changes coming with the 3.x branch. You should read the full documentation to use all the new features. Instruction below are only to migrate your v2 code to the v3 version.</p>
 
 	<h6>onClick</h6>
 
@@ -2664,7 +2676,7 @@ cal.init({
 	<p>Read the page source for the examples' complete code, as the stylesheet is not visible via the <em>View code</em> buttons.</p>
 
 	<div class="example clearfix full-width">
-		<p>Localized in french, this graph is displaying the number of flies falling in Master Lao Zhi's living room because of his suffocating ki energy.</p>
+		<p>Localized in French, this graph is displaying the number of flies falling in Master Lao Zhi's living room because of his suffocating ki energy.</p>
 
 		<p>Hover over the subDomain and legend cells to view the new customized title.</p>
 
@@ -3004,7 +3016,7 @@ cal.init({
 
 	<h2 id="about">About</h2>
 
-	<p>Cal-HeatMap is licenced under the <a href="http://opensource.org/licenses/MIT">MIT Licence</a></p>
+	<p>Cal-HeatMap is licensed under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
 
 	<p>Developed with love by <a href="https://github.com/kamisama">Wan Qi Chen</a></p>
 
