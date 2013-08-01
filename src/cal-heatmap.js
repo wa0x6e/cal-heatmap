@@ -269,9 +269,8 @@ var CalHeatMap = function() {
 					case "month" :
 						if (self.options.verticalOrientation) {
 							return 6;
-						} else {
-							return self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1) : 6;
 						}
+						return self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1) : 6;
 					case "week" : return 1;
 				}
 			},
@@ -379,9 +378,8 @@ var CalHeatMap = function() {
 			case "month" :
 				if (!self.options.verticalOrientation) {
 					return 6;
-				} else {
-					return self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1) : 6;
 				}
+				return self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1) : 6;
 			case "week" : return 1;
 		}
 	};
