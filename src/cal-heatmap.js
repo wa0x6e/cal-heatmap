@@ -49,6 +49,10 @@ var CalHeatMap = function() {
 		// @default now
 		start : new Date(),
 
+		minDate : null,
+
+		maxDate: null,
+
 		// URL, where to fetch the original datas
 		data : "",
 
@@ -427,14 +431,14 @@ var CalHeatMap = function() {
 			if (self.options.nextSelector !== false) {
 				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function(d) {
 					d3.event.preventDefault();
-					self.loadNextDomain();
+					return self.loadNextDomain();
 				});
 			}
 
 			if (self.options.previousSelector !== false) {
 				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(d) {
 					d3.event.preventDefault();
-					self.loadPreviousDomain();
+					return self.loadPreviousDomain();
 				});
 			}
 
@@ -1075,9 +1079,22 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 	// DOMAIN NAVIGATION														//
 	// =========================================================================//
+	/**
+	 * Shift the calendar one domain forward
+	 *
+	 * The new domain is loaded only if it's beyond the maxDate
+	 *
+	 * @return bool True if the next domain was loaded, else false
+	 */
 	loadNextDomain: function() {
+		var nextDomainStart = this.getNextDomain().getTime();
+
+		if (this.options.maxDate !== null && (this.options.maxDate.getTime() < nextDomainStart)) {
+			return false;
+		}
+
 		var parent = this;
-		this._domains.push(this.getNextDomain().getTime());
+		this._domains.push(nextDomainStart);
 		this._domains.shift();
 
 		this.paint(this.NAVIGATE_RIGHT);
@@ -1092,9 +1109,22 @@ CalHeatMap.prototype = {
 		);
 
 		this.afterLoadNextDomain(new Date(this._domains[this._domains.length-1]));
+
+		return true;
 	},
 
+	/**
+	 * Shift the calendar one domain backward
+	 *
+	 * The previous domain is loaded only if it's not beyond the minDate
+	 *
+	 * @return bool True if the previous domain was loaded, else false
+	 */
 	loadPreviousDomain: function() {
+		if (this.options.minDate !== null && (this.options.minDate.getTime() >= this._domains[0])) {
+			return false;
+		}
+
 		var parent = this;
 		this._domains.unshift(this.getPreviousDomain().getTime());
 		this._domains.pop();
@@ -1111,6 +1141,8 @@ CalHeatMap.prototype = {
 		);
 
 		this.afterLoadPreviousDomain(new Date(this._domains[0]));
+
+		return true;
 	},
 
 	// =========================================================================//
