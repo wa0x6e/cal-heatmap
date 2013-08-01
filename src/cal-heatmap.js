@@ -208,7 +208,23 @@ var CalHeatMap = function() {
 		// Used mainly to convert the datas if they're not formatted like expected
 		// Takes the fetched "data" object as argument, must return a json object
 		// formatted like {timestamp:count, timestamp2:count2},
-		afterLoadData : function(data) { return data; }
+		afterLoadData : function(data) { return data; },
+
+		// Callback triggered after calling next().
+		// The `status` argument is equal to true if there is no
+		// more next domain to load
+		//
+		// This callback is also executed once, after calling previous(),
+		// only when the max domain is reached
+		onMaxDomainReached: function(reached) {},
+
+		// Callback triggered after calling previous().
+		// The `status` argument is equal to true if there is no
+		// more previous domain to load
+		//
+		// This callback is also executed once, after calling next(),
+		// only when the min domain is reached
+		onMinDomainReached: function(reached) {}
 	};
 
 
@@ -406,6 +422,9 @@ var CalHeatMap = function() {
 	this.NAVIGATE_RIGHT = 2;
 
 	this.root = null;
+
+	this._maxDomainReached = false;
+	this._minDomainReached = false;
 
 	this.domainPosition = new DomainPosition();
 
@@ -1061,6 +1080,26 @@ CalHeatMap.prototype = {
 		}
 	},
 
+	onMinDomainReached: function(reached) {
+		this._minDomainReached = reached;
+		if (typeof (this.options.onMinDomainReached) === "function") {
+			return this.options.onMinDomainReached(reached);
+		} else {
+			console.log("Provided callback for onMinDomainReached is not a function.");
+			return false;
+		}
+	},
+
+	onMaxDomainReached: function(reached) {
+		this._maxDomainReached = reached;
+		if (typeof (this.options.onMaxDomainReached) === "function") {
+			return this.options.onMaxDomainReached(reached);
+		} else {
+			console.log("Provided callback for onMaxDomainReached is not a function.");
+			return false;
+		}
+	},
+
 	formatNumber: d3.format(",g"),
 
 	formatDate: function(d, format) {
@@ -1079,22 +1118,24 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 	// DOMAIN NAVIGATION														//
 	// =========================================================================//
+
 	/**
 	 * Shift the calendar one domain forward
 	 *
-	 * The new domain is loaded only if it's beyond the maxDate
+	 * The new domain is loaded only if it's not beyond the maxDate
 	 *
 	 * @return bool True if the next domain was loaded, else false
 	 */
 	loadNextDomain: function() {
-		var nextDomainStart = this.getNextDomain().getTime();
 
-		if (this.options.maxDate !== null && (this.options.maxDate.getTime() < nextDomainStart)) {
+		var nextDomainStartTimestamp = this.getNextDomain().getTime();
+
+		if (this._maxDomainReached || this.maxDomainIsReached(nextDomainStartTimestamp)) {
 			return false;
 		}
 
 		var parent = this;
-		this._domains.push(nextDomainStart);
+		this._domains.push(nextDomainStartTimestamp);
 		this._domains.shift();
 
 		this.paint(this.NAVIGATE_RIGHT);
@@ -1110,6 +1151,15 @@ CalHeatMap.prototype = {
 
 		this.afterLoadNextDomain(new Date(this._domains[this._domains.length-1]));
 
+		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
+			this.onMaxDomainReached(true);
+		}
+
+		// Try to "disengage" the min domain reached setting
+		if (this._minDomainReached && !this.minDomainIsReached(this._domains[0])) {
+			this.onMinDomainReached(false);
+		}
+
 		return true;
 	},
 
@@ -1121,12 +1171,14 @@ CalHeatMap.prototype = {
 	 * @return bool True if the previous domain was loaded, else false
 	 */
 	loadPreviousDomain: function() {
-		if (this.options.minDate !== null && (this.options.minDate.getTime() >= this._domains[0])) {
+		if (this._minDomainReached || this.minDomainIsReached(this._domains[0])) {
 			return false;
 		}
 
+		var previousDomainStartTimestamp = this.getPreviousDomain().getTime();
+
 		var parent = this;
-		this._domains.unshift(this.getPreviousDomain().getTime());
+		this._domains.unshift(previousDomainStartTimestamp);
 		this._domains.pop();
 
 		this.paint(this.NAVIGATE_LEFT);
@@ -1142,7 +1194,34 @@ CalHeatMap.prototype = {
 
 		this.afterLoadPreviousDomain(new Date(this._domains[0]));
 
+		if (this.minDomainIsReached(previousDomainStartTimestamp)) {
+			this.onMinDomainReached(true);
+		}
+
+		// Try to "disengage" the max domain reached setting
+		if (this._maxDomainReached && !this.maxDomainIsReached(this._domains[this._domains.length-1])) {
+			this.onMaxDomainReached(false);
+		}
+
 		return true;
+	},
+
+	/**
+	 * Return whether a date is inside the scope determined by maxDate
+	 *
+	 * @return bool
+	 */
+	maxDomainIsReached: function(datetimestamp) {
+		return (this.options.maxDate !== null && (this.options.maxDate.getTime() < datetimestamp));
+	},
+
+	/**
+	 * Return whether a date is inside the scope determined by minDate
+	 *
+	 * @return bool
+	 */
+	minDomainIsReached: function (datetimestamp) {
+		return (this.options.minDate !== null && (this.options.minDate.getTime() >= datetimestamp));
 	},
 
 	// =========================================================================//
