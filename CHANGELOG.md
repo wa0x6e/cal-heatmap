@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.9 [2013-08-01]
+
+* [new] Fix #26: add `considerMissingDataAsZero` option to consider missing value as zero
+
 ## v3.0.8 [2013-08-01]
 
 * [new] Add `minDate`, `startDate` to limit domain navigation beyond certain dates

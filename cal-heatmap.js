@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.0.8 (Thu Aug 01 2013 14:27:18)
+/*! cal-heatmap v3.0.9 (Thu Aug 01 2013 18:58:29)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -65,6 +65,10 @@ var CalHeatMap = function() {
 		data : "",
 
 		dataType: allowedDataType[0],
+
+		// Whether to consider missing date:value from the datasource
+		// as equal to 0, or just leave them as missing
+		considerMissingDataAsZero: false,
 
 		// Load remote data on calendar creation
 		// When false, the calendar will be left empty
@@ -1316,17 +1320,23 @@ CalHeatMap.prototype = {
 	 */
 	display: function(data, domain) {
 		var parent = this;
+
 		domain.each(function(domainUnit) {
 
-			if (data.hasOwnProperty(domainUnit)) {
+			if (data.hasOwnProperty(domainUnit) || parent.options.considerMissingDataAsZero) {
 				d3.select(this).selectAll(".graph-subdomain-group rect")
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
-						var htmlClass = "graph-rect" + parent.getHighlightClassName(d) +
-						(data[domainUnit].hasOwnProperty(subDomainUnit) ?
-							(" " + parent.legend(data[domainUnit][subDomainUnit])) : ""
-						);
+						var htmlClass = "graph-rect" + parent.getHighlightClassName(d);
+
+						var value;
+
+						if (data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) {
+							htmlClass += " " + parent.legend(data[domainUnit][subDomainUnit]);
+						} else if (parent.options.considerMissingDataAsZero) {
+							htmlClass += " " + parent.legend(0);
+						}
 
 						if (parent.options.onClick !== null) {
 							htmlClass += " hover_cursor";
@@ -1339,7 +1349,7 @@ CalHeatMap.prototype = {
 							var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 							return parent.onClick(
 								d,
-								(data[domainUnit].hasOwnProperty(subDomainUnit) ? data[domainUnit][subDomainUnit] : null)
+								(data[domainUnit].hasOwnProperty(subDomainUnit) || parent.options.considerMissingDataAsZero ? data[domainUnit][subDomainUnit] : null)
 							);
 						}
 					});
@@ -1347,18 +1357,26 @@ CalHeatMap.prototype = {
 				d3.select(this).selectAll(".graph-subdomain-group title")
 					.text(function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-						return (
-						(data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) ?
-							(parent.options.subDomainTitleFormat.filled).format({
-								count: parent.formatNumber(data[domainUnit][subDomainUnit]),
-								name: parent.options.itemName[(data[domainUnit][subDomainUnit] !== 1 ? 1 : 0)],
+
+						if ((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) || parent.options.considerMissingDataAsZero){
+
+							if (data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) {
+								value = data[domainUnit][subDomainUnit];
+							} else if (parent.options.considerMissingDataAsZero) {
+								value = 0;
+							}
+
+							return (parent.options.subDomainTitleFormat.filled).format({
+								count: parent.formatNumber(value),
+								name: parent.options.itemName[(value !== 1 ? 1 : 0)],
 								connector: parent._domainType[parent.options.subDomain].format.connector,
 								date: parent.formatDate(d, parent.options.subDomainDateFormat)
-							}) :
-							(parent.options.subDomainTitleFormat.empty).format({
+							});
+						} else {
+							return (parent.options.subDomainTitleFormat.empty).format({
 								date: parent.formatDate(d, parent.options.subDomainDateFormat)
-							})
-						);
+							});
+						};
 					});
 
 
