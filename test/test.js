@@ -15,11 +15,9 @@ test("get domain when domain is 1 HOUR", function() {
 	expect(6);
 
 	var date     = new Date(2003, 10, 31, 20, 26);
-	var nextHour = new Date(2003, 10, 31, 21);
 
 	var cal = createCalendar({range: 1, start: date});
 	var domain = cal.getDomain(date);
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 hour");
 
@@ -35,11 +33,11 @@ test("get domain when domain is 1 HOUR, from a timestamp", function() {
 	expect(6);
 
 	var date     = new Date(2003, 10, 31, 20, 26);
-	var nextHour = new Date(2003, 10, 31, 21);
+
 
 	var cal = createCalendar({range: 1, start: date});
 	var domain = cal.getDomain(date.getTime());
-	var domainEnd = domain[domain.length-1];
+
 
 	equal(domain.length, 1, "Domain size is 1 hour");
 
@@ -55,11 +53,9 @@ test("get domain when domain is 1 DAY", function() {
 	expect(6);
 
 	var date    = new Date(2003, 10, 20, 23, 26);
-	var nextDay = new Date(2003, 10, 21);
 
 	var cal = createCalendar({domain: "day", range:1, start : date});
 	var domain = cal.getDomain(date);
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 day");
 
@@ -75,11 +71,9 @@ test("get domain when domain is 1 DAY, from a timestamp", function() {
 	expect(6);
 
 	var date    = new Date(2003, 10, 20, 23, 26);
-	var nextDay = new Date(2003, 10, 21);
 
 	var cal = createCalendar({domain: "day", range:1, start : date});
 	var domain = cal.getDomain(date.getTime());
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 day");
 
@@ -198,11 +192,9 @@ test("get domain when domain is 1 MONTH", function() {
 	expect(6);
 
 	var date      = new Date(2003, 10, 25, 23, 26);
-	var nextMonth = new Date(2003, 11, 1, 0, 0);
 
 	var cal = createCalendar({domain: "month", range: 1, start : date});
 	var domain = cal.getDomain(date);
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 month");
 
@@ -219,11 +211,9 @@ test("get domain when domain is 1 MONTH, from a timestamp", function() {
 	expect(6);
 
 	var date      = new Date(2003, 10, 25, 23, 26);
-	var nextMonth = new Date(2003, 11, 1, 0, 0);
 
 	var cal = createCalendar({domain: "month", range: 1, start : date});
 	var domain = cal.getDomain(date.getTime());
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 month");
 
@@ -240,11 +230,9 @@ test("get domain when domain is 1 YEAR", function() {
 	expect(6);
 
 	var date     = new Date(2004, 10, 20, 23, 26);
-	var nextYear = new Date(2005, 0, 1);
 
 	var cal = createCalendar({domain: "year", range: 1, start : date});
 	var domain = cal.getDomain(date);
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 year");
 
@@ -261,11 +249,9 @@ test("get domain when domain is 1 YEAR. from a timestamp", function() {
 	expect(6);
 
 	var date     = new Date(2004, 10, 20, 23, 26);
-	var nextYear = new Date(2005, 0, 1);
 
 	var cal = createCalendar({domain: "year", range: 1, start : date});
 	var domain = cal.getDomain(date.getTime());
-	var domainEnd = domain[domain.length-1];
 
 	equal(domain.length, 1, "Domain size is 1 year");
 
@@ -345,7 +331,6 @@ test("get domain when domain is > 1 WEEK", function() {
 	expect(11);
 
 	var date      = new Date(2013, 1, 20, 20, 15);	// Wednesday : February 20th, 2013
-	var weekStart = new Date(2013, 1, 18);			// Monday : February 18th, 2013
 	var weekEnd   = new Date(2013, 2, 4);			// Sunday : March 4th, 2013
 
 	var cal = createCalendar({domain: "week", range: 3, start : date});
@@ -724,7 +709,6 @@ test("HOUR -> MIN", function() {
 
 	var cal = createCalendar({start : date, domain: "hour", subDomain: "min", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
-	var subDomain = cal.getSubDomain(date);
 
 	var startDate = new Date(2013, 0, 1, 10);
 	var endDate = new Date(2013, 0, 1, 12);
@@ -756,7 +740,6 @@ test("DAY -> HOUR", function() {
 
 	var cal = createCalendar({start : date, domain: "day", subDomain: "hour", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
-	var subDomain = cal.getSubDomain(date);
 
 	var startDate = new Date(2013, 0, 1, 0);
 	var endDate = new Date(2013, 0, 3, 0);
@@ -789,7 +772,6 @@ test("DAY -> MIN", function() {
 
 	var cal = createCalendar({start : date, domain: "day", subDomain: "min", range: 3, paintOnLoad: true});
 	var domain = cal.getDomain(date);
-	var subDomain = cal.getSubDomain(date);
 
 	var startDate = new Date(2013, 0, 1, 0);
 	var endDate = new Date(2013, 0, 3, 0);
@@ -949,7 +931,6 @@ test("MONTH -> WEEK", function() {
 		domainStartDate = new Date(domainStartDate);
 
 		var endOfMonth = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth()+1, 0);
-		var weekNb = Math.ceil(endOfMonth.getDate() / 7);
 
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 		if (startDate.getDay() > 1) {
@@ -1045,7 +1026,6 @@ test("YEAR -> DAY", function() {
 	var domain = cal.getDomain(date);
 
 	var startDate = new Date(2013, 0);
-	var endDate = new Date(2014, 0, 0);
 
 	equal(domain.length, 1, "Domain is equal to 1 year");
 	equal(domain[0].getTime(), startDate.getTime());
@@ -1752,7 +1732,10 @@ test("afterLoadPreviousDomain", function() {
 
 	expect(2);
 
-	var testFunction = function(start, end) { return {start:start, end:end}; };
+	var start = new Date(2012, 0, 1, 20);
+	var end = new Date(2012, 0, 1, 20, 59);
+
+	var testFunction = function(start, end) { console.log(start); return {start:start, end:end}; };
 
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomain: testFunction});
 
@@ -1769,6 +1752,9 @@ test("afterLoadPreviousDomain", function() {
 test("afterLoadNextDomain", function() {
 
 	expect(2);
+
+	var start = new Date(2012, 0, 1, 20);
+	var end = new Date(2012, 0, 1, 20, 59);
 
 	var testFunction = function(start, end) { return {start:start, end:end}; };
 
