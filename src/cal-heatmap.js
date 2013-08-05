@@ -190,7 +190,7 @@ var CalHeatMap = function() {
 
 
 		// ================================================
-		// CALLBACK
+		// EVENTS CALLBACK
 		// ================================================
 
 		// Callback when clicking on a time block
@@ -200,10 +200,10 @@ var CalHeatMap = function() {
 		afterLoad : null,
 
 		// Callback after loading the next domain in the calendar
-		afterLoadNextDomain : function(start) {},
+		afterLoadNextDomain : null,
 
 		// Callback after loading the previous domain in the calendar
-		afterLoadPreviousDomain : function(start) {},
+		afterLoadPreviousDomain : null,
 
 		// Callback after finishing all actions on the calendar
 		onComplete : null,
@@ -220,7 +220,7 @@ var CalHeatMap = function() {
 		//
 		// This callback is also executed once, after calling previous(),
 		// only when the max domain is reached
-		onMaxDomainReached: function(reached) {},
+		onMaxDomainReached: null,
 
 		// Callback triggered after calling previous().
 		// The `status` argument is equal to true if there is no
@@ -228,7 +228,7 @@ var CalHeatMap = function() {
 		//
 		// This callback is also executed once, after calling next(),
 		// only when the min domain is reached
-		onMinDomainReached: function(reached) {}
+		onMinDomainReached: null
 	};
 
 
@@ -237,8 +237,8 @@ var CalHeatMap = function() {
 		"min" : {
 			name: "minute",
 			level: 10,
-			row: function(d) {return 10;},
-			column: function(d) { return 6; },
+			row: function() {return 10;},
+			column: function() { return 6; },
 			position: {
 				x : function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d)); },
 				y : function(d) { return d.getMinutes() % self._domainType.min.row(d);}
@@ -253,7 +253,7 @@ var CalHeatMap = function() {
 		"hour" : {
 			name: "hour",
 			level: 20,
-			row: function(d) {return 6;},
+			row: function() {return 6;},
 			column: function(d) {
 				switch(self.options.domain) {
 					case "day" : return 4;
@@ -285,7 +285,7 @@ var CalHeatMap = function() {
 		"day" : {
 			name: "day",
 			level: 30,
-			row: function(d) {return 7;},
+			row: function() {return 7;},
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
@@ -319,7 +319,7 @@ var CalHeatMap = function() {
 		"week" : {
 			name: "week",
 			level: 40,
-			row: function(d) {return 1;},
+			row: function() {return 1;},
 			column: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
@@ -335,7 +335,7 @@ var CalHeatMap = function() {
 						case "month" : return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth())) - 1;
 					}
 				},
-				y: function(d) {
+				y: function() {
 					return 0;
 				}
 			},
@@ -349,8 +349,8 @@ var CalHeatMap = function() {
 		"month" : {
 			name: "month",
 			level: 50,
-			row: function(d) {return 1;},
-			column: function(d) {return 12;},
+			row: function() {return 1;},
+			column: function() {return 12;},
 			position: {
 				x : function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
 				y : function(d) { return d.getMonth() % self._domainType.month.row(d);}
@@ -365,8 +365,8 @@ var CalHeatMap = function() {
 		"year" : {
 			name: "year",
 			level: 60,
-			row: function(d) {return 1;},
-			column: function(d) {return 12;},
+			row: function() {return 1;},
+			column: function() {return 12;},
 			position: {
 				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row(d)); },
 				y : function(d) { return d.getFullYear() % this._domainType.year.row(d);}
@@ -1010,103 +1010,112 @@ var CalHeatMap = function() {
 
 CalHeatMap.prototype = {
 
-
 	// =========================================================================//
-	// CALLBACK																	//
+	// EVENTS CALLBACK															//
 	// =========================================================================//
 
 	/**
-	 * Callback when clicking on a subdomain cell
+	 * Helper method for triggering event callback
+	 *
+	 * @param  string	eventName       Name of the event to trigger
+	 * @param  array	successArgs     List of argument to pass to the callback
+	 * @param  boolean  skip			Whether to skip the event triggering
+	 * @return mixed	True when the triggering was skipped, false on error, else the callback function
+	 */
+	triggerEvent: function(eventName, successArgs, skip) {
+		if ((arguments.length === 3 && skip) || this.options[eventName] === null) {
+			return true;
+		}
+
+		if (typeof this.options[eventName] === "function") {
+			if (typeof successArgs === "function") {
+				successArgs = successArgs();
+			}
+			return this.options[eventName].apply(this, successArgs);
+		} else {
+			console.log("Provided callback for " + eventName + " is not a function.");
+			return false;
+		}
+	},
+
+	/**
+	 * Event triggered on a mouse click on a subDomain cell
+	 *
 	 * @param  Date		d		Date of the subdomain block
 	 * @param  int		itemNb	Number of items in that date
 	 */
 	onClick : function(d, itemNb) {
-		if (typeof this.options.onClick === "function") {
-			return this.options.onClick(d, itemNb);
-		} else {
-			console.log("Provided callback for onClick is not a function.");
-			return false;
-		}
+		return this.triggerEvent("onClick", [d, itemNb]);
 	},
 
 	/**
-	 * Callback to fire after drawing the calendar, but before filling it
+	 * Event triggered after drawing the calendar, byt before filling it with data
 	 */
 	afterLoad : function() {
-		if (typeof (this.options.afterLoad) === "function") {
-			return this.options.afterLoad();
-		} else {
-			console.log("Provided callback for afterLoad is not a function.");
-			return false;
-		}
+		return this.triggerEvent("afterLoad");
 	},
 
 	/**
-	 * Callback to fire at the end, when all actions on the calendar are completed
+	 * Event triggered after completing drawing and filling the calendar
 	 */
 	onComplete : function() {
-		if (this.options.onComplete === null || this._completed === true) {
-			return true;
-		}
-
+		var response = this.triggerEvent("onComplete", [], this._completed);
 		this._completed = true;
-		if (typeof (this.options.onComplete) === "function") {
-			return this.options.onComplete();
-		} else {
-			console.log("Provided callback for onComplete is not a function.");
-			return false;
-		}
+		return response;
 	},
 
 	/**
-	 * Callback after shifting the calendar one domain back
+	 * Event triggered after shifting the calendar one domain back
+	 *
 	 * @param  Date		start	Domain start date
 	 * @param  Date		end		Domain end date
 	 */
 	afterLoadPreviousDomain: function(start) {
-		if (typeof (this.options.afterLoadPreviousDomain) === "function") {
-			var subDomain = this.getSubDomain(start);
-			return this.options.afterLoadPreviousDomain(subDomain.shift(), subDomain.pop());
-		} else {
-			console.log("Provided callback for afterLoadPreviousDomain is not a function.");
-			return false;
-		}
+		var parent = this;
+		return this.triggerEvent("afterLoadPreviousDomain", function() {
+			var subDomain = parent.getSubDomain(start);
+			return [subDomain.shift(), subDomain.pop()];
+		});
 	},
 
 	/**
-	 * Callback after shifting the calendar one domain above
+	 * Event triggered after shifting the calendar one domain above
+	 *
 	 * @param  Date		start	Domain start date
 	 * @param  Date		end		Domain end date
 	 */
 	afterLoadNextDomain: function(start) {
-		if (typeof (this.options.afterLoadNextDomain) === "function") {
-			var subDomain = this.getSubDomain(start);
-			return this.options.afterLoadNextDomain(subDomain.shift(), subDomain.pop());
-		} else {
-			console.log("Provided callback for afterLoadNextDomain is not a function.");
-			return false;
-		}
+		var parent = this;
+		return this.triggerEvent("afterLoadNextDomain", function() {
+			var subDomain = parent.getSubDomain(start);
+			return [subDomain.shift(), subDomain.pop()];
+		});
 	},
 
+	/**
+	 * Event triggered after loading the leftmost domain allowed by minDate
+	 *
+	 * @param  boolean  reached True if the leftmost domain was reached
+	 */
 	onMinDomainReached: function(reached) {
 		this._minDomainReached = reached;
-		if (typeof (this.options.onMinDomainReached) === "function") {
-			return this.options.onMinDomainReached(reached);
-		} else {
-			console.log("Provided callback for onMinDomainReached is not a function.");
-			return false;
-		}
+		return this.triggerEvent("onMinDomainReached", [reached]);
 	},
 
+	/**
+	 * Event triggered after loading the rightmost domain allowed by maxDate
+	 *
+	 * @param  boolean  reached True if the rightmost domain was reached
+	 */
 	onMaxDomainReached: function(reached) {
 		this._maxDomainReached = reached;
-		if (typeof (this.options.onMaxDomainReached) === "function") {
-			return this.options.onMaxDomainReached(reached);
-		} else {
-			console.log("Provided callback for onMaxDomainReached is not a function.");
-			return false;
-		}
+		return this.triggerEvent("onMaxDomainReached", [reached]);
 	},
+
+
+	// =========================================================================//
+	// FORMATTER																//
+	// =========================================================================//
 
 	formatNumber: d3.format(",g"),
 
@@ -1122,6 +1131,7 @@ CalHeatMap.prototype = {
 			return f(d);
 		}
 	},
+
 
 	// =========================================================================//
 	// DOMAIN NAVIGATION														//
@@ -1232,6 +1242,7 @@ CalHeatMap.prototype = {
 		return (this.options.minDate !== null && (this.options.minDate.getTime() >= datetimestamp));
 	},
 
+
 	// =========================================================================//
 	// PAINTING : LEGEND														//
 	// =========================================================================//
@@ -1303,6 +1314,7 @@ CalHeatMap.prototype = {
 		;
 
 	},
+
 
 	// =========================================================================//
 	// PAINTING : SUBDOMAIN FILLING												//
@@ -1377,6 +1389,7 @@ CalHeatMap.prototype = {
 		);
 		return true;
 	},
+
 
 	// =========================================================================//
 	// POSITIONNING																//
@@ -1459,6 +1472,7 @@ CalHeatMap.prototype = {
 			default : return false;
 		}
 	},
+
 
 	// =========================================================================//
 	// DOMAIN COMPUTATION														//
