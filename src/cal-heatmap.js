@@ -1853,6 +1853,29 @@ CalHeatMap.prototype = {
 		return this.loadPreviousDomain();
 	},
 
+	/**
+	 * Update the whole calendar with a new set of data
+	 *
+	 * @param  mixed	dataSource			The calendar's datasource, same type as this.options.data
+	 * @param  boolean	executeAfterLoad	Whether to execute afterLoad() on the data
+	 * @return boolean  True if the calendar was refreshed with the new data
+	 */
+	update: function(dataSource, executeAfterLoad) {
+		// Get datas from dataSource
+		// Execute afterLoad() if necessary
+		// Trigger repaint
+	},
+
+	/**
+	 * Update the value of some dates
+	 *
+	 * @params object data A json object of new values, indexed by timestamp
+	 * @return boolean  True if the calendar was refreshed with the new data
+	 */
+	updateDate: function(data) {
+
+	},
+
 	getSVG: function() {
 		var styles = {
 			".graph": {},
