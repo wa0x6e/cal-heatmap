@@ -13,6 +13,7 @@
 	"trailing":	 true,
 	"jquery":	 true,
 	"loopfunc":	 true,
+	"unused": true,
 
 	"predef" : [
 		"d3",
