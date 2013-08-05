@@ -452,14 +452,14 @@ var CalHeatMap = function() {
 			// ATTACHING DOMAIN NAVIGATION EVENT										//
 			// =========================================================================//
 			if (self.options.nextSelector !== false) {
-				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function(d) {
+				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function() {
 					d3.event.preventDefault();
 					return self.loadNextDomain();
 				});
 			}
 
 			if (self.options.previousSelector !== false) {
-				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(d) {
+				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function() {
 					d3.event.preventDefault();
 					return self.loadPreviousDomain();
 				});
@@ -555,7 +555,7 @@ var CalHeatMap = function() {
 		var svg = domainSvg
 			.enter()
 			.append("svg")
-			.attr("width", function(d, i){
+			.attr("width", function(d){
 				return w(d, true);
 			})
 			.attr("height", function(d) {
@@ -582,9 +582,13 @@ var CalHeatMap = function() {
 				var date = new Date(d);
 				switch(self.options.domain) {
 					case "hour" : classname += " h_" + date.getHours();
+					/* falls through */
 					case "day" : classname += " d_" + date.getDate() + " dy_" + date.getDay();
+					/* falls through */
 					case "week" : classname += " w_" + self.getWeekNumber(date);
+					/* falls through */
 					case "month" : classname += " m_" + (date.getMonth() + 1);
+					/* falls through */
 					case "year" : classname += " y_" + date.getFullYear();
 				}
 				return classname;
@@ -625,8 +629,8 @@ var CalHeatMap = function() {
 		}
 
 		svg.append("rect")
-			.attr("width", function(d, i) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
-			.attr("height", function(d, i) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
+			.attr("width", function(d) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
+			.attr("height", function(d) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
 			.attr("class", "domain-background")
 			;
 
@@ -634,13 +638,13 @@ var CalHeatMap = function() {
 		// PAINTING SUBDOMAINS														//
 		// =========================================================================//
 		var subDomainSvgGroup = svg.append("svg")
-			.attr("x", function(d, i) {
+			.attr("x", function() {
 				switch(self.options.label.position) {
 					case "left" : return domainHorizontalLabelWidth + self.options.domainMargin[3];
 					default : return self.options.domainMargin[3];
 				}
 			})
-			.attr("y", function(d, i) {
+			.attr("y", function() {
 				switch(self.options.label.position) {
 					case "top" : return domainVerticalLabelHeight + self.options.domainMargin[0];
 					default : return self.options.domainMargin[0];
@@ -689,7 +693,7 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		svg.append("text")
 			.attr("class", "graph-label")
-			.attr("y", function(d, i) {
+			.attr("y", function(d) {
 				var y = self.options.domainMargin[0];
 				switch(self.options.label.position) {
 					case "top" : y += domainVerticalLabelHeight/2; break;
@@ -703,7 +707,7 @@ var CalHeatMap = function() {
 					-1 : 1
 				);
 			})
-			.attr("x", function(d, i){
+			.attr("x", function(d){
 				var x = self.options.domainMargin[3];
 				switch(self.options.label.position) {
 					case "right" : x += w(d); break;
@@ -815,7 +819,7 @@ var CalHeatMap = function() {
 
 		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
 		domainSvg.exit().transition().duration(self.options.animationDuration)
-			.attr("x", function(d, i){
+			.attr("x", function(d){
 				if (self.options.verticalOrientation) {
 					return 0;
 				} else {
@@ -1252,7 +1256,7 @@ CalHeatMap.prototype = {
 			.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
 			.attr("width", width)
 			.append("g")
-			.attr("transform", function(d) {
+			.attr("transform", function() {
 				switch(parent.options.legendHorizontalPosition) {
 					case "right" : return "translate(" + (width - legendWidth) + ")";
 					case "middle" :
@@ -1281,7 +1285,6 @@ CalHeatMap.prototype = {
 		legendItem
 			.append("title")
 			.text(function(d) {
-				var nextThreshold = parent.options.legend[d+1];
 				if (d === 0) {
 					return (parent.options.legendTitleFormat.lower).format({
 						min: parent.options.legend[d],
@@ -1319,10 +1322,7 @@ CalHeatMap.prototype = {
 				d3.select(this).selectAll(".graph-subdomain-group rect")
 					.attr("class", function(d) {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-
 						var htmlClass = "graph-rect" + parent.getHighlightClassName(d);
-
-						var value;
 
 						if (data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) {
 							htmlClass += " " + parent.legend(data[domainUnit][subDomainUnit]);
@@ -1351,7 +1351,7 @@ CalHeatMap.prototype = {
 						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
 
 						if ((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) || parent.options.considerMissingDataAsZero){
-
+							var value = null;
 							if (data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) {
 								value = data[domainUnit][subDomainUnit];
 							} else if (parent.options.considerMissingDataAsZero) {
@@ -1368,7 +1368,7 @@ CalHeatMap.prototype = {
 							return (parent.options.subDomainTitleFormat.empty).format({
 								date: parent.formatDate(d, parent.options.subDomainDateFormat)
 							});
-						};
+						}
 					});
 
 
@@ -1742,8 +1742,6 @@ CalHeatMap.prototype = {
 	 * - json object
 	 */
 	getDatas: function(source, startDate, endDate, callback) {
-		var parent = this;
-
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
