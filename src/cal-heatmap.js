@@ -694,7 +694,7 @@ var CalHeatMap = function() {
 			.attr("y", function(d) { return self.positionSubDomainY(d.t); })
 			.on("click", function(d) {
 				if (self.options.onClick !== null) {
-					return self.onClick(d.t, d.v);
+					return self.onClick(new Date(d.t), d.v);
 				}
 			})
 			.call(function(selection) {
