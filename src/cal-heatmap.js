@@ -280,8 +280,8 @@ var CalHeatMap = function() {
 				connector: "at"
 			},
 			extractUnit : function(d) {
-				var formatHour = d3.time.format("%H");
-				return d.getFullYear() + "" +  self.getDayOfYear(d) + "" + formatHour(d);
+				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
+				return dt.getTime();
 			}
 		},
 		"day" : {
@@ -316,7 +316,10 @@ var CalHeatMap = function() {
 				legend: "%e %b",
 				connector: "on"
 			},
-			extractUnit : function(d) { return d.getFullYear() + "" + self.getDayOfYear(d); }
+			extractUnit : function(d) {
+				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+				return dt.getTime();
+			}
 		},
 		"week" : {
 			name: "week",
@@ -346,7 +349,10 @@ var CalHeatMap = function() {
 				legend: "%B Week #%W",
 				connector: "on"
 			},
-			extractUnit : function(d) { return self.getWeekNumber(d); }
+			extractUnit : function(d) {
+				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+				return dt.setDate(dt.getDay() - dt.getWeekDay()).getTime();
+			}
 		},
 		"month" : {
 			name: "month",
@@ -362,7 +368,10 @@ var CalHeatMap = function() {
 				legend: "%B",
 				connector: "on"
 			},
-			extractUnit : function(d) { return d.getMonth(); }
+			extractUnit : function(d) {
+				var dt = new Date(d.getFullYear(), d.getMonth());
+				return dt.getTime();
+			}
 		},
 		"year" : {
 			name: "year",
@@ -378,7 +387,10 @@ var CalHeatMap = function() {
 				legend: "%Y",
 				connector: "on"
 			},
-			extractUnit : function(d) { return d.getFullYear(); }
+			extractUnit : function(d) {
+				var dt = new Date(d.getFullYear());
+				return dt.getTime();
+			}
 		}
 	};
 
