@@ -117,6 +117,7 @@
 					<ul>
 						<li><a href="#previous">previous</a></li>
 						<li><a href="#next">next</a></li>
+						<li><a href="#update">update</a></li>
 						<li><a href="#getSVG">getSVG</a></li>
 					</ul>
 				</li>
@@ -2150,6 +2151,223 @@ cal.next();
 </code></pre>
 
 			<p class="alert alert-info">See <a href="#previousSelector"><code>nextSelector</code></a> if you wish to directly attach <code>next()</code> to an Element mouse click event.</p>
+
+
+			<h4 id="update">update(data, afterLoad, updateMode)</h4> <strong class="version-added">+3.1.0</strong>
+			<div class="option-type"></div>
+			<p>Update the calendar with new data</p>
+
+			<p>Use <code>update()</code> when you want to refresh the calendar with a new set of data. <br/>Particularly useful if you're filling the calendar in realtime, or if you want to display a subset of the current data.</p>
+
+			<table class="table">
+				<tr>
+					<th>Argument</th>
+					<th>Type</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>data</code></td>
+					<td><code>string</code>|<code>object</code></td>
+					<td>Accept the same format as the <a href="#data"><code>data</code></a> option.</td>
+				</tr>
+				<tr>
+					<td><code>afterLoad</code></td>
+					<td><code>boolean</code>|<code>function</code></td>
+					<td><span class="label label-info">Optional</span> Default: <code>true</code>
+
+						<p>Whether to execute the <a href="#afterLoad"><code>afterLoad()</code></a> callback to convert your data into <em>the</em> json object, expected by cal-heatmap.</p>
+
+					<p>It can also directly takes a function, in case your data can not be converted with the <a href="#afterLoad"><code>afterLoad()</code></a> function you defined.</p>
+
+
+
+					</td>
+				</tr>
+				<tr>
+					<td><code>updateMode</code></td>
+					<td><code>constant</code></td>
+					<td><p><span class="label label-info">Optional</span> Define how to insert the new data into the calendar.</p>
+
+					<p>Accepted values are:</p>
+
+					<dl>
+						<dt><code>Instance.RESET_ALL_ON_UPDATE</code> (default) </dt>
+						<dd>Reset the whole calendar data before inserting the new data.</dd>
+
+						<dt><code>Instance.RESET_SINGLE_ON_UPDATE</code></dt>
+						<dd>Update only the dates (subDomain) you pass in the <code>data</code> argument, replace their value by the new ones. All other dates are leaved untouched.</dd>
+
+						<dt><code>Instance.APPEND_ON_UPDATE</code></dt>
+						<dd>Instead of replacing a date's value by a new one, increment it by the new value. All other dates are leaved untouched. That's the one you want to use of you're populating the calendar in realtime!</dd>
+					</dl>
+				</td>
+				</tr>
+			</table>
+
+			<p>The updated data are not persisted across domain navigation. If the domain was removed then reinserted after a navigation, all updates are lost, since it'll fetch the datasource given in <a href="#data"><code>data</code></a>.</p>
+
+			<p>If you're using the <code>Instance.RESET_ALL_ON_UPDATE</code> mode, you can set <a href="#data"><code>data</code></a> to the new datasource to persist the change.</p>
+
+			<pre><code class="language-javascript">var cal = new CalHeatmap();
+cal.init({
+	data: "user=Eric"
+});
+
+// Wrong way !
+cal.update("user=Marc");
+// Same as cal.update("user=Marc", true, cal.RESET_ALL_ON_UPDATE);
+cal.next();
+// => The new loaded domain contains data from Eric !
+
+// Right way
+cal.update("user=Marc");
+cal.options.data = "user=Marc";
+cal.next();
+</code></pre>
+
+			<div class="example clearfix full-width">
+				<div>
+					<p>Toggling  between 2 data sets</p>
+					<div style="margin: 20px 0">
+						<button id="update-a-display-marc" class="btn">Display Marc's data</button>
+						<button id="update-a-display-eric" class="btn">Display Eric's data</button>
+					</div>
+
+					<div id="update-a"></div>
+
+					<script>
+						(function() {
+var weekStart = new Date();
+weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+var ranges = d3.range(+weekStart/1000, +weekStart/1000 + 3600*24*8, 3600*24);
+
+var max = 5;
+var min = 1;
+
+var ericData = {};
+var marcData = {};
+
+// Creating 2 random data sets
+ranges.map(function(element, index, array) {
+	marcData[element] = Math.floor(Math.random() * (max - min) + min);
+	ericData[element] = Math.floor(Math.random() * (max - min) + min);
+});
+
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#update-a",
+	domain: "week",
+	subDomain: "x_day",
+	data: marcData,
+	cellSize: 20,
+	range: 1,
+	legend: [1, 2, 3, 4]
+});
+
+$("#update-a-display-marc").on("click", function() {
+	cal.update(marcData);
+});
+
+$("#update-a-display-eric").on("click", function() {
+	cal.update(ericData);
+});
+						})();
+					</script>
+				</div>
+			</div>
+
+			<div class="example clearfix full-width">
+				<div>
+					<p>Increment a random date by 2</p>
+					<div style="margin: 20px 0">
+						<button id="update-b-increment" class="btn">Increment a random date by 2</button>
+					</div>
+
+					<div id="update-b"></div>
+
+					<script>
+						(function() {
+var weekStart = new Date();
+weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+var ranges = d3.range(+weekStart/1000, +weekStart/1000 + 3600*24*8, 3600*24);
+
+var max = 5;
+var min = 1;
+
+var marcData = {};
+
+// Creating a random data set
+ranges.map(function(element, index, array) {
+	marcData[element] = Math.floor(Math.random() * (max - min) + min);
+});
+
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#update-b",
+	domain: "week",
+	subDomain: "x_day",
+	data: marcData,
+	cellSize: 20,
+	range: 1,
+	legend: [1, 2, 3, 4]
+});
+
+$("#update-b-increment").on("click", function() {
+	var randomData = {};
+	randomData[Math.floor(Math.random() * (ranges[ranges.length-1] - ranges[0]) + ranges[0])] = 2;
+	cal.update(randomData, false, cal.APPEND_ON_UPDATE);
+});
+						})();
+					</script>
+				</div>
+			</div>
+
+			<div class="example clearfix full-width">
+				<div>
+					<p>Set a random date to 1</p>
+					<div style="margin: 20px 0">
+						<button id="update-c-update" class="btn">Set a random date to 1</button>
+					</div>
+
+					<div id="update-c"></div>
+
+					<script>
+						(function() {
+var weekStart = new Date();
+weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+var ranges = d3.range(+weekStart/1000, +weekStart/1000 + 3600*24*8, 3600*24);
+
+var max = 5;
+var min = 2;
+
+var marcData = {};
+
+// Creating a random data set
+ranges.map(function(element, index, array) {
+	marcData[element] = Math.floor(Math.random() * (max - min) + min);
+});
+
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#update-c",
+	domain: "week",
+	subDomain: "x_day",
+	data: marcData,
+	cellSize: 20,
+	range: 1,
+	legend: [1, 2, 3, 4]
+});
+
+$("#update-c-update").on("click", function() {
+	var randomData = {};
+	randomData[Math.floor(Math.random() * (ranges[ranges.length-1] - ranges[0]) + ranges[0])] = 1;
+	cal.update(randomData, false, cal.RESET_SINGLE_ON_UPDATE);
+});
+						})();
+					</script>
+				</div>
+			</div>
+
 
 
 
