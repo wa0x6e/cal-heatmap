@@ -232,7 +232,6 @@ var CalHeatMap = function() {
 	};
 
 
-
 	this._domainType = {
 		"min" : {
 			name: "minute",
@@ -248,7 +247,7 @@ var CalHeatMap = function() {
 				legend: "",
 				connector: "at"
 			},
-			extractUnit : function(d) { return d.getMinutes(); }
+			extractUnit : function(d) { var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()); return dt.getTime(); }
 		},
 		"hour" : {
 			name: "hour",
@@ -415,7 +414,7 @@ var CalHeatMap = function() {
 
 	// Record all the valid domains
 	// Each domain value is a timestamp in milliseconds
-	this._domains = [];
+	this._domains = d3.map();
 
 	var graphDim = {
 		width: 0,
@@ -438,13 +437,30 @@ var CalHeatMap = function() {
 	 */
 	function _init() {
 
-		self._domains = self.getDomain(self.options.start).map(function(d) { return d.getTime(); });
+		self.getDomain(self.options.start).map(function(d) { return d.getTime(); }).map(function(d) {
+			self._domains.set(d, self.getSubDomain(d).map(function(d) { return {t: self._domainType[self.options.subDomain].extractUnit(d), v: null}; }));
+		});
 
 		self.root = d3.select(self.options.itemSelector);
 
 		self.root.append("svg").attr("class", "graph");
 
 		if (self.options.paintOnLoad) {
+
+			self.verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
+
+			self.domainVerticalLabelHeight = Math.max(25, self.options.cellSize*2);
+			self.domainHorizontalLabelWidth = 0;
+
+			if (!self.verticalDomainLabel) {
+				self.domainVerticalLabelHeight = 0;
+				self.domainHorizontalLabelWidth = self.options.label.width;
+			}
+
+			// @todo : check validity
+			if (typeof self.options.domainMargin === "number") {
+				self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
+			}
 
 			self.paint();
 
@@ -476,12 +492,14 @@ var CalHeatMap = function() {
 
 			// Fill the graph with some datas
 			if (self.options.loadOnInit) {
+				var domains = self._domains.keys().sort();
 				self.getDatas(
 					self.options.data,
-					new Date(self._domains[0]),
-					self.getSubDomain(self._domains[self._domains.length-1]).pop(),
-					function(data) {
-						self.fill(data, self.svg);
+					new Date(parseInt(domains[0], 10)),
+					self.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
+					function() {
+						self.fill();
+						self.onComplete();
 					}
 				);
 			} else {
@@ -490,6 +508,25 @@ var CalHeatMap = function() {
 		}
 
 		return true;
+	}
+
+	// Return the width of the domain block, without the domain gutter
+	// @param int d Domain start timestamp
+	function w(d, outer) {
+		var width = self.options.cellSize*self._domainType[self.options.subDomain].column(d) + self.options.cellPadding*self._domainType[self.options.subDomain].column(d);
+		if (typeof outer !== "undefined" && outer === true) {
+			return width += self.domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
+		}
+		return width;
+	}
+
+	// Return the height of the domain block, without the domain gutter
+	function h(d, outer) {
+		var height = self.options.cellSize*self._domainType[self.options.subDomain].row(d) + self.options.cellPadding*self._domainType[self.options.subDomain].row(d);
+		if (typeof outer !== "undefined" && outer === true) {
+			height += self.options.domainGutter + self.domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
+		}
+		return height;
 	}
 
 
@@ -504,44 +541,10 @@ var CalHeatMap = function() {
 			navigationDir = false;
 		}
 
-		var verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
-
-		var domainVerticalLabelHeight = Math.max(25, self.options.cellSize*2);
-		var domainHorizontalLabelWidth = 0;
-
-		if (!verticalDomainLabel) {
-			domainVerticalLabelHeight = 0;
-			domainHorizontalLabelWidth = self.options.label.width;
-		}
-
-		// @todo : check validity
-		if (typeof self.options.domainMargin === "number") {
-			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
-		}
-
-		// Return the width of the domain block, without the domain gutter
-		// @param int d Domain start timestamp
-		var w = function(d, outer) {
-			var width = self.options.cellSize*self._domainType[self.options.subDomain].column(d) + self.options.cellPadding*self._domainType[self.options.subDomain].column(d);
-			if (typeof outer !== "undefined" && outer === true) {
-				return width += domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
-			}
-			return width;
-		};
-
-		// Return the height of the domain block, without the domain gutter
-		var h = function(d, outer) {
-			var height = self.options.cellSize*self._domainType[self.options.subDomain].row(d) + self.options.cellPadding*self._domainType[self.options.subDomain].row(d);
-			if (typeof outer !== "undefined" && outer === true) {
-				height += self.options.domainGutter + domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
-			}
-			return height;
-		};
-
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
 			.selectAll(".graph-domain")
-			.data(self._domains, function(d) { return d;})
+			.data(self._domains.keys(), function(d) { return d;})
 		;
 
 		var enteringDomainDim = 0;
@@ -552,7 +555,7 @@ var CalHeatMap = function() {
 		// PAINTING DOMAIN															//
 		// =========================================================================//
 
-		var svg = domainSvg
+		self.svg = domainSvg
 			.enter()
 			.append("svg")
 			.attr("width", function(d){
@@ -561,17 +564,17 @@ var CalHeatMap = function() {
 			.attr("height", function(d) {
 				return h(d, true);
 			})
-			.attr("x", function(d, i) {
+			.attr("x", function(d) {
 				if (self.options.verticalOrientation) {
 					graphDim.width = w(d, true);
 					return 0;
 				} else {
-					return getDomainPosition(i, graphDim, "width", w(d, true));
+					return getDomainPosition(d, graphDim, "width", w(d, true));
 				}
 			})
-			.attr("y", function(d, i) {
+			.attr("y", function(d) {
 				if (self.options.verticalOrientation) {
-					return getDomainPosition(i, graphDim, "height", h(d, true));
+					return getDomainPosition(d, graphDim, "height", h(d, true));
 				} else {
 					graphDim.height = h(d, true);
 					return 0;
@@ -595,25 +598,25 @@ var CalHeatMap = function() {
 			})
 		;
 
-		function getDomainPosition(index, graphDim, axis, domainDim) {
+		function getDomainPosition(domainIndex, graphDim, axis, domainDim) {
 			var tmp = 0;
 			switch(navigationDir) {
 				case false :
-					if (index > 0) {
+					//if (domainIndex > 0) {
 						tmp = graphDim[axis];
-					}
+					//}
 
 					graphDim[axis] += domainDim;
-					self.domainPosition.pushPosition(tmp);
+					self.domainPosition.setPosition(domainIndex, tmp);
 					return tmp;
 
 				case self.NAVIGATE_RIGHT :
-					self.domainPosition.pushPosition(graphDim[axis]);
+					self.domainPosition.setPosition(domainIndex, graphDim[axis]);
 
 					enteringDomainDim = domainDim;
-					exitingDomainDim = self.domainPosition.getPosition(1);
+					exitingDomainDim = self.domainPosition.getPositionFromIndex(1);
 
-					self.domainPosition.shiftRight(exitingDomainDim);
+					self.domainPosition.shiftRightBy(exitingDomainDim);
 					return graphDim[axis];
 
 				case self.NAVIGATE_LEFT :
@@ -622,31 +625,31 @@ var CalHeatMap = function() {
 					enteringDomainDim = -tmp;
 					exitingDomainDim = graphDim[axis] - self.domainPosition.getLast();
 
-					self.domainPosition.unshiftPosition(tmp);
-					self.domainPosition.shiftLeft(enteringDomainDim);
+					self.domainPosition.setPosition(domainIndex, tmp);
+					self.domainPosition.shiftLeftBy(enteringDomainDim);
 					return tmp;
 			}
 		}
 
-		svg.append("rect")
+		self.svg.append("rect")
 			.attr("width", function(d) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
 			.attr("height", function(d) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
 			.attr("class", "domain-background")
-			;
+		;
 
 		// =========================================================================//
 		// PAINTING SUBDOMAINS														//
 		// =========================================================================//
-		var subDomainSvgGroup = svg.append("svg")
+		var subDomainSvgGroup = self.svg.append("svg")
 			.attr("x", function() {
 				switch(self.options.label.position) {
-					case "left" : return domainHorizontalLabelWidth + self.options.domainMargin[3];
+					case "left" : return self.domainHorizontalLabelWidth + self.options.domainMargin[3];
 					default : return self.options.domainMargin[3];
 				}
 			})
 			.attr("y", function() {
 				switch(self.options.label.position) {
-					case "top" : return domainVerticalLabelHeight + self.options.domainMargin[0];
+					case "top" : return self.domainVerticalLabelHeight + self.options.domainMargin[0];
 					default : return self.options.domainMargin[0];
 				}
 			})
@@ -654,8 +657,8 @@ var CalHeatMap = function() {
 		;
 
 		var rect = subDomainSvgGroup
-			.selectAll("svg")
-			.data(function(d) { return self.getSubDomain(d); })
+			.selectAll("g")
+			.data(function(d) { return self._domains.get(d); }, function(d) { return d.t; })
 			.enter()
 			.append("g")
 		;
@@ -667,37 +670,38 @@ var CalHeatMap = function() {
 			})
 			.attr("width", self.options.cellSize)
 			.attr("height", self.options.cellSize)
-			.attr("x", function(d) { return self.positionSubDomainX(d); })
-			.attr("y", function(d) { return self.positionSubDomainY(d); })
+			.attr("x", function(d) { return self.positionSubDomainX(d.t); })
+			.attr("y", function(d) { return self.positionSubDomainY(d.t); })
 			.on("click", function(d) {
 				if (self.options.onClick !== null) {
-					return self.onClick(d, null);
+					return self.onClick(d.t, d.v);
 				}
 			})
-			.call(radius)
+			.call(function(selection) {
+				if (self.options.cellRadius > 0) {
+					selection
+						.attr("rx", self.options.cellRadius)
+						.attr("ry", self.options.cellRadius)
+					;
+				}
+			})
 		;
 
-		function radius(selection) {
-			if (self.options.cellRadius > 0) {
-				selection
-					.attr("rx", self.options.cellRadius)
-					.attr("ry", self.options.cellRadius)
-				;
-			}
-		}
+		// Appending a title to each subdomain
+		rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainDateFormat); });
 
 
 
 		// =========================================================================//
 		// PAINTING LABEL															//
 		// =========================================================================//
-		svg.append("text")
+		self.svg.append("text")
 			.attr("class", "graph-label")
 			.attr("y", function(d) {
 				var y = self.options.domainMargin[0];
 				switch(self.options.label.position) {
-					case "top" : y += domainVerticalLabelHeight/2; break;
-					case "bottom" : y += h(d) + domainVerticalLabelHeight/2;
+					case "top" : y += self.domainVerticalLabelHeight/2; break;
+					case "bottom" : y += h(d) + self.domainVerticalLabelHeight/2;
 				}
 
 				return y + self.options.label.offset.y *
@@ -716,7 +720,7 @@ var CalHeatMap = function() {
 				}
 
 				if (self.options.label.align === "right") {
-					return x + domainHorizontalLabelWidth - self.options.label.offset.x *
+					return x + self.domainHorizontalLabelWidth - self.options.label.offset.x *
 					(self.options.label.rotate === "right" ? -1 : 1);
 				}
 				return x + self.options.label.offset.x;
@@ -731,8 +735,8 @@ var CalHeatMap = function() {
 					default : return "middle";
 				}
 			})
-			.attr("dominant-baseline", function() { return verticalDomainLabel ? "middle" : "top"; })
-			.text(function(d, i) { return self.formatDate(new Date(self._domains[i]), self.options.domainLabelFormat); })
+			.attr("dominant-baseline", function() { return self.verticalDomainLabel ? "middle" : "top"; })
+			.text(function(d) { return self.formatDate(new Date(parseInt(d, 10)), self.options.domainLabelFormat); })
 			.call(domainRotate)
 		;
 
@@ -744,7 +748,7 @@ var CalHeatMap = function() {
 						var s = "rotate(90), ";
 						switch(self.options.label.position) {
 							case "right" : s += "translate(-" + w(d) + " , -" + w(d) + ")"; break;
-							case "left" : s += "translate(0, -" + domainHorizontalLabelWidth + ")"; break;
+							case "left" : s += "translate(0, -" + self.domainHorizontalLabelWidth + ")"; break;
 						}
 
 						return s;
@@ -755,8 +759,8 @@ var CalHeatMap = function() {
 					.attr("transform", function(d) {
 						var s = "rotate(270), ";
 						switch(self.options.label.position) {
-							case "right" : s += "translate(-" + (w(d) + domainHorizontalLabelWidth) + " , " + w(d) + ")"; break;
-							case "left" : s += "translate(-" + (domainHorizontalLabelWidth) + " , " + domainHorizontalLabelWidth + ")"; break;
+							case "right" : s += "translate(-" + (w(d) + self.domainHorizontalLabelWidth) + " , " + w(d) + ")"; break;
+							case "left" : s += "translate(-" + (self.domainHorizontalLabelWidth) + " , " + self.domainHorizontalLabelWidth + ")"; break;
 						}
 
 						return s;
@@ -766,8 +770,6 @@ var CalHeatMap = function() {
 		}
 
 
-		// Appending a title to each subdomain
-		rect.append("title").text(function(d){ return self.formatDate(d, self.options.subDomainDateFormat); });
 
 
 		// =========================================================================//
@@ -777,8 +779,8 @@ var CalHeatMap = function() {
 			rect
 				.append("text")
 				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
-				.attr("x", function(d) { return self.positionSubDomainX(d) + self.options.cellSize/2; })
-				.attr("y", function(d) { return self.positionSubDomainY(d) + self.options.cellSize/2; })
+				.attr("x", function(d) { return self.positionSubDomainX(d.d) + self.options.cellSize/2; })
+				.attr("y", function(d) { return self.positionSubDomainY(d.d) + self.options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
 				.text(function(d){ return self.formatDate(d, self.options.subDomainTextFormat); })
@@ -791,19 +793,11 @@ var CalHeatMap = function() {
 
 		if (navigationDir !== false) {
 			domainSvg.transition().duration(self.options.animationDuration)
-				.attr("x", function(d, i){
-					if (self.options.verticalOrientation) {
-						return 0;
-					} else {
-						return self.domainPosition.getPosition(i);
-					}
+				.attr("x", function(d){
+					return self.options.verticalOrientation ? 0 : self.domainPosition.getPosition(d);
 				})
-				.attr("y", function(d, i){
-					if (self.options.verticalOrientation) {
-						return self.domainPosition.getPosition(i);
-					} else {
-						return 0;
-					}
+				.attr("y", function(d){
+					return self.options.verticalOrientation? self.domainPosition.getPosition(d) : 0;
 				})
 			;
 		}
@@ -847,13 +841,54 @@ var CalHeatMap = function() {
 			.attr("width", function() { return graphDim.width - self.options.domainGutter - self.options.cellPadding; })
 			.attr("height", function() { return graphDim.height - self.options.domainGutter - self.options.cellPadding; })
 		;
+	};
 
-		if (self.svg === null) {
-			self.svg = svg;
-		} else {
-			self.svg = self.root.select(".graph").selectAll("svg")
-			.data(self._domains, function(d) {return d;});
-		}
+	this.fill = function() {
+		var rect = self.svg
+			.selectAll("svg").selectAll("g")
+			.data(function(d) { return self._domains.get(d); }, function(d) { return d.t; })
+		;
+
+		rect.transition().select("rect")
+			.attr("class", function(d) {
+
+				var htmlClass = "graph-rect" + self.getHighlightClassName(d.v);
+
+				if (d.v !== null) {
+					htmlClass += " " + self.legend(d.v);
+				} else if (self.options.considerMissingDataAsZero) {
+					htmlClass += " " + self.legend(0);
+				}
+
+				if (self.options.onClick !== null) {
+					htmlClass += " hover_cursor";
+				}
+
+				return htmlClass;
+			})
+		;
+
+
+		rect.transition().select("title")
+			.text(function(d) {
+				if (d.v !== null || self.options.considerMissingDataAsZero) {
+					var value = d.v;
+					/*if (value === null && self.options.considerMissingDataAsZero) {
+						value = 0;
+					}*/
+
+					return (self.options.subDomainTitleFormat.filled).format({
+						count: self.formatNumber(value),
+						name: self.options.itemName[(value !== 1 ? 1 : 0)],
+						connector: self._domainType[self.options.subDomain].format.connector,
+						date: self.formatDate(new Date(d.t), self.options.subDomainDateFormat)
+					});
+				} else {
+					return (self.options.subDomainTitleFormat.empty).format({
+						date: self.formatDate(new Date(d.t), self.options.subDomainDateFormat)
+					});
+				}
+			});
 	};
 
 
@@ -1153,28 +1188,35 @@ CalHeatMap.prototype = {
 		}
 
 		var parent = this;
-		this._domains.push(nextDomainStartTimestamp);
-		this._domains.shift();
+		this._domains.set(
+			nextDomainStartTimestamp,
+			this.getSubDomain(nextDomainStartTimestamp).map(function(d) {
+				return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
+			})
+		);
+		this._domains.remove(this._domains.keys().sort().shift());
 
 		this.paint(this.NAVIGATE_RIGHT);
 
+		var domains = this._domains.keys().sort();
+
 		this.getDatas(
 			this.options.data,
-			new Date(this._domains[this._domains.length-1]),
-			this.getSubDomain(this._domains[this._domains.length-1]).pop(),
-			function(data) {
-				parent.fill(data, parent.svg);
+			new Date(parseInt(domains[domains.length-1], 10)),
+			this.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
+			function() {
+				parent.fill();
 			}
 		);
 
-		this.afterLoadNextDomain(new Date(this._domains[this._domains.length-1]));
+		this.afterLoadNextDomain(new Date(parseInt(domains[domains.length-1], 10)));
 
 		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
 			this.onMaxDomainReached(true);
 		}
 
 		// Try to "disengage" the min domain reached setting
-		if (this._minDomainReached && !this.minDomainIsReached(this._domains[0])) {
+		if (this._minDomainReached && !this.minDomainIsReached(domains[0])) {
 			this.onMinDomainReached(false);
 		}
 
@@ -1196,28 +1238,35 @@ CalHeatMap.prototype = {
 		var previousDomainStartTimestamp = this.getPreviousDomain().getTime();
 
 		var parent = this;
-		this._domains.unshift(previousDomainStartTimestamp);
-		this._domains.pop();
+		this._domains.set(
+			previousDomainStartTimestamp,
+			this.getSubDomain(previousDomainStartTimestamp).map(function(d) {
+				return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
+			})
+		);
+		this._domains.remove(this._domains.keys().sort().pop());
 
 		this.paint(this.NAVIGATE_LEFT);
 
+		var domains = this._domains.keys().sort();
+
 		this.getDatas(
 			this.options.data,
-			new Date(this._domains[0]),
-			this.getSubDomain(this._domains[0]).pop(),
-			function(data) {
-				parent.fill(data, parent.svg);
+			new Date(parseInt(domains[0], 10)),
+			this.getSubDomain(parseInt(domains[0], 10)).pop(),
+			function() {
+				parent.fill();
 			}
 		);
 
-		this.afterLoadPreviousDomain(new Date(this._domains[0]));
+		this.afterLoadPreviousDomain(new Date(parseInt(domains[0], 10)));
 
 		if (this.minDomainIsReached(previousDomainStartTimestamp)) {
 			this.onMinDomainReached(true);
 		}
 
 		// Try to "disengage" the max domain reached setting
-		if (this._maxDomainReached && !this.maxDomainIsReached(this._domains[this._domains.length-1])) {
+		if (this._maxDomainReached && !this.maxDomainIsReached(domains[domains.length-1])) {
 			this.onMaxDomainReached(false);
 		}
 
@@ -1325,7 +1374,7 @@ CalHeatMap.prototype = {
 	 *
 	 * @param  {[type]} data  [description]
 	 */
-	display: function(data, domain) {
+	display: function(data, domain) { return;
 		var parent = this;
 
 		domain.each(function(domainUnit) {
@@ -1396,12 +1445,12 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 
 	positionSubDomainX: function(d) {
-		var index = this._domainType[this.options.subDomain].position.x(d);
+		var index = this._domainType[this.options.subDomain].position.x(new Date(d));
 		return index * this.options.cellSize + index * this.options.cellPadding;
 	},
 
 	positionSubDomainY: function(d) {
-		var index = this._domainType[this.options.subDomain].position.y(d);
+		var index = this._domainType[this.options.subDomain].position.y(new Date(d));
 		return index * this.options.cellSize + index * this.options.cellPadding;
 	},
 
@@ -1696,11 +1745,11 @@ CalHeatMap.prototype = {
 	},
 
 	getNextDomain: function() {
-		return this.getDomain(this._domains[this._domains.length-1], 2).pop();
+		return this.getDomain(parseInt(this._domains.keys().sort().pop(), 10), 2).pop();
 	},
 
 	getPreviousDomain: function() {
-		return this.getDomain(this._domains[0], -1)[0];
+		return this.getDomain(parseInt(this._domains.keys().sort().shift(), 10), -1)[0];
 	},
 
 	/**
@@ -1737,17 +1786,6 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 
 	/**
-	 * @todo Add check for empty data
-	 *
-	 * @return bool True if the calendar was filled with the passed data
-	 */
-	fill: function(datas, domain) {
-		var response = this.display(this.parseDatas(datas), domain);
-		this.onComplete();
-		return response;
-	},
-
-	/**
 	 * Interpret the data property
 	 *
 	 * @return mixed
@@ -1756,25 +1794,29 @@ CalHeatMap.prototype = {
 	 * - json object
 	 */
 	getDatas: function(source, startDate, endDate, callback) {
+		var self = this;
+		var _callback = function(data) {
+			self.parseDatas(data);
+			callback();
+		};
+
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
-					this.onComplete();
 					return true;
 				} else {
-
 					switch(this.options.dataType) {
 						case "json" :
-							d3.json(this.parseURI(source, startDate, endDate), callback);
+							d3.json(this.parseURI(source, startDate, endDate), _callback);
 							break;
 						case "csv" :
-							d3.csv(this.parseURI(source, startDate, endDate), callback);
+							d3.csv(this.parseURI(source, startDate, endDate), _callback);
 							break;
 						case "tsv" :
-							d3.tsv(this.parseURI(source, startDate, endDate), callback);
+							d3.tsv(this.parseURI(source, startDate, endDate), _callback);
 							break;
 						case "text" :
-							d3.text(this.parseURI(source, startDate, endDate), "text/plain", callback);
+							d3.text(this.parseURI(source, startDate, endDate), "text/plain", _callback);
 							break;
 					}
 
@@ -1783,7 +1825,7 @@ CalHeatMap.prototype = {
 				break;
 			case "object" :
 				// @todo Check that it's a valid JSON object
-				callback(source);
+				_callback();
 		}
 
 		return true;
@@ -1796,7 +1838,6 @@ CalHeatMap.prototype = {
 	 * @return {[type]}      [description]
 	 */
 	parseDatas: function(data) {
-		var stats = {};
 
 		if (typeof (this.options.afterLoadData) === "function") {
 			data = this.options.afterLoadData(data);
@@ -1805,28 +1846,30 @@ CalHeatMap.prototype = {
 			return {};
 		}
 
+		var domainKeys = this._domains.keys();
+		var subDomainStep = this._domains.get(domainKeys[0])[1].t - this._domains.get(domainKeys[0])[0].t;
+
 		for (var d in data) {
 			var date = new Date(d*1000);
 			var domainUnit = this.getDomain(date)[0].getTime();
 
-			// Don't record datas not relevant to the current domain
-			if (this._domains.indexOf(domainUnit) < 0) {
-				continue;
-			}
+			// Record only datas relevant to the current domain
+			if (this._domains.has(domainUnit)) {
+				var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 
-			var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
-			if (typeof stats[domainUnit] === "undefined") {
-				stats[domainUnit] = {};
-			}
+				var subDomainsData = this._domains.get(domainUnit);
 
-			if (typeof stats[domainUnit][subDomainUnit] !== "undefined") {
-				stats[domainUnit][subDomainUnit] += data[d];
-			} else {
-				stats[domainUnit][subDomainUnit] = data[d];
+				var index = (subDomainUnit - domainUnit) / subDomainStep;
+
+				if (!isNaN(subDomainsData[index].v)) {
+					subDomainsData[index].v += data[d];
+				} else {
+					subDomainsData[index].v = data[d];
+				}
+
+
 			}
 		}
-
-		return stats;
 	},
 
 	parseURI: function(str, startDate, endDate) {
@@ -1872,7 +1915,7 @@ CalHeatMap.prototype = {
 	 * @params object data A json object of new values, indexed by timestamp
 	 * @return boolean  True if the calendar was refreshed with the new data
 	 */
-	updateDate: function(data) {
+	updateDates: function(data) {
 
 	},
 
@@ -1976,37 +2019,43 @@ CalHeatMap.prototype = {
 };
 
 var DomainPosition = function() {
-	this.positions = [];
+	this.positions = d3.map();
 };
 
-DomainPosition.prototype.getPosition = function(i) {
-	return this.positions[i];
+DomainPosition.prototype.getPosition = function(d) {
+	return this.positions.get(d);
+};
+
+DomainPosition.prototype.getPositionFromIndex = function(i) {
+	var domains = this.positions.keys().sort();
+	return this.positions.get(domains[i]);
 };
 
 DomainPosition.prototype.getLast = function() {
-	return this.positions[this.positions.length-1];
+	var domains = this.positions.keys().sort();
+	return this.positions.get(domains[domains.length-1]);
 };
 
-DomainPosition.prototype.pushPosition = function(dim) {
-	this.positions.push(dim);
+DomainPosition.prototype.setPosition = function(d, dim) {
+	this.positions.set(d, dim);
 };
 
-DomainPosition.prototype.unshiftPosition = function(dim) {
-	this.positions.unshift(dim);
+DomainPosition.prototype.shiftRightBy = function(exitingDomainDim) {
+	this.positions.forEach(function(key, value) {
+		this.set(key, value - exitingDomainDim);
+	});
+
+	var domains = this.positions.keys().sort();
+	this.positions.remove(domains[0]);
 };
 
-DomainPosition.prototype.shiftRight = function(exitingDomainDim) {
-	for(var i in this.positions) {
-		this.positions[i] -= exitingDomainDim;
-	}
-	this.positions.shift();
-};
+DomainPosition.prototype.shiftLeftBy = function(enteringDomainDim) {
+	this.positions.forEach(function(key, value) {
+		this.set(key, value + enteringDomainDim);
+	});
 
-DomainPosition.prototype.shiftLeft = function(enteringDomainDim) {
-	for(var i in this.positions) {
-		this.positions[i] += enteringDomainDim;
-	}
-	this.positions.pop();
+	var domains = this.positions.keys().sort();
+	this.positions.remove(domains[domains.length-1]);
 };
 
 
