@@ -247,7 +247,10 @@ var CalHeatMap = function() {
 				legend: "",
 				connector: "at"
 			},
-			extractUnit : function(d) { var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()); return dt.getTime(); }
+			extractUnit : function(d) {
+				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes());
+				return dt.getTime();
+			}
 		},
 		"hour" : {
 			name: "hour",
@@ -423,6 +426,11 @@ var CalHeatMap = function() {
 
 	this.NAVIGATE_LEFT = 1;
 	this.NAVIGATE_RIGHT = 2;
+
+	// Various update mode when using the update() API
+	this.RESET_ALL_ON_UPDATE = 0;
+	this.RESET_SINGLE_ON_UPDATE = 1;
+	this.APPEND_ON_UPDATE = 2;
 
 	this.root = null;
 
@@ -689,7 +697,6 @@ var CalHeatMap = function() {
 
 		// Appending a title to each subdomain
 		rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainDateFormat); });
-
 
 
 		// =========================================================================//
@@ -1364,82 +1371,6 @@ CalHeatMap.prototype = {
 
 	},
 
-
-	// =========================================================================//
-	// PAINTING : SUBDOMAIN FILLING												//
-	// =========================================================================//
-
-	/**
-	 * Colorize all rectangles according to their items count
-	 *
-	 * @param  {[type]} data  [description]
-	 */
-	display: function(data, domain) { return;
-		var parent = this;
-
-		domain.each(function(domainUnit) {
-
-			if (data.hasOwnProperty(domainUnit) || parent.options.considerMissingDataAsZero) {
-				d3.select(this).selectAll(".graph-subdomain-group rect")
-					.attr("class", function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-						var htmlClass = "graph-rect" + parent.getHighlightClassName(d);
-
-						if (data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) {
-							htmlClass += " " + parent.legend(data[domainUnit][subDomainUnit]);
-						} else if (parent.options.considerMissingDataAsZero) {
-							htmlClass += " " + parent.legend(0);
-						}
-
-						if (parent.options.onClick !== null) {
-							htmlClass += " hover_cursor";
-						}
-
-						return htmlClass;
-					})
-					.on("click", function(d) {
-						if (parent.options.onClick !== null) {
-							var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-							return parent.onClick(
-								d,
-								(data[domainUnit].hasOwnProperty(subDomainUnit) || parent.options.considerMissingDataAsZero ? data[domainUnit][subDomainUnit] : null)
-							);
-						}
-					});
-
-				d3.select(this).selectAll(".graph-subdomain-group title")
-					.text(function(d) {
-						var subDomainUnit = parent._domainType[parent.options.subDomain].extractUnit(d);
-
-						if ((data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit) && data[domainUnit][subDomainUnit] !== null) || parent.options.considerMissingDataAsZero){
-							var value = null;
-							if (data.hasOwnProperty(domainUnit) && data[domainUnit].hasOwnProperty(subDomainUnit)) {
-								value = data[domainUnit][subDomainUnit];
-							} else if (parent.options.considerMissingDataAsZero) {
-								value = 0;
-							}
-
-							return (parent.options.subDomainTitleFormat.filled).format({
-								count: parent.formatNumber(value),
-								name: parent.options.itemName[(value !== 1 ? 1 : 0)],
-								connector: parent._domainType[parent.options.subDomain].format.connector,
-								date: parent.formatDate(d, parent.options.subDomainDateFormat)
-							});
-						} else {
-							return (parent.options.subDomainTitleFormat.empty).format({
-								date: parent.formatDate(d, parent.options.subDomainDateFormat)
-							});
-						}
-					});
-
-
-				}
-			}
-		);
-		return true;
-	},
-
-
 	// =========================================================================//
 	// POSITIONNING																//
 	// =========================================================================//
@@ -1786,17 +1717,39 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 
 	/**
-	 * Interpret the data property
+	 * Fetch and interpret data from the datasource
+	 *
+	 * @param string|object source
+	 * @param Date startDate
+	 * @param Date endDate
+	 * @param function callback
+	 * @param function|boolean afterLoad function used to convert the data into a json object. Use true to use the afterLoad callback
+	 * @param updateMode
 	 *
 	 * @return mixed
-	 * - True if no data to load
-	 * - False if data is loaded asynchornously
-	 * - json object
+	 * - True if there are no data to load
+	 * - False if data are loaded asynchronously
 	 */
-	getDatas: function(source, startDate, endDate, callback) {
+	getDatas: function(source, startDate, endDate, callback, afterLoad, updateMode) {
 		var self = this;
+		if (arguments.length < 5) {
+			afterLoad = true;
+		}
+		if (arguments.length < 6) {
+			updateMode = this.APPEND_ON_UPDATE;
+		}
 		var _callback = function(data) {
-			self.parseDatas(data);
+			if (afterLoad !== false) {
+				if (typeof afterLoad === "function") {
+					data = afterLoad(data);
+				} else if (typeof (self.options.afterLoadData) === "function") {
+					data = self.options.afterLoadData(data);
+				} else {
+					console.log("Provided callback for afterLoadData is not a function.");
+					return {};
+				}
+			}
+			self.parseDatas(data, updateMode);
 			callback();
 		};
 
@@ -1825,25 +1778,28 @@ CalHeatMap.prototype = {
 				break;
 			case "object" :
 				// @todo Check that it's a valid JSON object
-				_callback();
+				_callback(source);
 		}
 
 		return true;
 	},
 
 	/**
-	 * Convert a JSON result into the expected format
+	 * Populate the calendar internal data
 	 *
-	 * @param  {[type]} data [description]
-	 * @return {[type]}      [description]
+	 * @param object data
+	 * @param constant updateMode
+	 *
+	 * @return void
 	 */
-	parseDatas: function(data) {
+	parseDatas: function(data, updateMode) {
 
-		if (typeof (this.options.afterLoadData) === "function") {
-			data = this.options.afterLoadData(data);
-		} else {
-			console.log("Provided callback for afterLoadData is not a function.");
-			return {};
+		if (updateMode === this.RESET_ALL_ON_UPDATE) {
+			this._domains.forEach(function(key, value) {
+				value.forEach(function(element, index, array) {
+					array[index].v = null;
+				});
+			});
 		}
 
 		var domainKeys = this._domains.keys();
@@ -1856,18 +1812,18 @@ CalHeatMap.prototype = {
 			// Record only datas relevant to the current domain
 			if (this._domains.has(domainUnit)) {
 				var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
-
 				var subDomainsData = this._domains.get(domainUnit);
-
 				var index = (subDomainUnit - domainUnit) / subDomainStep;
 
-				if (!isNaN(subDomainsData[index].v)) {
-					subDomainsData[index].v += data[d];
-				} else {
+				if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 					subDomainsData[index].v = data[d];
+				} else {
+					if (!isNaN(subDomainsData[index].v)) {
+						subDomainsData[index].v += data[d];
+					} else {
+						subDomainsData[index].v = data[d];
+					}
 				}
-
-
 			}
 		}
 	},
@@ -1897,26 +1853,32 @@ CalHeatMap.prototype = {
 	},
 
 	/**
-	 * Update the whole calendar with a new set of data
+	 * Update the calendar with new data
 	 *
-	 * @param  mixed	dataSource			The calendar's datasource, same type as this.options.data
-	 * @param  boolean	executeAfterLoad	Whether to execute afterLoad() on the data
-	 * @return boolean  True if the calendar was refreshed with the new data
+	 * @param  object|string		dataSource		The calendar's datasource, same type as this.options.data
+	 * @param  boolean|function		afterLoad		Whether to execute afterLoad() on the data. Pass directly a function
+	 * if you don't want to use the afterLoad() callback
 	 */
-	update: function(dataSource, executeAfterLoad) {
-		// Get datas from dataSource
-		// Execute afterLoad() if necessary
-		// Trigger repaint
-	},
+	update: function(dataSource, afterLoad, updateMode) {
+		if (arguments.length < 2) {
+			afterLoad = true;
+		}
+		if (arguments.length < 3) {
+			updateMode = this.RESET_ALL_ON_UPDATE;
+		}
 
-	/**
-	 * Update the value of some dates
-	 *
-	 * @params object data A json object of new values, indexed by timestamp
-	 * @return boolean  True if the calendar was refreshed with the new data
-	 */
-	updateDates: function(data) {
-
+		var domains = this._domains.keys().sort();
+		var self = this;
+		this.getDatas(
+			dataSource,
+			new Date(parseInt(domains[0], 10)),
+			this.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
+			function() {
+				self.fill();
+			},
+			afterLoad,
+			updateMode
+		);
 	},
 
 	getSVG: function() {
