@@ -2153,7 +2153,7 @@ cal.next();
 			<p class="alert alert-info">See <a href="#previousSelector"><code>nextSelector</code></a> if you wish to directly attach <code>next()</code> to an Element mouse click event.</p>
 
 
-			<h4 id="update">update(data, afterLoad, updateMode)</h4> <strong class="version-added">+3.1.0</strong>
+			<h4 id="update">update(data, afterLoad, updateMode)</h4> <strong class="version-added">3.1.0+</strong>
 			<div class="option-type"></div>
 			<p>Update the calendar with new data</p>
 
@@ -2204,9 +2204,9 @@ cal.next();
 				</tr>
 			</table>
 
-			<p>The updated data are not persisted across domain navigation. If the domain was removed then reinserted after a navigation, all updates are lost, since it'll fetch the datasource given in <a href="#data"><code>data</code></a>.</p>
+			<p>The updated data are not persisted across domain navigation. If the domain was removed then reinserted after a navigation, all updates will be lost, since it'll fetch the datasource given in <a href="#data"><code>data</code></a>.</p>
 
-			<p>If you're using the <code>Instance.RESET_ALL_ON_UPDATE</code> mode, you can set <a href="#data"><code>data</code></a> to the new datasource to persist the change.</p>
+			<p>If you're using the <code>Instance.RESET_ALL_ON_UPDATE</code> mode, you can change <a href="#data"><code>data</code></a> to the new datasource, to persist the change.</p>
 
 			<pre><code class="language-javascript">var cal = new CalHeatmap();
 cal.init({
@@ -2215,7 +2215,7 @@ cal.init({
 
 // Wrong way !
 cal.update("user=Marc");
-// Same as cal.update("user=Marc", true, cal.RESET_ALL_ON_UPDATE);
+// Same as calling cal.update("user=Marc", true, cal.RESET_ALL_ON_UPDATE);
 cal.next();
 // => The new loaded domain contains data from Eric !
 
@@ -2801,6 +2801,7 @@ cal.init({
 	domain: "hour",
 	cellSize: 5,
 	range: 12,
+	animationDuration: 100,
 	domainGutter: 0,
 	domainMargin: 5,
 	nextSelector: "#domain-highlight-next-selector",
