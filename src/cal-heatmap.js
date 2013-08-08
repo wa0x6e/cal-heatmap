@@ -564,7 +564,7 @@ var CalHeatMap = function() {
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
 			.selectAll(".graph-domain")
-			.data(self._domains.keys(), function(d) { return d;})
+			.data(self._domains.keys().map(function(d) { return parseInt(d, 10); }), function(d) { return d;})
 		;
 
 		var enteringDomainDim = 0;
@@ -578,7 +578,7 @@ var CalHeatMap = function() {
 		self.svg = domainSvg
 			.enter()
 			.append("svg")
-			.attr("width", function(d){
+			.attr("width", function(d) {
 				return w(d, true);
 			})
 			.attr("height", function(d) {
@@ -686,7 +686,7 @@ var CalHeatMap = function() {
 		rect
 			.append("rect")
 			.attr("class", function(d) {
-				return "graph-rect" + self.getHighlightClassName(d) + (self.options.onClick !== null ? " hover_cursor" : "");
+				return "graph-rect" + self.getHighlightClassName(d.t) + (self.options.onClick !== null ? " hover_cursor" : "");
 			})
 			.attr("width", self.options.cellSize)
 			.attr("height", self.options.cellSize)
@@ -755,7 +755,7 @@ var CalHeatMap = function() {
 				}
 			})
 			.attr("dominant-baseline", function() { return self.verticalDomainLabel ? "middle" : "top"; })
-			.text(function(d) { return self.formatDate(new Date(parseInt(d, 10)), self.options.domainLabelFormat); })
+			.text(function(d) { return self.formatDate(new Date(d), self.options.domainLabelFormat); })
 			.call(domainRotate)
 		;
 
@@ -797,12 +797,12 @@ var CalHeatMap = function() {
 		if (self.options.subDomainTextFormat !== null) {
 			rect
 				.append("text")
-				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d); })
-				.attr("x", function(d) { return self.positionSubDomainX(d.d) + self.options.cellSize/2; })
-				.attr("y", function(d) { return self.positionSubDomainY(d.d) + self.options.cellSize/2; })
+				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d.t); })
+				.attr("x", function(d) { return self.positionSubDomainX(d.t) + self.options.cellSize/2; })
+				.attr("y", function(d) { return self.positionSubDomainY(d.t) + self.options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
-				.text(function(d){ return self.formatDate(d, self.options.subDomainTextFormat); })
+				.text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainTextFormat); })
 			;
 		}
 
@@ -871,7 +871,7 @@ var CalHeatMap = function() {
 		rect.transition().select("rect")
 			.attr("class", function(d) {
 
-				var htmlClass = "graph-rect" + self.getHighlightClassName(d.v);
+				var htmlClass = "graph-rect" + self.getHighlightClassName(d.t);
 
 				if (d.v !== null) {
 					htmlClass += " " + self.legend(d.v);
@@ -1400,11 +1400,13 @@ CalHeatMap.prototype = {
 	/**
 	 * Return a classname if the specified date should be highlighted
 	 *
-	 * @param  Date d a date
+	 * @param  timestamp date Date of the current subDomain
 	 * @return String the highlight class
 	 */
 	getHighlightClassName: function(d)
 	{
+		d = new Date(d);
+
 		if (this.options.highlight.length > 0) {
 			for (var i in this.options.highlight) {
 				if (this.options.highlight[i] instanceof Date && this.dateIsEqual(this.options.highlight[i], d)) {
@@ -1768,6 +1770,7 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 			case "string" :
 				if (source === "") {
+					_callback();
 					return true;
 				} else {
 					switch(this.options.dataType) {
@@ -1825,7 +1828,7 @@ CalHeatMap.prototype = {
 			if (this._domains.has(domainUnit)) {
 				var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 				var subDomainsData = this._domains.get(domainUnit);
-				var index = (subDomainUnit - domainUnit) / subDomainStep;
+				var index = Math.floor((subDomainUnit - domainUnit) / subDomainStep);
 
 				if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 					subDomainsData[index].v = data[d];
