@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.1.0 [2013-08-08]
+
+* [new] Add `update()` method, to update calendar data.
+* [improvement] Use d3.js internal methods to bind data to subDomains
+
 ## v3.0.9 [2013-08-01]
 
 * [new] Fix #26: add `considerMissingDataAsZero` option to consider missing value as zero
