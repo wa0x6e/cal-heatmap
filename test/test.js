@@ -1,5 +1,5 @@
-/*globals asyncTest,deepEqual,equal,expect,module,notDeepEqual,notEqual,
-    notStrictEqual,ok,QUnit,raises,start,stop,strictEqual,test,CalHeatMap */
+/*global equal,expect,module,
+    ok,test,CalHeatMap */
 
 
 /*
@@ -726,8 +726,8 @@ test("HOUR -> MIN", function() {
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), domainStartDate.getHours(), 0);
 		var endDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), domainStartDate.getHours(), 59);
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The hour subdomain start is the first minute of hour");
-		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The hour subdomain start is the last minute of hour");
+		equal(subDomain[0].t, startDate.getTime(), "The hour subdomain start is the first minute of hour");
+		equal(subDomain[subDomain.length-1].t, endDate.getTime(), "The hour subdomain start is the last minute of hour");
 	});
 
 });
@@ -757,8 +757,8 @@ test("DAY -> HOUR", function() {
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 0);
 		var endDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 23);
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The hour subdomain start is the first hour of day");
-		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The hour subdomain start is the last hour of day");
+		equal(subDomain[0].t, startDate.getTime(), "The hour subdomain start is the first hour of day");
+		equal(subDomain[subDomain.length-1].t, endDate.getTime(), "The hour subdomain start is the last hour of day");
 	});
 
 });
@@ -789,8 +789,8 @@ test("DAY -> MIN", function() {
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 0);
 		var endDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate(), 23, 59);
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The hour subdomain start is the first minute of day");
-		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The hour subdomain start is the last minute of day");
+		equal(subDomain[0].t, startDate.getTime(), "The hour subdomain start is the first minute of day");
+		equal(subDomain[subDomain.length-1].t, endDate.getTime(), "The hour subdomain start is the last minute of day");
 	});
 
 });
@@ -823,10 +823,10 @@ test("WEEK -> DAY", function() {
 
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The week subdomain start is the first day of week : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), endWeek.getTime(), "The week subdomain end is the last day of week : " + subDomain[subDomain.length-1]);
-		equal(subDomain[0].getDay(), 1, "The week start a monday");
-		equal(subDomain[subDomain.length-1].getDay(), 0, "The week end a sunday");
+		equal(subDomain[0].t, startDate.getTime(), "The week subdomain start is the first day of week : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, endWeek.getTime(), "The week subdomain end is the last day of week : " + subDomain[subDomain.length-1]);
+		equal(new Date(subDomain[0].t).getDay(), 1, "The week start a monday");
+		equal(new Date(subDomain[subDomain.length-1].t).getDay(), 0, "The week end a sunday");
 	});
 
 });
@@ -862,10 +862,10 @@ test("WEEK -> HOUR", function() {
 
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The week subdomain start is the first hour of week : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), endWeek.getTime(), "The week subdomain end is the last hour of week : " + subDomain[subDomain.length-1]);
-		equal(subDomain[0].getDay(), 1, "The week start a monday");
-		equal(subDomain[subDomain.length-1].getDay(), 0, "The week end a sunday");
+		equal(subDomain[0].t, startDate.getTime(), "The week subdomain start is the first hour of week : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, endWeek.getTime(), "The week subdomain end is the last hour of week : " + subDomain[subDomain.length-1]);
+		equal(new Date(subDomain[0].t).getDay(), 1, "The week start a monday");
+		equal(new Date(subDomain[subDomain.length-1].t).getDay(), 0, "The week end a sunday");
 	});
 });
 
@@ -901,10 +901,10 @@ test("WEEK -> MIN", function() {
 
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The week subdomain start is the first minutes of week : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), endWeek.getTime(), "The week subdomain end is the last minute of week : " + subDomain[subDomain.length-1]);
-		equal(subDomain[0].getDay(), 1, "The week start a monday");
-		equal(subDomain[subDomain.length-1].getDay(), 0, "The week end a sunday");
+		equal(subDomain[0].t, startDate.getTime(), "The week subdomain start is the first minutes of week : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, endWeek.getTime(), "The week subdomain end is the last minute of week : " + subDomain[subDomain.length-1]);
+		equal(new Date(subDomain[0].t).getDay(), 1, "The week start a monday");
+		equal(new Date(subDomain[subDomain.length-1].t).getDay(), 0, "The week end a sunday");
 	});
 });
 
@@ -930,8 +930,6 @@ test("MONTH -> WEEK", function() {
 
 		domainStartDate = new Date(domainStartDate);
 
-		var endOfMonth = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth()+1, 0);
-
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 		if (startDate.getDay() > 1) {
 			startDate.setDate(startDate.getDate() - startDate.getDay() + 1);
@@ -942,8 +940,8 @@ test("MONTH -> WEEK", function() {
 		var endDate = new Date(startDate);
 		endDate.setDate(endDate.getDate() + 28);
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The month subdomain start is the first day of first week : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), endDate.getTime(), "The month subdomain end is the first day of last week : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].t, startDate.getTime(), "The month subdomain start is the first day of first week : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, endDate.getTime(), "The month subdomain end is the first day of last week : " + subDomain[subDomain.length-1]);
 	});
 
 });
@@ -975,8 +973,8 @@ test("MONTH -> DAY", function() {
 
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The month subdomain start is the first day of month : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), endOfMonth.getTime(), "The month subdomain end is the last day of month : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].t, startDate.getTime(), "The month subdomain start is the first day of month : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, endOfMonth.getTime(), "The month subdomain end is the last day of month : " + subDomain[subDomain.length-1]);
 	});
 
 });
@@ -1010,8 +1008,8 @@ test("MONTH -> HOUR", function() {
 
 		var startDate = new Date(domainStartDate.getFullYear(), domainStartDate.getMonth(), domainStartDate.getDate());
 
-		equal(subDomain[0].getTime(), startDate.getTime(), "The month subdomain start is the first hour of month : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), endOfMonth.getTime(), "The month subdomain end is the last hour of month : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].t, startDate.getTime(), "The month subdomain start is the first hour of month : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, endOfMonth.getTime(), "The month subdomain end is the last hour of month : " + subDomain[subDomain.length-1]);
 	});
 
 });
@@ -1039,8 +1037,8 @@ test("YEAR -> DAY", function() {
 		var yearDaysNb = cal.getDayOfYear(domainEndDate);
 
 		equal(subDomain.length, yearDaysNb, "The year contains " + yearDaysNb + " days");
-		equal(subDomain[0].getTime(), domainStartDate.getTime(), "The year subdomain start is the first day of first month of year : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), domainEndDate.getTime(), "The year subdomain end is the last day of last month of year : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].t, domainStartDate.getTime(), "The year subdomain start is the first day of first month of year : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, domainEndDate.getTime(), "The year subdomain end is the last day of last month of year : " + subDomain[subDomain.length-1]);
 	});
 
 });
@@ -1068,8 +1066,8 @@ test("YEAR -> MONTH", function() {
 		var domainEndDate = new Date(domainStartDate.getFullYear(), 11);
 
 		equal(subDomain.length, 12, "The year contains 12 months");
-		equal(subDomain[0].getTime(), domainStartDate.getTime(), "The year subdomain start is the first month of year : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), domainEndDate.getTime(), "The year subdomain end is the last month of year : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].t, domainStartDate.getTime(), "The year subdomain start is the first month of year : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, domainEndDate.getTime(), "The year subdomain end is the last month of year : " + subDomain[subDomain.length-1]);
 	});
 
 });
@@ -1089,10 +1087,10 @@ test("YEAR -> WEEK", function() {
 	equal(domain.length, 1, "Domain is equal to 1 year");
 	equal(domain[0].getTime(), startDate.getTime(), "Domain start the monday of the first week of the week");
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg.selectAll("svg").each(function(d){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
-		domainStartDate = new Date(domainStartDate);
+		var domainStartDate = new Date(+d);
 		var weekNb = cal.getWeekNumber(endDate);
 
 
@@ -1103,7 +1101,7 @@ test("YEAR -> WEEK", function() {
 		}
 
 		equal(subDomain.length, weekNb, "The year contains " + weekNb + " weeks");
-		equal(subDomain[0].getTime(), domainStartDate.getTime(), "The year subdomain start is the first week of year : " + subDomain[0]);
+		equal(subDomain[0].t, domainStartDate.getTime(), "The year subdomain start is the first week of year : " + subDomain[0].t);
 		//equal(subDomain[subDomain.length-1].getTime(), domainEndDate.getTime(), "The year subdomain end is the last week of year : " + subDomain[subDomain.length-1]);
 	});
 
@@ -1134,8 +1132,8 @@ test("YEAR -> DAY", function() {
 		var nbDaysInYear = cal.getDayOfYear(domainEndDate);
 
 		equal(subDomain.length, nbDaysInYear, "The year " + domainStartDate.getFullYear() + " contains " + nbDaysInYear + " days");
-		equal(subDomain[0].getTime(), domainStartDate.getTime(), "The year " + domainStartDate.getFullYear() + " subdomain start is the first day of year : " + subDomain[0]);
-		equal(subDomain[subDomain.length-1].getTime(), domainEndDate.getTime(), "The year " + domainStartDate.getFullYear() + " subdomain end is the last day of year : " + subDomain[subDomain.length-1]);
+		equal(subDomain[0].t, domainStartDate.getTime(), "The year " + domainStartDate.getFullYear() + " subdomain start is the first day of year : " + subDomain[0]);
+		equal(subDomain[subDomain.length-1].t, domainEndDate.getTime(), "The year " + domainStartDate.getFullYear() + " subdomain end is the last day of year : " + subDomain[subDomain.length-1]);
 	});
 
 });
@@ -1684,7 +1682,7 @@ test("afterLoad", function() {
 	var finalString = "Edited data";
 	var testFunction = function() { $("#cal-heatmap").data("test", finalString); };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: testFunction, paintOnLoad: true});
+	createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: testFunction, paintOnLoad: true});
 
 	equal($("#cal-heatmap").data("test"), finalString);
 });
@@ -1697,7 +1695,7 @@ test("onComplete", function() {
 	var finalString = "Edited data";
 	var testFunction = function() { $("body").data("test", finalString); };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: true});
+	createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: true});
 
 	equal($("body").data("test"), finalString);
 });
@@ -1710,7 +1708,7 @@ test("onComplete is ran even on loadOnInit = false", function() {
 	var finalString = "Edited data";
 	var testFunction = function() { $("body").data("test", finalString); };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: false});
+	createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: false});
 
 	equal($("body").data("test"), finalString);
 });
@@ -1723,7 +1721,7 @@ test("onComplete does not run with paintOnLoad = false", function() {
 	var finalString = "Edited data";
 	var testFunction = function() { $("body").data("test", finalString); };
 
-	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: false});
+	createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: false});
 
 	equal($("body").data("test"), "Dummy Data");
 });
@@ -1732,10 +1730,7 @@ test("afterLoadPreviousDomain", function() {
 
 	expect(2);
 
-	var start = new Date(2012, 0, 1, 20);
-	var end = new Date(2012, 0, 1, 20, 59);
-
-	var testFunction = function(start, end) { console.log(start); return {start:start, end:end}; };
+	var testFunction = function(start, end) { return {start:start, end:end}; };
 
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomain: testFunction});
 
@@ -1752,9 +1747,6 @@ test("afterLoadPreviousDomain", function() {
 test("afterLoadNextDomain", function() {
 
 	expect(2);
-
-	var start = new Date(2012, 0, 1, 20);
-	var end = new Date(2012, 0, 1, 20, 59);
 
 	var testFunction = function(start, end) { return {start:start, end:end}; };
 
@@ -1818,37 +1810,6 @@ test("onComplete is not a valid callback : string", function() {
 	equal(cal.onComplete(), false);
 });
 
-test("afterLoadData callback", function() {
-	expect(4);
-
-	var date = new Date(2000, 0, 1);
-	var date1 = date.getTime()/1000;
-	var date2 = date1+3600;
-	var date3 = date2+60;
-
-	var datas = [];
-	datas.push({date: date1, value: 15});	// 15 events for 00:00
-	datas.push({date: date2, value: 25});	// 25 events for 01:00
-	datas.push({date: date3, value: 1});	// 01 events for 01:01
-
-	var parser = function(data) {
-		var stats = {};
-		for (var d in data) {
-			stats[data[d].date] = data[d].value;
-		}
-		return stats;
-	};
-
-	var cal = createCalendar({data: datas, start: new Date(2000, 0, 1, 1), afterLoadData: parser, domain: "hour", subDomain: "min"});
-
-	var calDatas = cal.parseDatas(datas);
-
-	equal(Object.keys(calDatas).length, 1, "Only datas for 1 hour");
-	equal(calDatas.hasOwnProperty(date1*1000), false, "Datas for the first hour are filtered out");
-	equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
-	equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
-});
-
 test("afterLoadData is not a valid callback", function() {
 	expect(1);
 
@@ -1882,7 +1843,7 @@ test("Display empty calendar", function() {
 
 	expect(4);
 
-	var cal = createCalendar({paintOnLoad: true});
+	createCalendar({paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph").length, 1, "Calendar was created");
 	equal($("#cal-heatmap .graph .graph-subdomain-group").length, 12, "The graph contains 12 hours");
@@ -1894,7 +1855,7 @@ test("Don't display legend", function() {
 
 	expect(1);
 
-	var cal = createCalendar({displayLegend: false, paintOnLoad: true});
+	createCalendar({displayLegend: false, paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph-legend").length, 0, "The legend is not created");
 });
@@ -1904,7 +1865,7 @@ test("Display domain according to range number", function() {
 
 	expect(1);
 
-	var cal = createCalendar({range: 5, paintOnLoad: true});
+	createCalendar({range: 5, paintOnLoad: true});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group").length, 5, "The graph contains only 5 hours");
 
@@ -1916,7 +1877,7 @@ test("Append graph to the passed DOM ID", function() {
 
 	$("body").append("<div id=test-container style='display:hidden;'></div>");
 
-	var cal = createCalendar({itemSelector: "#test-container", paintOnLoad: true});
+	createCalendar({itemSelector: "#test-container", paintOnLoad: true});
 
 	equal($("#test-container .graph").length, 1, "The graph is added to the specified ID");
 	equal($("#cal-heatmap .graph").length, 0, "Default ID is empty");
@@ -1955,7 +1916,7 @@ test("Attach events to next and previous selector on custom namespace", function
 		previousSelector: "#previous"
 	});
 
-	var cal2 = createCalendar({
+	createCalendar({
 		paintOnLoad: true,
 		nextSelector: "#next",
 		previousSelector: "#previous",
@@ -1975,7 +1936,7 @@ test("Attach events to not-valid namespace fallback to default namespace", funct
 	$("body").append("<a id='next'></a>");
 	$("body").append("<a id='previous'></a>");
 
-	var cal = createCalendar({
+	createCalendar({
 		paintOnLoad: true,
 		nextSelector: "#next",
 		previousSelector: "#previous",
@@ -1986,28 +1947,6 @@ test("Attach events to not-valid namespace fallback to default namespace", funct
 	equal(typeof d3.select("#previous").on("click.cal-heatmap"), "function", "loadPreviousDomain is attached to defaultNamespace");
 });
 
-test("Fill subdomain only if there is data", function() {
-
-	expect(1);
-
-	var date = new Date(2000, 0, 1);
-	var date1 = date.getTime()/1000;
-	var date2 = date1+3600;
-	var date3 = date2+60;
-
-	var datas = {};
-	datas[date1] = 15;	// 15 events for 00:00
-	datas[date2] = 25;	// 25 events for 01:00
-	datas[date3] = 1;	// 01 events for 01:01
-
-	var complete = false;
-	var setComplete = function(){ complete = true; };
-
-	var cal = createCalendar({data: datas, paintOnLoad: true});
-	var response = cal.fill(datas, cal.svg, setComplete);
-
-	equal(response, true);
-});
 
 
 test("Custom date formatting with d3.js internal formatter", function() {
@@ -2016,7 +1955,7 @@ test("Custom date formatting with d3.js internal formatter", function() {
 
 	var date = new Date(2000, 0, 5);
 
-	var cal = createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: "==%B=="});
+	createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: "==%B=="});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, "==January==");
 
@@ -2028,11 +1967,11 @@ test("Custom date formatting with custom function", function() {
 
 	var date = new Date(2000, 0, 5);
 
-	var cal = createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: function(date) { return date.getTime();}});
+	createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: function(date) { return date.getTime();}});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, date.getTime());
 });
-
+/*
 test("Cell label have different title formatting depending on whether it's filled or not", function() {
 
 	expect(2);
@@ -2050,11 +1989,12 @@ test("Cell label have different title formatting depending on whether it's fille
 		domain: "year",
 		subDomain: "month",
 		range: 1,
-		subDomainTitleFormat: title});
+		subDomainTitleFormat: title
+	});
 
-	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, title.filled);
-	equal($("#cal-heatmap .graph .graph-subdomain-group title")[1].firstChild.data, title.empty);
-});
+	equal(d3.selectAll("#cal-heatmap title")[0].textContent, title.filled);
+	equal($("#cal-heatmap title")[1].textContent, title.empty);
+});*/
 
 test("Cell radius is applied", function() {
 
@@ -2062,7 +2002,7 @@ test("Cell radius is applied", function() {
 
 	var radius = 15;
 
-	var cal = createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellRadius: radius});
+	createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellRadius: radius});
 
 	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellRadius applied");
 	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellRadius applied");
@@ -2101,7 +2041,7 @@ test("Data Source is a regular string", function() {
 	var datas = "regular string";
 	var cal = createCalendar({data: datas});
 
-	equal(cal.getDatas(datas, new Date(), new Date()), false, "getDatas() return false: datas load is asynchronous");
+	equal(cal.getDatas(datas, new Date(), new Date(), function() {}), false, "getDatas() return false: datas load is asynchronous");
 });
 
 test("Data Source is a en empty string", function() {
@@ -2110,7 +2050,7 @@ test("Data Source is a en empty string", function() {
 	var datas = "";
 	var cal = createCalendar({data: datas});
 
-	equal(cal.getDatas(datas), true, "getDatas() return true: datas load is not asynchronous");
+	equal(cal.getDatas(datas, new Date(), new Date(), function() {}), true, "getDatas() return true: datas load is not asynchronous");
 });
 
 /*
@@ -2127,8 +2067,11 @@ test("Data Source is a string", function() {
 	var filePath = "path/to/file.html";
 
 	var cal = createCalendar({data: filePath});
+
+	var domains = cal._domains.keys();
+
 	equal(
-		cal.parseURI(filePath, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])),
+		cal.parseURI(filePath, new Date(+domains[0]), new Date(+domains[domains.length-1])),
 		filePath,
 		"Data source is left as is"
 	);
@@ -2139,23 +2082,25 @@ test("Data Source is a regex string, replace by timestamp", function() {
 
 	var cal = createCalendar({start: new Date()});
 	var uri = "get?start={{t:start}}&end={{t:end}}";
+	var domains = cal._domains.keys();
 
-	var parsedUri = "get?start=" + cal._domains[0]/1000 + "&end=" + cal._domains[cal._domains.length-1]/1000;
+	var parsedUri = "get?start=" + (domains[0]/1000) + "&end=" + (domains[domains.length-1]/1000);
 
-	equal(cal.parseURI(uri, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])), parsedUri, "Start and end token was replaced by a timestamp : " + parsedUri);
+	equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a timestamp : " + parsedUri);
 });
 
 test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 
 	var cal = createCalendar({start: new Date()});
 	var uri = "get?start={{d:start}}&end={{d:end}}";
+	var domains = cal._domains.keys();
 
-	var startDate = new Date(cal._domains[0]);
-	var endDate = new Date(cal._domains[cal._domains.length-1]);
+	var startDate = new Date(+domains[0]);
+	var endDate = new Date(+domains[domains.length-1]);
 
 	var parsedUri = "get?start=" + startDate.toISOString() + "&end=" + endDate.toISOString();
 
-	equal(cal.parseURI(uri, new Date(cal._domains[0]), new Date(cal._domains[cal._domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
+	equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
 });
 
 /*
@@ -2163,7 +2108,7 @@ test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 	DATA PARSING
 	-----------------------------------------------------------------
  */
-
+/*
 module( "Data processing" );
 
 test("Grouping datas by hour>min", function() {
@@ -2235,7 +2180,7 @@ test("Filter out datas not relevant to calendar domain", function() {
 	equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
 	equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
 
-});
+});*/
 
 function createCalendar(settings) {
 

@@ -17,6 +17,7 @@
 
 	"predef" : [
 		"d3",
-		"define"
+		"define",
+		"Element"
 	]
 }

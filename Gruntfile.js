@@ -49,7 +49,7 @@ module.exports = function(grunt) {
                     coberturaReport: "report/"
                 }
             },
-            all: ["test/index.html", "test/index-amd.html"]
+            all: ["test/index-amd.html", "test/index.html"]
         },
         concat: {
             options: {
@@ -74,10 +74,10 @@ module.exports = function(grunt) {
 
     // TO RUN BEFORE COMMIT
     // ====================
-    grunt.registerTask("quick-build", ["csslint"]);
+    grunt.registerTask("quick-build", ["csslint", "jshint"]);
 
     // Full build without version bump
-    grunt.registerTask("build", ["concat", "qunit", "csslint", "uglify"]);
+    grunt.registerTask("build", ["concat", "qunit", "csslint", "jshint", "uglify"]);
 
     // FOR TRAVIS
     // ==========

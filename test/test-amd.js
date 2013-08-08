@@ -1,5 +1,4 @@
-/*globals asyncTest,deepEqual,equal,expect,module,notDeepEqual,notEqual,
-    notStrictEqual,ok,QUnit,raises,start,stop,strictEqual,test,CalHeatMap,require */
+/*global equal,expect,test,require */
 
 require.config({
 	paths: {
