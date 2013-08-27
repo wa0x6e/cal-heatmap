@@ -92,7 +92,11 @@ var CalHeatMap = function() {
 
 			rotate: null,
 
-			width: 100
+			// Used only on vertical orientation
+			width: 100,
+
+			// Used only on horizontal orientation
+			height: null
 		},
 
 		// ================================================
@@ -475,8 +479,12 @@ var CalHeatMap = function() {
 
 			self.verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
 
-			self.domainVerticalLabelHeight = Math.max(25, self.options.cellSize*2);
+			self.domainVerticalLabelHeight = self.options.label.height === null ? Math.max(25, self.options.cellSize*2) : self.options.label.height;
 			self.domainHorizontalLabelWidth = 0;
+
+			if (self.options.domainLabelFormat === "" && self.options.label.height === null) {
+				self.domainVerticalLabelHeight = 0;
+			}
 
 			if (!self.verticalDomainLabel) {
 				self.domainVerticalLabelHeight = 0;
@@ -722,50 +730,52 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// PAINTING LABEL															//
 		// =========================================================================//
-		self.svg.append("text")
-			.attr("class", "graph-label")
-			.attr("y", function(d) {
-				var y = self.options.domainMargin[0];
-				switch(self.options.label.position) {
-					case "top" : y += self.domainVerticalLabelHeight/2; break;
-					case "bottom" : y += h(d) + self.domainVerticalLabelHeight/2;
-				}
+		if (self.options.domainLabelFormat !== "") {
+			self.svg.append("text")
+				.attr("class", "graph-label")
+				.attr("y", function(d) {
+					var y = self.options.domainMargin[0];
+					switch(self.options.label.position) {
+						case "top" : y += self.domainVerticalLabelHeight/2; break;
+						case "bottom" : y += h(d) + self.domainVerticalLabelHeight/2;
+					}
 
-				return y + self.options.label.offset.y *
-				(
-					((self.options.label.rotate === "right" && self.options.label.position === "right") ||
-					(self.options.label.rotate === "left" && self.options.label.position === "left")) ?
-					-1 : 1
-				);
-			})
-			.attr("x", function(d){
-				var x = self.options.domainMargin[3];
-				switch(self.options.label.position) {
-					case "right" : x += w(d); break;
-					case "bottom" :
-					case "top" : x += w(d)/2;
-				}
+					return y + self.options.label.offset.y *
+					(
+						((self.options.label.rotate === "right" && self.options.label.position === "right") ||
+						(self.options.label.rotate === "left" && self.options.label.position === "left")) ?
+						-1 : 1
+					);
+				})
+				.attr("x", function(d){
+					var x = self.options.domainMargin[3];
+					switch(self.options.label.position) {
+						case "right" : x += w(d); break;
+						case "bottom" :
+						case "top" : x += w(d)/2;
+					}
 
-				if (self.options.label.align === "right") {
-					return x + self.domainHorizontalLabelWidth - self.options.label.offset.x *
-					(self.options.label.rotate === "right" ? -1 : 1);
-				}
-				return x + self.options.label.offset.x;
+					if (self.options.label.align === "right") {
+						return x + self.domainHorizontalLabelWidth - self.options.label.offset.x *
+						(self.options.label.rotate === "right" ? -1 : 1);
+					}
+					return x + self.options.label.offset.x;
 
-			})
-			.attr("text-anchor", function() {
-				switch(self.options.label.align) {
-					case "start" :
-					case "left" : return "start";
-					case "end" :
-					case "right" : return "end";
-					default : return "middle";
-				}
-			})
-			.attr("dominant-baseline", function() { return self.verticalDomainLabel ? "middle" : "top"; })
-			.text(function(d) { return self.formatDate(new Date(d), self.options.domainLabelFormat); })
-			.call(domainRotate)
-		;
+				})
+				.attr("text-anchor", function() {
+					switch(self.options.label.align) {
+						case "start" :
+						case "left" : return "start";
+						case "end" :
+						case "right" : return "end";
+						default : return "middle";
+					}
+				})
+				.attr("dominant-baseline", function() { return self.verticalDomainLabel ? "middle" : "top"; })
+				.text(function(d) { return self.formatDate(new Date(d), self.options.domainLabelFormat); })
+				.call(domainRotate)
+			;
+		}
 
 		function domainRotate(selection) {
 			switch (self.options.label.rotate) {
@@ -795,9 +805,6 @@ var CalHeatMap = function() {
 					break;
 			}
 		}
-
-
-
 
 		// =========================================================================//
 		// PAINTING DOMAIN SUBDOMAIN CONTENT										//
