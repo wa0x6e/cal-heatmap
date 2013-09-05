@@ -27,7 +27,7 @@
     "karma": "~0.10"
   },
   "scripts": {
-    "test": "grunt travis --verbose; ./node_modules/.bin/karma start --single-run --browsers PhantomJS"
+    "test": "npm list; grunt travis --verbose; ./node_modules/.bin/karma start --single-run --browsers PhantomJS"
   },
   "repository": {
     "type": "git",
