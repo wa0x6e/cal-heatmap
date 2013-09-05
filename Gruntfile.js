@@ -67,9 +67,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-css");
-    grunt.loadNpmTasks("grunt-qunit-istanbul");
-    grunt.loadNpmTasks("grunt-bump");
-    //grunt.loadNpmTasks("grunt-replace");
+    grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-concat");
 
     // TO RUN BEFORE COMMIT
@@ -81,5 +79,5 @@ module.exports = function(grunt) {
 
     // FOR TRAVIS
     // ==========
-    grunt.registerTask("travis", ["qunit", "jshint", "csslint"]);
+    grunt.registerTask("travis", ["jshint", "csslint"]);
 };
