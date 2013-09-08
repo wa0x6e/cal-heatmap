@@ -840,7 +840,7 @@ var CalHeatMap = function() {
 		var tempHeight = self.graphDim.height;
 
 		if (self.options.verticalOrientation) {
-			graphDim.height += enteringDomainDim - exitingDomainDim;
+			self.graphDim.height += enteringDomainDim - exitingDomainDim;
 		} else {
 			self.graphDim.width += enteringDomainDim - exitingDomainDim;
 		}
@@ -1348,6 +1348,7 @@ CalHeatMap.prototype = {
 			legend = legendElement;
 			legendItem = legend
 				.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
+				.select("g")
 				.selectAll("rect").data(d3.range(0, this.options.legend.length+1))
 			;
 		} else {
@@ -1374,11 +1375,12 @@ CalHeatMap.prototype = {
 			.attr("width", this.options.legendCellSize)
 			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
-			.attr("x", function(d) {
+			.attr("x", function(d) { console.log(d);
 				return d * (parent.options.legendCellSize + parent.options.legendCellPadding);
 			})
 			.attr("y", this.options.legendMargin[0])
 			.attr("fill-opacity", 0)
+			.append("title")
 			;
 
 
@@ -1388,10 +1390,7 @@ CalHeatMap.prototype = {
 
 		legendItem.transition().delay(function(d, i) { return parent.options.animationDuration * i/10;}).attr("fill-opacity", 1);
 
-
-		legendItem
-			.append("title")
-			.text(function(d) {
+		legendItem.select("title").text(function(d) {
 				if (d === 0) {
 					return (parent.options.legendTitleFormat.lower).format({
 						min: parent.options.legend[d],
@@ -1944,12 +1943,16 @@ CalHeatMap.prototype = {
 			this.options.legend = arguments[0];
 		} else if (arguments.length === 3 && typeof arguments[0] === "number" && typeof arguments[1] === "number" && typeof arguments[2] === "number") {
 			this.options.legend = d3.range(arguments[0], arguments[1], arguments[2]);
-		} else {
+		} else if (arguments.length !== 0) {
 			console.log("Provided arguments for setLegend() are not valid");
 			return false;
 		}
 
 		this.displayLegend(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+
+		if (arguments.length === 0) {
+			// @todo : Replaint calendar with new colors
+		}
 	},
 
 	getSVG: function() {
