@@ -441,7 +441,7 @@ var CalHeatMap = function() {
 	// Each domain value is a timestamp in milliseconds
 	this._domains = d3.map();
 
-	var graphDim = {
+	this.graphDim = {
 		width: 0,
 		height: 0
 	};
@@ -517,7 +517,7 @@ var CalHeatMap = function() {
 
 			// Display legend if needed
 			if (self.options.displayLegend) {
-				self.displayLegend(graphDim.width - self.options.domainGutter - self.options.cellPadding);
+				self.displayLegend(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -600,17 +600,17 @@ var CalHeatMap = function() {
 			})
 			.attr("x", function(d) {
 				if (self.options.verticalOrientation) {
-					graphDim.width = w(d, true);
+					self.graphDim.width = w(d, true);
 					return 0;
 				} else {
-					return getDomainPosition(d, graphDim, "width", w(d, true));
+					return getDomainPosition(d, self.graphDim, "width", w(d, true));
 				}
 			})
 			.attr("y", function(d) {
 				if (self.options.verticalOrientation) {
-					return getDomainPosition(d, graphDim, "height", h(d, true));
+					return getDomainPosition(d, self.graphDim, "height", h(d, true));
 				} else {
-					graphDim.height = h(d, true);
+					self.graphDim.height = h(d, true);
 					return 0;
 				}
 			})
@@ -836,13 +836,13 @@ var CalHeatMap = function() {
 			;
 		}
 
-		var tempWidth = graphDim.width;
-		var tempHeight = graphDim.height;
+		var tempWidth = self.graphDim.width;
+		var tempHeight = self.graphDim.height;
 
 		if (self.options.verticalOrientation) {
 			graphDim.height += enteringDomainDim - exitingDomainDim;
 		} else {
-			graphDim.width += enteringDomainDim - exitingDomainDim;
+			self.graphDim.width += enteringDomainDim - exitingDomainDim;
 		}
 
 		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
@@ -852,7 +852,7 @@ var CalHeatMap = function() {
 					return 0;
 				} else {
 					switch(navigationDir) {
-						case self.NAVIGATE_LEFT : return Math.min(graphDim.width, tempWidth);
+						case self.NAVIGATE_LEFT : return Math.min(self.graphDim.width, tempWidth);
 						case self.NAVIGATE_RIGHT : return -w(d, true);
 					}
 				}
@@ -860,7 +860,7 @@ var CalHeatMap = function() {
 			.attr("y", function(d){
 				if (self.options.verticalOrientation) {
 					switch(navigationDir) {
-						case self.NAVIGATE_LEFT : return Math.min(graphDim.height, tempHeight);
+						case self.NAVIGATE_LEFT : return Math.min(self.graphDim.height, tempHeight);
 						case self.NAVIGATE_RIGHT : return -h(d, true);
 					}
 				} else {
@@ -872,8 +872,8 @@ var CalHeatMap = function() {
 
 		// Resize the graph
 		self.root.select(".graph").transition().duration(self.options.animationDuration)
-			.attr("width", function() { return graphDim.width - self.options.domainGutter - self.options.cellPadding; })
-			.attr("height", function() { return graphDim.height - self.options.domainGutter - self.options.cellPadding; })
+			.attr("width", function() { return self.graphDim.width - self.options.domainGutter - self.options.cellPadding; })
+			.attr("height", function() { return self.graphDim.height - self.options.domainGutter - self.options.cellPadding; })
 		;
 	};
 
@@ -1336,35 +1336,39 @@ CalHeatMap.prototype = {
 
 		var parent = this;
 		var legend = this.root;
-
-		if (this.options.legendVerticalPosition === "top") {
-			legend = legend.insert("svg", ".graph");
-		} else {
-			legend = legend.append("svg");
-		}
+		var legendItem;
 
 		var legendWidth =
 			this.options.legendCellSize * (this.options.legend.length+1) +
 			this.options.legendCellPadding * (this.options.legend.length+1) +
 			this.options.legendMargin[3] + this.options.legendMargin[1];
 
-		legend = legend
-			.attr("class", "graph-legend")
-			.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
-			.attr("width", width)
-			.append("g")
-			.attr("transform", function() {
-				switch(parent.options.legendHorizontalPosition) {
-					case "right" : return "translate(" + (width - legendWidth) + ")";
-					case "middle" :
-					case "center" : return "translate(" + (width/2 - legendWidth/2) + ")";
-					default : return "translate(" + parent.options.legendMargin[3] + ")";
-				}
-			})
-			.attr("y", this.options.legendMargin[0])
-			.selectAll().data(d3.range(0, this.options.legend.length+1));
+		var legendElement = d3.select(this.options.itemSelector + " .graph-legend");
+		if (legendElement[0][0] !== null) {
+			legend = legendElement;
+			legendItem = legend
+				.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
+				.selectAll("rect").data(d3.range(0, this.options.legend.length+1))
+			;
+		} else {
+			// Creating the new legend DOM if it doesn't already exist
+			if (this.options.legendVerticalPosition === "top") {
+				legend = legend.insert("svg", ".graph");
+			} else {
+				legend = legend.append("svg");
+			}
 
-		var legendItem = legend
+			legendItem = legend
+				.attr("class", "graph-legend")
+				.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
+				.attr("width", width)
+				.append("g")
+				.attr("y", this.options.legendMargin[0])
+				.selectAll().data(d3.range(0, this.options.legend.length+1))
+			;
+		}
+
+		legendItem
 			.enter()
 			.append("rect")
 			.attr("width", this.options.legendCellSize)
@@ -1377,7 +1381,13 @@ CalHeatMap.prototype = {
 			.attr("fill-opacity", 0)
 			;
 
+
+		legendItem.exit().transition().duration(parent.options.animationDuration)
+		.attr("fill-opacity", 0)
+		.remove();
+
 		legendItem.transition().delay(function(d, i) { return parent.options.animationDuration * i/10;}).attr("fill-opacity", 1);
+
 
 		legendItem
 			.append("title")
@@ -1398,6 +1408,15 @@ CalHeatMap.prototype = {
 				}
 			})
 		;
+
+		legend.select("g").attr("transform", function() {
+			switch(parent.options.legendHorizontalPosition) {
+				case "right" : return "translate(" + (width - legendWidth) + ")";
+				case "middle" :
+				case "center" : return "translate(" + (width/2 - legendWidth/2) + ")";
+				default : return "translate(" + parent.options.legendMargin[3] + ")";
+			}
+		});
 
 	},
 
@@ -1913,6 +1932,24 @@ CalHeatMap.prototype = {
 			afterLoad,
 			updateMode
 		);
+	},
+
+	/**
+	 * Set the legend
+	 *
+	 * @param mixed
+	 */
+	setLegend: function() {
+		if (arguments.length === 1 && Array.isArray(arguments[0])) {
+			this.options.legend = arguments[0];
+		} else if (arguments.length === 3 && typeof arguments[0] === "number" && typeof arguments[1] === "number" && typeof arguments[2] === "number") {
+			this.options.legend = d3.range(arguments[0], arguments[1], arguments[2]);
+		} else {
+			console.log("Provided arguments for setLegend() are not valid");
+			return false;
+		}
+
+		this.displayLegend(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 	},
 
 	getSVG: function() {
