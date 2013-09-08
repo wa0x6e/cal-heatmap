@@ -1375,7 +1375,7 @@ CalHeatMap.prototype = {
 			.attr("width", this.options.legendCellSize)
 			.attr("height", this.options.legendCellSize)
 			.attr("class", function(d){ return "graph-rect q" + (d+1); })
-			.attr("x", function(d) { console.log(d);
+			.attr("x", function(d) {
 				return d * (parent.options.legendCellSize + parent.options.legendCellPadding);
 			})
 			.attr("y", this.options.legendMargin[0])
@@ -1936,7 +1936,12 @@ CalHeatMap.prototype = {
 	/**
 	 * Set the legend
 	 *
-	 * @param mixed
+	 * @param mixed Either
+	 * - an array of integer, representing the different threshold value,
+	 * - or 3 integers, representing respectively the minimum threshold, the maximum threshold,
+	 * and the step, used for generating the final array of threshold
+	 * - or no parameter, In that case, setLegend() will only act on the legend position and dimension,
+	 * leaving the colors untouched.
 	 */
 	setLegend: function() {
 		if (arguments.length === 1 && Array.isArray(arguments[0])) {
@@ -1950,8 +1955,8 @@ CalHeatMap.prototype = {
 
 		this.displayLegend(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 
-		if (arguments.length === 0) {
-			// @todo : Replaint calendar with new colors
+		if (arguments.length > 0) {
+			this.fill();
 		}
 	},
 
