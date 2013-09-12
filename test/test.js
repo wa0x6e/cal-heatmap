@@ -8,6 +8,10 @@
 	-----------------------------------------------------------------
  */
 
+CalHeatMap.prototype.svg = function() {
+	return this.root.selectAll(".graph-domain");
+};
+
 module( "Domain equal 1" );
 
 test("get domain when domain is 1 HOUR", function() {
@@ -717,7 +721,7 @@ test("HOUR -> MIN", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 60, "The hour subdomain contains 60 minutes");
 
@@ -748,7 +752,7 @@ test("DAY -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 24, "The day subdomain contains 24 hours");
 
@@ -780,7 +784,7 @@ test("DAY -> MIN", function() {
 	equal(domain[0].getTime(), startDate.getTime(), "First domain start is midnight of first day");
 	equal(domain[domain.length-1].getTime(), endDate.getTime(), "Last domain start is midnight of last day");
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 		equal(subDomain.length, 1440, "The day subdomain contains 1440 minutes");
 
@@ -811,7 +815,7 @@ test("WEEK -> DAY", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -847,7 +851,7 @@ test("WEEK -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -885,7 +889,7 @@ test("WEEK -> MIN", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -925,7 +929,7 @@ test("MONTH -> WEEK", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -962,7 +966,7 @@ test("MONTH -> DAY", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -995,7 +999,7 @@ test("MONTH -> HOUR", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1028,7 +1032,7 @@ test("YEAR -> DAY", function() {
 	equal(domain.length, 1, "Domain is equal to 1 year");
 	equal(domain[0].getTime(), startDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1059,7 +1063,7 @@ test("YEAR -> MONTH", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);
@@ -1087,7 +1091,7 @@ test("YEAR -> WEEK", function() {
 	equal(domain.length, 1, "Domain is equal to 1 year");
 	equal(domain[0].getTime(), startDate.getTime(), "Domain start the monday of the first week of the week");
 
-	cal.svg.selectAll("svg").each(function(d){
+	cal.svg().selectAll("svg").each(function(d){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		var domainStartDate = new Date(+d);
@@ -1124,7 +1128,7 @@ test("YEAR -> DAY", function() {
 	equal(domain[0].getTime(), startDate.getTime());
 	equal(domain[domain.length-1].getTime(), endDate.getTime());
 
-	cal.svg.selectAll("svg").each(function(domainStartDate){
+	cal.svg().selectAll("svg").each(function(domainStartDate){
 		var subDomain = d3.select(this).selectAll("rect").data();
 
 		domainStartDate = new Date(domainStartDate);

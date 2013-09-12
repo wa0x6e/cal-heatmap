@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.2.0 (Thu Sep 12 2013 17:59:06)
+/*! cal-heatmap v3.2.0 (Thu Sep 12 2013 19:22:40)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -440,8 +440,8 @@ var CalHeatMap = function() {
 		}
 	};
 
-
-	this.svg = null;
+	// Record the address of the last inserted domain when browsing
+	this.lastInsertedSvg = null;
 
 	this._completed = false;
 
@@ -597,7 +597,7 @@ var CalHeatMap = function() {
 		// PAINTING DOMAIN															//
 		// =========================================================================//
 
-		self.svg = domainSvg
+		var svg = domainSvg
 			.enter()
 			.append("svg")
 			.attr("width", function(d) {
@@ -640,6 +640,8 @@ var CalHeatMap = function() {
 			})
 		;
 
+		self.lastInsertedSvg = svg;
+
 		function getDomainPosition(domainIndex, graphDim, axis, domainDim) {
 			var tmp = 0;
 			switch(navigationDir) {
@@ -673,7 +675,7 @@ var CalHeatMap = function() {
 			}
 		}
 
-		self.svg.append("rect")
+		svg.append("rect")
 			.attr("width", function(d) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
 			.attr("height", function(d) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
 			.attr("class", "domain-background")
@@ -682,7 +684,7 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// PAINTING SUBDOMAINS														//
 		// =========================================================================//
-		var subDomainSvgGroup = self.svg.append("svg")
+		var subDomainSvgGroup = svg.append("svg")
 			.attr("x", function() {
 				if (self.options.label.position === "left") {
 					return self.domainHorizontalLabelWidth + self.options.domainMargin[3];
@@ -702,7 +704,7 @@ var CalHeatMap = function() {
 
 		var rect = subDomainSvgGroup
 			.selectAll("g")
-			.data(function(d) { return self._domains.get(d); }, function(d) { return d.t; })
+			.data(function(d) { return self._domains.get(d); })
 			.enter()
 			.append("g")
 		;
@@ -739,7 +741,7 @@ var CalHeatMap = function() {
 		// PAINTING LABEL															//
 		// =========================================================================//
 		if (self.options.domainLabelFormat !== "") {
-			self.svg.append("text")
+			svg.append("text")
 				.attr("class", "graph-label")
 				.attr("y", function(d) {
 					var y = self.options.domainMargin[0];
@@ -885,10 +887,21 @@ var CalHeatMap = function() {
 		;
 	};
 
-	this.fill = function() {
-		var rect = self.svg
+	/**
+	 * Fill the calendar by coloring the cells
+	 *
+	 * @param array svg An array of html node to apply the transformation to (optional)
+	 *                  It's used to limit the painting to only a subset of the calendar
+	 * @return void
+	 */
+	this.fill = function(svg) {
+		if (arguments.length === 0) {
+			svg = self.root.selectAll(".graph-domain");
+		}
+
+		var rect = svg
 			.selectAll("svg").selectAll("g")
-			.data(function(d) { return self._domains.get(d); }, function(d) { return d.t; })
+			.data(function(d) { return self._domains.get(d); })
 		;
 
 		rect.transition().select("rect")
@@ -932,7 +945,8 @@ var CalHeatMap = function() {
 						date: self.formatDate(new Date(d.t), self.options.subDomainDateFormat)
 					});
 				}
-			});
+			})
+		;
 	};
 
 
@@ -1249,7 +1263,7 @@ CalHeatMap.prototype = {
 			new Date(parseInt(domains[domains.length-1], 10)),
 			this.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
 			function() {
-				parent.fill();
+				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
@@ -1299,7 +1313,7 @@ CalHeatMap.prototype = {
 			new Date(parseInt(domains[0], 10)),
 			this.getSubDomain(parseInt(domains[0], 10)).pop(),
 			function() {
-				parent.fill();
+				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
