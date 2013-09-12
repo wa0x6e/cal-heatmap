@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.2.0 (Sat Sep 07 2013 23:24:08)
+/*! cal-heatmap v3.2.0 (Thu Sep 12 2013 17:59:06)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -1808,7 +1808,7 @@ CalHeatMap.prototype = {
 					return {};
 				}
 			}
-			self.parseDatas(data, updateMode);
+			self.parseDatas(data, updateMode, startDate, endDate);
 			callback();
 		};
 
@@ -1849,10 +1849,12 @@ CalHeatMap.prototype = {
 	 *
 	 * @param object data
 	 * @param constant updateMode
+	 * @param Date startDate
+	 * @param Date endDate
 	 *
 	 * @return void
 	 */
-	parseDatas: function(data, updateMode) {
+	parseDatas: function(data, updateMode, startDate, endDate) {
 
 		if (updateMode === this.RESET_ALL_ON_UPDATE) {
 			this._domains.forEach(function(key, value) {
@@ -1870,7 +1872,7 @@ CalHeatMap.prototype = {
 			var domainUnit = this.getDomain(date)[0].getTime();
 
 			// Record only datas relevant to the current domain
-			if (this._domains.has(domainUnit)) {
+			if (this._domains.has(domainUnit) && (domainUnit >= +startDate && domainUnit < +endDate)) {
 				var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 				var subDomainsData = this._domains.get(domainUnit);
 				var index = Math.floor((subDomainUnit - domainUnit) / subDomainStep);
