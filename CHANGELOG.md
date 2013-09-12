@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.0 [2013-09-12]
+
+* [fix] Fix #33: domain browsing is incrementing the calendar's value when data is a json object
+* [fix] Fix #34: Only the newly appended domain can be manipulated by `update()` after calling `next()` or `previous()`
+* [new] Add `setLegend()` method to redefine legend threshold
+
 ## v3.1.0 [2013-08-08]
 
 * [new] Add `update()` method, to update calendar data.
