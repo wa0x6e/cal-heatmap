@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.2.0 (Thu Sep 12 2013 19:22:40)
+/*! cal-heatmap v3.2.1 (Tue Sep 17 2013 18:46:03)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -534,7 +534,7 @@ var CalHeatMap = function() {
 
 			// Fill the graph with some datas
 			if (self.options.loadOnInit) {
-				var domains = self._domains.keys().sort();
+				var domains = self.getDomainKeys();
 				self.getDatas(
 					self.options.data,
 					new Date(parseInt(domains[0], 10)),
@@ -586,7 +586,7 @@ var CalHeatMap = function() {
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
 			.selectAll(".graph-domain")
-			.data(self._domains.keys().map(function(d) { return parseInt(d, 10); }), function(d) { return d;})
+			.data(self.getDomainKeys().map(function(d) { return parseInt(d, 10); }), function(d) { return d;})
 		;
 
 		var enteringDomainDim = 0;
@@ -646,9 +646,7 @@ var CalHeatMap = function() {
 			var tmp = 0;
 			switch(navigationDir) {
 				case false :
-					//if (domainIndex > 0) {
-						tmp = graphDim[axis];
-					//}
+					tmp = graphDim[axis];
 
 					graphDim[axis] += domainDim;
 					self.domainPosition.setPosition(domainIndex, tmp);
@@ -1252,11 +1250,10 @@ CalHeatMap.prototype = {
 				return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
 			})
 		);
-		this._domains.remove(this._domains.keys().sort().shift());
+		var domains = this.getDomainKeys();
+		this._domains.remove(domains.shift());
 
 		this.paint(this.NAVIGATE_RIGHT);
-
-		var domains = this._domains.keys().sort();
 
 		this.getDatas(
 			this.options.data,
@@ -1302,11 +1299,10 @@ CalHeatMap.prototype = {
 				return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
 			})
 		);
-		this._domains.remove(this._domains.keys().sort().pop());
+		var domains = this.getDomainKeys();
+		this._domains.remove(domains.pop());
 
 		this.paint(this.NAVIGATE_LEFT);
-
-		var domains = this._domains.keys().sort();
 
 		this.getDatas(
 			this.options.data,
@@ -1439,6 +1435,12 @@ CalHeatMap.prototype = {
 			}
 		});
 
+	},
+
+	getDomainKeys : function() {
+		return this._domains.keys().sort(function(a, b) {
+			return parseInt(a, 10) - parseInt(b, 10);
+		});
 	},
 
 	// =========================================================================//
@@ -1749,11 +1751,11 @@ CalHeatMap.prototype = {
 	},
 
 	getNextDomain: function() {
-		return this.getDomain(parseInt(this._domains.keys().sort().pop(), 10), 2).pop();
+		return this.getDomain(parseInt(this.getDomainKeys().pop(), 10), 2).pop();
 	},
 
 	getPreviousDomain: function() {
-		return this.getDomain(parseInt(this._domains.keys().sort().shift(), 10), -1)[0];
+		return this.getDomain(parseInt(this.getDomainKeys().shift(), 10), -1)[0];
 	},
 
 	/**
@@ -1943,7 +1945,7 @@ CalHeatMap.prototype = {
 			updateMode = this.RESET_ALL_ON_UPDATE;
 		}
 
-		var domains = this._domains.keys().sort();
+		var domains = this.getDomainKeys();
 		var self = this;
 		this.getDatas(
 			dataSource,
@@ -2092,12 +2094,12 @@ DomainPosition.prototype.getPosition = function(d) {
 };
 
 DomainPosition.prototype.getPositionFromIndex = function(i) {
-	var domains = this.positions.keys().sort();
+	var domains = this.getKeys();
 	return this.positions.get(domains[i]);
 };
 
 DomainPosition.prototype.getLast = function() {
-	var domains = this.positions.keys().sort();
+	var domains = this.getKeys();
 	return this.positions.get(domains[domains.length-1]);
 };
 
@@ -2110,7 +2112,7 @@ DomainPosition.prototype.shiftRightBy = function(exitingDomainDim) {
 		this.set(key, value - exitingDomainDim);
 	});
 
-	var domains = this.positions.keys().sort();
+	var domains = this.getKeys();
 	this.positions.remove(domains[0]);
 };
 
@@ -2119,10 +2121,15 @@ DomainPosition.prototype.shiftLeftBy = function(enteringDomainDim) {
 		this.set(key, value + enteringDomainDim);
 	});
 
-	var domains = this.positions.keys().sort();
+	var domains = this.getKeys();
 	this.positions.remove(domains[domains.length-1]);
 };
 
+DomainPosition.prototype.getKeys = function() {
+	return this.positions.keys().sort(function(a, b) {
+		return parseInt(a, 10) - parseInt(b, 10);
+	});
+};
 
 /**
  * Sprintf like function

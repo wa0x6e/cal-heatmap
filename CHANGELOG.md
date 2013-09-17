@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.2.1 [2013-09-17]
+
+* [fix] Fix #35: Can't load new domain with `next()` when the new domain's timestamp contains more character
+
 ## v3.2.0 [2013-09-12]
 
 * [fix] Fix #33: domain browsing is incrementing the calendar's value when data is a json object
