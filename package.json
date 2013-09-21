@@ -26,7 +26,8 @@
     "grunt-contrib-concat": "~0.3.0",
     "karma": "~0.10",
     "karma-coverage": "~0.1.0",
-    "karma-qunit": "~0.1.0"
+    "karma-qunit": "~0.1.0",
+    "grunt-karma-coveralls": "~2.0.2"
   },
   "scripts": {
     "test": "grunt travis --verbose; ./node_modules/.bin/karma start --single-run --browsers PhantomJS"

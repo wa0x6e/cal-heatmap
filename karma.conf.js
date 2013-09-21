@@ -55,6 +55,10 @@ module.exports = function(config) {
 			"src/*.js": ["coverage"]
 		},
 
+		coverageReporter: {
+			type: "lcov",
+			dir: "coverage/"
+		},
 
 		// Start these browsers, currently available:
 		// - Chrome

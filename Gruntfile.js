@@ -59,16 +59,20 @@ module.exports = function(grunt) {
                 src: ["src/<%= pkg.name %>.js"],
                 dest: "<%= pkg.name %>.js"
             }
+        },
+        coveralls: {
+            options: {
+                coverage_dir: "coverage/"
+            }
         }
     });
-
-
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-css");
     grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-concat");
+    grunt.loadNpmTasks("grunt-karma-coveralls");
 
     // TO RUN BEFORE COMMIT
     // ====================
