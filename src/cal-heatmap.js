@@ -459,13 +459,15 @@ var CalHeatMap = function() {
 	this.RESET_SINGLE_ON_UPDATE = 1;
 	this.APPEND_ON_UPDATE = 2;
 
+	this.DEFAULT_LEGEND_MARGIN = 10;
+
 	this.root = null;
 
 	this._maxDomainReached = false;
 	this._minDomainReached = false;
 
 	this.domainPosition = new DomainPosition();
-	this.Legend = new Legend(this);
+	this.Legend = null;
 
 	/**
 	 * Display the graph for the first time
@@ -480,6 +482,8 @@ var CalHeatMap = function() {
 		self.root = d3.select(self.options.itemSelector);
 
 		self.root.attr("x", 0).attr("y", 0).append("svg").attr("class", "graph");
+
+		self.Legend = new Legend(self);
 
 		if (self.options.paintOnLoad) {
 
@@ -1089,6 +1093,21 @@ var CalHeatMap = function() {
 			}
 		}
 
+		if (!settings.hasOwnProperty("legendMargin")) {
+			if (self.options.legendVerticalPosition === "top") {
+				self.options.legendMargin[0] = self.DEFAULT_LEGEND_MARGIN;
+			} else if (self.options.legendVerticalPosition === "bottom") {
+				self.options.legendMargin[2] = self.DEFAULT_LEGEND_MARGIN;
+			}
+
+			if (self.options.legendHorizontalPosition === "middle" || self.options.legendHorizontalPosition === "center") {
+				if (self.options.legendVerticalPosition === "left") {
+					self.options.legendMargin[1] = self.DEFAULT_LEGEND_MARGIN;
+				} else if (self.options.legendVerticalPosition === "right") {
+					self.options.legendMargin[3] = self.DEFAULT_LEGEND_MARGIN;
+				}
+			}
+		}
 
 		function validateSelector(selector) {
 			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
@@ -1857,20 +1876,17 @@ CalHeatMap.prototype = {
 			.attr("y", function() {
 				if (parent.options.legendVerticalPosition === "top") {
 					return parent.Legend.getDim("height");
-				} else {
-					return 0;
 				}
+				return 0;
 			})
 			.attr("x", function() {
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
 					if (parent.options.legendHorizontalPosition === "left") {
 						return parent.Legend.getDim("width");
-					} else if (parent.options.legendHorizontalPosition === "right") {
-						return 0;
 					}
-				} else {
-					return 0;
 				}
+				return 0;
+
 			})
 		;
 	},
@@ -2094,14 +2110,17 @@ DomainPosition.prototype.getKeys = function() {
 
 var Legend = function(calendar) {
 	this.calendar = calendar;
+	this.computeDim();
+};
 
+Legend.prototype.computeDim = function() {
 	this.dim = {
 		width:
 			this.calendar.options.legendCellSize * (this.calendar.options.legend.length+1) +
 			this.calendar.options.legendCellPadding * (this.calendar.options.legend.length) +
 			this.calendar.options.legendMargin[3] + this.calendar.options.legendMargin[1],
 		height:
-			calendar.options.legendCellSize + calendar.options.legendMargin[0] + calendar.options.legendMargin[2]
+			this.calendar.options.legendCellSize + this.calendar.options.legendMargin[0] + this.calendar.options.legendMargin[2]
 	};
 };
 
@@ -2181,6 +2200,7 @@ Legend.prototype.display = function(width) {
 		})
 	;
 
+	this.computeDim();
 	legend.transition().duration(calendar.options.animationDuration)
 		.attr("x", getLegendXPosition())
 		.attr("y", getLegendYPosition())
@@ -2192,9 +2212,9 @@ Legend.prototype.display = function(width) {
 		switch(calendar.options.legendHorizontalPosition) {
 			case "right" :
 				if (calendar.options.legendVerticalPosition === "center" || calendar.options.legendVerticalPosition === "middel") {
-					return width;
+					return width + calendar.options.legendMargin[3];
 				}
-				return width - parent.dim.width;
+				return width - parent.dim.width + calendar.options.legendMargin[1];
 			case "middle" :
 			case "center" : return width/2 - parent.dim.width/2;
 			default : return calendar.options.legendMargin[3];
@@ -2203,6 +2223,8 @@ Legend.prototype.display = function(width) {
 
 	function getLegendYPosition() {
 		switch(calendar.options.legendVerticalPosition) {
+			case "center" :
+			case "middle" :
 			case "top" : return 0;
 			case "bottom" : return calendar.graphDim.height;
 		}
