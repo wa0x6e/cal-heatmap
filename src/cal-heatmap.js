@@ -2217,8 +2217,8 @@ Legend.prototype.display = function(width) {
 	legend.transition().duration(calendar.options.animationDuration)
 		.attr("x", getLegendXPosition())
 		.attr("y", getLegendYPosition())
-		.attr("width", calendar.options.legendOrientation === "horizontal" ? parent.dim.width : parent.dim.height)
-		.attr("height", calendar.options.legendOrientation === "horizontal" ? parent.dim.height : parent.dim.width)
+		.attr("width", parent.dim[calendar.options.legendOrientation === "horizontal" ? "width" : "height"])
+		.attr("height", parent.dim[calendar.options.legendOrientation === "horizontal" ? "height" : "width"])
 	;
 
 	legend.select("g").transition().duration(calendar.options.animationDuration)
@@ -2233,7 +2233,7 @@ Legend.prototype.display = function(width) {
 	function getLegendXPosition() {
 		switch(calendar.options.legendHorizontalPosition) {
 			case "right" :
-				if (calendar.options.legendVerticalPosition === "center" || calendar.options.legendVerticalPosition === "middel") {
+				if (calendar.options.legendVerticalPosition === "center" || calendar.options.legendVerticalPosition === "middle") {
 					return width + calendar.options.legendMargin[3];
 				}
 				return width - parent.getDim("width") - calendar.options.legendMargin[1];
@@ -2265,8 +2265,8 @@ Legend.prototype.display = function(width) {
  */
 Legend.prototype.getDim = function(axis) {
 	switch(axis) {
-		case "width" : return this.calendar.options.legendOrientation === "horizontal" ? this.dim.width : this.dim.height;
-		case "height" : return this.calendar.options.legendOrientation === "horizontal" ? this.dim.height : this.dim.width;
+		case "width" : return this.dim[this.calendar.options.legendOrientation === "horizontal" ? "width" : "height"];
+		case "height" : return this.dim[this.calendar.options.legendOrientation === "horizontal" ? "height" : "width"];
 	}
 };
 
