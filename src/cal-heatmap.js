@@ -479,7 +479,7 @@ var CalHeatMap = function() {
 			self._domains.set(d, self.getSubDomain(d).map(function(d) { return {t: self._domainType[self.options.subDomain].extractUnit(d), v: null}; }));
 		});
 
-		self.root = d3.select(self.options.itemSelector);
+		self.root = d3.select(self.options.itemSelector).append("svg").attr("id", "cal-heatmap-container");
 
 		self.root.attr("x", 0).attr("y", 0).append("svg").attr("class", "graph");
 
@@ -1880,10 +1880,10 @@ CalHeatMap.prototype = {
 				return 0;
 			})
 			.attr("x", function() {
-				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
-					if (parent.options.legendHorizontalPosition === "left") {
+				if (
+					(parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") &&
+					parent.options.legendHorizontalPosition === "left") {
 						return parent.Legend.getDim("width");
-					}
 				}
 				return 0;
 
@@ -2131,7 +2131,7 @@ Legend.prototype.display = function(width) {
 	var legend = calendar.root;
 	var legendItem;
 
-	var legendElement = d3.select(calendar.options.itemSelector + " .graph-legend");
+	var legendElement = calendar.root.select(".graph-legend");
 	if (legendElement[0][0] !== null) {
 		legend = legendElement;
 		legendItem = legend
