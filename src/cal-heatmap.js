@@ -113,7 +113,7 @@ var CalHeatMap = function() {
 
 		legendCellPadding: 2,
 
-		legendMargin: [10, 0, 0, 0],
+		legendMargin: [0, 0, 0, 0],
 
 		// Legend vertical position
 		// top : place legend above calendar
@@ -446,6 +446,11 @@ var CalHeatMap = function() {
 		height: 0
 	};
 
+	this.legendDim = {
+		width: 0,
+		height: 0
+	};
+
 	this.NAVIGATE_LEFT = 1;
 	this.NAVIGATE_RIGHT = 2;
 
@@ -460,6 +465,7 @@ var CalHeatMap = function() {
 	this._minDomainReached = false;
 
 	this.domainPosition = new DomainPosition();
+	this.Legend = new Legend(this);
 
 	/**
 	 * Display the graph for the first time
@@ -473,7 +479,7 @@ var CalHeatMap = function() {
 
 		self.root = d3.select(self.options.itemSelector);
 
-		self.root.append("svg").attr("class", "graph");
+		self.root.attr("x", 0).attr("y", 0).append("svg").attr("class", "graph");
 
 		if (self.options.paintOnLoad) {
 
@@ -517,7 +523,7 @@ var CalHeatMap = function() {
 
 			// Display legend if needed
 			if (self.options.displayLegend) {
-				self.displayLegend(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
+				self.Legend.display(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -875,6 +881,9 @@ var CalHeatMap = function() {
 			.attr("width", function() { return self.graphDim.width - self.options.domainGutter - self.options.cellPadding; })
 			.attr("height", function() { return self.graphDim.height - self.options.domainGutter - self.options.cellPadding; })
 		;
+
+		// Resize the root container
+		self.resize();
 	};
 
 	/**
@@ -1335,98 +1344,6 @@ CalHeatMap.prototype = {
 	 */
 	minDomainIsReached: function (datetimestamp) {
 		return (this.options.minDate !== null && (this.options.minDate.getTime() >= datetimestamp));
-	},
-
-
-	// =========================================================================//
-	// PAINTING : LEGEND														//
-	// =========================================================================//
-
-	displayLegend: function(width) {
-
-		var parent = this;
-		var legend = this.root;
-		var legendItem;
-
-		var legendWidth =
-			this.options.legendCellSize * (this.options.legend.length+1) +
-			this.options.legendCellPadding * (this.options.legend.length+1) +
-			this.options.legendMargin[3] + this.options.legendMargin[1];
-
-		var legendElement = d3.select(this.options.itemSelector + " .graph-legend");
-		if (legendElement[0][0] !== null) {
-			legend = legendElement;
-			legendItem = legend
-				.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
-				.select("g")
-				.selectAll("rect").data(d3.range(0, this.options.legend.length+1))
-			;
-		} else {
-			// Creating the new legend DOM if it doesn't already exist
-			if (this.options.legendVerticalPosition === "top") {
-				legend = legend.insert("svg", ".graph");
-			} else {
-				legend = legend.append("svg");
-			}
-
-			legendItem = legend
-				.attr("class", "graph-legend")
-				.attr("height", this.options.legendCellSize + this.options.legendMargin[0] + this.options.legendMargin[2])
-				.attr("width", width)
-				.append("g")
-				.attr("y", this.options.legendMargin[0])
-				.selectAll().data(d3.range(0, this.options.legend.length+1))
-			;
-		}
-
-		legendItem
-			.enter()
-			.append("rect")
-			.attr("width", this.options.legendCellSize)
-			.attr("height", this.options.legendCellSize)
-			.attr("class", function(d){ return "graph-rect q" + (d+1); })
-			.attr("x", function(d) {
-				return d * (parent.options.legendCellSize + parent.options.legendCellPadding);
-			})
-			.attr("y", this.options.legendMargin[0])
-			.attr("fill-opacity", 0)
-			.append("title")
-			;
-
-
-		legendItem.exit().transition().duration(parent.options.animationDuration)
-		.attr("fill-opacity", 0)
-		.remove();
-
-		legendItem.transition().delay(function(d, i) { return parent.options.animationDuration * i/10;}).attr("fill-opacity", 1);
-
-		legendItem.select("title").text(function(d) {
-				if (d === 0) {
-					return (parent.options.legendTitleFormat.lower).format({
-						min: parent.options.legend[d],
-						name: parent.options.itemName[1]});
-				} else if (d === parent.options.legend.length) {
-					return (parent.options.legendTitleFormat.upper).format({
-						max: parent.options.legend[d-1],
-						name: parent.options.itemName[1]});
-				} else {
-					return (parent.options.legendTitleFormat.inner).format({
-						down: parent.options.legend[d-1],
-						up: parent.options.legend[d],
-						name: parent.options.itemName[1]});
-				}
-			})
-		;
-
-		legend.select("g").attr("transform", function() {
-			switch(parent.options.legendHorizontalPosition) {
-				case "right" : return "translate(" + (width - legendWidth) + ")";
-				case "middle" :
-				case "center" : return "translate(" + (width/2 - legendWidth/2) + ")";
-				default : return "translate(" + parent.options.legendMargin[3] + ")";
-			}
-		});
-
 	},
 
 	getDomainKeys : function() {
@@ -1910,6 +1827,54 @@ CalHeatMap.prototype = {
 		return str;
 	},
 
+	/**
+	 * Handle the calendar layout and dimension
+	 *
+	 * Expand and skrink the container depending on its children dimension
+	 * Also rearrange the children position depending on their dimension,
+	 * and the legend position
+	 *
+	 * @return void
+	 */
+	resize: function() {
+		var parent = this;
+		this.root.transition().duration(parent.options.animationDuration)
+			.attr("width", function() {
+				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
+					return parent.graphDim.width + parent.Legend.getDim("width");
+				}
+				return parent.graphDim.width;
+			})
+			.attr("height", function() {
+				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
+					return parent.graphDim.height;
+				}
+				return parent.graphDim.height + parent.Legend.getDim("height");
+			})
+		;
+
+		this.root.select(".graph").transition().duration(parent.options.animationDuration)
+			.attr("y", function() {
+				if (parent.options.legendVerticalPosition === "top") {
+					return parent.Legend.getDim("height");
+				} else {
+					return 0;
+				}
+			})
+			.attr("x", function() {
+				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
+					if (parent.options.legendHorizontalPosition === "left") {
+						return parent.Legend.getDim("width");
+					} else if (parent.options.legendHorizontalPosition === "right") {
+						return 0;
+					}
+				} else {
+					return 0;
+				}
+			})
+		;
+	},
+
 	// =========================================================================//
 	// PUBLIC API																//
 	// =========================================================================//
@@ -1971,7 +1936,7 @@ CalHeatMap.prototype = {
 			return false;
 		}
 
-		this.displayLegend(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 
 		if (arguments.length > 0) {
 			this.fill();
@@ -2077,6 +2042,10 @@ CalHeatMap.prototype = {
 	}
 };
 
+
+/**
+ * Compute the position of a domain, relative to the calendar
+ */
 var DomainPosition = function() {
 	this.positions = d3.map();
 };
@@ -2122,6 +2091,130 @@ DomainPosition.prototype.getKeys = function() {
 		return parseInt(a, 10) - parseInt(b, 10);
 	});
 };
+
+var Legend = function(calendar) {
+	this.calendar = calendar;
+
+	this.dim = {
+		width:
+			this.calendar.options.legendCellSize * (this.calendar.options.legend.length+1) +
+			this.calendar.options.legendCellPadding * (this.calendar.options.legend.length) +
+			this.calendar.options.legendMargin[3] + this.calendar.options.legendMargin[1],
+		height:
+			calendar.options.legendCellSize + calendar.options.legendMargin[0] + calendar.options.legendMargin[2]
+	};
+};
+
+Legend.prototype.display = function(width) {
+
+	var parent = this;
+	var calendar = this.calendar;
+	var legend = calendar.root;
+	var legendItem;
+
+	var legendElement = d3.select(calendar.options.itemSelector + " .graph-legend");
+	if (legendElement[0][0] !== null) {
+		legend = legendElement;
+		legendItem = legend
+			.attr("height", calendar.options.legendCellSize + calendar.options.legendMargin[0] + calendar.options.legendMargin[2])
+			.select("g")
+			.selectAll("rect").data(d3.range(0, calendar.options.legend.length+1))
+		;
+	} else {
+		// Creating the new legend DOM if it doesn't already exist
+		if (calendar.options.legendVerticalPosition === "top") {
+			legend = legend.insert("svg", ".graph");
+		} else {
+			legend = legend.append("svg");
+		}
+
+		legend
+			.attr("x", getLegendXPosition())
+			.attr("y", getLegendYPosition())
+		;
+
+		legendItem = legend
+			.attr("class", "graph-legend")
+			.attr("height", parent.dim.height)
+			.attr("width", parent.dim.width)
+			.append("g")
+			.selectAll().data(d3.range(0, calendar.options.legend.length+1))
+		;
+	}
+
+	legendItem
+		.enter()
+		.append("rect")
+		.attr("width", calendar.options.legendCellSize)
+		.attr("height", calendar.options.legendCellSize)
+		.attr("class", function(d){ return "graph-rect q" + (d+1); })
+		.attr("x", function(d) {
+			return d * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
+		})
+		.attr("y", calendar.options.legendMargin[0])
+		.attr("fill-opacity", 0)
+		.append("title")
+	;
+
+
+	legendItem.exit().transition().duration(calendar.options.animationDuration)
+	.attr("fill-opacity", 0)
+	.remove();
+
+	legendItem.transition().delay(function(d, i) { return calendar.options.animationDuration * i/10;}).attr("fill-opacity", 1);
+
+	legendItem.select("title").text(function(d) {
+			if (d === 0) {
+				return (calendar.options.legendTitleFormat.lower).format({
+					min: calendar.options.legend[d],
+					name: calendar.options.itemName[1]});
+			} else if (d === calendar.options.legend.length) {
+				return (calendar.options.legendTitleFormat.upper).format({
+					max: calendar.options.legend[d-1],
+					name: calendar.options.itemName[1]});
+			} else {
+				return (calendar.options.legendTitleFormat.inner).format({
+					down: calendar.options.legend[d-1],
+					up: calendar.options.legend[d],
+					name: calendar.options.itemName[1]});
+			}
+		})
+	;
+
+	legend.transition().duration(calendar.options.animationDuration)
+		.attr("x", getLegendXPosition())
+		.attr("y", getLegendYPosition())
+		.attr("width", parent.dim.width)
+		.attr("height", parent.dim.height)
+	;
+
+	function getLegendXPosition() {
+		switch(calendar.options.legendHorizontalPosition) {
+			case "right" :
+				if (calendar.options.legendVerticalPosition === "center" || calendar.options.legendVerticalPosition === "middel") {
+					return width;
+				}
+				return width - parent.dim.width;
+			case "middle" :
+			case "center" : return width/2 - parent.dim.width/2;
+			default : return calendar.options.legendMargin[3];
+		}
+	}
+
+	function getLegendYPosition() {
+		switch(calendar.options.legendVerticalPosition) {
+			case "top" : return 0;
+			case "bottom" : return calendar.graphDim.height;
+		}
+	}
+
+	calendar.resize();
+};
+
+Legend.prototype.getDim = function(axis) {
+	return this.dim[axis];
+};
+
 
 /**
  * Sprintf like function
