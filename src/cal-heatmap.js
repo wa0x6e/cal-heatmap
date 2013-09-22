@@ -124,6 +124,9 @@ var CalHeatMap = function() {
 		// accepted values : left, center, right
 		legendHorizontalPosition: "left",
 
+		// Legend rotation
+		// accepted values: horizontal, vertical
+		legendOrientation: "horizontal",
 
 		// ================================================
 		// HIGHLIGHT
@@ -1859,23 +1862,29 @@ CalHeatMap.prototype = {
 		var parent = this;
 		this.root.transition().duration(parent.options.animationDuration)
 			.attr("width", function() {
+				var graphWidth = parent.graphDim.width;
+				var legendWidth = parent.Legend.getDim("width") + parent.options.legendMargin[1] + parent.options.legendMargin[3];
+
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
-					return parent.graphDim.width + parent.Legend.getDim("width");
+					return graphWidth + legendWidth;
 				}
-				return parent.graphDim.width;
+				return Math.max(graphWidth, legendWidth);
 			})
 			.attr("height", function() {
+				var graphHeight = parent.graphDim.height;
+				var legendHeight = parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2];
+
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
-					return parent.graphDim.height;
+					return Math.max(graphHeight, legendHeight);
 				}
-				return parent.graphDim.height + parent.Legend.getDim("height");
+				return graphHeight + legendHeight;
 			})
 		;
 
 		this.root.select(".graph").transition().duration(parent.options.animationDuration)
 			.attr("y", function() {
 				if (parent.options.legendVerticalPosition === "top") {
-					return parent.Legend.getDim("height");
+					return parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2];
 				}
 				return 0;
 			})
@@ -1883,7 +1892,7 @@ CalHeatMap.prototype = {
 				if (
 					(parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") &&
 					parent.options.legendHorizontalPosition === "left") {
-						return parent.Legend.getDim("width");
+						return parent.Legend.getDim("width")  + parent.options.legendMargin[1] + parent.options.legendMargin[3];
 				}
 				return 0;
 
@@ -2114,13 +2123,16 @@ var Legend = function(calendar) {
 };
 
 Legend.prototype.computeDim = function() {
+	/*
+		1 extra pixel is added to the width and height
+		to avoid the stroke displayed on hover clipped on webkit
+	 */
 	this.dim = {
 		width:
 			this.calendar.options.legendCellSize * (this.calendar.options.legend.length+1) +
-			this.calendar.options.legendCellPadding * (this.calendar.options.legend.length) +
-			this.calendar.options.legendMargin[3] + this.calendar.options.legendMargin[1],
+			this.calendar.options.legendCellPadding * (this.calendar.options.legend.length) + 1,
 		height:
-			this.calendar.options.legendCellSize + this.calendar.options.legendMargin[0] + this.calendar.options.legendMargin[2]
+			this.calendar.options.legendCellSize + 1
 	};
 };
 
@@ -2131,11 +2143,13 @@ Legend.prototype.display = function(width) {
 	var legend = calendar.root;
 	var legendItem;
 
+	this.computeDim();
+
 	var legendElement = calendar.root.select(".graph-legend");
 	if (legendElement[0][0] !== null) {
 		legend = legendElement;
 		legendItem = legend
-			.attr("height", calendar.options.legendCellSize + calendar.options.legendMargin[0] + calendar.options.legendMargin[2])
+			//.attr("height", calendar.options.legendCellSize/* + calendar.options.legendMargin[0] + calendar.options.legendMargin[2]*/)
 			.select("g")
 			.selectAll("rect").data(d3.range(0, calendar.options.legend.length+1))
 		;
@@ -2154,8 +2168,8 @@ Legend.prototype.display = function(width) {
 
 		legendItem = legend
 			.attr("class", "graph-legend")
-			.attr("height", parent.dim.height)
-			.attr("width", parent.dim.width)
+			.attr("height", parent.getDim("height"))
+			.attr("width", parent.getDim("width"))
 			.append("g")
 			.selectAll().data(d3.range(0, calendar.options.legend.length+1))
 		;
@@ -2170,7 +2184,6 @@ Legend.prototype.display = function(width) {
 		.attr("x", function(d) {
 			return d * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
 		})
-		.attr("y", calendar.options.legendMargin[0])
 		.attr("fill-opacity", 0)
 		.append("title")
 	;
@@ -2200,12 +2213,21 @@ Legend.prototype.display = function(width) {
 		})
 	;
 
-	this.computeDim();
+
 	legend.transition().duration(calendar.options.animationDuration)
 		.attr("x", getLegendXPosition())
 		.attr("y", getLegendYPosition())
-		.attr("width", parent.dim.width)
-		.attr("height", parent.dim.height)
+		.attr("width", calendar.options.legendOrientation === "horizontal" ? parent.dim.width : parent.dim.height)
+		.attr("height", calendar.options.legendOrientation === "horizontal" ? parent.dim.height : parent.dim.width)
+	;
+
+	legend.select("g").transition().duration(calendar.options.animationDuration)
+		.attr("transform", function() {
+			if (calendar.options.legendOrientation === "vertical")	{
+				return "rotate(90 " + calendar.options.legendCellSize/2 + " " + calendar.options.legendCellSize/2 + ")";
+			}
+			return "";
+		})
 	;
 
 	function getLegendXPosition() {
@@ -2214,9 +2236,9 @@ Legend.prototype.display = function(width) {
 				if (calendar.options.legendVerticalPosition === "center" || calendar.options.legendVerticalPosition === "middel") {
 					return width + calendar.options.legendMargin[3];
 				}
-				return width - parent.dim.width + calendar.options.legendMargin[1];
+				return width - parent.getDim("width") - calendar.options.legendMargin[1];
 			case "middle" :
-			case "center" : return width/2 - parent.dim.width/2;
+			case "center" : return Math.round(width/2 - parent.getDim("width")/2);
 			default : return calendar.options.legendMargin[3];
 		}
 	}
@@ -2225,16 +2247,27 @@ Legend.prototype.display = function(width) {
 		switch(calendar.options.legendVerticalPosition) {
 			case "center" :
 			case "middle" :
-			case "top" : return 0;
-			case "bottom" : return calendar.graphDim.height;
+			case "top" : return calendar.options.legendMargin[0];
+			case "bottom" : return calendar.graphDim.height + calendar.options.legendMargin[0];
 		}
 	}
 
 	calendar.resize();
 };
 
+/**
+ * Return the dimension of the legend
+ *
+ * Takes into account rotation
+ *
+ * @param  string axis Width or height
+ * @return int height or width in pixels
+ */
 Legend.prototype.getDim = function(axis) {
-	return this.dim[axis];
+	switch(axis) {
+		case "width" : return this.calendar.options.legendOrientation === "horizontal" ? this.dim.width : this.dim.height;
+		case "height" : return this.calendar.options.legendOrientation === "horizontal" ? this.dim.height : this.dim.width;
+	}
 };
 
 
