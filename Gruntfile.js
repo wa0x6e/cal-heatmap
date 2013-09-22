@@ -58,6 +58,10 @@ module.exports = function(grunt) {
             js: {
                 src: ["src/<%= pkg.name %>.js"],
                 dest: "<%= pkg.name %>.js"
+            },
+            test: {
+                src: ["test/src/function.js", "test/src/module-*.js"],
+                dest: "test/test.js"
             }
         },
         coveralls: {
