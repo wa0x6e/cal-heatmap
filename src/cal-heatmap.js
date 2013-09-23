@@ -128,6 +128,18 @@ var CalHeatMap = function() {
 		// accepted values: horizontal, vertical
 		legendOrientation: "horizontal",
 
+		// Objects holding all the heatmap different colors
+		// null to disable, and use the default css styles
+		//
+		// Examples:
+		// legendColors: {
+		//		min: "green",
+		//		max: "red",
+		//		empty: "#ffffff",
+		//		base: "grey"
+		// }
+		legendColors: null,
+
 		// ================================================
 		// HIGHLIGHT
 		// ================================================
@@ -471,6 +483,7 @@ var CalHeatMap = function() {
 
 	this.domainPosition = new DomainPosition();
 	this.Legend = null;
+	this.legendScale = null;
 
 	/**
 	 * Display the graph for the first time
@@ -733,6 +746,10 @@ var CalHeatMap = function() {
 						.attr("ry", self.options.cellRadius)
 					;
 				}
+
+				if (self.legendScale !== null && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("base")) {
+					selection.attr("fill", self.options.legendColors.base);
+				}
 			})
 		;
 
@@ -910,10 +927,26 @@ var CalHeatMap = function() {
 			.data(function(d) { return self._domains.get(d); })
 		;
 
-		rect.transition().select("rect")
+		/**
+		 * Colorize the cell via a style attribute if enabled
+		 */
+		function addStyle(element) {
+			if (self.legendScale === null) {
+				return false;
+			}
+
+			element.attr("fill", function(d) {
+				if (d.v === 0 && self.options.legend[0] > 0 && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("empty")) {
+					return self.options.legendColors.empty;
+				}
+				return self.legendScale(Math.min(d.v, self.options.legend[self.options.legend.length-2]));
+			});
+		}
+
+		rect.transition().duration(self.options.animationDuration).select("rect")
 			.attr("class", function(d) {
 
-				var htmlClass = "graph-rect" + self.getHighlightClassName(d.t);
+				var htmlClass = self.getHighlightClassName(d.t);
 
 				if (d.v !== null) {
 					htmlClass += " " + self.legend(d.v);
@@ -927,10 +960,10 @@ var CalHeatMap = function() {
 
 				return htmlClass;
 			})
+			.call(addStyle)
 		;
 
-
-		rect.transition().select("title")
+		rect.transition().duration(self.options.animationDuration).select("title")
 			.text(function(d) {
 
 				if (d.v === null && !self.options.considerMissingDataAsZero) {
@@ -1697,25 +1730,35 @@ CalHeatMap.prototype = {
 	 */
 	legend: function(n) {
 
-		if (isNaN(n)) {
-			return "qi";
-		} else if (n === null) {
+		if (n === null) {
 			return "";
 		}
+
+		var index = this.options.legend.length;
 
 		for (var i = 0, total = this.options.legend.length-1; i <= total; i++) {
 
 			if (n === 0 && this.options.legend[0] > 0) {
-				return "";
+				index = 0;
+				break;
 			} else if (this.options.legend[0] > 0 && n < 0) {
-				return "qi";
+				index = "i";
+				break;
 			}
 
 			if (n <= this.options.legend[i]) {
-				return "q" + (i+1);
+				index = (i+1);
+				break;
 			}
 		}
-		return "q" + (this.options.legend.length + 1);
+
+		var klass = "r" + index;
+
+		if (this.legendScale === null) {
+			klass += " graph-rect q" + index;
+		}
+
+		return klass;
 	},
 
 	// =========================================================================//
@@ -1952,12 +1995,21 @@ CalHeatMap.prototype = {
 		if (arguments.length >= 1 && Array.isArray(arguments[0])) {
 			this.options.legend = arguments[0];
 		}
+		if (arguments.length >= 2) {
+			if (Array.isArray(arguments[1]) && arguments[1].length >= 2) {
+				this.options.legendColors = [arguments[1][0], arguments[1][1]];
+			} else {
+				this.options.legendColors = arguments[1];
+			}
 
-		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+		}
 
 		if (arguments.length > 0 && !oldLegend.equals(this.options.legend)) {
+			this.Legend.buildColors();
 			this.fill();
 		}
+
+		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 	},
 
 	getSVG: function() {
@@ -2112,6 +2164,10 @@ DomainPosition.prototype.getKeys = function() {
 var Legend = function(calendar) {
 	this.calendar = calendar;
 	this.computeDim();
+
+	if (calendar.options.legendColors !== null) {
+		this.buildColors();
+	}
 };
 
 Legend.prototype.computeDim = function() {
@@ -2137,13 +2193,15 @@ Legend.prototype.display = function(width) {
 
 	this.computeDim();
 
+	var _legend = calendar.options.legend;
+	_legend.push(_legend[_legend.length-1]+1);
+
 	var legendElement = calendar.root.select(".graph-legend");
 	if (legendElement[0][0] !== null) {
 		legend = legendElement;
 		legendItem = legend
-			//.attr("height", calendar.options.legendCellSize/* + calendar.options.legendMargin[0] + calendar.options.legendMargin[2]*/)
 			.select("g")
-			.selectAll("rect").data(d3.range(0, calendar.options.legend.length+1))
+			.selectAll("rect").data(_legend)
 		;
 	} else {
 		// Creating the new legend DOM if it doesn't already exist
@@ -2163,8 +2221,23 @@ Legend.prototype.display = function(width) {
 			.attr("height", parent.getDim("height"))
 			.attr("width", parent.getDim("width"))
 			.append("g")
-			.selectAll().data(d3.range(0, calendar.options.legend.length+1))
+			.selectAll().data(_legend)
 		;
+	}
+
+	function addStyle(element) {
+		element.attr("fill", function(d, i) {
+			if (calendar.legendScale === null) {
+				return "";
+			}
+
+			if (i === 0) {
+				return calendar.legendScale(d - 1);
+			}
+			return calendar.legendScale(calendar.options.legend[i-1]);
+		});
+
+		element.attr("class", function(d) { return calendar.legend(d); });
 	}
 
 	legendItem
@@ -2172,34 +2245,41 @@ Legend.prototype.display = function(width) {
 		.append("rect")
 		.attr("width", calendar.options.legendCellSize)
 		.attr("height", calendar.options.legendCellSize)
-		.attr("class", function(d){ return "graph-rect q" + (d+1); })
-		.attr("x", function(d) {
-			return d * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
+		.attr("class", function(d){ return calendar.legend(d); })
+		.attr("x", function(d, i) {
+			return i * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
 		})
 		.attr("fill-opacity", 0)
+		.call(function(selection) {
+			if (calendar.legendScale !== null && calendar.options.legendColors !== null && calendar.options.legendColors.hasOwnProperty("base")) {
+				selection.attr("fill", calendar.options.legendColors.base);
+			}
+		})
 		.append("title")
 	;
-
 
 	legendItem.exit().transition().duration(calendar.options.animationDuration)
 	.attr("fill-opacity", 0)
 	.remove();
 
-	legendItem.transition().delay(function(d, i) { return calendar.options.animationDuration * i/10;}).attr("fill-opacity", 1);
+	legendItem.transition().delay(function(d, i) { return calendar.options.animationDuration * i/10;})
+		.attr("fill-opacity", 1)
+		.call(addStyle)
+	;
 
-	legendItem.select("title").text(function(d) {
-			if (d === 0) {
+	legendItem.select("title").text(function(d, i) {
+			if (i === 0) {
 				return (calendar.options.legendTitleFormat.lower).format({
-					min: calendar.options.legend[d],
+					min: calendar.options.legend[i],
 					name: calendar.options.itemName[1]});
-			} else if (d === calendar.options.legend.length) {
+			} else if (i === _legend.length-1) {
 				return (calendar.options.legendTitleFormat.upper).format({
-					max: calendar.options.legend[d-1],
+					max: calendar.options.legend[i-1],
 					name: calendar.options.itemName[1]});
 			} else {
 				return (calendar.options.legendTitleFormat.inner).format({
-					down: calendar.options.legend[d-1],
-					up: calendar.options.legend[d],
+					down: calendar.options.legend[i-1],
+					up: calendar.options.legend[i],
 					name: calendar.options.itemName[1]});
 			}
 		})
@@ -2260,6 +2340,41 @@ Legend.prototype.getDim = function(axis) {
 		case "width" : return this.dim[this.calendar.options.legendOrientation === "horizontal" ? "width" : "height"];
 		case "height" : return this.dim[this.calendar.options.legendOrientation === "horizontal" ? "height" : "width"];
 	}
+};
+
+Legend.prototype.buildColors = function() {
+	if (this.calendar.options.legendColors === null) {
+		this.calendar.legendScale = null;
+		return false;
+	}
+
+	var _colorRange = [];
+
+	if (Array.isArray(this.calendar.options.legendColors)) {
+		_colorRange = this.calendar.options.legendColors;
+	} else if (this.calendar.options.legendColors.hasOwnProperty("min") && this.calendar.options.legendColors.hasOwnProperty("max")) {
+		_colorRange = [this.calendar.options.legendColors.min, this.calendar.options.legendColors.max];
+	} else {
+		this.calendar.options.legendColors = null;
+		return false;
+	}
+
+	var l = this.calendar.options.legend.slice(0);
+
+	if (this.calendar.options.legend[0] > 0) {
+		l.unshift(0);
+	}
+
+	var colorScale = d3.scale.linear()
+		.range(_colorRange)
+		.interpolate(d3.interpolateHcl)
+		.domain([d3.min(l), d3.max(l)])
+	;
+
+	var legendColors = l.map(function(element) { return colorScale(element); });
+	this.calendar.legendScale = d3.scale.threshold().domain(this.calendar.options.legend).range(legendColors);
+
+	return true;
 };
 
 
