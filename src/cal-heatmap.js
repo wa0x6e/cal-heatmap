@@ -1944,26 +1944,18 @@ CalHeatMap.prototype = {
 	/**
 	 * Set the legend
 	 *
-	 * @param mixed Either
-	 * - an array of integer, representing the different threshold value,
-	 * - or 3 integers, representing respectively the minimum threshold, the maximum threshold,
-	 * and the step, used for generating the final array of threshold
-	 * - or no parameter, In that case, setLegend() will only act on the legend position and dimension,
-	 * leaving the colors untouched.
+	 * @param array legend an array of integer, representing the different threshold value
+	 * @param array colorRange an array of 2 hex colors, for the minimum and maximum colors
 	 */
 	setLegend: function() {
-		if (arguments.length === 1 && Array.isArray(arguments[0])) {
+		var oldLegend = this.options.legend;
+		if (arguments.length >= 1 && Array.isArray(arguments[0])) {
 			this.options.legend = arguments[0];
-		} else if (arguments.length === 3 && typeof arguments[0] === "number" && typeof arguments[1] === "number" && typeof arguments[2] === "number") {
-			this.options.legend = d3.range(arguments[0], arguments[1], arguments[2]);
-		} else if (arguments.length !== 0) {
-			console.log("Provided arguments for setLegend() are not valid");
-			return false;
 		}
 
 		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 
-		if (arguments.length > 0) {
+		if (arguments.length > 0 && !oldLegend.equals(this.options.legend)) {
 			this.fill();
 		}
 	},
@@ -2306,6 +2298,40 @@ function mergeRecursive(obj1, obj2) {
 
 	return obj1;
 }
+
+/**
+ * Check if 2 arrays are equals
+ *
+ * @link http://stackoverflow.com/a/14853974/805649
+ * @param  array array the array to compare to
+ * @return bool true of the 2 arrays are equals
+ */
+Array.prototype.equals = function (array) {
+    // if the other array is a falsy value, return
+    if (!array) {
+        return false;
+    }
+
+    // compare lengths - can save a lot of time
+    if (this.length !== array.length) {
+        return false;
+    }
+
+    for (var i = 0; i < this.length; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!this[i].compare(array[i])) {
+                return false;
+            }
+        }
+        else if (this[i] !== array[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
+};
 
 /**
  * AMD Loader
