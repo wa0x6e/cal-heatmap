@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.2.1 (Mon Sep 23 2013 23:15:04)
+/*! cal-heatmap v3.2.1 (Tue Sep 24 2013 12:13:25)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -248,13 +248,31 @@ test("Data Source is a regular string", function() {
 	equal(cal.getDatas(datas, new Date(), new Date(), function() {}), false, "getDatas() return false: datas load is asynchronous");
 });
 
-test("Data Source is a en empty string", function() {
+test("Data Source is an empty string", function() {
 	expect(1);
 
 	var datas = "";
 	var cal = createCalendar({data: datas});
 
 	equal(cal.getDatas(datas, new Date(), new Date(), function() {}), true, "getDatas() return true: datas load is not asynchronous");
+});
+
+test("Data Source is an array", function() {
+	expect(1);
+
+	var datas = [];
+	var cal = createCalendar({data: datas});
+
+	equal(cal.getDatas(datas, new Date(), new Date(), function() {}), true, "getDatas() return true: no data to load");
+});
+
+test("Data Source is an object", function() {
+	expect(1);
+
+	var datas = {};
+	var cal = createCalendar({data: datas});
+
+	equal(cal.getDatas(datas, new Date(), new Date(), function() {}), false, "getDatas() return false: datas load is loaded");
 });
 
 /*
