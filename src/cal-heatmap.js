@@ -1844,7 +1844,7 @@ CalHeatMap.prototype = {
 			if (this._domains.has(domainUnit) && (domainUnit >= +startDate && domainUnit < +endDate)) {
 				var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 				var subDomainsData = this._domains.get(domainUnit);
-				var index = Math.floor((subDomainUnit - domainUnit) / subDomainStep);
+				var index = Math.round((subDomainUnit - domainUnit) / subDomainStep);
 
 				if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 					subDomainsData[index].v = data[d];
