@@ -66,6 +66,15 @@ test("Empty value", function() {
 	equal(cal.Legend.getClass(null, false), "", "Null value return empty string");
 });
 
+test("Invalid value", function() {
+
+	expect(1);
+
+	var cal = createCalendar({});
+
+	equal(cal.Legend.getClass("foo", false), "", "NaN return empty string");
+});
+
 test("Also return the qn styling class", function() {
 
 	expect(10);

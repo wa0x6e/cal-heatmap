@@ -2370,7 +2370,7 @@ Legend.prototype.buildColors = function() {
  */
 Legend.prototype.getClass = function(n, withCssClass) {
 
-	if (n === null) {
+	if (n === null || isNaN(n)) {
 		return "";
 	}
 

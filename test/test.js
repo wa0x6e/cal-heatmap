@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.2.1 (Tue Sep 24 2013 13:11:34)
+/*! cal-heatmap v3.2.1 (Tue Sep 24 2013 13:29:59)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -1718,6 +1718,15 @@ test("Empty value", function() {
 	var cal = createCalendar({});
 
 	equal(cal.Legend.getClass(null, false), "", "Null value return empty string");
+});
+
+test("Invalid value", function() {
+
+	expect(1);
+
+	var cal = createCalendar({});
+
+	equal(cal.Legend.getClass("foo", false), "", "NaN return empty string");
 });
 
 test("Also return the qn styling class", function() {
