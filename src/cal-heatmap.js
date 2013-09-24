@@ -405,8 +405,8 @@ var CalHeatMap = function() {
 			row: function() {return 1;},
 			column: function() {return 12;},
 			position: {
-				x : function(d) { return Math.floor(d.getFullYear() / this._domainType.year.row(d)); },
-				y : function(d) { return d.getFullYear() % this._domainType.year.row(d);}
+				x : function(d) { return Math.floor(d.getFullYear() / self._domainType.year.row(d)); },
+				y : function(d) { return d.getFullYear() % self._domainType.year.row(d);}
 			},
 			format: {
 				date: "%Y",
@@ -2204,21 +2204,6 @@ Legend.prototype.display = function(width) {
 		;
 	}
 
-	function addStyle(element) {
-		element.attr("fill", function(d, i) {
-			if (calendar.legendScale === null) {
-				return "";
-			}
-
-			if (i === 0) {
-				return calendar.legendScale(d - 1);
-			}
-			return calendar.legendScale(calendar.options.legend[i-1]);
-		});
-
-		element.attr("class", function(d) { return calendar.Legend.getClass(d, (calendar.legendScale === null)); });
-	}
-
 	legendItem
 		.enter()
 		.append("rect")
@@ -2243,7 +2228,20 @@ Legend.prototype.display = function(width) {
 
 	legendItem.transition().delay(function(d, i) { return calendar.options.animationDuration * i/10;})
 		.attr("fill-opacity", 1)
-		.call(addStyle)
+		.call(function(element) {
+			element.attr("fill", function(d, i) {
+				if (calendar.legendScale === null) {
+					return "";
+				}
+
+				if (i === 0) {
+					return calendar.legendScale(d - 1);
+				}
+				return calendar.legendScale(calendar.options.legend[i-1]);
+			});
+
+			element.attr("class", function(d) { return calendar.Legend.getClass(d, (calendar.legendScale === null)); });
+		})
 	;
 
 	legendItem.select("title").text(function(d, i) {
