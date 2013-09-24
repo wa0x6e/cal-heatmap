@@ -2393,13 +2393,8 @@ Legend.prototype.getClass = function(n, withCssClass) {
 		index.push(0);
 	}
 
-	var klass = "r" + index.join(" r");
-
-	if (withCssClass) {
-		klass += " q" + index.join(" q");
-	}
-
-	return klass;
+	index.unshift("");
+	return (index.join(" r") + (withCssClass ? index.join(" q") : "")).trim();
 };
 
 
