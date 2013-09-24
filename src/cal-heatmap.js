@@ -1794,8 +1794,11 @@ CalHeatMap.prototype = {
 				}
 				break;
 			case "object" :
-				// @todo Check that it's a valid JSON object
-				_callback(source);
+				// Check that source is really a valid json object
+				if (source === Object(source) && Object.prototype.toString.call(source) !== "[object Array]") {
+					_callback(source);
+					return false;
+				}
 		}
 
 		return true;
@@ -1825,6 +1828,9 @@ CalHeatMap.prototype = {
 		var subDomainStep = this._domains.get(domainKeys[0])[1].t - this._domains.get(domainKeys[0])[0].t;
 
 		for (var d in data) {
+			if (isNaN(d)) {
+				continue;
+			}
 			var date = new Date(d*1000);
 			var domainUnit = this.getDomain(date)[0].getTime();
 
