@@ -136,7 +136,8 @@ var CalHeatMap = function() {
 		//		min: "green",
 		//		max: "red",
 		//		empty: "#ffffff",
-		//		base: "grey"
+		//		base: "grey",
+		//		overflow: "red"
 		// }
 		legendColors: null,
 
@@ -936,9 +937,14 @@ var CalHeatMap = function() {
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === 0 && self.options.legend[0] > 0 && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("empty")) {
+				if (d.v === 0 && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("empty")) {
 					return self.options.legendColors.empty;
 				}
+
+				if (d.v < 0 && self.options.legend[0] > 0 && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("overflow")) {
+					return self.options.legendColors.overflow;
+				}
+
 				return self.legendScale(Math.min(d.v, self.options.legend[self.options.legend.length-2]));
 			});
 		}
@@ -2368,27 +2374,29 @@ Legend.prototype.getClass = function(n, withCssClass) {
 		return "";
 	}
 
-	var index = this.calendar.options.legend.length + 1;
+	var index = [this.calendar.options.legend.length + 1];
 
 	for (var i = 0, total = this.calendar.options.legend.length-1; i <= total; i++) {
 
-		if (n === 0 && this.calendar.options.legend[0] > 0) {
-			index = 0;
+		if (this.calendar.options.legend[0] > 0 && n < 0) {
+			index = ["1", "i"];
 			break;
-		} else if (this.calendar.options.legend[0] > 0 && n < 0) {
-			return "r1 ri" + (withCssClass ? " q1 qi" : "");
 		}
 
 		if (n <= this.calendar.options.legend[i]) {
-			index = (i+1);
+			index = [i+1];
 			break;
 		}
 	}
 
-	var klass = "r" + index;
+	if (n === 0) {
+		index.push(0);
+	}
+
+	var klass = "r" + index.join(" r");
 
 	if (withCssClass) {
-		klass += " q" + index;
+		klass += " q" + index.join(" q");
 	}
 
 	return klass;

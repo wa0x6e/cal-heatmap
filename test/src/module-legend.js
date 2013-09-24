@@ -12,7 +12,7 @@ test("Positive legend", function() {
 
 	var cal = createCalendar({legend: [100, 200, 300, 400]});
 
-	equal(cal.Legend.getClass(0, false), "r0");
+	equal(cal.Legend.getClass(0, false), "r1 r0");
 	equal(cal.Legend.getClass(50, false), "r1");
 	equal(cal.Legend.getClass(100, false), "r1");
 	equal(cal.Legend.getClass(150, false), "r2");
@@ -32,7 +32,7 @@ test("Positive and negative custom legend", function() {
 	equal(cal.Legend.getClass(-200, false), "r1");
 	equal(cal.Legend.getClass(-100, false), "r1");
 	equal(cal.Legend.getClass(-50, false), "r2");
-	equal(cal.Legend.getClass(0, false), "r2");
+	equal(cal.Legend.getClass(0, false), "r2 r0");
 	equal(cal.Legend.getClass(50, false), "r3");
 	equal(cal.Legend.getClass(100, false), "r3");
 	equal(cal.Legend.getClass(150, false), "r4");
@@ -47,7 +47,7 @@ test("Float value custom legend", function() {
 	var cal = createCalendar({legend: [0.1, 0.2, 0.3]});
 
 	equal(cal.Legend.getClass(-100, false), "r1 ri");
-	equal(cal.Legend.getClass(0, false), "r0");
+	equal(cal.Legend.getClass(0, false), "r1 r0");
 	equal(cal.Legend.getClass(0.1, false), "r1");
 	equal(cal.Legend.getClass(0.15, false), "r2");
 	equal(cal.Legend.getClass(0.2, false), "r2");
@@ -73,7 +73,7 @@ test("Also return the qn styling class", function() {
 	var cal = createCalendar({legend: [100, 200, 300, 400]});
 
 	equal(cal.Legend.getClass(-100, true), "r1 ri q1 qi");
-	equal(cal.Legend.getClass(0, true), "r0 q0");
+	equal(cal.Legend.getClass(0, true), "r1 r0 q1 q0");
 	equal(cal.Legend.getClass(50, true), "r1 q1");
 	equal(cal.Legend.getClass(100, true), "r1 q1");
 	equal(cal.Legend.getClass(150, true), "r2 q2");
