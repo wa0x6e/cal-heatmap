@@ -15,13 +15,16 @@
 	font-size: 10px
 }
 
-.graph-rect
-{
-	fill: #ededed;
+.graph, .graph-legend rect {
 	shape-rendering: crispedges
 }
 
-.graph-rect:hover
+.graph-rect
+{
+	fill: #ededed;
+}
+
+.graph rect:hover
 {
 	stroke: #000;
 	stroke-width: 1px
