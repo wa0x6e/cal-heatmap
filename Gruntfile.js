@@ -18,7 +18,15 @@ module.exports = function(grunt) {
             options: {
                 jshintrc: ".jshintrc"
             },
-            files: ["<%= pkg.name %>.js", "test/test.js", "test/test-amd.js"]
+            lib: {
+                src: ["<%= pkg.name %>.js"]
+            },
+            test: {
+                options: {
+                    jshintrc: "test/.jshintrc"
+                },
+                src: ["test/test.js", "test/test-amd.js"]
+            }
         },
         csslint: {
             base: {
@@ -68,7 +76,16 @@ module.exports = function(grunt) {
             options: {
                 coverage_dir: "coverage/"
             }
-        }
+        },
+        watch: {
+			scripts: {
+				files: "test/src/*.js",
+				tasks: ["concat:test"],
+				options: {
+					interrupt: true,
+				}
+			}
+		}
     });
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
@@ -77,6 +94,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-karma-coveralls");
+    grunt.loadNpmTasks("grunt-contrib-watch");
 
     // TO RUN BEFORE COMMIT
     // ====================
