@@ -4,57 +4,40 @@
 	-----------------------------------------------------------------
  */
 
-module( "Legend" );
+module( "Legend class" );
 
-test("Basic default legend", function() {
+test("Positive legend", function() {
 
-	expect(8);
-
-	var cal = createCalendar({});
-
-	equal(cal.legend(0), "");
-	equal(cal.legend(5), "q1");
-	equal(cal.legend(10), "q1");
-	equal(cal.legend(15), "q2");
-	equal(cal.legend(20), "q2");
-	equal(cal.legend(25), "q3");
-	equal(cal.legend(30), "q3");
-	equal(cal.legend(35), "q4");
-
-});
-
-test("Positive custom legend", function() {
-
-	expect(8);
+	expect(9);
 
 	var cal = createCalendar({legend: [100, 200, 300, 400]});
 
-	equal(cal.legend(0), "");
-	equal(cal.legend(50), "q1");
-	equal(cal.legend(100), "q1");
-	equal(cal.legend(150), "q2");
-	equal(cal.legend(200), "q2");
-	equal(cal.legend(250), "q3");
-	equal(cal.legend(300), "q3");
-	equal(cal.legend(350), "q4");
-
+	equal(cal.Legend.getClass(0, false), "r0");
+	equal(cal.Legend.getClass(50, false), "r1");
+	equal(cal.Legend.getClass(100, false), "r1");
+	equal(cal.Legend.getClass(150, false), "r2");
+	equal(cal.Legend.getClass(200, false), "r2");
+	equal(cal.Legend.getClass(250, false), "r3");
+	equal(cal.Legend.getClass(300, false), "r3");
+	equal(cal.Legend.getClass(350, false), "r4");
+	equal(cal.Legend.getClass(600, false), "r5");
 });
 
 test("Positive and negative custom legend", function() {
 
-	expect(8);
+	expect(9);
 
 	var cal = createCalendar({legend: [-100, 0, 100, 200, 300, 400]});
 
-	equal(cal.legend(-200), "q1");
-	equal(cal.legend(-100), "q1");
-	equal(cal.legend(-50), "q2");
-	equal(cal.legend(0), "q2");
-	equal(cal.legend(50), "q3");
-	equal(cal.legend(100), "q3");
-	equal(cal.legend(150), "q4");
-	equal(cal.legend(200), "q4");
-
+	equal(cal.Legend.getClass(-200, false), "r1");
+	equal(cal.Legend.getClass(-100, false), "r1");
+	equal(cal.Legend.getClass(-50, false), "r2");
+	equal(cal.Legend.getClass(0, false), "r2");
+	equal(cal.Legend.getClass(50, false), "r3");
+	equal(cal.Legend.getClass(100, false), "r3");
+	equal(cal.Legend.getClass(150, false), "r4");
+	equal(cal.Legend.getClass(200, false), "r4");
+	equal(cal.Legend.getClass(600, false), "r7");
 });
 
 test("Float value custom legend", function() {
@@ -63,39 +46,40 @@ test("Float value custom legend", function() {
 
 	var cal = createCalendar({legend: [0.1, 0.2, 0.3]});
 
-	equal(cal.legend(-100), "qi");
-	equal(cal.legend(0), "");
-	equal(cal.legend(0.1), "q1");
-	equal(cal.legend(0.15), "q2");
-	equal(cal.legend(0.2), "q2");
-	equal(cal.legend(0.25), "q3");
-	equal(cal.legend(0.3), "q3");
-	equal(cal.legend(0.35), "q4", "Classes top at q3, since legend contains only 3 items");
-	equal(cal.legend(0.4), "q4", "Classes top at q3, since legend contains only 3 items");
-
+	equal(cal.Legend.getClass(-100, false), "r1 ri");
+	equal(cal.Legend.getClass(0, false), "r0");
+	equal(cal.Legend.getClass(0.1, false), "r1");
+	equal(cal.Legend.getClass(0.15, false), "r2");
+	equal(cal.Legend.getClass(0.2, false), "r2");
+	equal(cal.Legend.getClass(0.25, false), "r3");
+	equal(cal.Legend.getClass(0.3, false), "r3");
+	equal(cal.Legend.getClass(0.35, false), "r4");
+	equal(cal.Legend.getClass(0.4, false), "r4");
 });
 
-test("Null value", function() {
+test("Empty value", function() {
 
-	expect(3);
+	expect(1);
 
 	var cal = createCalendar({});
 
-	equal(cal.legend(null), "");
-	equal(cal.legend(0), "");
-	equal(cal.legend(1), "q1");
-
+	equal(cal.Legend.getClass(null, false), "", "Null value return empty string");
 });
 
-test("Not a number", function() {
+test("Also return the qn styling class", function() {
 
-	expect(4);
+	expect(10);
 
-	var cal = createCalendar({});
+	var cal = createCalendar({legend: [100, 200, 300, 400]});
 
-	equal(cal.legend("Hello"), "qi");
-	equal(cal.legend({}), "qi");
-	equal(cal.legend(0), "");
-	equal(cal.legend(1), "q1");
-
+	equal(cal.Legend.getClass(-100, true), "r1 ri q1 qi");
+	equal(cal.Legend.getClass(0, true), "r0 q0");
+	equal(cal.Legend.getClass(50, true), "r1 q1");
+	equal(cal.Legend.getClass(100, true), "r1 q1");
+	equal(cal.Legend.getClass(150, true), "r2 q2");
+	equal(cal.Legend.getClass(200, true), "r2 q2");
+	equal(cal.Legend.getClass(250, true), "r3 q3");
+	equal(cal.Legend.getClass(300, true), "r3 q3");
+	equal(cal.Legend.getClass(350, true), "r4 q4");
+	equal(cal.Legend.getClass(600, true), "r5 q5");
 });

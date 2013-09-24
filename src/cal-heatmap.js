@@ -948,10 +948,14 @@ var CalHeatMap = function() {
 
 				var htmlClass = self.getHighlightClassName(d.t);
 
+				if (self.legendScale === null) {
+					htmlClass = " graph-rect";
+				}
+
 				if (d.v !== null) {
-					htmlClass += " " + self.legend(d.v);
+					htmlClass += " " + self.Legend.getClass(d.v, (self.legendScale === null));
 				} else if (self.options.considerMissingDataAsZero) {
-					htmlClass += " " + self.legend(0);
+					htmlClass += " " + self.Legend.getClass(0, (self.legendScale === null));
 				}
 
 				if (self.options.onClick !== null) {
@@ -1722,44 +1726,7 @@ CalHeatMap.prototype = {
 		return this.getDomain(parseInt(this.getDomainKeys().shift(), 10), -1)[0];
 	},
 
-	/**
-	 * Return the classname on the legend for the specified value
-	 *
-	 * @param  Item count n Number of items for that perdiod of time
-	 * @return string		Classname according to the legend
-	 */
-	legend: function(n) {
 
-		if (n === null) {
-			return "";
-		}
-
-		var index = this.options.legend.length;
-
-		for (var i = 0, total = this.options.legend.length-1; i <= total; i++) {
-
-			if (n === 0 && this.options.legend[0] > 0) {
-				index = 0;
-				break;
-			} else if (this.options.legend[0] > 0 && n < 0) {
-				index = "i";
-				break;
-			}
-
-			if (n <= this.options.legend[i]) {
-				index = (i+1);
-				break;
-			}
-		}
-
-		var klass = "r" + index;
-
-		if (this.legendScale === null) {
-			klass += " graph-rect q" + index;
-		}
-
-		return klass;
-	},
 
 	// =========================================================================//
 	// DATAS																	//
@@ -2237,7 +2204,7 @@ Legend.prototype.display = function(width) {
 			return calendar.legendScale(calendar.options.legend[i-1]);
 		});
 
-		element.attr("class", function(d) { return calendar.legend(d); });
+		element.attr("class", function(d) { return calendar.Legend.getClass(d, (calendar.legendScale === null)); });
 	}
 
 	legendItem
@@ -2245,7 +2212,7 @@ Legend.prototype.display = function(width) {
 		.append("rect")
 		.attr("width", calendar.options.legendCellSize)
 		.attr("height", calendar.options.legendCellSize)
-		.attr("class", function(d){ return calendar.legend(d); })
+		.attr("class", function(d){ return calendar.Legend.getClass(d, (calendar.legendScale === null)); })
 		.attr("x", function(d, i) {
 			return i * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
 		})
@@ -2359,22 +2326,66 @@ Legend.prototype.buildColors = function() {
 		return false;
 	}
 
-	var l = this.calendar.options.legend.slice(0);
+	var _legend = this.calendar.options.legend.slice(0);
 
-	if (this.calendar.options.legend[0] > 0) {
-		l.unshift(0);
+	if (_legend[0] > 0) {
+		_legend.unshift(0);
+	} else if (_legend[0] < 0) {
+		// Let's guess the leftmost value, it we have to add one
+		_legend.unshift(_legend[0] - (_legend[_legend.length-1] - _legend[0])/_legend.length);
 	}
 
 	var colorScale = d3.scale.linear()
 		.range(_colorRange)
 		.interpolate(d3.interpolateHcl)
-		.domain([d3.min(l), d3.max(l)])
+		.domain([d3.min(_legend), d3.max(_legend)])
 	;
 
-	var legendColors = l.map(function(element) { return colorScale(element); });
+	var legendColors = _legend.map(function(element) { return colorScale(element); });
 	this.calendar.legendScale = d3.scale.threshold().domain(this.calendar.options.legend).range(legendColors);
 
 	return true;
+};
+
+/**
+ * Return the classname on the legend for the specified value
+ *
+ * @param integer n Value associated to a date
+ * @param bool withCssClass Whether to display the css class used to style the cell.
+ *                          Disabling will allow styling directly via html fill attribute
+ *
+ * @return string Classname according to the legend
+ */
+Legend.prototype.getClass = function(n, withCssClass) {
+
+	if (n === null) {
+		return "";
+	}
+
+	var index = this.calendar.options.legend.length + 1;
+
+	for (var i = 0, total = this.calendar.options.legend.length-1; i <= total; i++) {
+
+		if (n === 0 && this.calendar.options.legend[0] > 0) {
+			index = 0;
+			break;
+		} else if (this.calendar.options.legend[0] > 0 && n < 0) {
+			return "r1 ri" + (withCssClass ? " q1 qi" : "");
+		}
+
+		if (n <= this.calendar.options.legend[i]) {
+			index = (i+1);
+			break;
+		}
+	}
+
+	var klass = "r" + index;
+
+	if (withCssClass) {
+		klass += " q" + index;
+	}
+
+	return klass;
 };
 
 
