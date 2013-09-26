@@ -264,8 +264,18 @@ var CalHeatMap = function() {
 		"min": {
 			name: "minute",
 			level: 10,
-			row: function() { return self.options.colLimit || 10; },
-			column: function() { return self.options.rowLimit || 6; },
+			row: function() {
+				if (self.options.colLimit > 0) {
+					return Math.ceil(60 / self.options.colLimit);
+				}
+				return self.options.rowLimit || 10;
+			},
+			column: function() {
+				if (self.options.rowLimit > 0) {
+					return Math.ceil(60 / self.options.rowLimit);
+				}
+				return self.options.colLimit || 6;
+			},
 			position: {
 				x: function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d)); },
 				y: function(d) { return d.getMinutes() % self._domainType.min.row(d); }
@@ -283,24 +293,55 @@ var CalHeatMap = function() {
 		"hour": {
 			name: "hour",
 			level: 20,
-			row: function() { return self.options.rowLimit || 6; },
+			row: function(d) {
+				if (self.options.colLimit > 0) {
+					var total = 24;
+					if (self.options.domain === "week") {
+						total = 24 * 7;
+					} else if (self.options.domain === "month") {
+						total = 24 * self.getDayNumberInMonth(d);
+					}
+					return Math.ceil(total / self.options.colLimit);
+				}
+				return self.options.rowLimit || 6; },
 			column: function(d) {
+				if (self.options.colLimit > 0) {
+					return self.options.colLimit;
+				}
+
 				switch(self.options.domain) {
-					case "day": return 4;
-					case "week": return 28;
-					case "month": return (self.options.domainDynamicDimension ? self.getEndOfMonth(d).getDate(): 31) * 4;
+					case "day": return self.options.rowLimit > 0 ? Math.ceil(24 / self.options.rowLimit) : 4;
+					case "week": return self.options.rowLimit > 0 ? Math.ceil(24 * 7 / self.options.rowLimit) : 28;
+					case "month": return self.options.rowLimit > 0 ?
+						Math.ceil(24 * 31 / self.options.rowLimit) :
+						((self.options.domainDynamicDimension ? self.getEndOfMonth(d).getDate(): 31) * 4);
 				}
 			},
 			position: {
 				x: function(d) {
 					if (self.options.domain === "month") {
+						if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+							return Math.floor((d.getHours() + (d.getDate()-1)*24) / self._domainType.hour.row(d));
+						}
 						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + (d.getDate()-1)*4;
 					} else if (self.options.domain === "week") {
+						if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+							return Math.floor((d.getHours() + self.getWeekDay(d)*24) / self._domainType.hour.row(d));
+						}
 						return Math.floor(d.getHours() / self._domainType.hour.row(d)) + self.getWeekDay(d)*4;
 					}
 					return Math.floor(d.getHours() / self._domainType.hour.row(d));
 				},
-				y: function(d) { return d.getHours() % self._domainType.hour.row(d); }
+				y: function(d) {
+					if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+						switch(self.options.domain) {
+							case "month": return Math.floor((d.getHours() + (d.getDate()-1)*24) % self._domainType.hour.row(d));
+							case "week": return Math.floor((d.getHours() + self.getWeekDay(d)*24) % self._domainType.hour.row(d));
+						}
+
+					}
+					return d.getHours() % self._domainType.hour.row(d);
+				}
 			},
 			format: {
 				date: "%Hh, %A %B %-e, %Y",
@@ -315,8 +356,23 @@ var CalHeatMap = function() {
 		"day": {
 			name: "day",
 			level: 30,
-			row: function() { return self.options.rowLimit || 7; },
+			row: function(d) {
+				if (self.options.colLimit > 0) {
+					var total = 0;
+					switch(self.options.domain) {
+						case "year": total = self.getDayNumberInYear(d); break;
+						case "month": total = self.getDayNumberInMonth(d); break;
+						case "week": total = 7;
+					}
+					return Math.ceil(total / self.options.colLimit);
+				}
+				return self.options.rowLimit || 7;
+			},
 			column: function(d) {
+				if (self.options.colLimit > 0) {
+					return self.options.colLimit;
+				}
+
 				d = new Date(d);
 				switch(self.options.domain) {
 					case "year": return (self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) - self.getWeekNumber(new Date(d.getFullYear(), 0)) + 1): 54);
@@ -325,19 +381,36 @@ var CalHeatMap = function() {
 							return 6;
 						}
 						return self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1): 6;
-					case "week": return 1;
+					case "week": return Math.ceil(7 / self._domainType.day.row(d));
 				}
 			},
 			position: {
 				x: function(d) {
 					switch(self.options.domain) {
-						case "week": return 0;
+						case "week": return Math.floor(self.getWeekDay(d) / self._domainType.day.row(d));
 						case "month":
+							if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+								return Math.floor((d.getDate() - 1)/ self._domainType.day.row(d));
+							}
 							return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
-						case "year": return self.getWeekNumber(d) ;
+						case "year":
+							if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+								return Math.floor((self.getDayOfYear(d) - 1) / self._domainType.day.row(d));
+							}
+							return self.getWeekNumber(d);
 					}
 				},
-				y: function(d) { return self.getWeekDay(d); }
+				y: function(d) {
+					if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+						switch(self.options.domain) {
+							case "year": return Math.floor((self.getDayOfYear(d) - 1) % self._domainType.day.row(d));
+							case "week": return Math.floor(self.getWeekDay(d) % self._domainType.day.row(d));
+							case "month": return Math.floor((d.getDate() - 1) % self._domainType.day.row(d));
+						}
+
+					}
+					return self.getWeekDay(d) % self._domainType.day.row(d);
+				}
 			},
 			format: {
 				date: "%A %B %-e, %Y",
@@ -352,8 +425,17 @@ var CalHeatMap = function() {
 		"week": {
 			name: "week",
 			level: 40,
-			row: function() { return self.options.rowLimit || 1; },
+			row: function() {
+				if (self.options.colLimit > 0) {
+					return Math.ceil(54 / self.options.colLimit);
+				}
+				return self.options.rowLimit || 1;
+			},
 			column: function(d) {
+				if (self.options.colLimit > 0) {
+					return self.options.colLimit;
+				}
+
 				d = new Date(d);
 				switch(self.options.domain) {
 					case "year": return 54;
@@ -364,12 +446,22 @@ var CalHeatMap = function() {
 			position: {
 				x: function(d) {
 					switch(self.options.domain) {
-						case "year": return self.getWeekNumber(d);
-						case "month": return self.getWeekNumber(d) - self.getWeekNumber(new Date(d.getFullYear(), d.getMonth())) - 1;
+						case "year":
+							if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+								return Math.floor(self.getWeekNumber(d) / self._domainType.week.row(d));
+							}
+							return self.getWeekNumber(d);
+						case "month":
+							var weekNumberInMonth = self.getMonthWeekNumber(d);
+							if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
+
+								return Math.floor((weekNumberInMonth - 1) / self._domainType.week.row(d));
+							}
+							return weekNumberInMonth;
 					}
 				},
-				y: function() {
-					return 0;
+				y: function(d) {
+					return self.getWeekNumber(d) % self._domainType.week.row(d);
 				}
 			},
 			format: {
@@ -391,8 +483,18 @@ var CalHeatMap = function() {
 		"month": {
 			name: "month",
 			level: 50,
-			row: function() { return self.options.rowLimit || 1; },
-			column: function() { return self.options.colLimit || 12; },
+			row: function() {
+				if (self.options.colLimit > 0) {
+					return Math.ceil(12 / self.options.colLimit);
+				}
+				return self.options.rowLimit || 1;
+			},
+			column: function() {
+				if (self.options.rowLimit > 0) {
+					return Math.ceil(12 / self.options.rowLimit);
+				}
+				return self.options.colLimit || 12;
+			},
 			position: {
 				x: function(d) { return Math.floor(d.getMonth() / self._domainType.month.row(d)); },
 				y: function(d) { return d.getMonth() % self._domainType.month.row(d); }
@@ -411,10 +513,10 @@ var CalHeatMap = function() {
 			name: "year",
 			level: 60,
 			row: function() { return self.options.rowLimit || 1; },
-			column: function() { return self.options.colLimit || 12; },
+			column: function() { return self.options.colLimit || 1; },
 			position: {
-				x: function(d) { return Math.floor(d.getFullYear() / self._domainType.year.row(d)); },
-				y: function(d) { return d.getFullYear() % self._domainType.year.row(d); }
+				x: function() { return 1; },
+				y: function() { return 1; }
 			},
 			format: {
 				date: "%Y",
@@ -1107,6 +1209,11 @@ var CalHeatMap = function() {
 			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
 		}
 
+		if (settings.hasOwnProperty("rowLimit") && settings.hasOwnProperty("colLimit") && settings.rowLimit > 0 && settings.colLimit > 0) {
+			console.log("colLimit and rowLimit are mutually exclusive, rowLimit will be ignored");
+			self.options.rowLimit = null;
+		}
+
 		if (Array.isArray(self.options.domainMargin)) {
 			switch(self.options.domainMargin.length) {
 				case 0: self.options.domainMargin = [0, 0, 0, 0]; break;
@@ -1162,6 +1269,8 @@ var CalHeatMap = function() {
 				}
 			}
 		}
+
+
 
 		function validateSelector(selector) {
 			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
@@ -1531,6 +1640,60 @@ CalHeatMap.prototype = {
 		return f(d);
 	},
 
+	/**
+	 * Return the week number, relative to its month
+	 *
+	 * @param  int|Date d Date or timestamp in milliseconds
+	 * @return int Week number, relative to the month [0-5]
+	 */
+	getMonthWeekNumber: function (d) {
+		if (typeof d === "number") {
+			d = new Date(d);
+		}
+
+		var monthFirstWeekNumber = this.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
+		var n = this.getWeekNumber(d) - monthFirstWeekNumber - 1;
+
+		return n;
+	},
+
+	/**
+	 * Return the number of weeks in the dates' year
+	 *
+	 * @param  int|Date d Date or timestamp in milliseconds
+	 * @return int Number of weeks in the date's year
+	 */
+	getWeekNumberInYear: function(d) {
+		if (typeof d === "number") {
+			d = new Date(d);
+		}
+
+	},
+
+	/**
+	 * Return the number of days in the date's month
+	 *
+	 * @param  int|Date d Date or timestamp in milliseconds
+	 * @return int Number of days in the date's month
+	 */
+	getDayNumberInMonth: function(d) {
+		return this.getEndOfMonth(d).getDate();
+	},
+
+
+	/**
+	 * Return the number of day in the date's year
+	 *
+	 * @param  int|Date d Date or timestamp in milliseconds
+	 * @return int Number of days in the date's year
+	 */
+	getDayNumberInYear: function(d) {
+		if (typeof d === "number") {
+			d = new Date(d);
+		}
+
+		return (d.getFullYear() % 400 === 0) ? 366 : 365;
+	},
 
 	getWeekDay: function(d) {
 		if (this.options.weekStartOnMonday === false) {
