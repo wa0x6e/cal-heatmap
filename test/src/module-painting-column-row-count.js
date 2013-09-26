@@ -10,55 +10,70 @@
 	* Year 2000: 52 weeks
  */
 
+// Whether to split each domain>subDomain test into their own module
+var SPLIT_TEST = false;
+
+// Count the number of keys in an array
+// Redefine because Array.prototype was edited in Cal-heatmap
 function count(array) {
 	return d3.keys(array).length - 1;
+}
+
+function _test(domain, subDomain, config_h, config_v, skipped) {
+
+	if (arguments.length < 5) {
+		skipped = false;
+	}
+
+	if (SPLIT_TEST) {
+		module("Test painting " + domain + " > " + subDomain + " columns/rows");
+	}
+
+	for(var i = 0, total = config_h.length; i < total; i++) {
+		testConfig(domain, subDomain, config_h[i][0], config_h[i][1], config_h[i][2], config_h[i][3], skipped);
+		testConfig(domain, "x_" + subDomain, config_h[i][0], config_h[i][1], config_h[i][3], config_h[i][2], skipped);
+	}
+
+	// Cutting along the reading direction
+	for(i = 0, total = config_v.length; i < total; i++) {
+		testConfig(domain, subDomain, config_v[i][0], config_v[i][1], config_v[i][2], config_v[i][3], skipped);
+		testConfig(domain, "x_" + subDomain, config_v[i][0], config_v[i][1], config_v[i][3], config_v[i][2], skipped);
+	}
 }
 
 /**
  * Trigger the test for the columns and rows limit
  */
-function _test(domain, subDomain, col, row, expectedCol, expectedRow) {
-	if (col === 0 && row === 0) {
-		testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow);
-		testColumnsAndRows(domain, "x_" + subDomain, row, col, expectedRow, expectedCol);
-		return;
-	}
-
-	testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow);
-	testColumnsAndRows(domain, subDomain, row, col, expectedRow, expectedCol);
-
-	testColumnsAndRows(domain, "x_" + subDomain, row, col, expectedCol, expectedRow);
-	testColumnsAndRows(domain, "x_" + subDomain, col, row, expectedRow, expectedCol);
-
+function testConfig(domain, subDomain, col, row, expectedCol, expectedRow, skipped) {
+	testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow, skipped);
 }
 
-function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow) {
+/**
+ * The test itself
+ */
+function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow, skipped) {
 
 	testTitle = "Default splitting";
 
 	if (col > 0) {
-		testTitle = "Split into ";
-		if (col % 2 === 0) {
-			testTitle += "even";
-		} else {
-			testTitle += "uneven";
-		}
-		testTitle += " columns [" + col + "]";
+		testTitle = "Split into [" + col + "] columns";
 	} else if (row > 0) {
-		testTitle = "Split into ";
-		if (row % 2 === 0) {
-			testTitle += "even";
-		} else {
-			testTitle += "uneven";
-		}
-		testTitle += " rows [" + row + "]";
+		testTitle = "Split into [" + row + "] rows";
 	}
 
 	if (subDomain[0] === "x") {
 		testTitle += " [vertical layout]";
 	}
 
-	test(domain.toUpperCase() + " » " + subDomain.toUpperCase() + " : " + testTitle, function() {
+	testTitle = domain.toUpperCase() + " » " + subDomain.toUpperCase() + " : " + testTitle;
+
+	if (skipped) {
+		testSkip(testTitle, _t);
+	} else {
+		test(testTitle, _t);
+	}
+
+	function _t() {
 		expect(2);
 
 		var cal = createCalendar({domain: domain, subDomain: subDomain, colLimit: col, rowLimit: row,
@@ -78,7 +93,7 @@ function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRo
 
 		equal(count(_count.column), expectedCol, "The domain was split into " + expectedCol + " columns");
 		equal(count(_count.row), expectedRow, "The domain was split into " + expectedRow + " rows");
-	});
+	}
 }
 
 
@@ -100,12 +115,20 @@ module("Painting column and row count");
 	=================================================================
  */
 
-_test("hour", "min", 0, 0, 6, 10);
-
-_test("hour", "min", 2, 0, 2, 30);
-_test("hour", "min", 50, 0, 50, 2);
-_test("hour", "min", 7, 0, 7, 9);
-_test("hour", "min", 21, 0, 21, 3);
+_test("hour", "min", [
+	[0, 0, 6, 10],
+	[2, 0, 2, 30],
+	[50, 0, 30, 2],
+	[7, 0, 7, 9],
+	[21, 0, 20, 3],
+	[75, 0, 60, 1]
+], [
+	[0, 2, 30, 2],
+	[0, 50, 2, 50],
+	[0, 7, 9, 7],
+	[0, 21, 3, 21],
+	[0, 75, 1, 60]
+]);
 
 /*
 	=================================================================
@@ -113,12 +136,18 @@ _test("hour", "min", 21, 0, 21, 3);
 	=================================================================
  */
 
-_test("day", "hour", 0, 0, 4, 6);
-
-_test("day", "hour", 2, 0, 2, 12);
-_test("day", "hour", 10, 0, 10, 2);
-_test("day", "hour", 5, 0, 5, 5);
-_test("day", "hour", 29, 0, 29, 3);
+_test("day", "hour", [
+	[0, 0, 4, 6],
+	[2, 0, 2, 12],
+	[10, 0, 8, 3],
+	[5, 0, 5, 5],
+	[29, 0, 24, 1]
+], [
+	[0, 2, 12, 2],
+	[0, 10, 3, 10],
+	[0, 5, 5, 5],
+	[0, 29, 1, 24]
+]);
 
 /*
 	=================================================================
@@ -128,12 +157,20 @@ _test("day", "hour", 29, 0, 29, 3);
 
 // 1 week = 168 hours
 
-_test("week", "hour", 0, 0, 28, 6);
-
-_test("week", "hour", 12, 0, 12, 14);
-_test("week", "hour", 100, 0, 100, 2);
-_test("week", "hour", 27, 0, 27, 7);
-_test("week", "hour", 41, 0, 41, 5);
+_test("week", "hour", [
+	[0, 0, 28, 6],
+	[12, 0, 12, 14],
+	[100, 0, 84, 2],
+	[27, 0, 24, 7],
+	[41, 0, 34, 5],
+	[170, 0, 168, 1]
+], [
+	[0, 12, 14, 12],
+	[0, 100, 2, 100],
+	[0, 27, 7, 27],
+	[0, 41, 5, 41],
+	[0, 170, 1, 168]
+]);
 
 /*
 	=================================================================
@@ -141,12 +178,44 @@ _test("week", "hour", 41, 0, 41, 5);
 	=================================================================
  */
 
-_test("week", "day", 0, 0, 1, 7);
+_test("week", "day", [
+	[0, 0, 1, 7],
+	[2, 0, 2, 4],
+	[6, 0, 4, 2],
+	[3, 0, 3, 3],
+	[5, 0, 4, 2],
+	[10, 0, 7, 1]
+], [
+	[0, 2, 4, 2],
+	[0, 6, 2, 6],
+	[0, 3, 3, 3],
+	[0, 5, 2, 5],
+	[0, 10, 1, 7]
+]);
 
-_test("week", "day", 2, 0, 2, 4);
-_test("week", "day", 6, 0, 6, 2);
-_test("week", "day", 3, 0, 3, 3);
-_test("week", "day", 5, 0, 5, 2);
+/*
+	=================================================================
+	MONTH > HOUR
+	=================================================================
+ */
+
+// Tested month contains : 31 * 24 = 744 hours
+
+_test("month", "hour", [
+	[0, 0, 124, 6],
+	[2, 0, 2, 372],
+	[100, 0, 93, 8],
+	[7, 0, 7, 107],
+	[551, 0, 372, 2],
+	[800, 0, 744, 1]
+], [
+	[0, 2, 372, 2],
+	[0, 100, 8, 100],
+	[0, 7, 107, 7],
+	[0, 551, 2, 551],
+	[0, 800, 1, 744]
+]);
+
 
 /*
 	=================================================================
@@ -154,16 +223,22 @@ _test("week", "day", 5, 0, 5, 2);
 	=================================================================
  */
 
-_test("month", "hour", 0, 0, 124, 4);
+// Tested month contains 31 days
 
-
-/*
-	=================================================================
-	MONTH > DAY
-	=================================================================
- */
-
-_test("month", "day", 0, 0, 6, 7);
+_test("month", "day", [
+	[0, 0, 6, 7],
+	[2, 0, 2, 16],
+	[10, 0, 8, 4],
+	[7, 0, 7, 5],
+	[19, 0, 16, 2],
+	[40, 0, 31, 1]
+], [
+	[0, 2, 16, 2],
+	[0, 10, 4, 10],
+	[0, 7, 5, 7],
+	[0, 19, 2, 19],
+	[0, 40, 1, 31]
+]);
 
 /*
 	=================================================================
@@ -171,7 +246,18 @@ _test("month", "day", 0, 0, 6, 7);
 	=================================================================
  */
 
-_test("month", "week", 0, 0, 6, 1);
+// January 2000 contains 5 weeks
+
+_test("month", "week", [
+	[0, 0, 5, 1],
+	[2, 0, 2, 3],
+	[3, 0, 3, 2],
+	[8, 0, 5, 1]
+], [
+	[0, 2, 3, 2],
+	[0, 3, 2, 3],
+	[0, 8, 1, 8]
+], true);
 
 /*
 	=================================================================
@@ -179,7 +265,20 @@ _test("month", "week", 0, 0, 6, 1);
 	=================================================================
  */
 
-_test("year", "day", 0, 0, 52, 7);
+_test("year", "day", [
+	[0, 0, 53, 7],
+	[2, 0, 2, 183],
+	[50, 0, 46, 8],
+	[3, 0, 3, 122],
+	[60, 0, 53, 7],
+	[400, 0, 366, 1]
+], [
+	[0, 2, 183, 2],
+	[0, 50, 8, 50],
+	[0, 3, 122, 3],
+	[0, 60, 7, 60],
+	[0, 400, 1, 366]
+]);
 
 /*
 	=================================================================
@@ -187,7 +286,18 @@ _test("year", "day", 0, 0, 52, 7);
 	=================================================================
  */
 
-_test("year", "week", 0, 0, 52, 1);
+_test("year", "week", [
+	[0, 0, 52, 1],
+	[2, 0, 2, 26],
+	[30, 0, 26, 2],
+	[3, 0, 3, 18],
+	[49, 0, 2, 26]
+], [
+	[0, 2, 26, 2],
+	[0, 30, 2, 30],
+	[0, 3, 18, 3],
+	[0, 49, 1, 49]
+], true);
 
 
 /*
@@ -196,9 +306,17 @@ _test("year", "week", 0, 0, 52, 1);
 	=================================================================
  */
 
-_test("year", "month", 0, 0, 12, 1);
-
-_test("year", "month", 2, 0, 2, 6);
-_test("year", "month", 10, 0, 10, 2);
-_test("year", "month", 5, 0, 5, 3);
-_test("year", "month", 11, 0, 11, 2);
+_test("year", "month", [
+	[0, 0, 12, 1],
+	[2, 0, 2, 6],
+	[10, 0, 6, 2],
+	[5, 0, 4, 3],
+	[11, 0, 6, 2],
+	[15, 0, 12, 1]
+], [
+	[0, 2, 6, 2],
+	[0, 10, 2, 10],
+	[0, 5, 3, 5],
+	[0, 11, 2, 11],
+	[0, 15, 1, 12]
+]);
