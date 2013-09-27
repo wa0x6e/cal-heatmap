@@ -2053,10 +2053,12 @@ CalHeatMap.prototype = {
 	 */
 	resize: function() {
 		var parent = this;
+		var legendWidth = parent.options.displayLegend ? (parent.Legend.getDim("width") + parent.options.legendMargin[1] + parent.options.legendMargin[3]) : 0;
+		var legendHeight = parent.options.displayLegend ? (parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2]) : 0;
+
 		this.root.transition().duration(parent.options.animationDuration)
 			.attr("width", function() {
 				var graphWidth = parent.graphDim.width;
-				var legendWidth = parent.Legend.getDim("width") + parent.options.legendMargin[1] + parent.options.legendMargin[3];
 
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
 					return graphWidth + legendWidth;
@@ -2065,7 +2067,6 @@ CalHeatMap.prototype = {
 			})
 			.attr("height", function() {
 				var graphHeight = parent.graphDim.height;
-				var legendHeight = parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2];
 
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
 					return Math.max(graphHeight, legendHeight);
@@ -2077,7 +2078,7 @@ CalHeatMap.prototype = {
 		this.root.select(".graph").transition().duration(parent.options.animationDuration)
 			.attr("y", function() {
 				if (parent.options.legendVerticalPosition === "top") {
-					return parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2];
+					return legendHeight;
 				}
 				return 0;
 			})
@@ -2085,7 +2086,7 @@ CalHeatMap.prototype = {
 				if (
 					(parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") &&
 					parent.options.legendHorizontalPosition === "left") {
-						return parent.Legend.getDim("width")  + parent.options.legendMargin[1] + parent.options.legendMargin[3];
+						return legendWidth;
 				}
 				return 0;
 
@@ -2159,6 +2160,18 @@ CalHeatMap.prototype = {
 			this.fill();
 		}
 
+		if (this.options.displayLegend) {
+			this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+		}
+	},
+
+	removeLegend: function() {
+		this.options.displayLegend = false;
+		this.Legend.remove();
+	},
+
+	showLegend: function() {
+		this.options.displayLegend = true;
 		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 	},
 
@@ -2334,6 +2347,11 @@ Legend.prototype.computeDim = function() {
 	};
 };
 
+Legend.prototype.remove = function() {
+	this.calendar.root.select(".graph-legend").remove();
+	this.calendar.resize();
+};
+
 Legend.prototype.display = function(width) {
 
 	var parent = this;
@@ -2378,12 +2396,8 @@ Legend.prototype.display = function(width) {
 	legendItem
 		.enter()
 		.append("rect")
-		.attr("width", calendar.options.legendCellSize)
-		.attr("height", calendar.options.legendCellSize)
+		.call(legendCellLayout)
 		.attr("class", function(d){ return calendar.Legend.getClass(d, (calendar.legendScale === null)); })
-		.attr("x", function(d, i) {
-			return i * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
-		})
 		.attr("fill-opacity", 0)
 		.call(function(selection) {
 			if (calendar.legendScale !== null && calendar.options.legendColors !== null && calendar.options.legendColors.hasOwnProperty("base")) {
@@ -2398,6 +2412,7 @@ Legend.prototype.display = function(width) {
 	.remove();
 
 	legendItem.transition().delay(function(d, i) { return calendar.options.animationDuration * i/10; })
+		.call(legendCellLayout)
 		.attr("fill-opacity", 1)
 		.call(function(element) {
 			element.attr("fill", function(d, i) {
@@ -2414,6 +2429,16 @@ Legend.prototype.display = function(width) {
 			element.attr("class", function(d) { return calendar.Legend.getClass(d, (calendar.legendScale === null)); });
 		})
 	;
+
+	function legendCellLayout(selection) {
+		selection
+			.attr("width", calendar.options.legendCellSize)
+			.attr("height", calendar.options.legendCellSize)
+			.attr("x", function(d, i) {
+				return i * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
+			})
+		;
+	}
 
 	legendItem.select("title").text(function(d, i) {
 			if (i === 0) {
@@ -2437,8 +2462,8 @@ Legend.prototype.display = function(width) {
 	legend.transition().duration(calendar.options.animationDuration)
 		.attr("x", getLegendXPosition())
 		.attr("y", getLegendYPosition())
-		.attr("width", parent.dim[calendar.options.legendOrientation === "horizontal" ? "width": "height"])
-		.attr("height", parent.dim[calendar.options.legendOrientation === "horizontal" ? "height": "width"])
+		.attr("width", parent.getDim("width"))
+		.attr("height", parent.getDim("height"))
 	;
 
 	legend.select("g").transition().duration(calendar.options.animationDuration)
