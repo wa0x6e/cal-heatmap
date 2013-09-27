@@ -24,7 +24,7 @@
 	fill: #ededed;
 }
 
-.graph rect:hover
+.graph-subdomain-group rect:hover
 {
 	stroke: #000;
 	stroke-width: 1px
