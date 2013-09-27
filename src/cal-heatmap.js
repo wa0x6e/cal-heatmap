@@ -606,7 +606,7 @@ var CalHeatMap = function() {
 			self._domains.set(d, self.getSubDomain(d).map(function(d) { return {t: self._domainType[self.options.subDomain].extractUnit(d), v: null}; }));
 		});
 
-		self.root = d3.select(self.options.itemSelector).append("svg").attr("id", "cal-heatmap-container");
+		self.root = d3.select(self.options.itemSelector).append("svg").attr("class", "cal-heatmap-container");
 
 		self.root.attr("x", 0).attr("y", 0).append("svg").attr("class", "graph");
 
@@ -2141,7 +2141,7 @@ CalHeatMap.prototype = {
 	 * @param array colorRange an array of 2 hex colors, for the minimum and maximum colors
 	 */
 	setLegend: function() {
-		var oldLegend = this.options.legend;
+		var oldLegend = this.options.legend.slice(0);
 		if (arguments.length >= 1 && Array.isArray(arguments[0])) {
 			this.options.legend = arguments[0];
 		}
@@ -2154,7 +2154,7 @@ CalHeatMap.prototype = {
 
 		}
 
-		if (arguments.length > 0 && !oldLegend.equals(this.options.legend)) {
+		if ((arguments.length > 0 && !arrayEquals(oldLegend, this.options.legend)) || arguments.length >= 2) {
 			this.Legend.buildColors();
 			this.fill();
 		}
@@ -2343,7 +2343,7 @@ Legend.prototype.display = function(width) {
 
 	this.computeDim();
 
-	var _legend = calendar.options.legend;
+	var _legend = calendar.options.legend.slice(0);
 	_legend.push(_legend[_legend.length-1]+1);
 
 	var legendElement = calendar.root.select(".graph-legend");
@@ -2610,32 +2610,32 @@ function mergeRecursive(obj1, obj2) {
  * @param  array array the array to compare to
  * @return bool true of the 2 arrays are equals
  */
-Array.prototype.equals = function (array) {
+function arrayEquals(array_a, array_b) {
     // if the other array is a falsy value, return
-    if (!array) {
+    if (!array_b || !array_a) {
         return false;
     }
 
     // compare lengths - can save a lot of time
-    if (this.length !== array.length) {
+    if (array_a.length !== array_b.length) {
         return false;
     }
 
-    for (var i = 0; i < this.length; i++) {
+    for (var i = 0; i < array_a.length; i++) {
         // Check if we have nested arrays
-        if (this[i] instanceof Array && array[i] instanceof Array) {
+        if (array_a[i] instanceof Array && array_b[i] instanceof Array) {
             // recurse into the nested arrays
-            if (!this[i].compare(array[i])) {
+            if (!arrayEquals(array_a[i], array_b[i])) {
                 return false;
             }
         }
-        else if (this[i] !== array[i]) {
+        else if (array_a[i] !== array_b[i]) {
             // Warning - two different object instances will never be equal: {x:20} != {x:20}
             return false;
         }
     }
     return true;
-};
+}
 
 /**
  * AMD Loader
