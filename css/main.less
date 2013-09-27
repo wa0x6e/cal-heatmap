@@ -144,6 +144,15 @@ nav {
 		display: block;
 		text-transform: uppercase;
 	}
+
+	.playground-link {
+		i {
+			font-size: 160%;
+			margin-right: 5px;
+		}
+
+		font-size: 90%;
+	}
 }
 
 ul {
@@ -336,6 +345,55 @@ h6 {
 
 small{
 	color: #999;
+}
+
+.playground {
+	margin-top: 2.5em;
+	margin-left: -20px;
+	padding: 20px 0 40px 20px;
+	background: steelblue;
+
+	h4 {
+		margin-top: 0;
+		margin-bottom: 1em;
+		color: #fff;
+		font-size: 22px;
+		font-weight: 600;
+
+		i {
+			float: right;
+			font-size: 180%;
+			line-height: 40%;
+		}
+	}
+
+	.cal, .playground-controls  {
+		background: #fff;
+		padding: 20px;
+	}
+
+	.cal {
+		border-bottom: 3px solid lighten(steelblue, 35);
+	}
+
+
+	.cal-heatmap-container {
+		margin: 0 auto;
+		display: block;
+	}
+
+	.playground-controls {
+		margin-top: 1em;
+	}
+
+	code {
+		float: right;
+		opacity: 0;
+	}
+
+	.control-group:hover code {
+		opacity: 1;
+	}
 }
 
 
