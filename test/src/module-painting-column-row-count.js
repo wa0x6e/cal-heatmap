@@ -14,9 +14,8 @@
 var SPLIT_TEST = false;
 
 // Count the number of keys in an array
-// Redefine because Array.prototype was edited in Cal-heatmap
 function count(array) {
-	return d3.keys(array).length - 1;
+	return d3.keys(array).length;
 }
 
 function _test(domain, subDomain, config_h, config_v, skipped) {
