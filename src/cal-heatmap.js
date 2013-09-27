@@ -2165,14 +2165,32 @@ CalHeatMap.prototype = {
 		}
 	},
 
+	/**
+	 * Remove the legend
+	 *
+	 * @return bool False if there is no legend to remove
+	 */
 	removeLegend: function() {
+		if (!this.options.displayLegend) {
+			return false;
+		}
 		this.options.displayLegend = false;
 		this.Legend.remove();
+		return true;
 	},
 
+	/**
+	 * Display the legend
+	 *
+	 * @return bool False if the legend was already displayed
+	 */
 	showLegend: function() {
+		if (this.options.displayLegend) {
+			return false;
+		}
 		this.options.displayLegend = true;
 		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+		return true;
 	},
 
 	getSVG: function() {
