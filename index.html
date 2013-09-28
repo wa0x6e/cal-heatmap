@@ -2929,13 +2929,48 @@ $("#update-c-update").on("click", function() {
 			<div class="option-type"></div>
 			<p>Change the legend settings and/or threshold</p>
 
+			<p>Can takes 2 optional arguments:</p>
+
+			<table class="table table-condensed">
+				<tr>
+					<th>Value</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>legend</code></td>
+					<td>Same as <a href="#legend"><code>legend</code></a>: an array of thresholds</td>
+				</tr>
+				<tr>
+					<td><code>legendColors</code></td>
+					<td>Same as <a href="#legendColors"><code>legendColors</code></a>: an object with the heatmap's colors, or an array of 2 colors</td>
+				</tr>
+			</table>
+
+			<p>When called without arguments, <a href="setLegend"><code>setLegend()</code></a> will just redraw the legend.</p>
+
+			<pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+	legendVerticalPosition: "top",
+	legendHorizontalPosition: "left",
+	legendOrientation: "horizontal"
+});
+
+// Lets' move the legend on the right side, and rotate it by 90deg
+cal.legendVerticalPosition: "center";
+cal.legendHorizontalPosition: "right";
+cal.legendOrientation: "vertical";
+
+// Let's redraw the calendar to apply the settings
+cal.setLegend();
+</code></pre>
+
 			<p class="alert alert-info">Check the <a href="#legend-playground">legend playground</a> for example.</p>
 
 			<h4 id="removeLegend">removeLegend()</h4> <b class="version-added">3.3.0+</b>
 			<div class="option-type"></div>
 			<p>Remove the legend from the calendar</p>
 
-			<p>Settings are kept and you can re-add the legend with the same settings with <a href="#showLegend"><code>showLegend()</code></a>.</p>
+			<p>Settings are kept and you can re-add the legend with the same settings using <a href="#showLegend"><code>showLegend()</code></a>.</p>
 
 			<p class="alert alert-info">Check the <a href="#legend-playground">legend playground</a> for example.</p>
 
