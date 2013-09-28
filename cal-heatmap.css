@@ -45,12 +45,18 @@
 	fill: #999;
 }
 
+/*
 .q0
 {
+
+	Remove comment to apply this style to date with value equal to 0
+
 	background-color: #fff;
 	fill: #fff;
 	stroke: #ededed
+
 }
+*/
 
 .q1
 {
