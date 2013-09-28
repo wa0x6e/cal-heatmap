@@ -1011,12 +1011,6 @@ var CalHeatMap = function() {
 			.remove()
 		;
 
-		// Resize the graph
-		self.root.select(".graph").transition().duration(self.options.animationDuration)
-			.attr("width", function() { return self.graphDim.width - self.options.domainGutter - self.options.cellPadding; })
-			.attr("height", function() { return self.graphDim.height - self.options.domainGutter - self.options.cellPadding; })
-		;
-
 		// Resize the root container
 		self.resize();
 	};
@@ -2056,18 +2050,17 @@ CalHeatMap.prototype = {
 		var legendWidth = parent.options.displayLegend ? (parent.Legend.getDim("width") + parent.options.legendMargin[1] + parent.options.legendMargin[3]) : 0;
 		var legendHeight = parent.options.displayLegend ? (parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2]) : 0;
 
+		var graphWidth = parent.graphDim.width - parent.options.domainGutter - parent.options.cellPadding;
+		var graphHeight = parent.graphDim.height - parent.options.domainGutter - parent.options.cellPadding;
+
 		this.root.transition().duration(parent.options.animationDuration)
 			.attr("width", function() {
-				var graphWidth = parent.graphDim.width;
-
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
 					return graphWidth + legendWidth;
 				}
 				return Math.max(graphWidth, legendWidth);
 			})
 			.attr("height", function() {
-				var graphHeight = parent.graphDim.height;
-
 				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
 					return Math.max(graphHeight, legendHeight);
 				}
