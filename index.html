@@ -60,6 +60,8 @@
 								<li><a href="#domainDynamicDimension">domainDynamicDimension</a></li>
 								<li><a href="#verticalOrientation">verticalOrientation</a></li>
 								<li><a href="#label">label</a></li>
+								<li><a href="#colLimit">colLimit</a></li>
+								<li><a href="#rowLimit">rowLimit</a></li>
 								<li>
 								</li>
 							</ul>
@@ -122,6 +124,9 @@
 						<li><a href="#next">next</a></li>
 						<li><a href="#update">update</a></li>
 						<li><a href="#getSVG">getSVG</a></li>
+						<li><a href="#setLegend">setLegend</a></li>
+						<li><a href="#removeLegend">removeLegend</a></li>
+						<li><a href="#showLegend">showLegend</a></li>
 					</ul>
 				</li>
 				<li>
@@ -973,6 +978,94 @@ cal.init({
 				Use <code>.graph-label</code> to style the label.
 			</p>
 
+			<h4 id="colLimit">colLimit</h4> <strong class="version-added">3.3.0+</strong>
+			<div class="option-type">integer</div>
+			<div class="option-default"><code>null</code></div>
+
+			<p>Control the number of columns to split the domain dates into.</p>
+
+			<p>Each domain is split into an arbitrary number of columns (or rows depending on the reading direction). You can overwrite that number with <code>colLimit</code>, and force all dates on the same line, or split them into more columns.</p>
+
+			<p>That setting limit the <em>maximum</em> number of columns, and doesn't necessary means that each rows will contains that number of columns.</p>
+
+			<div class="example clearfix empty-calendar">
+				<div>
+					<div id="colLimit-a"></div>
+					<p>Default splitting, 4 columns with 6 hours each</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#colLimit-a",
+	domain: "day",
+	range: 1,
+	displayLegend: false
+});
+						})();
+					</script>
+				</div>
+
+				<div>
+					<div id="colLimit-b"></div>
+					<p>All hours on the same line</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#colLimit-b",
+	domain: "day",
+	colLimit: 24,
+	range: 1,
+	displayLegend: false
+});
+						})();
+					</script>
+				</div>
+			</div>
+
+			<h4 id="rowLimit">rowLimit</h4> <strong class="version-added">3.3.0+</strong>
+			<div class="option-type">integer</div>
+			<div class="option-default"><code>null</code></div>
+
+			<p>Control the number of rows to split the domain dates into.</p>
+
+			<p>If <code>rowLimit</code> and <code>colLimit</code> are both used, <code>rowLimit</code> will be ignored.</p>
+
+			<div class="example clearfix empty-calendar">
+				<div>
+					<div id="rowLimit-a"></div>
+					<p>7 days per column (default)</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#rowLimit-a",
+	domain: "month",
+	range: 1,
+	displayLegend: false
+});
+						})();
+					</script>
+				</div>
+
+				<div>
+					<div id="rowLimit-b"></div>
+					<p>10 days per column</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#rowLimit-b",
+	domain: "month",
+	rowLimit: 10,
+	range: 1,
+	displayLegend: false
+});
+						})();
+					</script>
+				</div>
+			</div>
+
 			<div class="section-head">Data</div>
 
 			<h4 id="start">start</h4>
@@ -1345,10 +1438,10 @@ $("#minDate-next").on("click", function(e) {
 			<div class="option-type">Array</div>
 			<div class="option-default"><code>[10, 20, 30, 40]</code></div>
 
-			<p>Assign each color in the heatmap to a range of values.</p>
+			<p>Assign each range of values to a color.</p>
 
-			<p>It accepts an array of any number of arguments, as long as they are number, and in ascendant order.<br/>
-			An array of n values will generate a legend of 5 colors. Each colors correspond to a css class, formatted like <code>q{n}</code>.
+			<p><a href="#legend"><code>legend</code></a> accepts an array of any number of arguments, as long as they are number (even negative numbers), and in ascendant order.<br/>
+			An array of <b>N</b> values (thresholds) will generate a legend of <b>N + 1</b> colors. Each colors correspond to a CSS class, formatted like <code>.q{n}</code>.
 			</p>
 
 			<div class="example-bloc">
@@ -1363,23 +1456,23 @@ $("#minDate-next").on("click", function(e) {
 						<th>Range</th>
 					</tr>
 					<tr>
-						<td>.q1</td>
+						<td><code>.q1</code></td>
 						<td>Less than 10</td>
 					</tr>
 					<tr>
-						<td>.q2</td>
+						<td><code>.q2</code></td>
 						<td>Between 10 and 20</td>
 					</tr>
 					<tr>
-						<td>.q3</td>
+						<td><code>.q3</code></td>
 						<td>Between 20 and 30</td>
 					</tr>
 					<tr>
-						<td>.q4</td>
+						<td><code>.q4</code></td>
 						<td>Between 30 and 40</td>
 					</tr>
 					<tr>
-						<td>.q5</td>
+						<td><code>.q5</code></td>
 						<td>More than 40</td>
 					</tr>
 				</table>
@@ -1420,7 +1513,15 @@ cal.init({
 			</div>
 
 			<p class="alert alert-success"><strong><i class="icon icon-magic"></i>Styling tips</strong><br/>
-				<code>.graph-rect</code> style is applied to all subDomain cells, and used by default when the cell is not associated to a value.</p>
+				<code>.graph-rect</code> class is applied to all subDomain cells, and used when the cell is not associated to a value.</p>
+
+			<p class="alert alert-success"><strong><i class="icon icon-magic"></i>Styling tips</strong><br/>
+				<code>.q0</code> will be applied to all dates with values == 0.</p>
+
+			<p class="alert alert-success"><strong><i class="icon icon-magic"></i>Styling tips</strong><br/>
+				<code>.qi</code> will be applied to all dates with "overflowing" values, like negative values, when the legend is all positive.</p>
+
+			<p class="alert alert-info">You can also generate the colors automatically without using CSS, refer to <a href="#legendColors"><code>legendColors</code></a>.</p>
 
 
 			<h4 id="displayLegend">displayLegend</h4>
@@ -1460,6 +1561,8 @@ cal.init({
 					</script>
 				</div>
 			</div>
+
+			<p class="alert alert-info">Legend can be added or removed after initialisation, by calling <a href="#showLegend"><code>showLegend()</code></a> and <a href="#removeLegend"><code>removeLegend()</code></a>.</p>
 
 
 			<h4 id="legendCellSize">legendCellSize</h4>
@@ -1801,7 +1904,7 @@ cal.init({
 
 			<p>Set of colors to automagically compute the heatmap colors.</p>
 
-			<p>Instead of relying on the CSS for your heatmap's colors, you can also set the heatmap's color directly with cal-heatmap on initilialisation, or even dynamically change it after.</p>
+			<p>Instead of relying on the CSS for your heatmap's colors, you can also set the heatmap's colors directly with cal-heatmap on initilialisation, or even dynamically change them after.</p>
 
 			<p>The <code>legendColors</code> setting takes an object with the following keys:</p>
 
@@ -1823,22 +1926,22 @@ cal.init({
 				</tr>
 				<tr>
 					<td><code>empty</code></td>
-					<td>Color for the dates with empty value</td>
+					<td><span class="label label-info">Optional</span> Color for the dates with value == 0</td>
 					<td><code>.q0</code></td>
 				</tr>
 				<tr>
 					<td><code>base</code></td>
-					<td>Base color of the date cell's</td>
+					<td><span class="label label-info">Optional</span> Base color of the date cell's</td>
 					<td><code>.graph-rect</code></td>
 				</tr>
 				<tr>
 					<td><code>overflow</code></td>
-					<td>Color for the special value</td>
+					<td><span class="label label-info">Optional</span> Color for the special value</td>
 					<td><code>.qi</code></td>
 				</tr>
 			</table>
 
-			<p>Colors can be defined using the hexadecimal notation <code>#FFFFFF</code> or its english equivalent name <code>white</code>.</p>
+			<p>Colors can be defined using the hexadecimal notation <code>#FFFFFF</code> or its english equivalent name <code>white</code>. <br/>Other fancy function like <code>hsl(350, 100%, 50%)</code> are also accepted.</p>
 
 			<pre><code class="language-javascript">var cal = new CalHeatMap();
 cal.init({
@@ -1846,12 +1949,12 @@ cal.init({
 		min: "#efefef",
 		max: "steelblue",
 		empty: "white"
-		// Missing keys will default to their CSS equivalent
+		// Will use the CSS for the missing keys
 	}
 });
 </code></pre>
 
-			<p class="alert alert-info">Only the <code>min</code> and <code>max</code> keys are mandatory. <br/> When using only the mandatory keys, you can use the shorthand <code>[min, max]</code> variant, instead of the whole object.</p>
+			<p class="alert alert-info">When using only the mandatory <code>min</code> and <code>max</code> keys, you can use an array <code>[min, max]</code>, instead of the whole object.</p>
 
 			<pre><code class="language-javascript">var cal = new CalHeatMap();
 cal.init({
@@ -1860,6 +1963,11 @@ cal.init({
 </code></pre>
 
 			<p>All the intermediate colors on the legend will be interpolated from the <code>min</code> and <code>max</code> colors, using the <a href="https://gist.github.com/mbostock/3014589">HCL interpolation</a>.</p>
+
+			<h4>Note</h4>
+			<div class="option-type"></div>
+
+			<p>All legend settings can be changed dynamically after calendar initialisation, with <a href="#setLegend"><code>setLegend()</code></a>.</p>
 
 </div>
 
@@ -1988,7 +2096,7 @@ cal.init({
 			</div>
 
 			<div class="control-group">
-				<label class="control-label"></label>
+				<label class="control-label">Visibility</label>
 				<a href="#displayLegend"><code>displayLegend</code></a>
 				<div class="controls" id="legend-playground-visibility">
 					<button class="btn btn-danger" value="remove"><i class="icon-remove"></i> Remove legend</button>
@@ -2817,6 +2925,28 @@ $("#update-c-update").on("click", function() {
 
 			<p class="alert alert-error">Still buggy</p>
 
+			<h4 id="setLegend">setLegend(legend, legendColors)</h4> <b class="version-added">3.3.0+</b>
+			<div class="option-type"></div>
+			<p>Change the legend settings and/or threshold</p>
+
+			<p class="alert alert-info">Check the <a href="#legend-playground">legend playground</a> for example.</p>
+
+			<h4 id="removeLegend">removeLegend()</h4> <b class="version-added">3.3.0+</b>
+			<div class="option-type"></div>
+			<p>Remove the legend from the calendar</p>
+
+			<p>Settings are kept and you can re-add the legend with the same settings with <a href="#showLegend"><code>showLegend()</code></a>.</p>
+
+			<p class="alert alert-info">Check the <a href="#legend-playground">legend playground</a> for example.</p>
+
+
+			<h4 id="showLegend">showLegend()</h4> <b class="version-added">3.3.0+</b>
+			<div class="option-type"></div>
+			<p>Display the legend, if not already shown</p>
+
+			<p class="alert alert-info">Check the <a href="#legend-playground">legend playground</a> for example.</p>
+
+
 		<h3 id="events">Events</h3>
 
 			<h4 id="onClick">onClick(date, value)</h4>
@@ -3072,7 +3202,7 @@ cal.init({
 
 		<p>When the leftmost domain set by <a href="#minDate"><code>minDate</code></a> is loaded into the calendar, <code>onMinDomainReached()</code> will be triggered with <code>true</code> as argument.</p>
 
-		<p>This event is useful if you want to disable your <em>previous</em> button, as there is no more previous domains to load.</p>
+		<p>This event is useful if you want to disable your <em>previous</em> button, since there is no more previous domains to load.</p>
 
 		<p>In order to reverse the action, <a href="onMinDomainReached"><code>onMinDomainReached()</code></a> will be called with <code>false</code> as argument after <a href="#next"><code>next()</code></a>, only once, and only if the leftmost domain is not the lower limit domain anymore.</p>
 
@@ -3324,6 +3454,8 @@ cal.init({
 	<p>Previously, calendar width was dynamic, when using the month domain, coupled with the x_week subDomain, as a month not always contains the same number of weeks. Domain width was adjusted to the number of weeks to avoid blank space.</p>
 
 	<p>This function has been removed in v3, the domains will now always have the same width, so there'll be a blank space on some months with fewer weeks. This will avoid complex calculation, and allow smoother animation when navigating between domains.</p>
+
+	<p>This does not affect other domain/subDomain couple.</p>
 
 
 	<h2 id="examples">Examples</h2>
@@ -3661,6 +3793,43 @@ cal.init({
 		width: 110
 	},
 	legend: [20, 40, 60, 80]
+});
+				})();
+			</script>
+		</div>
+	</div>
+
+	<div class="example clearfix full-width">
+		<p>Display all the hours of the day on the same line.</p>
+		<div>
+			<div id="example-i"></div>
+			<p></p>
+
+			<script>
+				(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-i",
+	domain: "day",
+	subDomain: "hour",
+	rowLimit: 1,
+	domainGutter: 0,
+	data: "datas-years.json",
+	start: new Date(2000, 0, 5),
+	cellSize: 15,
+	cellPadding: 5,
+	range: 7,
+	verticalOrientation: true,
+	displayLegend: false,
+	label: {
+		position: "left",
+		offset: {
+			x: 20,
+			y: 12
+		},
+		width: 110
+	},
+	legend: [1, 2, 3, 4]
 });
 				})();
 			</script>
