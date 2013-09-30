@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.3.0 [2013-]
+
+* [change] `setLegend()` now takes a legend threshold array as first argument, and a color array as second argument
+* [new] `setLegend()` will redraw the legend if some of its settings (cellSize/padding, position, etc ...) were changed
+* [new] Add `legendColors` setting, to dynamically control the heatmap colors
+* [new] Add `showLegend()` and `removeLegend()` methods
+* [new] Add `legendOrientation` setting
+* [new] Add `rowLimit` and `colLimit` setting to control the number of columns and rows in a domain
+* [fix] Fix #37: two days get summed
+* [change] All invalid data (not a number) will be ignored
+
 ## v3.2.1 [2013-09-17]
 
 * [fix] Fix #35: Can't load new domain with `next()` when the new domain's timestamp contains more character
