@@ -1,12 +1,12 @@
 /* Cal-HeatMap CSS */
 
+.cal-heatmap-container {
+	display: block;
+}
 
 .graph
 {
-	clear: both;
-	display: block;
 	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
-	overflow: hidden;
 }
 
 .graph-label
@@ -21,7 +21,7 @@
 
 .graph-rect
 {
-	fill: #ededed;
+	fill: #ededed
 }
 
 .graph-subdomain-group rect:hover
@@ -33,28 +33,25 @@
 .subdomain-text {
 	font-size: 8px;
 	fill: #999;
-	pointer-events: none;
+	pointer-events: none
 }
 
 .hover_cursor:hover {
-	cursor: pointer;
+	cursor: pointer
 }
 
 .qi {
 	background-color: #999;
-	fill: #999;
+	fill: #999
 }
 
 /*
+Remove comment to apply this style to date with value equal to 0
 .q0
 {
-
-	Remove comment to apply this style to date with value equal to 0
-
 	background-color: #fff;
 	fill: #fff;
 	stroke: #ededed
-
 }
 */
 
@@ -91,27 +88,27 @@
 rect.highlight
 {
 	stroke:#444;
-	stroke-width:1;
+	stroke-width:1
 }
 
 text.highlight
 {
-	fill: #444;
+	fill: #444
 }
 
 rect.now
 {
-	stroke: red;
+	stroke: red
 }
 
 text.now
 {
 	fill: red;
-	font-weight: 800;
+	font-weight: 800
 }
 
 .domain-background {
 	fill: none;
-	shape-rendering: crispedges;
+	shape-rendering: crispedges
 }
 
