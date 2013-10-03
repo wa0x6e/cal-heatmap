@@ -375,8 +375,18 @@ var CalHeatMap = function() {
 
 				d = new Date(d);
 				switch(self.options.domain) {
-					case "year": return (self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) - self.getWeekNumber(new Date(d.getFullYear(), 0)) + 1): 54);
+					case "year":
+						if (self.options.rowLimit > 0) {
+							var dayCountInMonth = self.options.domainDynamicDimension ? self.getDayNumberInYear(d) : 366;
+							return Math.ceil(dayCountInMonth / self.options.rowLimit);
+						}
+						return (self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) - self.getWeekNumber(new Date(d.getFullYear(), 0)) + 1): 54);
 					case "month":
+						if (self.options.rowLimit > 0) {
+							var dayNumber = self.options.domainDynamicDimension ? new Date(d.getFullYear(), d.getMonth()+1, 0).getDate() : 31;
+							return Math.ceil(dayNumber / self.options.rowLimit);
+						}
+
 						if (self.options.verticalOrientation) {
 							return 6;
 						}
@@ -2067,6 +2077,8 @@ CalHeatMap.prototype = {
 				return graphHeight + legendHeight;
 			})
 		;
+
+
 
 		this.root.select(".graph").transition().duration(parent.options.animationDuration)
 			.attr("y", function() {
