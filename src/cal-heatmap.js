@@ -216,7 +216,6 @@ var CalHeatMap = function() {
 
 		itemNamespace: "cal-heatmap",
 
-
 		// ================================================
 		// EVENTS CALLBACK
 		// ================================================
@@ -258,7 +257,6 @@ var CalHeatMap = function() {
 		// only when the min domain is reached
 		onMinDomainReached: null
 	};
-
 
 	this._domainType = {
 		"min": {
@@ -664,7 +662,7 @@ var CalHeatMap = function() {
 
 			// Display legend if needed
 			if (self.options.displayLegend) {
-				self.Legend.display(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
+				self.Legend.redraw(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
 			}
 
 			if (self.options.afterLoad !== null) {
@@ -710,7 +708,6 @@ var CalHeatMap = function() {
 		return height;
 	}
 
-
 	/**
 	 *
 	 *
@@ -730,7 +727,6 @@ var CalHeatMap = function() {
 
 		var enteringDomainDim = 0;
 		var exitingDomainDim = 0;
-
 
 		// =========================================================================//
 		// PAINTING DOMAIN															//
@@ -876,7 +872,6 @@ var CalHeatMap = function() {
 
 		// Appending a title to each subdomain
 		rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainDateFormat); });
-
 
 		// =========================================================================//
 		// PAINTING LABEL															//
@@ -1112,7 +1107,6 @@ var CalHeatMap = function() {
 		;
 	};
 
-
 	this.init = function(settings) {
 
 		self.options = mergeRecursive(self.options, settings);
@@ -1131,7 +1125,6 @@ var CalHeatMap = function() {
 			console.log("'" + self.options.subDomain + "' is not a valid subDomain to '" + self.options.domain +  "'");
 			return false;
 		}
-
 
 		// Set the most suitable subdomain for the domain
 		// if subDomain is not explicitly specified
@@ -1165,7 +1158,6 @@ var CalHeatMap = function() {
 				case "right": self.options.label.align = "left"; break;
 				default: self.options.label.align = "center";
 			}
-
 
 			if (self.options.label.rotate === "left") {
 				self.options.label.align = "right";
@@ -1275,7 +1267,6 @@ var CalHeatMap = function() {
 		}
 
 
-
 		function validateSelector(selector) {
 			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
 		}
@@ -1283,7 +1274,6 @@ var CalHeatMap = function() {
 		return _init();
 
 	};
-
 };
 
 CalHeatMap.prototype = {
@@ -1390,7 +1380,6 @@ CalHeatMap.prototype = {
 		return this.triggerEvent("onMaxDomainReached", [reached]);
 	},
 
-
 	// =========================================================================//
 	// FORMATTER																//
 	// =========================================================================//
@@ -1409,7 +1398,6 @@ CalHeatMap.prototype = {
 			return f(d);
 		}
 	},
-
 
 	// =========================================================================//
 	// DOMAIN NAVIGATION														//
@@ -1622,7 +1610,6 @@ CalHeatMap.prototype = {
 		}
 	},
 
-
 	// =========================================================================//
 	// DOMAIN COMPUTATION														//
 	// =========================================================================//
@@ -1671,7 +1658,6 @@ CalHeatMap.prototype = {
 		if (typeof d === "number") {
 			d = new Date(d);
 		}
-
 	},
 
 	/**
@@ -1683,7 +1669,6 @@ CalHeatMap.prototype = {
 	getDayNumberInMonth: function(d) {
 		return this.getEndOfMonth(d).getDate();
 	},
-
 
 	/**
 	 * Return the number of day in the date's year
@@ -1708,7 +1693,6 @@ CalHeatMap.prototype = {
 		}
 		return d.getDay()-1;
 	},
-
 
 	/**
 	 * Get the last day of the month
@@ -1884,7 +1868,6 @@ CalHeatMap.prototype = {
 			}
 		};
 
-
 		switch(this.options.subDomain) {
 			case "x_min":
 			case "min"  : return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
@@ -1906,7 +1889,6 @@ CalHeatMap.prototype = {
 	getPreviousDomain: function() {
 		return this.getDomain(parseInt(this.getDomainKeys().shift(), 10), -1)[0];
 	},
-
 
 
 	// =========================================================================//
@@ -2078,8 +2060,6 @@ CalHeatMap.prototype = {
 			})
 		;
 
-
-
 		this.root.select(".graph").transition().duration(parent.options.animationDuration)
 			.attr("y", function() {
 				if (parent.options.legendVerticalPosition === "top") {
@@ -2166,7 +2146,7 @@ CalHeatMap.prototype = {
 		}
 
 		if (this.options.displayLegend) {
-			this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+			this.Legend.redraw(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 		}
 	},
 
@@ -2194,7 +2174,7 @@ CalHeatMap.prototype = {
 			return false;
 		}
 		this.options.displayLegend = true;
-		this.Legend.display(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
+		this.Legend.redraw(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 		return true;
 	},
 
@@ -2275,8 +2255,6 @@ CalHeatMap.prototype = {
 			}
 		}
 
-
-
 		var string = "<svg xmlns=\"http://www.w3.org/2000/svg\" "+
 		"xmlns:xlink=\"http://www.w3.org/1999/xlink\"><style type=\"text/css\"><![CDATA[ ";
 
@@ -2296,7 +2274,6 @@ CalHeatMap.prototype = {
 		return string;
 	}
 };
-
 
 /**
  * Compute the position of a domain, relative to the calendar
@@ -2375,7 +2352,7 @@ Legend.prototype.remove = function() {
 	this.calendar.resize();
 };
 
-Legend.prototype.display = function(width) {
+Legend.prototype.redraw = function(width) {
 
 	var parent = this;
 	var calendar = this.calendar;
@@ -2480,7 +2457,6 @@ Legend.prototype.display = function(width) {
 			}
 		})
 	;
-
 
 	legend.transition().duration(calendar.options.animationDuration)
 		.attr("x", getLegendXPosition())
@@ -2613,7 +2589,6 @@ Legend.prototype.getClass = function(n, withCssClass) {
 	index.unshift("");
 	return (index.join(" r") + (withCssClass ? index.join(" q"): "")).trim();
 };
-
 
 /**
  * Sprintf like function
