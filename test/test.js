@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.2.1 (Thu Sep 26 2013 22:03:20)
+/*! cal-heatmap v3.2.1 (Fri Oct 04 2013 00:57:45)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -1764,6 +1764,54 @@ test("Also return the qn styling class", function() {
 	equal(cal.Legend.getClass(300, true), "r3 q3");
 	equal(cal.Legend.getClass(350, true), "r4 q4");
 	equal(cal.Legend.getClass(600, true), "r5 q5");
+});
+
+module("Legend API");
+
+test("Removing not existing legend", function() {
+
+	expect(1);
+
+	var cal = createCalendar({displayLegend: false});
+
+	equal(cal.removeLegend(), false, "removeLegend() return false when legend does not exist");
+});
+
+test("Removing existing legend", function() {
+
+	expect(5);
+
+	var cal = createCalendar({displayLegend: true, paintOnLoad: true});
+
+	equal(cal.options.displayLegend, true, "displayLegend setting is set to true");
+	notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend exists int DOM");
+
+	equal(cal.removeLegend(), true, "removeLegend() return true when legend does exist");
+	equal(cal.options.displayLegend, false, "displayLegend setting is now set to false");
+	equal(cal.root.select(".graph-legend")[0][0], null, "Legend is now removed from the DOM");
+});
+
+test("Show already existing legend", function() {
+
+	expect(1);
+
+	var cal = createCalendar({displayLegend: true});
+
+	equal(cal.showLegend(), false, "showLegend() return false when legend already exists");
+});
+
+test("Show not existing legend", function() {
+
+	expect(5);
+
+	var cal = createCalendar({displayLegend: false});
+
+	equal(cal.options.displayLegend, false, "displayLegend setting is set to false");
+	equal(cal.root.select(".graph-legend")[0][0], null, "There is no legend in the DOM");
+
+	equal(cal.showLegend(), true, "showLegend() return true when legend does not exist yet");
+	equal(cal.options.displayLegend, true, "displayLegend setting is now set to true");
+	notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend is now added into the DOM");
 });
 
 /*
