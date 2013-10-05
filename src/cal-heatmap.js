@@ -1408,38 +1408,50 @@ CalHeatMap.prototype = {
 	 *
 	 * The new domain is loaded only if it's not beyond the maxDate
 	 *
+	 * @param int n Number of domains to load
 	 * @return bool True if the next domain was loaded, else false
 	 */
-	loadNextDomain: function() {
+	loadNextDomain: function(n) {
+		if (arguments.length === 0) {
+			n = 1;
+		}
 
-		var nextDomainStartTimestamp = this.getNextDomain().getTime();
+		var nextDomainStartTimestamp = this.getDomain(this.getNextDomain(), n);
 
 		if (this._maxDomainReached || this.maxDomainIsReached(nextDomainStartTimestamp)) {
 			return false;
 		}
 
 		var parent = this;
-		this._domains.set(
-			nextDomainStartTimestamp,
-			this.getSubDomain(nextDomainStartTimestamp).map(function(d) {
-				return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
-			})
-		);
+		// Append new domains to the domains map
+		for (var i = 0, total = nextDomainStartTimestamp.length; i < total; i++) {
+			this._domains.set(
+				nextDomainStartTimestamp[i].getTime(),
+				this.getSubDomain(nextDomainStartTimestamp[i]).map(function(d) {
+					return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
+				})
+			);
+		}
+
 		var domains = this.getDomainKeys();
-		this._domains.remove(domains.shift());
+
+		// Removing old domains
+		domains.slice(0, nextDomainStartTimestamp.length).forEach(function(key) {
+			parent._domains.remove(key);
+		});
 
 		this.paint(this.NAVIGATE_RIGHT);
 
 		this.getDatas(
 			this.options.data,
-			new Date(domains[domains.length-1]),
-			this.getSubDomain(domains[domains.length-1]).pop(),
+			nextDomainStartTimestamp[0],
+			this.getSubDomain(nextDomainStartTimestamp[nextDomainStartTimestamp.length-1]).pop(),
 			function() {
 				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
-		this.afterLoadNextDomain(new Date(domains[domains.length-1]));
+		this.afterLoadNextDomain(nextDomainStartTimestamp[nextDomainStartTimestamp.length-1]);
 
 		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
 			this.onMaxDomainReached(true);
@@ -1458,39 +1470,50 @@ CalHeatMap.prototype = {
 	 *
 	 * The previous domain is loaded only if it's not beyond the minDate
 	 *
+	 * @param int n Number of domains to load
 	 * @return bool True if the previous domain was loaded, else false
 	 */
-	loadPreviousDomain: function() {
+	loadPreviousDomain: function(n) {
+		if (arguments.length === 0) {
+			n = 1;
+		}
+
 		if (this._minDomainReached || this.minDomainIsReached(this._domains[0])) {
 			return false;
 		}
 
-		var previousDomainStartTimestamp = this.getPreviousDomain().getTime();
+		var previousDomainStartTimestamp = this.getDomain(this.getPreviousDomain(), -n);
 
 		var parent = this;
-		this._domains.set(
-			previousDomainStartTimestamp,
-			this.getSubDomain(previousDomainStartTimestamp).map(function(d) {
-				return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
-			})
-		);
+		for (var i = 0, total = previousDomainStartTimestamp.length; i < total; i++) {
+			this._domains.set(
+				previousDomainStartTimestamp[i].getTime(),
+				this.getSubDomain(previousDomainStartTimestamp[i]).map(function(d) {
+					return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
+				})
+			);
+		}
+
 		var domains = this.getDomainKeys();
-		this._domains.remove(domains.pop());
+
+		domains.slice(-previousDomainStartTimestamp.length).forEach(function(key) {
+			parent._domains.remove(key);
+		});
 
 		this.paint(this.NAVIGATE_LEFT);
 
 		this.getDatas(
 			this.options.data,
-			new Date(domains[0]),
-			this.getSubDomain(domains[0]).pop(),
+			previousDomainStartTimestamp[0],
+			this.getSubDomain(previousDomainStartTimestamp[previousDomainStartTimestamp.length-1]).pop(),
 			function() {
 				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
-		this.afterLoadPreviousDomain(new Date(domains[0]));
+		this.afterLoadPreviousDomain(previousDomainStartTimestamp);
 
-		if (this.minDomainIsReached(previousDomainStartTimestamp)) {
+		if (this.minDomainIsReached(previousDomainStartTimestamp[0])) {
 			this.onMinDomainReached(true);
 		}
 
@@ -1521,15 +1544,9 @@ CalHeatMap.prototype = {
 	},
 
 	getDomainKeys: function() {
-		var keys = this._domains.keys().sort(function(a, b) {
-			return parseInt(a, 10) - parseInt(b, 10);
-		});
-
-		for (var i = 0, total = keys.length; i < total; i++) {
-			keys[i] = parseInt(keys[i], 10);
-		}
-
-		return keys;
+		return this._domains.keys()
+			.sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); })
+			.map(function(d) { return parseInt(d, 10); });
 	},
 
 	// =========================================================================//
@@ -2147,15 +2164,21 @@ CalHeatMap.prototype = {
 	/**
 	 * Shift the calendar forward
 	 */
-	next: function() {
-		return this.loadNextDomain();
+	next: function(n) {
+		if (arguments.length === 0) {
+			n = 1;
+		}
+		return this.loadNextDomain(n);
 	},
 
 	/**
 	 * Shift the calendar backward
 	 */
-	previous: function() {
-		return this.loadPreviousDomain();
+	previous: function(n) {
+		if (arguments.length === 0) {
+			n = 1;
+		}
+		return this.loadPreviousDomain(n);
 	},
 
 	/**
