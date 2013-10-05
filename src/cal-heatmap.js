@@ -297,7 +297,7 @@ var CalHeatMap = function() {
 					if (self.options.domain === "week") {
 						total = 24 * 7;
 					} else if (self.options.domain === "month") {
-						total = 24 * self.getDayNumberInMonth(d);
+						total = 24 * self.getDayCountInMonth(d);
 					}
 					return Math.ceil(total / self.options.colLimit);
 				}
@@ -358,8 +358,8 @@ var CalHeatMap = function() {
 				if (self.options.colLimit > 0) {
 					var total = 0;
 					switch(self.options.domain) {
-						case "year": total = self.getDayNumberInYear(d); break;
-						case "month": total = self.getDayNumberInMonth(d); break;
+						case "year": total = self.getDayCountInYear(d); break;
+						case "month": total = self.getDayCountInMonth(d); break;
 						case "week": total = 7;
 					}
 					return Math.ceil(total / self.options.colLimit);
@@ -375,7 +375,7 @@ var CalHeatMap = function() {
 				switch(self.options.domain) {
 					case "year":
 						if (self.options.rowLimit > 0) {
-							var dayCountInMonth = self.options.domainDynamicDimension ? self.getDayNumberInYear(d) : 366;
+							var dayCountInMonth = self.options.domainDynamicDimension ? self.getDayCountInYear(d) : 366;
 							return Math.ceil(dayCountInMonth / self.options.rowLimit);
 						}
 						return (self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) - self.getWeekNumber(new Date(d.getFullYear(), 0)) + 1): 54);
@@ -674,8 +674,8 @@ var CalHeatMap = function() {
 				var domains = self.getDomainKeys();
 				self.getDatas(
 					self.options.data,
-					new Date(parseInt(domains[0], 10)),
-					self.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
+					new Date(domains[0]),
+					self.getSubDomain(domains[domains.length-1]).pop(),
 					function() {
 						self.fill();
 						self.onComplete();
@@ -722,7 +722,7 @@ var CalHeatMap = function() {
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
 			.selectAll(".graph-domain")
-			.data(self.getDomainKeys().map(function(d) { return parseInt(d, 10); }), function(d) { return d; })
+			.data(self.getDomainKeys(), function(d) { return d; })
 		;
 
 		var enteringDomainDim = 0;
@@ -1432,14 +1432,14 @@ CalHeatMap.prototype = {
 
 		this.getDatas(
 			this.options.data,
-			new Date(parseInt(domains[domains.length-1], 10)),
-			this.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
+			new Date(domains[domains.length-1]),
+			this.getSubDomain(domains[domains.length-1]).pop(),
 			function() {
 				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
-		this.afterLoadNextDomain(new Date(parseInt(domains[domains.length-1], 10)));
+		this.afterLoadNextDomain(new Date(domains[domains.length-1]));
 
 		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
 			this.onMaxDomainReached(true);
@@ -1481,14 +1481,14 @@ CalHeatMap.prototype = {
 
 		this.getDatas(
 			this.options.data,
-			new Date(parseInt(domains[0], 10)),
-			this.getSubDomain(parseInt(domains[0], 10)).pop(),
+			new Date(domains[0]),
+			this.getSubDomain(domains[0]).pop(),
 			function() {
 				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
-		this.afterLoadPreviousDomain(new Date(parseInt(domains[0], 10)));
+		this.afterLoadPreviousDomain(new Date(domains[0]));
 
 		if (this.minDomainIsReached(previousDomainStartTimestamp)) {
 			this.onMinDomainReached(true);
@@ -1521,9 +1521,15 @@ CalHeatMap.prototype = {
 	},
 
 	getDomainKeys: function() {
-		return this._domains.keys().sort(function(a, b) {
+		var keys = this._domains.keys().sort(function(a, b) {
 			return parseInt(a, 10) - parseInt(b, 10);
 		});
+
+		for (var i = 0, total = keys.length; i < total; i++) {
+			keys[i] = parseInt(keys[i], 10);
+		}
+
+		return keys;
 	},
 
 	// =========================================================================//
@@ -1611,7 +1617,7 @@ CalHeatMap.prototype = {
 	},
 
 	// =========================================================================//
-	// DOMAIN COMPUTATION														//
+	// DATE COMPUTATION															//
 	// =========================================================================//
 
 	/**
@@ -1643,9 +1649,7 @@ CalHeatMap.prototype = {
 		}
 
 		var monthFirstWeekNumber = this.getWeekNumber(new Date(d.getFullYear(), d.getMonth()));
-		var n = this.getWeekNumber(d) - monthFirstWeekNumber - 1;
-
-		return n;
+		return this.getWeekNumber(d) - monthFirstWeekNumber - 1;
 	},
 
 	/**
@@ -1666,32 +1670,37 @@ CalHeatMap.prototype = {
 	 * @param  int|Date d Date or timestamp in milliseconds
 	 * @return int Number of days in the date's month
 	 */
-	getDayNumberInMonth: function(d) {
+	getDayCountInMonth: function(d) {
 		return this.getEndOfMonth(d).getDate();
 	},
 
 	/**
-	 * Return the number of day in the date's year
+	 * Return the number of days in the date's year
 	 *
 	 * @param  int|Date d Date or timestamp in milliseconds
 	 * @return int Number of days in the date's year
 	 */
-	getDayNumberInYear: function(d) {
+	getDayCountInYear: function(d) {
 		if (typeof d === "number") {
 			d = new Date(d);
 		}
-
 		return (d.getFullYear() % 400 === 0) ? 366 : 365;
 	},
 
+	/**
+	 * Get the weekday from a date
+	 *
+	 * Return the week day number (0-6) of a date,
+	 * depending on whether the week start on monday or sunday
+	 *
+	 * @param  Date d
+	 * @return int The week day number (0-6)
+	 */
 	getWeekDay: function(d) {
 		if (this.options.weekStartOnMonday === false) {
 			return d.getDay();
 		}
-		else if (d.getDay() === 0) {
-			return 6;
-		}
-		return d.getDay()-1;
+		return d.getDay() === 0 ? 6 : (d.getDay()-1);
 	},
 
 	/**
@@ -1705,6 +1714,30 @@ CalHeatMap.prototype = {
 		}
 		return new Date(d.getFullYear(), d.getMonth()+1, 0);
 	},
+
+	/**
+	 *
+	 * @param  Date date
+	 * @param  int count
+	 * @param  string step
+	 * @return Date
+	 */
+	jumpDate: function(date, count, step) {
+		var d = new Date(date);
+		switch(step) {
+			case "hour" : d.setHours(d.getHours() + count); break;
+			case "day" : d.setHours(d.getHours() + count * 24); break;
+			case "week" : d.setHours(d.getHours() + count * 24 * 7); break;
+			case "month" : d.setMonth(d.getMonth() + count); break;
+			case "year" : d.setFullYear(d.getFullYear() + count);
+		}
+
+		return new Date(d);
+	},
+
+	// =========================================================================//
+	// DOMAIN COMPUTATION														//
+	// =========================================================================//
 
 	/**
 	 * Return a range of week number
@@ -1763,10 +1796,7 @@ CalHeatMap.prototype = {
 	 */
 	getHourDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		var stop = range;
-		if (typeof range === "number") {
-			stop = new Date(start.getTime() + 3600 * 1000 * range);
-		}
+		var stop = new Date(start.getTime() + 3600 * 1000 * range);
 
 		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
 	},
@@ -1798,12 +1828,19 @@ CalHeatMap.prototype = {
 		return d3.time.months(Math.min(start, stop), Math.max(start, stop));
 	},
 
+	/**
+	 * Get an array of domain start dates
+	 *
+	 * @param  int|Date date A random date included in the wanted domain
+	 * @param  int range Number of dates to get
+	 * @return Array of dates
+	 */
 	getDomain: function(date, range) {
 		if (typeof date === "number") {
 			date = new Date(date);
 		}
 
-		if (typeof range === "undefined") {
+		if (arguments.length < 2) {
 			range = this.options.range;
 		}
 
@@ -1823,16 +1860,20 @@ CalHeatMap.prototype = {
 
 		var parent = this;
 
+		/**
+		 * @return int
+		 */
 		var computeDaySubDomainSize = function(date, domain) {
 			switch(domain) {
-				case "year": return parent.getDayOfYear(new Date(date.getFullYear()+1, 0, 0));
-				case "month":
-					var lastDayOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
-					return lastDayOfMonth.getDate();
+				case "year": return parent.getDayCountInYear(date);
+				case "month": return parent.getDayCountInMonth(date);
 				case "week": return 7;
 			}
 		};
 
+		/**
+		 * @return int
+		 */
 		var computeMinSubDomainSize = function(date, domain) {
 			switch (domain) {
 				case "hour": return 60;
@@ -1841,16 +1882,20 @@ CalHeatMap.prototype = {
 			}
 		};
 
+		/**
+		 * @return int
+		 */
 		var computeHourSubDomainSize = function(date, domain) {
 			switch(domain) {
 				case "day": return 24;
 				case "week": return 168;
-				case "month":
-					var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
-					return endOfMonth.getDate() * 24;
+				case "month": return parent.getDayCountInMonth(date) * 24;
 			}
 		};
 
+		/**
+		 * @return int
+		 */
 		var computeWeekSubDomainSize = function(date, domain) {
 			if (domain === "month") {
 				var endOfMonth = new Date(date.getFullYear(), date.getMonth()+1, 0);
@@ -1882,12 +1927,28 @@ CalHeatMap.prototype = {
 		}
 	},
 
-	getNextDomain: function() {
-		return this.getDomain(parseInt(this.getDomainKeys().pop(), 10), 2).pop();
+	/**
+	 * Get the n-th next domain after the calendar newest (rightmost) domain
+	 * @param  int n
+	 * @return Date The start date of the wanted domain
+	 */
+	getNextDomain: function(n) {
+		if (arguments.length === 0) {
+			n = 1;
+		}
+		return this.getDomain(this.jumpDate(this.getDomainKeys().pop(), n, this.options.domain), 1)[0];
 	},
 
-	getPreviousDomain: function() {
-		return this.getDomain(parseInt(this.getDomainKeys().shift(), 10), -1)[0];
+	/**
+	 * Get the n-th domain before the calendar oldest (leftmost) domain
+	 * @param  int n
+	 * @return Date The start date of the wanted domain
+	 */
+	getPreviousDomain: function(n) {
+		if (arguments.length === 0) {
+			n = 1;
+		}
+		return this.getDomain(this.jumpDate(this.getDomainKeys().shift(), -n, this.options.domain), 1)[0];
 	},
 
 
@@ -2083,10 +2144,16 @@ CalHeatMap.prototype = {
 	// PUBLIC API																//
 	// =========================================================================//
 
+	/**
+	 * Shift the calendar forward
+	 */
 	next: function() {
 		return this.loadNextDomain();
 	},
 
+	/**
+	 * Shift the calendar backward
+	 */
 	previous: function() {
 		return this.loadPreviousDomain();
 	},
@@ -2110,8 +2177,8 @@ CalHeatMap.prototype = {
 		var self = this;
 		this.getDatas(
 			dataSource,
-			new Date(parseInt(domains[0], 10)),
-			this.getSubDomain(parseInt(domains[domains.length-1], 10)).pop(),
+			new Date(domains[0]),
+			this.getSubDomain(domains[domains.length-1]).pop(),
 			function() {
 				self.fill();
 			},
