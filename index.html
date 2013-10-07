@@ -122,6 +122,7 @@
 					<ul>
 						<li><a href="#previous">previous</a></li>
 						<li><a href="#next">next</a></li>
+						<li><a href="#jumpto">jumpto</a></li>
 						<li><a href="#update">update</a></li>
 						<li><a href="#getSVG">getSVG</a></li>
 						<li><a href="#setLegend">setLegend</a></li>
@@ -2620,6 +2621,8 @@ cal.init({
 				</div>
 			</div>
 
+			<p>If you want to shift by more than one domain, see the <a href=""><code>previous()</code></a> method</p>
+
 
 			<p class="alert alert-info">See <a href="#itemSelector"><code>itemSelector</code></a> for details about String Selector and Element type.</p>
 
@@ -2628,6 +2631,8 @@ cal.init({
 			<div class="option-default"><code>false</code></div>
 
 			<p>Will attach the <a href="#next"><code>next()</code></a> event to the specified element, on a mouse click, shifting the calendar one domain forward.</p>
+
+			<p>If you want to shift by more than one domain, see the <a href="#next"><code>next()</code></a> method</p>
 
 			<p class="alert alert-info">See <a href="#previousSelector"><code>previousSelector</code></a> for an example.</p>
 
@@ -2679,9 +2684,11 @@ cal2.init({
 
 		<p>Beside <code>init()</code>, Cal-HeatMap also boast other methods to control the behavior of the calendar.</p>
 
-			<h4 id="previous">previous()</h4>
+			<h4 id="previous">previous(n)</h4>
 			<div class="option-type"></div>
-			<p>Shift the calendar one domain back</p>
+			<p>Shift the calendar <b>n</b> domains back</p>
+
+			<p><b>n</b> is optional, and by default is equal to 1.</p>
 
 			<pre><code class="language-javascript">var cal = new CalHeatmap();
 cal.init({});
@@ -2689,17 +2696,101 @@ cal.previous();
 </code></pre>
 			<p class="alert alert-info">See <a href="#previousSelector"><code>previousSelector</code></a> if you wish to directly attach <code>previous()</code> to an Element mouse click event.</p>
 
-			<h4 id="next">next()</h4>
+			<h4 id="next">next(n)</h4>
 			<div class="option-type"></div>
-			<p>Shift the calendar one domain forward</p>
+			<p>Shift the calendar <b>n</b> domains forward</p>
+
+			<p><b>n</b> is optional, and by default is equal to 1.</p>
 
 			<pre><code class="language-javascript">var cal = new CalHeatmap();
 cal.init({});
 cal.next();
+cal.next(5); // Move back by 5 domains
 </code></pre>
 
 			<p class="alert alert-info">See <a href="#previousSelector"><code>nextSelector</code></a> if you wish to directly attach <code>next()</code> to an Element mouse click event.</p>
 
+			<h4 id="jumpto">jumpTo(date, reset)</h4> <strong class="version-added">3.3.0+</strong>
+			<div class="option-type"></div>
+			<p>Jump the calendar to the specified date</p>
+
+			<p>This method will shift the calendar backward or forward, until the domain containing the specified date is visible.</p>
+
+			<table class="table">
+				<tr>
+					<th>Argument</th>
+					<th>Type</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>Date</code></td>
+					<td><code>Date</code></td>
+					<td>The date to jump to.</td>
+				</tr>
+				<tr>
+					<td><code>reset</code></td>
+					<td><code>boolean</code></td>
+					<td><span class="label label-info">Optional</span> Default: <code>false</code>
+						<p>Whether to set the domain with the specified as the calendar's first domain.</p>
+
+					</td>
+				</tr>
+			</table>
+
+			<div class="example clearfix empty-calendar">
+
+
+				<div>
+					<div id="jumpTo-a"></div>
+					<p>With <code>reset</code> == false, <code>jumpTo</code> will stop as soon as the wanted date is visible</p>
+
+					<div style="float:none;margin-top: 20px;">
+						<button class="btn" id="jumpTo-a-btn">Jump to May 2000</button>
+					</div>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#jumpTo-a",
+	start: new Date(2000, 0),
+	domain: "month",
+	range: 4
+});
+
+$("#jumpTo-a-btn").on("click", function(event) {
+	cal.jumpTo(new Date(2000, 4));
+});
+						})();
+					</script>
+				</div>
+
+				<div>
+					<div id="jumpTo-b"></div>
+					<p>With <code>reset</code> == true, <code>jumpTo</code> will move the wanted domain to the start of the calendar</p>
+
+					<div style="float:none;margin-top: 20px;">
+						<button class="btn" id="jumpTo-b-btn">Jump to May 2000</button>
+					</div>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#jumpTo-b",
+	start: new Date(2000, 0),
+	domain: "month",
+	range: 4
+});
+
+$("#jumpTo-b-btn").on("click", function(event) {
+	cal.jumpTo(new Date(2000, 4), true);
+});
+						})();
+					</script>
+				</div>
+
+
+
+			</div>
 
 			<h4 id="update">update(data, afterLoad, updateMode)</h4> <strong class="version-added">3.1.0+</strong>
 			<div class="option-type"></div>
