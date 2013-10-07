@@ -68,7 +68,7 @@ module.exports = function(grunt) {
                 dest: "<%= pkg.name %>.js"
             },
             test: {
-                src: ["test/src/function.js", "test/src/module-*.js"],
+                src: ["test/src/function.js", "test/src/**/*.js"],
                 dest: "test/test.js"
             }
         },
@@ -79,7 +79,7 @@ module.exports = function(grunt) {
         },
         watch: {
 			scripts: {
-				files: "test/src/*.js",
+				files: "test/src/**/*.js",
 				tasks: ["concat:test"],
 				options: {
 					interrupt: true,
