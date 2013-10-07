@@ -722,7 +722,13 @@ var CalHeatMap = function() {
 		// Painting all the domains
 		var domainSvg = self.root.select(".graph")
 			.selectAll(".graph-domain")
-			.data(self.getDomainKeys(), function(d) { return d; })
+			.data(
+				function() {
+					var data = self.getDomainKeys();
+					return navigationDir === self.NAVIGATE_LEFT ? data.reverse(): data;
+				},
+				function(d) { return d; }
+			)
 		;
 
 		var enteringDomainDim = 0;
@@ -1406,28 +1412,35 @@ CalHeatMap.prototype = {
 	/**
 	 * Shift the calendar one domain forward
 	 *
-	 * The new domain is loaded only if it's not beyond the maxDate
+	 * The new domain is loaded only if it's not beyond maxDate
 	 *
 	 * @param int n Number of domains to load
 	 * @return bool True if the next domain was loaded, else false
 	 */
 	loadNextDomain: function(n) {
+		if (this._maxDomainReached) {
+			return false;
+		}
+
 		if (arguments.length === 0) {
 			n = 1;
 		}
 
-		var nextDomainStartTimestamp = this.getDomain(this.getNextDomain(), n);
-
-		if (this._maxDomainReached || this.maxDomainIsReached(nextDomainStartTimestamp)) {
-			return false;
-		}
+		var newDomains = this.getDomain(this.getNextDomain(), n);
 
 		var parent = this;
-		// Append new domains to the domains map
-		for (var i = 0, total = nextDomainStartTimestamp.length; i < total; i++) {
+		var i = -1;
+		var total = newDomains.length;
+
+		// Appending new domains to existing domain list, as long as minDomain is not reached
+		while (++i < total) {
+			if (this.maxDomainIsReached(newDomains[i])) {
+				newDomains = newDomains.slice(0, i);
+				break;
+			}
 			this._domains.set(
-				nextDomainStartTimestamp[i].getTime(),
-				this.getSubDomain(nextDomainStartTimestamp[i]).map(function(d) {
+				newDomains[i].getTime(),
+				this.getSubDomain(newDomains[i]).map(function(d) {
 					return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
 				})
 			);
@@ -1436,7 +1449,7 @@ CalHeatMap.prototype = {
 		var domains = this.getDomainKeys();
 
 		// Removing old domains
-		domains.slice(0, nextDomainStartTimestamp.length).forEach(function(key) {
+		domains.slice(0, newDomains.length).forEach(function(key) {
 			parent._domains.remove(key);
 		});
 
@@ -1444,21 +1457,21 @@ CalHeatMap.prototype = {
 
 		this.getDatas(
 			this.options.data,
-			nextDomainStartTimestamp[0],
-			this.getSubDomain(nextDomainStartTimestamp[nextDomainStartTimestamp.length-1]).pop(),
+			newDomains[0],
+			this.getSubDomain(newDomains[newDomains.length-1]).pop(),
 			function() {
 				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
-		this.afterLoadNextDomain(nextDomainStartTimestamp[nextDomainStartTimestamp.length-1]);
+		this.afterLoadNextDomain(newDomains[newDomains.length-1]);
 
 		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
 			this.onMaxDomainReached(true);
 		}
 
 		// Try to "disengage" the min domain reached setting
-		if (this._minDomainReached && !this.minDomainIsReached(domains[0])) {
+		if (this._minDomainReached && !this.minDomainIsReached(domains[1])) {
 			this.onMinDomainReached(false);
 		}
 
@@ -1474,46 +1487,60 @@ CalHeatMap.prototype = {
 	 * @return bool True if the previous domain was loaded, else false
 	 */
 	loadPreviousDomain: function(n) {
+		if (this._minDomainReached) {
+			return false;
+		}
+
 		if (arguments.length === 0) {
 			n = 1;
 		}
 
-		if (this._minDomainReached || this.minDomainIsReached(this._domains[0])) {
-			return false;
-		}
-
-		var previousDomainStartTimestamp = this.getDomain(this.getPreviousDomain(), -n);
+		var domains = this.getDomainKeys();
+		var newDomains = this.getDomain(domains[0], -n).reverse();
 
 		var parent = this;
-		for (var i = 0, total = previousDomainStartTimestamp.length; i < total; i++) {
-			this._domains.set(
-				previousDomainStartTimestamp[i].getTime(),
-				this.getSubDomain(previousDomainStartTimestamp[i]).map(function(d) {
+		var i = -1;
+		var total = newDomains.length;
+
+		// Remove out of bound domains from list of new domains to prepend
+		while (++i < total) {
+			if (this.minDomainIsReached(newDomains[i])) {
+				newDomains = newDomains.slice(0, i+1);
+				break;
+			}
+		}
+
+		for (i = 0, total = newDomains.length; i < total; i++) {
+			parent._domains.set(
+				newDomains[i].getTime(),
+				parent.getSubDomain(newDomains[i]).map(function(d) {
 					return {t: parent._domainType[parent.options.subDomain].extractUnit(d), v: null};
 				})
 			);
 		}
 
-		var domains = this.getDomainKeys();
+		domains = this.getDomainKeys();
 
-		domains.slice(-previousDomainStartTimestamp.length).forEach(function(key) {
+		domains.slice(-newDomains.length).forEach(function(key) {
 			parent._domains.remove(key);
 		});
+
+		newDomains = newDomains.reverse();
 
 		this.paint(this.NAVIGATE_LEFT);
 
 		this.getDatas(
 			this.options.data,
-			previousDomainStartTimestamp[0],
-			this.getSubDomain(previousDomainStartTimestamp[previousDomainStartTimestamp.length-1]).pop(),
+			newDomains[0],
+			this.getSubDomain(newDomains[newDomains.length-1]).pop(),
 			function() {
 				parent.fill(parent.lastInsertedSvg);
 			}
 		);
 
-		this.afterLoadPreviousDomain(previousDomainStartTimestamp);
+		this.afterLoadPreviousDomain(newDomains);
 
-		if (this.minDomainIsReached(previousDomainStartTimestamp[0])) {
+		if (this.minDomainIsReached(newDomains[0])) {
 			this.onMinDomainReached(true);
 		}
 
@@ -1545,8 +1572,8 @@ CalHeatMap.prototype = {
 
 	getDomainKeys: function() {
 		return this._domains.keys()
-			.sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); })
-			.map(function(d) { return parseInt(d, 10); });
+			.map(function(d) { return parseInt(d, 10); })
+			.sort(function(a,b) { return a-b; });
 	},
 
 	// =========================================================================//
@@ -2365,6 +2392,10 @@ CalHeatMap.prototype = {
 	}
 };
 
+// =========================================================================//
+// DOMAIN POSITION COMPUTATION												//
+// =========================================================================//
+
 /**
  * Compute the position of a domain, relative to the calendar
  */
@@ -2413,6 +2444,10 @@ DomainPosition.prototype.getKeys = function() {
 		return parseInt(a, 10) - parseInt(b, 10);
 	});
 };
+
+// =========================================================================//
+// LEGEND																	//
+// =========================================================================//
 
 var Legend = function(calendar) {
 	this.calendar = calendar;
