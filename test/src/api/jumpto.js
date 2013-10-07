@@ -36,10 +36,24 @@ _testJumpTo(
 );
 
 _testJumpTo(
-	new Date(2000, 7),
+	new Date(2000, 0, 16, 23),
 	false,
 	true,
-	new Date(2000, 4)
+	new Date(2000, 0)
+);
+
+_testJumpTo(
+	new Date(2000, 6),
+	false,
+	true,
+	new Date(2000, 3)
+);
+
+_testJumpTo(
+	new Date(2000, 6, 12, 8),
+	false,
+	true,
+	new Date(2000, 3)
 );
 
 // Without reset, out-of-bound date
@@ -74,6 +88,14 @@ _testJumpTo(
 );
 
 _testJumpTo(
+	new Date(2000, 2, 25, 13, 18),
+	false,
+	false,
+	new Date(2000, 2),
+	"already visible, no jump"
+);
+
+_testJumpTo(
 	new Date(2000, 3),
 	false,
 	false,
@@ -95,6 +117,37 @@ _testJumpTo(
 	false,
 	new Date(2000, 2),
 	"already visible, no jump"
+);
+
+_testJumpTo(
+	new Date(2000, 5, 30, 23, 59),
+	false,
+	false,
+	new Date(2000, 2),
+	"already visible, no jump"
+);
+
+// With reset
+
+_testJumpTo(
+	new Date(2000, 0),
+	true,
+	true,
+	new Date(2000, 0)
+);
+
+_testJumpTo(
+	new Date(2000, 0, 6, 16),
+	true,
+	true,
+	new Date(2000, 0)
+);
+
+_testJumpTo(
+	new Date(2000, 6, 18),
+	true,
+	true,
+	new Date(2000, 6)
 );
 
 // With reset, out-of-bound date
@@ -119,28 +172,28 @@ _testJumpTo(
 // Set the calendar first domain to the jumped dated
 
 _testJumpTo(
-	new Date(2000, 2),
+	new Date(2000, 2, 15),
 	true,
 	false,
 	new Date(2000, 2)
 );
 
 _testJumpTo(
-	new Date(2000, 3),
+	new Date(2000, 3, 26),
 	true,
 	true,
 	new Date(2000, 3)
 );
 
 _testJumpTo(
-	new Date(2000, 4),
+	new Date(2000, 4, 5),
 	true,
 	true,
 	new Date(2000, 4)
 );
 
 _testJumpTo(
-	new Date(2000, 5),
+	new Date(2000, 5, 30),
 	true,
 	true,
 	new Date(2000, 5)

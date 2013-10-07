@@ -1799,8 +1799,10 @@ CalHeatMap.prototype = {
 	 */
 	getMinuteDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		var stop = range;
-		if (typeof range !== "object") {
+		var stop = null;
+		if (typeof range === "object") {
+			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
+		} else {
 			stop = new Date(start.getTime() + 60 * 1000 * range);
 		}
 
@@ -1816,8 +1818,10 @@ CalHeatMap.prototype = {
 	 */
 	getHourDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		var stop = range;
-		if (typeof range !== "object") {
+		var stop = null;
+		if (typeof range === "object") {
+			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
+		} else {
 			stop = new Date(start.getTime() + 3600 * 1000 * range);
 		}
 
@@ -1833,8 +1837,10 @@ CalHeatMap.prototype = {
 	 */
 	getDayDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-		var stop = range;
-		if (typeof range !== "object") {
+		var stop = null;
+		if (typeof range === "object") {
+			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate());
+		} else {
 			stop = new Date(start);
 			stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
 		}
@@ -1887,8 +1893,10 @@ CalHeatMap.prototype = {
 	 */
 	getMonthDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth());
-		var stop = range;
-		if (typeof range !== "object") {
+		var stop = null;
+		if (typeof range === "object") {
+			stop = new Date(range.getFullYear(), range.getMonth());
+		} else {
 			stop = new Date(start);
 			stop = stop.setMonth(stop.getMonth()+range);
 		}
@@ -1905,8 +1913,10 @@ CalHeatMap.prototype = {
 	 */
 	getYearDomain: function(d, range){
 		var start = new Date(d.getFullYear(), 0);
-		var stop = range;
-		if (typeof range !== "object") {
+		var stop = null;
+		if (typeof range === "object") {
+			stop = new Date(range.getFullYear(), 0);
+		} else {
 			stop = new Date(d.getFullYear()+range, 0);
 		}
 
@@ -2177,7 +2187,7 @@ CalHeatMap.prototype = {
 	/**
 	 * Handle the calendar layout and dimension
 	 *
-	 * Expand and skrink the container depending on its children dimension
+	 * Expand and shrink the container depending on its children dimension
 	 * Also rearrange the children position depending on their dimension,
 	 * and the legend position
 	 *
@@ -2268,12 +2278,16 @@ CalHeatMap.prototype = {
 		var firstDomain = domains[0];
 		var lastDomain = domains[domains.length-1];
 
-		if (date > firstDomain && date <= lastDomain && reset) {
-			return this.loadNextDomain(this.getDomain(firstDomain, date).length);
-		} else if (date < firstDomain) {
+		if (date < firstDomain) {
 			return this.loadPreviousDomain(this.getDomain(firstDomain, date).length);
-		} else if (date > lastDomain) {
-			return this.loadNextDomain(this.getDomain(lastDomain, date).length);
+		} else {
+			if (reset) {
+				return this.loadNextDomain(this.getDomain(firstDomain, date).length);
+			}
+
+			if (date > lastDomain) {
+				return this.loadNextDomain(this.getDomain(lastDomain, date).length);
+			}
 		}
 
 		return false;
