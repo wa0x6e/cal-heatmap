@@ -1418,7 +1418,7 @@ CalHeatMap.prototype = {
 	 * @return bool True if the next domain was loaded, else false
 	 */
 	loadNextDomain: function(n) {
-		if (this._maxDomainReached) {
+		if (this._maxDomainReached || n === 0) {
 			return false;
 		}
 
@@ -1487,7 +1487,7 @@ CalHeatMap.prototype = {
 	 * @return bool True if the previous domain was loaded, else false
 	 */
 	loadPreviousDomain: function(n) {
-		if (this._minDomainReached) {
+		if (this._minDomainReached || n === 0) {
 			return false;
 		}
 
@@ -1555,7 +1555,8 @@ CalHeatMap.prototype = {
 	/**
 	 * Return whether a date is inside the scope determined by maxDate
 	 *
-	 * @return bool
+	 * @param int datetimestamp The timestamp in ms to test
+	 * @return bool True if the specified date correspond to the calendar upper bound
 	 */
 	maxDomainIsReached: function(datetimestamp) {
 		return (this.options.maxDate !== null && (this.options.maxDate.getTime() < datetimestamp));
@@ -1564,12 +1565,18 @@ CalHeatMap.prototype = {
 	/**
 	 * Return whether a date is inside the scope determined by minDate
 	 *
-	 * @return bool
+	 * @param int datetimestamp The timestamp in ms to test
+	 * @return bool True if the specified date correspond to the calendar lower bound
 	 */
 	minDomainIsReached: function (datetimestamp) {
 		return (this.options.minDate !== null && (this.options.minDate.getTime() >= datetimestamp));
 	},
 
+	/**
+	 * Return the list of the calendar's domain timestamp
+	 *
+	 * @return Array a sorted array of timestamp
+	 */
 	getDomainKeys: function() {
 		return this._domains.keys()
 			.map(function(d) { return parseInt(d, 10); })
@@ -1784,9 +1791,63 @@ CalHeatMap.prototype = {
 	// =========================================================================//
 
 	/**
-	 * Return a range of week number
-	 * @param  number|Date	d	A date, or timestamp in milliseconds
-	 * @return Date				The start of the hour
+	 * Return all the minutes between 2 dates
+	 *
+	 * @param  Date	d	date	A date
+	 * @param  int|date	range	Number of minutes in the range, or a stop date
+	 * @return array	An array of minutes
+	 */
+	getMinuteDomain: function (d, range) {
+		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
+		var stop = range;
+		if (typeof range !== "object") {
+			stop = new Date(start.getTime() + 60 * 1000 * range);
+		}
+
+		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
+	},
+
+	/**
+	 * Return all the hours between 2 dates
+	 *
+	 * @param  Date	d	A date
+	 * @param  int|date	range	Number of hours in the range, or a stop date
+	 * @return array	An array of hours
+	 */
+	getHourDomain: function (d, range) {
+		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
+		var stop = range;
+		if (typeof range !== "object") {
+			stop = new Date(start.getTime() + 3600 * 1000 * range);
+		}
+
+		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+	},
+
+	/**
+	 * Return all the days between 2 dates
+	 *
+	 * @param  Date		d		A date
+	 * @param  int|date	range	Number of days in the range, or a stop date
+	 * @return array	An array of weeks
+	 */
+	getDayDomain: function (d, range) {
+		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		var stop = range;
+		if (typeof range !== "object") {
+			stop = new Date(start);
+			stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
+		}
+
+		return d3.time.days(Math.min(start, stop), Math.max(start, stop));
+	},
+
+	/**
+	 * Return all the weeks between 2 dates
+	 *
+	 * @param  Date	d	A date
+	 * @param  int|date	range	Number of minutes in the range, or a stop date
+	 * @return array	An array of weeks
 	 */
 	getWeekDomain: function (d, range) {
 		var weekStart;
@@ -1806,7 +1867,10 @@ CalHeatMap.prototype = {
 
 		var endDate = new Date(weekStart);
 
-		var stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
+		var stop = range;
+		if (typeof range !== "object") {
+			stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
+		}
 
 		return (this.options.weekStartOnMonday === true) ?
 			d3.time.mondays(Math.min(weekStart, stop), Math.max(weekStart, stop)):
@@ -1814,69 +1878,46 @@ CalHeatMap.prototype = {
 		;
 	},
 
-	getYearDomain: function(d, range){
-		var start = new Date(d.getFullYear(), 0);
-		var stop = new Date(d.getFullYear()+range, 0);
-
-		return d3.time.years(Math.min(start, stop), Math.max(start, stop));
-	},
-
 	/**
-	 * Return all the minutes between from the same hour
-	 * @param  number|Date	d	A date, or timestamp in milliseconds
-	 * @return Date				The start of the hour
-	 */
-	getMinuteDomain: function (d, range) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		var stop = new Date(start.getTime() + 60 * 1000 * range);
-
-		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
-	},
-
-	/**
-	 * Return the start of an hour
-	 * @param  number|Date	d	A date, or timestamp in milliseconds
-	 * @return Date				The start of the hour
-	 */
-	getHourDomain: function (d, range) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-		var stop = new Date(start.getTime() + 3600 * 1000 * range);
-
-		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
-	},
-
-	/**
-	 * Return the start of an hour
-	 * @param  number|Date	d		A date, or timestamp in milliseconds
-	 * @param  int			range	Number of days in the range
-	 * @return Date					The start of the hour
-	 */
-	getDayDomain: function (d, range) {
-		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-		var stop = new Date(start);
-		stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
-
-		return d3.time.days(Math.min(start, stop), Math.max(start, stop));
-	},
-
-	/**
-	 * Return the month domain for the current date
-	 * @param  Date		d	A date
-	 * @return Array
+	 * Return all the months between 2 dates
+	 *
+	 * @param  Date		d		A date
+	 * @param  int|date	range	Number of months in the range, or a stop date
+	 * @return array	An array of months
 	 */
 	getMonthDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth());
-		var stop = new Date(start);
-		stop = stop.setMonth(stop.getMonth()+range);
+		var stop = range;
+		if (typeof range !== "object") {
+			stop = new Date(start);
+			stop = stop.setMonth(stop.getMonth()+range);
+		}
 
 		return d3.time.months(Math.min(start, stop), Math.max(start, stop));
+	},
+
+	/**
+	 * Return all the years between 2 dates
+	 *
+	 * @param  Date	d	date	A date
+	 * @param  int|date	range	Number of minutes in the range, or a stop date
+	 * @return array	An array of hours
+	 */
+	getYearDomain: function(d, range){
+		var start = new Date(d.getFullYear(), 0);
+		var stop = range;
+		if (typeof range !== "object") {
+			stop = new Date(d.getFullYear()+range, 0);
+		}
+
+		return d3.time.years(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
 	 * Get an array of domain start dates
 	 *
 	 * @param  int|Date date A random date included in the wanted domain
-	 * @param  int range Number of dates to get
+	 * @param  int|Date range Number of dates to get, or a stop date
 	 * @return Array of dates
 	 */
 	getDomain: function(date, range) {
@@ -2206,6 +2247,36 @@ CalHeatMap.prototype = {
 			n = 1;
 		}
 		return this.loadPreviousDomain(n);
+	},
+
+	/**
+	 * Jump directly to a specific date
+	 *
+	 * JumpTo will scroll the calendar until the wanted domain with the specified
+	 * date is visible. Unless you set reset to true, the wanted domain
+	 * will not necessarily be the first (leftmost) domain of the calendar.
+	 *
+	 * @param Date date Jump to the domain containing that date
+	 * @param bool reset Whether the wanted domain should be the first domain of the calendar
+	 * @param bool True of the calendar was scrolled
+	 */
+	jumpTo: function(date, reset) {
+		if (arguments.length < 2) {
+			reset = false;
+		}
+		var domains = this.getDomainKeys();
+		var firstDomain = domains[0];
+		var lastDomain = domains[domains.length-1];
+
+		if (date > firstDomain && date <= lastDomain && reset) {
+			return this.loadNextDomain(this.getDomain(firstDomain, date).length);
+		} else if (date < firstDomain) {
+			return this.loadPreviousDomain(this.getDomain(firstDomain, date).length);
+		} else if (date > lastDomain) {
+			return this.loadNextDomain(this.getDomain(lastDomain, date).length);
+		}
+
+		return false;
 	},
 
 	/**
