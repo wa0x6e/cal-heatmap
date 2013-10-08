@@ -1070,7 +1070,7 @@ var CalHeatMap = function() {
 				var htmlClass = self.getHighlightClassName(d.t);
 
 				if (self.legendScale === null) {
-					htmlClass = " graph-rect";
+					htmlClass += " graph-rect";
 				}
 
 				if (d.v !== null) {
