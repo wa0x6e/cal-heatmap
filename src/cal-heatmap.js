@@ -1538,7 +1538,7 @@ CalHeatMap.prototype = {
 			}
 		);
 
-		this.afterLoadPreviousDomain(newDomains);
+		this.afterLoadPreviousDomain(newDomains[0]);
 
 		if (this.minDomainIsReached(newDomains[0])) {
 			this.onMinDomainReached(true);

@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.1 [2013-10-07]
+
+* [fix] Fix broken `afterLoadPreviousDomain` callback
+
 ## v3.3.0 [2013-10-07]
 
 * [new] Add `jumpTo()` method to scroll the calendar to the specified date
