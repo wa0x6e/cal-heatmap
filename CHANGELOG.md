@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.2 [2013-10-08]
+
+* [Fix] Fix#45: Fix loss of htmlClass (e.g. highlight) for graph rects with zero scale
+
 ## v3.3.1 [2013-10-07]
 
 * [fix] Fix broken `afterLoadPreviousDomain` callback
