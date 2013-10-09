@@ -117,6 +117,7 @@ text.now
 	background: #222;
 	color: #bbb;
 	font-size: 12px;
+	line-height: 1.4;
 	width: 140px;
 	position: absolute;
 	z-index: 99999;
