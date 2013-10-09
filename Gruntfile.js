@@ -32,7 +32,8 @@ module.exports = function(grunt) {
             base: {
                 src: "<%= pkg.name %>.css",
                 rules: {
-                    "known-properties": false
+                    "known-properties": false,
+                    "box-sizing": false
                 }
             }
         },
