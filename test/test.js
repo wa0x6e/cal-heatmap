@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.0 (Mon Oct 07 2013 18:56:45)
+/*! cal-heatmap v3.3.3 (Wed Oct 09 2013 18:17:57)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -2266,19 +2266,19 @@ test("itemSelector accept a valid document.querySelector or CSS3 string value", 
 
 	var cal = new CalHeatMap();
 	equal(cal.init({itemSelector: "#a", paintOnLoad: false}), true, "#a is a valid itemSelector");
-	equal($("#a .graph").length, 1, "Graph is appended to #a");
+	equal($("#a .cal-heatmap-container").length, 1, "Calendar is appended to #a");
 
 	equal(cal.init({itemSelector: "#a + #b", paintOnLoad: false}), true, "#a + #b is a valid itemSelector");
-	equal($("#b .graph").length, 1, "Graph is appended to #a + #b");
+	equal($("#b .cal-heatmap-container").length, 1, "Calendar is appended to #a + #b");
 
 	equal(cal.init({itemSelector: "div[data=y]", paintOnLoad: false}), true, "div[data=y] is a valid itemSelector");
-	equal($("div[data=y] .graph").length, 1, "Graph is appended to div[data=y]");
+	equal($("div[data=y] .cal-heatmap-container").length, 1, "Calendar is appended to div[data=y]");
 
 	equal(cal.init({itemSelector: ".u", paintOnLoad: false}), true, ".u is a valid itemSelector");
-	equal($(".u .graph").length, 1, "Graph is appended to .u");
+	equal($(".u .cal-heatmap-container").length, 1, "Calendar is appended to .u");
 
-	equal(cal.init({itemSelector: "#test div:last-child", paintOnLoad: false}), true, "#test div:last-child is a valid itemSelector");
-	equal($("#last .graph").length, 1, "Graph is appended to #test div:last-child");
+	equal(cal.init({itemSelector: "#test > div:last-child", paintOnLoad: false}), true, "#test > div:last-child is a valid itemSelector");
+	equal($("#last .cal-heatmap-container").length, 1, "Calendar is appended to #test > div:last-child");
 
 	$("#test").remove();
 });

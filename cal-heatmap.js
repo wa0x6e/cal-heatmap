@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.1 (Tue Oct 08 2013 14:03:04)
+/*! cal-heatmap v3.3.3 (Wed Oct 09 2013 18:17:57)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -223,6 +223,8 @@ var CalHeatMap = function() {
 		previousSelector: false,
 
 		itemNamespace: "cal-heatmap",
+
+		tooltip: false,
 
 		// ================================================
 		// EVENTS CALLBACK
@@ -604,6 +606,7 @@ var CalHeatMap = function() {
 	this.DEFAULT_LEGEND_MARGIN = 10;
 
 	this.root = null;
+	this.tooltip = null;
 
 	this._maxDomainReached = false;
 	this._minDomainReached = false;
@@ -623,6 +626,10 @@ var CalHeatMap = function() {
 		});
 
 		self.root = d3.select(self.options.itemSelector).append("svg").attr("class", "cal-heatmap-container");
+
+		self.tooltip = d3.select(self.options.itemSelector).attr("style", "position:relative;").append("div")
+			.attr("class", "ch-tooltip")
+		;
 
 		self.root.attr("x", 0).attr("y", 0).append("svg").attr("class", "graph");
 
@@ -881,11 +888,36 @@ var CalHeatMap = function() {
 				if (self.legendScale !== null && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("base")) {
 					selection.attr("fill", self.options.legendColors.base);
 				}
+
+				if (self.options.tooltip) {
+					selection.on("mouseover", function(d) {
+						var domainNode = this.parentNode.parentNode.parentNode;
+
+						self.tooltip
+						.html(self.getSubDomainTitle(d))
+						.attr("style", "display: block;")
+						;
+
+						self.tooltip.attr("style",
+							"display: block; " +
+							"left: " + (self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + self.options.cellSize/2 + parseInt(domainNode.getAttribute("x"), 10)) + "px; " +
+							"top: " + (self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - self.options.cellSize/2 + parseInt(domainNode.getAttribute("y"), 10)) + "px;")
+						;
+					});
+
+					selection.on("mouseout", function() {
+						self.tooltip
+						.attr("style", "display:none")
+						.html("");
+					});
+				}
 			})
 		;
 
 		// Appending a title to each subdomain
-		rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainDateFormat); });
+		if (!self.options.tooltip) {
+			rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainDateFormat); });
+		}
 
 		// =========================================================================//
 		// PAINTING LABEL															//
@@ -1097,27 +1129,7 @@ var CalHeatMap = function() {
 		;
 
 		rect.transition().duration(self.options.animationDuration).select("title")
-			.text(function(d) {
-
-				if (d.v === null && !self.options.considerMissingDataAsZero) {
-					return (self.options.subDomainTitleFormat.empty).format({
-						date: self.formatDate(new Date(d.t), self.options.subDomainDateFormat)
-					});
-				} else {
-					var value = d.v;
-					// Consider null as 0
-					if (value === null && self.options.considerMissingDataAsZero) {
-						value = 0;
-					}
-
-					return (self.options.subDomainTitleFormat.filled).format({
-						count: self.formatNumber(value),
-						name: self.options.itemName[(value !== 1 ? 1: 0)],
-						connector: self._domainType[self.options.subDomain].format.connector,
-						date: self.formatDate(new Date(d.t), self.options.subDomainDateFormat)
-					});
-				}
-			})
+			.text(function(d) { return self.getSubDomainTitle(d); })
 		;
 	};
 
@@ -1410,6 +1422,27 @@ CalHeatMap.prototype = {
 		} else {
 			var f = d3.time.format(format);
 			return f(d);
+		}
+	},
+
+	getSubDomainTitle: function(d) {
+		if (d.v === null && !this.options.considerMissingDataAsZero) {
+			return (this.options.subDomainTitleFormat.empty).format({
+				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
+			});
+		} else {
+			var value = d.v;
+			// Consider null as 0
+			if (value === null && this.options.considerMissingDataAsZero) {
+				value = 0;
+			}
+
+			return (this.options.subDomainTitleFormat.filled).format({
+				count: this.formatNumber(value),
+				name: this.options.itemName[(value !== 1 ? 1: 0)],
+				connector: this._domainType[this.options.subDomain].format.connector,
+				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
+			});
 		}
 	},
 
