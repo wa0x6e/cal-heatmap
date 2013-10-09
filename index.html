@@ -62,6 +62,7 @@
 								<li><a href="#label">label</a></li>
 								<li><a href="#colLimit">colLimit</a></li>
 								<li><a href="#rowLimit">rowLimit</a></li>
+								<li><a href="#tooltip">tooltip</a></li>
 								<li>
 								</li>
 							</ul>
@@ -1061,6 +1062,47 @@ cal.init({
 	rowLimit: 10,
 	range: 1,
 	displayLegend: false
+});
+						})();
+					</script>
+				</div>
+			</div>
+
+			<h4 id="tooltip">tooltip</h4> <strong class="version-added">3.3.3+</strong>
+			<div class="option-type">boolean</div>
+			<div class="option-default"><code>false</code></div>
+
+			<p>Whether to display a tooltip when hovering over a date.</p>
+
+			<div class="example clearfix empty-calendar">
+				<div>
+					<div id="tooltip-a"></div>
+					<p>Default title on hover</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#tooltip-a",
+	domain: "month",
+	range: 1,
+	displayLegend: false
+});
+						})();
+					</script>
+				</div>
+
+				<div>
+					<div id="tooltip-b"></div>
+					<p>Tooltip on hover</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#tooltip-b",
+	domain: "month",
+	range: 1,
+	displayLegend: false,
+	tooltip: true
 });
 						})();
 					</script>
