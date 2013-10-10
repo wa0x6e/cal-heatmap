@@ -1,7 +1,7 @@
 {
   "name": "cal-heatmap",
   "version": "3.3.3",
-  "description": "Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph",
+  "description": "Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data",
   "keywords": [
     "calendar",
     "graph",
@@ -13,7 +13,7 @@
     "test": "test"
   },
   "dependencies": {
-    "d3": "~v3.0.6"
+    "d3": ">= v3.0.6"
   },
   "devDependencies": {
     "karma": "~0.8",
