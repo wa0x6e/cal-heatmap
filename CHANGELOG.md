@@ -1,12 +1,16 @@
 # Changelog
 
+## v3.3.4 [2013-10-10]
+
+* [fix] Fix #47: Increase d3 version dependency
+
 ## v3.3.3 [2013-10-09]
 
 * [new] Add tooltip on date hover
 
 ## v3.3.2 [2013-10-08]
 
-* [Fix] Fix#45: Fix loss of htmlClass (e.g. highlight) for graph rects with zero scale
+* [Fix] Fix #45: Fix loss of htmlClass (e.g. highlight) for graph rects with zero scale
 
 ## v3.3.1 [2013-10-07]
 
