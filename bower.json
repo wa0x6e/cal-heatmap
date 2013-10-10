@@ -15,7 +15,10 @@
   "licence": "MIT",
   "ignore": [
     "test/",
-    "src/"
+    "src/",
+    "Gruntfile.js",
+    "karma.conf.js",
+    "package.json"
   ],
   "author": {
     "name": "Wan Qi Chen",
