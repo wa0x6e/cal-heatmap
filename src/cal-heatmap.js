@@ -656,14 +656,14 @@ var CalHeatMap = function() {
 			if (self.options.nextSelector !== false) {
 				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function() {
 					d3.event.preventDefault();
-					return self.loadNextDomain();
+					return self.loadNextDomain(1);
 				});
 			}
 
 			if (self.options.previousSelector !== false) {
 				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function() {
 					d3.event.preventDefault();
-					return self.loadPreviousDomain();
+					return self.loadPreviousDomain(1);
 				});
 			}
 
@@ -676,9 +676,10 @@ var CalHeatMap = function() {
 				self.afterLoad();
 			}
 
+			var domains = self.getDomainKeys();
+
 			// Fill the graph with some datas
 			if (self.options.loadOnInit) {
-				var domains = self.getDomainKeys();
 				self.getDatas(
 					self.options.data,
 					new Date(domains[0]),
@@ -690,6 +691,15 @@ var CalHeatMap = function() {
 				);
 			} else {
 				self.onComplete();
+			}
+
+			// Check for calendar limits
+			if (self.minDomainIsReached(domains[0])) {
+				self.onMinDomainReached(true);
+			}
+
+			if (self.maxDomainIsReached(self.getNextDomain().getTime())) {
+				self.onMaxDomainReached(true);
 			}
 		}
 
@@ -1455,10 +1465,6 @@ CalHeatMap.prototype = {
 			return false;
 		}
 
-		if (arguments.length === 0) {
-			n = 1;
-		}
-
 		var newDomains = this.getDomain(this.getNextDomain(), n);
 
 		var parent = this;
@@ -1499,13 +1505,13 @@ CalHeatMap.prototype = {
 
 		this.afterLoadNextDomain(newDomains[newDomains.length-1]);
 
-		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
-			this.onMaxDomainReached(true);
-		}
-
 		// Try to "disengage" the min domain reached setting
 		if (this._minDomainReached && !this.minDomainIsReached(domains[1])) {
 			this.onMinDomainReached(false);
+		}
+
+		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
+			this.onMaxDomainReached(true);
 		}
 
 		return true;
@@ -1522,10 +1528,6 @@ CalHeatMap.prototype = {
 	loadPreviousDomain: function(n) {
 		if (this._minDomainReached || n === 0) {
 			return false;
-		}
-
-		if (arguments.length === 0) {
-			n = 1;
 		}
 
 		var domains = this.getDomainKeys();
