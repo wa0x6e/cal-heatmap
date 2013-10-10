@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.3 (Wed Oct 09 2013 18:17:57)
+/*! cal-heatmap v3.3.3 (Wed Oct 09 2013 22:58:32)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data, a la github contribution graph
  *  https://github.com/kamisama/cal-heatmap
@@ -251,6 +251,290 @@ _testJumpTo(
 	true,
 	new Date(2000, 5)
 );
+
+/*
+	-----------------------------------------------------------------
+	API
+	-----------------------------------------------------------------
+ */
+
+module("API : next()");
+
+function _testNext(title, count, expectedReturn, expectedStartDate, startDate, maxDate) {
+
+	if (arguments.length < 5) {
+		startDate = new Date(2000, 0);
+	}
+
+	if (arguments.length < 6) {
+		maxDate = new Date(2000, 11);
+	}
+
+	test(title, function() {
+		expect(2);
+
+		var cal = createCalendar( {
+			domain: "month",
+			start: startDate,
+			range: 4,
+			loadOnInit: true,
+			paintOnLoad: true,
+			maxDate: maxDate
+		});
+
+		equal((count === null ? cal.next() : cal.next(count)), expectedReturn, "next() should return " + expectedReturn);
+		equal(cal.getDomainKeys()[0], +expectedStartDate, "Calendar should start on " + expectedStartDate.toDateString());
+	});
+}
+
+/*
+
+  Test:
+	- Calling next() without any argument
+	- Calling next(n) with n = 1
+	- Calling next(1) with n > 1
+	- Calling next() when maxDate is reached
+ */
+
+_testNext(
+	"Shift one domain forward with next()",
+	null,
+	true,
+	new Date(2000, 1)
+);
+
+_testNext(
+	"Shift three domains forward with next(3)",
+	3,
+	true,
+	new Date(2000, 3)
+);
+
+_testNext(
+	"Shift eight domains forward with next(8)",
+	8,
+	true,
+	new Date(2000, 8)
+);
+
+_testNext(
+	"Shifting does not go beyond maxDate",
+	11,
+	true,
+	new Date(2000, 8)
+);
+
+_testNext(
+	"Shifting does not go beyond maxDate",
+	25,
+	true,
+	new Date(2000, 8)
+);
+
+_testNext(
+	"next() do nothing when maxDate === startDate",
+	null,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 0)
+);
+
+_testNext(
+	"next() do nothing when maxDate is 'inside' the calendar",
+	null,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 2)
+);
+
+_testNext(
+	"next() d nothing when maxDate is the last domain of the calendar",
+	null,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 3)
+);
+
+_testNext(
+	"next(10) do nothing when maxDate === startDate",
+	10,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 0)
+);
+
+_testNext(
+	"next(10) do nothing when maxDate is 'inside' the calendar",
+	10,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 2)
+);
+
+_testNext(
+	"next(10) d nothing when maxDate is the last domain of the calendar",
+	10,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 3)
+);
+
+test("Calling next when minDate is reached remove the minDomainReached state", function() {
+	expect(2);
+
+	var cal = createCalendar( {
+		domain: "month",
+		start: new Date(2000, 0),
+		range: 4,
+		loadOnInit: true,
+		paintOnLoad: true,
+		minDate: new Date(2000, 0)
+	});
+
+	equal(true, cal._minDomainReached, "Min domain is reached on calendar init");
+	cal.next();
+	equal(false, cal._minDomainReached, "Min domain is not reached after next()");
+});
+
+/*
+	-----------------------------------------------------------------
+	API
+	-----------------------------------------------------------------
+ */
+
+module("API : previous()");
+
+function _testPrevious(title, count, expectedReturn, expectedStartDate, startDate, minDate) {
+
+	if (arguments.length < 5) {
+		startDate = new Date(2000, 0);
+	}
+
+	if (arguments.length < 6) {
+		minDate = new Date(1999, 2);
+	}
+
+	test(title, function() {
+		expect(2);
+
+		var cal = createCalendar( {
+			domain: "month",
+			start: startDate,
+			range: 4,
+			loadOnInit: true,
+			paintOnLoad: true,
+			minDate: minDate,
+			maxDate: new Date(2000, 3)
+		});
+
+		equal((count === null ? cal.previous() : cal.previous(count)), expectedReturn, "previous() should return " + expectedReturn);
+		equal(cal.getDomainKeys()[0], +expectedStartDate, "Calendar should start on " + expectedStartDate.toDateString());
+	});
+}
+
+/*
+
+  Test:
+	- Calling previous() without any argument
+	- Calling previous(n) with n = 1
+	- Calling previous(1) with n > 1
+	- Calling previous() when minDate is reached
+ */
+
+_testPrevious(
+	"Shift one domain backward with previous()",
+	null,
+	true,
+	new Date(1999, 11)
+);
+
+_testPrevious(
+	"Shift three domains backward with previous(3)",
+	3,
+	true,
+	new Date(1999, 9)
+);
+
+_testPrevious(
+	"Shift eight domains backward with previous(8)",
+	8,
+	true,
+	new Date(1999, 4)
+);
+
+_testPrevious(
+	"Shifting does not go beyond minDate",
+	11,
+	true,
+	new Date(1999, 2)
+);
+
+_testPrevious(
+	"Shifting does not go beyond minDate",
+	25,
+	true,
+	new Date(1999, 2)
+);
+
+_testPrevious(
+	"previous() do nothing when minDate === startDate",
+	null,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 0)
+);
+
+_testPrevious(
+	"previous() do nothing when minDate is 'inside' the calendar",
+	null,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 2)
+);
+
+_testPrevious(
+	"previous(10) do nothing when minDate === startDate",
+	10,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 0)
+);
+
+_testPrevious(
+	"previous(10) do nothing when minDate is 'inside' the calendar",
+	10,
+	false,
+	new Date(2000, 0),
+	new Date(2000, 0),
+	new Date(2000, 2)
+);
+
+test("Calling previous when maxDate is reached remove the maxDomainReached state", function() {
+	expect(2);
+
+	var cal = createCalendar( {
+		domain: "month",
+		start: new Date(2000, 0),
+		range: 4,
+		loadOnInit: true,
+		paintOnLoad: true,
+		maxDate: new Date(2000, 3)
+	});
+
+	equal(true, cal._maxDomainReached, "Max domain is reached on calendar init");
+	cal.previous();
+	equal(false, cal._maxDomainReached, "Max domain is not reached after previous()");
+});
+
 
 /*
 	-----------------------------------------------------------------
