@@ -710,7 +710,7 @@ var CalHeatMap = function() {
 	// @param int d Domain start timestamp
 	function w(d, outer) {
 		var width = self.options.cellSize*self._domainType[self.options.subDomain].column(d) + self.options.cellPadding*self._domainType[self.options.subDomain].column(d);
-		if (typeof outer !== "undefined" && outer === true) {
+		if (arguments.length === 2 && outer === true) {
 			return width += self.domainHorizontalLabelWidth + self.options.domainGutter + self.options.domainMargin[1] + self.options.domainMargin[3];
 		}
 		return width;
@@ -719,7 +719,7 @@ var CalHeatMap = function() {
 	// Return the height of the domain block, without the domain gutter
 	function h(d, outer) {
 		var height = self.options.cellSize*self._domainType[self.options.subDomain].row(d) + self.options.cellPadding*self._domainType[self.options.subDomain].row(d);
-		if (typeof outer !== "undefined" && outer === true) {
+		if (arguments.length === 2 && outer === true) {
 			height += self.options.domainGutter + self.domainVerticalLabelHeight + self.options.domainMargin[0] + self.options.domainMargin[2];
 		}
 		return height;
@@ -732,7 +732,7 @@ var CalHeatMap = function() {
 	 */
 	this.paint = function(navigationDir) {
 
-		if (typeof navigationDir === "undefined") {
+		if (arguments.length === 0) {
 			navigationDir = false;
 		}
 
@@ -1415,7 +1415,7 @@ CalHeatMap.prototype = {
 	formatNumber: d3.format(",g"),
 
 	formatDate: function(d, format) {
-		if (typeof format === "undefined") {
+		if (arguments.length < 2) {
 			format = "title";
 		}
 
@@ -1638,8 +1638,7 @@ CalHeatMap.prototype = {
 	 * @param  timestamp date Date of the current subDomain
 	 * @return String the highlight class
 	 */
-	getHighlightClassName: function(d)
-	{
+	getHighlightClassName: function(d) {
 		d = new Date(d);
 
 		if (this.options.highlight.length > 0) {
@@ -1835,7 +1834,7 @@ CalHeatMap.prototype = {
 	getMinuteDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
 		var stop = null;
-		if (typeof range === "object") {
+		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
 			stop = new Date(start.getTime() + 60 * 1000 * range);
@@ -1854,7 +1853,7 @@ CalHeatMap.prototype = {
 	getHourDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
 		var stop = null;
-		if (typeof range === "object") {
+		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
 			stop = new Date(start.getTime() + 3600 * 1000 * range);
@@ -1873,7 +1872,7 @@ CalHeatMap.prototype = {
 	getDayDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 		var stop = null;
-		if (typeof range === "object") {
+		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate());
 		} else {
 			stop = new Date(start);
@@ -1929,7 +1928,7 @@ CalHeatMap.prototype = {
 	getMonthDomain: function (d, range) {
 		var start = new Date(d.getFullYear(), d.getMonth());
 		var stop = null;
-		if (typeof range === "object") {
+		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth());
 		} else {
 			stop = new Date(start);
@@ -1949,7 +1948,7 @@ CalHeatMap.prototype = {
 	getYearDomain: function(d, range){
 		var start = new Date(d.getFullYear(), 0);
 		var stop = null;
-		if (typeof range === "object") {
+		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), 0);
 		} else {
 			stop = new Date(d.getFullYear()+range, 0);
