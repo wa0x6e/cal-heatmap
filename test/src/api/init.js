@@ -1,10 +1,11 @@
 /*
 	-----------------------------------------------------------------
 	SETTINGS
+	Test options passed to init()
 	-----------------------------------------------------------------
  */
 
-module( "Settings" );
+module("API: init()");
 
 test("Allow only valid domain", function() {
 
