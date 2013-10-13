@@ -225,6 +225,7 @@ var CalHeatMap = function() {
 		onClick: null,
 
 		// Callback after painting the empty calendar
+		// Can be used to trigger an API call, once the calendar is ready to be filled
 		afterLoad: null,
 
 		// Callback after loading the next domain in the calendar
@@ -285,8 +286,7 @@ var CalHeatMap = function() {
 				connector: "at"
 			},
 			extractUnit: function(d) {
-				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes());
-				return dt.getTime();
+				return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()).getTime();
 			}
 		},
 		"hour": {
@@ -354,8 +354,7 @@ var CalHeatMap = function() {
 				connector: "at"
 			},
 			extractUnit: function(d) {
-				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-				return dt.getTime();
+				return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours()).getTime();
 			}
 		},
 		"day": {
@@ -384,6 +383,7 @@ var CalHeatMap = function() {
 				}
 
 				d = new Date(d);
+
 				switch(self.options.domain) {
 				case "year":
 					if (self.options.rowLimit > 0) {
@@ -443,8 +443,7 @@ var CalHeatMap = function() {
 				connector: "on"
 			},
 			extractUnit: function(d) {
-				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-				return dt.getTime();
+				return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 			}
 		},
 		"week": {
@@ -533,8 +532,7 @@ var CalHeatMap = function() {
 				connector: "on"
 			},
 			extractUnit: function(d) {
-				var dt = new Date(d.getFullYear(), d.getMonth());
-				return dt.getTime();
+				return new Date(d.getFullYear(), d.getMonth()).getTime();
 			}
 		},
 		"year": {
@@ -552,8 +550,7 @@ var CalHeatMap = function() {
 				connector: "on"
 			},
 			extractUnit: function(d) {
-				var dt = new Date(d.getFullYear());
-				return dt.getTime();
+				return new Date(d.getFullYear()).getTime();
 			}
 		}
 	};
@@ -651,83 +648,69 @@ var CalHeatMap = function() {
 		self.Legend = new Legend(self);
 
 		if (self.options.paintOnLoad) {
-
-			self.verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
-
-			self.domainVerticalLabelHeight = self.options.label.height === null ? Math.max(25, self.options.cellSize*2): self.options.label.height;
-			self.domainHorizontalLabelWidth = 0;
-
-			if (self.options.domainLabelFormat === "" && self.options.label.height === null) {
-				self.domainVerticalLabelHeight = 0;
-			}
-
-			if (!self.verticalDomainLabel) {
-				self.domainVerticalLabelHeight = 0;
-				self.domainHorizontalLabelWidth = self.options.label.width;
-			}
-
-			// @todo: check validity
-			if (typeof self.options.domainMargin === "number") {
-				self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
-			}
-
-			self.paint();
-
-			// =========================================================================//
-			// ATTACHING DOMAIN NAVIGATION EVENT										//
-			// =========================================================================//
-			if (self.options.nextSelector !== false) {
-				d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function() {
-					d3.event.preventDefault();
-					return self.loadNextDomain(1);
-				});
-			}
-
-			if (self.options.previousSelector !== false) {
-				d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function() {
-					d3.event.preventDefault();
-					return self.loadPreviousDomain(1);
-				});
-			}
-
-			// Display legend if needed
-			if (self.options.displayLegend) {
-				self.Legend.redraw(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
-			}
-
-			if (self.options.afterLoad !== null) {
-				self.afterLoad();
-			}
-
-			var domains = self.getDomainKeys();
-
-			// Fill the graph with some datas
-			if (self.options.loadOnInit) {
-				self.getDatas(
-					self.options.data,
-					new Date(domains[0]),
-					self.getSubDomain(domains[domains.length-1]).pop(),
-					function() {
-						self.fill();
-						self.onComplete();
-					}
-				);
-			} else {
-				self.onComplete();
-			}
-
-			// Check for calendar limits
-			if (self.minDomainIsReached(domains[0])) {
-				self.onMinDomainReached(true);
-			}
-
-			if (self.maxDomainIsReached(self.getNextDomain().getTime())) {
-				self.onMaxDomainReached(true);
-			}
+			_initCalendar();
 		}
 
 		return true;
 	};
+
+	function _initCalendar() {
+		self.verticalDomainLabel = (self.options.label.position === "top" || self.options.label.position === "bottom");
+
+		self.domainVerticalLabelHeight = self.options.label.height === null ? Math.max(25, self.options.cellSize*2): self.options.label.height;
+		self.domainHorizontalLabelWidth = 0;
+
+		if (self.options.domainLabelFormat === "" && self.options.label.height === null) {
+			self.domainVerticalLabelHeight = 0;
+		}
+
+		if (!self.verticalDomainLabel) {
+			self.domainVerticalLabelHeight = 0;
+			self.domainHorizontalLabelWidth = self.options.label.width;
+		}
+
+		self.paint();
+
+		// =========================================================================//
+		// ATTACHING DOMAIN NAVIGATION EVENT										//
+		// =========================================================================//
+		if (self.options.nextSelector !== false) {
+			d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function() {
+				d3.event.preventDefault();
+				return self.loadNextDomain(1);
+			});
+		}
+
+		if (self.options.previousSelector !== false) {
+			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function() {
+				d3.event.preventDefault();
+				return self.loadPreviousDomain(1);
+			});
+		}
+
+		self.Legend.redraw(self.graphDim.width - self.options.domainGutter - self.options.cellPadding);
+		self.afterLoad();
+
+		var domains = self.getDomainKeys();
+
+		// Fill the graph with some datas
+		if (self.options.loadOnInit) {
+			self.getDatas(
+				self.options.data,
+				new Date(domains[0]),
+				self.getSubDomain(domains[domains.length-1]).pop(),
+				function() {
+					self.fill();
+					self.onComplete();
+				}
+			);
+		} else {
+			self.onComplete();
+		}
+
+		self.checkIfMinDomainIsReached(domains[0]);
+		self.checkIfMaxDomainIsReached(self.getNextDomain().getTime());
+	}
 
 	// Return the width of the domain block, without the domain gutter
 	// @param int d Domain start timestamp
@@ -1116,16 +1099,17 @@ var CalHeatMap = function() {
 		// Resize the root container
 		self.resize();
 	};
-
-
-
-
-
-
 };
 
 CalHeatMap.prototype = {
 
+	/**
+	 * Validate and merge user settings with default settings
+	 *
+	 * @param  {object} settings User settings
+	 * @return {bool} False if settings contains error
+	 */
+	/* jshint maxstatements:false */
 	init: function(settings) {
 		"use strict";
 
@@ -1133,44 +1117,35 @@ CalHeatMap.prototype = {
 
 		parent.options = mergeRecursive(parent.options, settings);
 
+		// Fatal errors
+		// Stop script execution on error
 		try {
 			validateDomainType();
 			validateSelector(parent.options.itemSelector, false, "itemSelector");
 			validateSelector(parent.options.nextSelector, true, "nextSelector");
 			validateSelector(parent.options.previousSelector, true, "previousSelector");
+
+			if (parent.allowedDataType.indexOf(parent.options.dataType) < 0) {
+				throw new Error("The data type '" + parent.options.dataType + "' is not valid data type");
+			}
+
+			if (d3.select(parent.options.itemSelector)[0][0] === null) {
+				throw new Error("The node specified in itemSelector does not exists");
+			}
 		} catch(error) {
 			console.log(error.message);
 			return false;
 		}
 
+		// If other settings contains error, will fallback to default
+
 		if (!settings.hasOwnProperty("subDomain")) {
 			this.options.subDomain = getOptimalSubDomain(settings.domain);
-		}
-
-		if (parent.allowedDataType.indexOf(parent.options.dataType) < 0) {
-			console.log("The data type '" + parent.options.dataType + "' is not valid data type");
-			return false;
-		}
-
-		if (d3.select(parent.options.itemSelector)[0][0] === null) {
-			console.log("The node specified in itemSelector does not exists");
-			return false;
 		}
 
 		if (typeof parent.options.itemNamespace !== "string" || parent.options.itemNamespace === "") {
 			console.log("itemNamespace can not be empty, falling back to cal-heatmap");
 			parent.options.itemNamespace = "cal-heatmap";
-		}
-
-		if (settings.hasOwnProperty("rowLimit") && settings.hasOwnProperty("colLimit") && settings.rowLimit > 0 && settings.colLimit > 0) {
-			console.log("colLimit and rowLimit are mutually exclusive, rowLimit will be ignored");
-			parent.options.rowLimit = null;
-		}
-
-		if (typeof parent.options.itemName === "string") {
-			parent.options.itemName = [parent.options.itemName, parent.options.itemName + "s"];
-		} else if (Array.isArray(parent.options.itemName) && parent.options.itemName.length === 1) {
-			parent.options.itemName = [parent.options.itemName[0], parent.options.itemName[0] + "s"];
 		}
 
 		// Don't touch these settings
@@ -1182,25 +1157,17 @@ CalHeatMap.prototype = {
 			}
 		}
 
-		if (typeof parent.options.highlight === "string") {
-			if (parent.options.highlight === "now") {
-				parent.options.highlight = [new Date()];
-			} else {
-				parent.options.highlight = [];
-			}
-		} else if (Array.isArray(parent.options.highlight)) {
-			var i = parent.options.highlight.indexOf("now");
-			if (i !== -1) {
-				parent.options.highlight.splice(i, 1);
-				parent.options.highlight.push(new Date());
-			}
-		}
-
 		parent.options.subDomainDateFormat = parent.options.subDomainDateFormat || this._domainType[parent.options.subDomain].format.date;
 		parent.options.domainLabelFormat = parent.options.domainLabelFormat || this._domainType[parent.options.domain].format.legend;
 		parent.options.domainMargin = expandMarginSetting(parent.options.domainMargin);
 		parent.options.legendMargin = expandMarginSetting(parent.options.legendMargin);
-		autoAddLegendMargin();
+		parent.options.highlight = expandDateSetting(parent.options.highlight);
+		parent.options.itemName = expandItemName(parent.options.itemName);
+		parent.options.colLimit = parseColLimit(parent.options.colLimit);
+		parent.options.rowLimit = parseRowLimit(parent.options.rowLimit);
+		if (!settings.hasOwnProperty("legendMargin")) {
+			autoAddLegendMargin();
+		}
 		autoAlignLabel();
 
 		/**
@@ -1286,7 +1253,6 @@ CalHeatMap.prototype = {
 				} else if (parent.options.label.rotate === "right") {
 					parent.options.label.align = "left";
 				}
-
 			}
 
 			if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
@@ -1305,20 +1271,16 @@ CalHeatMap.prototype = {
 		 * @return void
 		 */
 		function autoAddLegendMargin() {
-			if (!settings.hasOwnProperty("legendMargin")) {
-				if (parent.options.legendVerticalPosition === "top") {
-					parent.options.legendMargin[0] = parent.DEFAULT_LEGEND_MARGIN;
-				} else if (parent.options.legendVerticalPosition === "bottom") {
-					parent.options.legendMargin[2] = parent.DEFAULT_LEGEND_MARGIN;
-				}
-
-				if (parent.options.legendHorizontalPosition === "middle" || parent.options.legendHorizontalPosition === "center") {
-					if (parent.options.legendVerticalPosition === "left") {
-						parent.options.legendMargin[1] = parent.DEFAULT_LEGEND_MARGIN;
-					} else if (parent.options.legendVerticalPosition === "right") {
-						parent.options.legendMargin[3] = parent.DEFAULT_LEGEND_MARGIN;
-					}
-				}
+			switch(parent.options.legendVerticalPosition) {
+			case "top":
+				parent.options.legendMargin[2] = parent.DEFAULT_LEGEND_MARGIN;
+				break;
+			case "bottom":
+				parent.options.legendMargin[0] = parent.DEFAULT_LEGEND_MARGIN;
+				break;
+			case "middle":
+			case "center":
+				parent.options.legendMargin[parent.options.legendHorizontalPosition === "right" ? 3 : 1] = parent.DEFAULT_LEGEND_MARGIN;
 			}
 		}
 
@@ -1342,7 +1304,7 @@ CalHeatMap.prototype = {
 			case 0:
 				return [0, 0, 0, 0];
 			case 1:
-				return [value, value, value, value];
+				return [value[0], value[0], value[0], value[0]];
 			case 2:
 				return [value[0], value[1], value[0], value[1]];
 			case 3:
@@ -1352,6 +1314,69 @@ CalHeatMap.prototype = {
 			default:
 				return value.slice(0, 4);
 			}
+		}
+
+		/**
+		 * Convert a keyword or an array of keyword/date to an array of date objects
+		 *
+		 * @param  {string|array|Date} value Data to convert
+		 * @return {array}       An array of Dates
+		 */
+		function expandDateSetting(value) {
+			if (typeof value === "string") {
+				if (value === "now") {
+					return [new Date()];
+				} else {
+					return [];
+				}
+			} else if (Array.isArray(value)) {
+				return value.map(function(data) {
+					if (data === "now") {
+						return new Date();
+					}
+					if (data instanceof Date) {
+						return data;
+					}
+					return false;
+				}).filter(function(d) { return d !== false; });
+			}
+			return [];
+		}
+
+		/**
+		 * Convert a string to an array like [singular-form, plural-form]
+		 *
+		 * @param  {string|array} value Date to convert
+		 * @return {array}       An array like [singular-form, plural-form]
+		 */
+		function expandItemName(value) {
+			if (typeof value === "string") {
+				return [value, value + (value !== "" ? "s" : "")];
+			}
+
+			if (Array.isArray(value)) {
+				if (value.length === 1) {
+					return [value[0], value[0] + "s"];
+				} else if (value.length > 2) {
+					return value.slice(0, 2);
+				}
+
+				return value;
+			}
+
+			return ["item", "items"];
+		}
+
+		function parseColLimit(value) {
+			return value > 0 ? value : null;
+		}
+
+		function parseRowLimit(value) {
+			if (value > 0 && parent.options.colLimit > 0) {
+				console.log("colLimit and rowLimit are mutually exclusive, rowLimit will be ignored");
+				return null;
+			}
+			return value > 0 ? value : null;
 		}
 
 		return this._init();
@@ -1547,6 +1572,34 @@ CalHeatMap.prototype = {
 		return this.triggerEvent("onMaxDomainReached", [reached]);
 	},
 
+	checkIfMinDomainIsReached: function(date, upperBound) {
+		"use strict";
+
+		if (this.minDomainIsReached(date)) {
+			this.onMinDomainReached(true);
+		}
+
+		if (arguments.length === 2) {
+			if (this._maxDomainReached && !this.maxDomainIsReached(upperBound)) {
+				this.onMaxDomainReached(false);
+			}
+		}
+	},
+
+	checkIfMaxDomainIsReached: function(date, lowerBound) {
+		"use strict";
+
+		if (this.maxDomainIsReached(date)) {
+			this.onMaxDomainReached(true);
+		}
+
+		if (arguments.length === 2) {
+			if (this._minDomainReached && !this.minDomainIsReached(lowerBound)) {
+				this.onMinDomainReached(false);
+			}
+		}
+	},
+
 	// =========================================================================//
 	// FORMATTER																//
 	// =========================================================================//
@@ -1613,15 +1666,7 @@ CalHeatMap.prototype = {
 		var bound = this.loadNewDomains(this.NAVIGATE_RIGHT, this.getDomain(this.getNextDomain(), n));
 
 		this.afterLoadNextDomain(bound.end);
-
-		// Try to "disengage" the min domain reached setting
-		if (this._minDomainReached && !this.minDomainIsReached(bound.start)) {
-			this.onMinDomainReached(false);
-		}
-
-		if (this.maxDomainIsReached(this.getNextDomain().getTime())) {
-			this.onMaxDomainReached(true);
-		}
+		this.checkIfMaxDomainIsReached(this.getNextDomain().getTime(), bound.start);
 
 		return true;
 	},
@@ -1644,15 +1689,7 @@ CalHeatMap.prototype = {
 		var bound = this.loadNewDomains(this.NAVIGATE_LEFT, this.getDomain(this.getDomainKeys()[0], -n).reverse());
 
 		this.afterLoadPreviousDomain(bound.start);
-
-		if (this.minDomainIsReached(bound.start)) {
-			this.onMinDomainReached(true);
-		}
-
-		// Try to "disengage" the max domain reached setting
-		if (this._maxDomainReached && !this.maxDomainIsReached(bound.end)) {
-			this.onMaxDomainReached(false);
-		}
+		this.checkIfMinDomainIsReached(bound.start, bound.end);
 
 		return true;
 	},
@@ -1814,6 +1851,7 @@ CalHeatMap.prototype = {
 	 * @param  Date dateB Secon date to compare
 	 * @return bool true if the 2 dates are equals
 	 */
+	/* jshint maxcomplexity: false */
 	dateIsEqual: function(dateA, dateB) {
 		"use strict";
 
@@ -2172,6 +2210,7 @@ CalHeatMap.prototype = {
 		}
 	},
 
+	/* jshint maxcomplexity: false */
 	getSubDomain: function(date) {
 		"use strict";
 
@@ -2607,9 +2646,7 @@ CalHeatMap.prototype = {
 			this.fill();
 		}
 
-		if (this.options.displayLegend) {
-			this.Legend.redraw(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
-		}
+		this.Legend.redraw(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 	},
 
 	/**
@@ -2858,6 +2895,10 @@ Legend.prototype.remove = function() {
 
 Legend.prototype.redraw = function(width) {
 	"use strict";
+
+	if (!this.calendar.options.displayLegend) {
+		return false;
+	}
 
 	var parent = this;
 	var calendar = this.calendar;
