@@ -2,7 +2,7 @@ module.exports = function(grunt) {
 
 	"use strict";
 
-     var headerComment = "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
+    var headerComment = "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
                 " *  ---------------------------------------------\n" +
                 " *  <%= pkg.description %>\n" +
                 " *  <%= pkg.homepage %>\n" +
@@ -82,6 +82,13 @@ module.exports = function(grunt) {
 			scripts: {
 				files: "test/src/**/*.js",
 				tasks: ["concat:test"],
+				options: {
+					interrupt: true,
+				}
+			},
+			lint: {
+				files: "src/*.js",
+				tasks: ["jshint:lib"],
 				options: {
 					interrupt: true,
 				}
