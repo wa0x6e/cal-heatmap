@@ -43,7 +43,6 @@ test("Allow only known subDomain", function() {
 	equal(c.init({subDomain:"year", domain: "year"}), false, "Min is a valid domain but not a valid subdomain");
 	equal(c.init({subDomain:"notvalid", domain: "month"}), false, "Fail when subdomain is not valid");
 	equal(c.init({subDomain:null, domain: "month"}), false, "Fail when subdomain is null");
-
 });
 
 test("SubDomain must be smaller than domain", function() {
@@ -55,8 +54,6 @@ test("SubDomain must be smaller than domain", function() {
 	equal(c.init({subDomain:"min", domain: "month"}), true, "VALID : subdomain is lower level than domain");
 	equal(c.init({subDomain:"month", domain: "month"}), false, "NOT VALID : subdomain is same level than domain");
 	equal(c.init({subDomain:"year", domain: "month"}), false, "NOT VALID : subdomain is greater level than domain");
-
-
 });
 
 test("Set default domain and subDomain", function() {
@@ -234,61 +231,4 @@ test("Auto align domain label horizontally when rotated", function() {
 
 });
 
-test("Setting namespace", function() {
-	expect(6);
 
-	var cal = new CalHeatMap();
-
-	cal.init({paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not specified");
-
-	cal.init({itemNamespace: "test", paintOnLoad: false});
-	equal(cal.options.itemNamespace, "test", "Namespace can be set via init()");
-
-	cal.init({itemNamespace: "", paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not empty");
-
-	cal.init({itemNamespace: [], paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (array)");
-
-	cal.init({itemNamespace: {}, paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (object)");
-
-	cal.init({itemNamespace: 100, paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (number)");
-});
-
-test("Set itemName from a string", function() {
-	expect(3);
-
-	var cal = new CalHeatMap();
-
-	cal.init({paintOnLoad: false});
-	equal(cal.options.itemName.toString(), ["item", "items"].toString(), "Setting default itemName");
-
-	cal.init({itemName: "car", paintOnLoad: false});
-	equal(cal.options.itemName.toString(), ["car", "cars"].toString(), "Expanding itemName from a string");
-
-	cal.init({itemName: ["car"], paintOnLoad: false});
-	equal(cal.options.itemName.toString(), ["car", "cars"].toString(), "Expanding itemName from an array");
-});
-
-
-test("Highlight consider 'now' string as now", function() {
-	expect(6);
-
-	var cal = new CalHeatMap();
-
-	cal.init({paintOnLoad: false, highlight: "now"});
-	var arr = cal.options.highlight;
-	equal(arr.length, 1, "Convert the string 'now' into an array");
-	equal(arr[0] instanceof Date, true, "'now' is converted to a Date");
-
-	var now = new Date();
-	cal.init({paintOnLoad: false, highlight: ["now", now]});
-	arr = cal.options.highlight;
-	equal(arr.length, 2, "Convert the string 'now' into an array");
-	equal(arr[0] instanceof Date, true, "Date 1 is a Date");
-	equal(arr[1] instanceof Date, true, "Date 2 is a Date");
-	equal(arr[0].getTime(), now.getTime());
-});

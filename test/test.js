@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.3 (Thu Oct 10 2013 22:57:47)
+/*! cal-heatmap v3.3.3 (Sun Oct 13 2013 15:56:55)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -54,6 +54,247 @@ testSkip = QUnit.testSkip;
 /*
 	-----------------------------------------------------------------
 	SETTINGS
+	Test that when no legendMargin is set, margin are automatically
+	computed from legend position and orientation
+	-----------------------------------------------------------------
+ */
+
+module("API: init(legendMargin)");
+
+function __testAutoSetLegendMarginSetting(title, ver, hor, autoMarginIndex) {
+	test("Automatically add margin to " + title, function() {
+		expect(1);
+
+		var margin = [0, 0, 0, 0];
+		var cal = createCalendar({ legendVerticalPosition: ver, legendHorizontalPosition: hor });
+		margin[autoMarginIndex] = cal.DEFAULT_LEGEND_MARGIN;
+
+		deepEqual(cal.options.legendMargin, margin, "domainMargin is set to [" + margin.join(", ") + "]");
+	});
+}
+
+__testAutoSetLegendMarginSetting("bottom", "top", "left", 2);
+__testAutoSetLegendMarginSetting("bottom", "top", "center", 2);
+__testAutoSetLegendMarginSetting("bottom", "top", "right", 2);
+__testAutoSetLegendMarginSetting("top", "bottom", "left", 0);
+__testAutoSetLegendMarginSetting("top", "bottom", "center", 0);
+__testAutoSetLegendMarginSetting("top", "bottom", "right", 0);
+__testAutoSetLegendMarginSetting("right", "middle", "left", 1);
+__testAutoSetLegendMarginSetting("left", "middle", "right", 3);
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test colLimit and rowLimit setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(colLimit)");
+
+function __testcolLimitSetting(title, value, expected) {
+	test("Set colLimit from " + title, function() {
+		expect(1);
+
+		var cal = createCalendar({ colLimit: value });
+		deepEqual(cal.options.colLimit, expected, "colLimit is set to " + expected);
+	});
+}
+
+__testcolLimitSetting("null will disable colLimit", null, null);
+__testcolLimitSetting("false will disable colLimit", false, null);
+__testcolLimitSetting("an invalid value (string) will disable colLimit", false, null);
+__testcolLimitSetting("a valid empty integer will disable colLimit", 0, null);
+__testcolLimitSetting("a valid non-empty integer will set colLimit", 2, 2);
+
+
+module("API: init(rowLimit)");
+
+function __testRowLimitSetting(title, value, expected) {
+	test("Set rowLimit from " + title, function() {
+		expect(1);
+
+		var cal = createCalendar({ rowLimit: value });
+		deepEqual(cal.options.rowLimit, expected, "rowLimit is set to " + expected);
+	});
+}
+
+__testRowLimitSetting("null will disable rowLimit", null, null);
+__testRowLimitSetting("false will disable rowLimit", false, null);
+__testRowLimitSetting("an invalid value (string) will disable rowLimit", false, null);
+__testRowLimitSetting("a valid empty integer will disable rowLimit", 0, null);
+__testRowLimitSetting("a valid non-integer will set rowLimit", 2, 2);
+
+test("RowLimit is disabled when colLimit is set", function() {
+	expect(1);
+
+	var cal = createCalendar({ colLimit: 5, rowLimit: 5 });
+	deepEqual(cal.options.rowLimit, null, "rowLimit is disabled");
+});
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test domainMargin and legendMargin setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(domainMargin)");
+
+function __testDomainMarginExpand(title, margin, expectedMargin) {
+	test("Test expanding " + title, function() {
+		expect(1);
+
+		var cal = createCalendar({ domainMargin: margin });
+		deepEqual(cal.options.domainMargin, expectedMargin, (Array.isArray(margin) ? "["+margin.join(", ")+"]" : margin) + " is expanded to [" + expectedMargin.join(", ") + "]");
+	});
+}
+
+__testDomainMarginExpand("a null integer", 0, [0,0,0,0]);
+__testDomainMarginExpand("a non-null integer", 10, [10,10,10,10]);
+__testDomainMarginExpand("a one-value (zero) array", [0], [0,0,0,0]);
+__testDomainMarginExpand("a one-value (five) array", [5], [5,5,5,5]);
+__testDomainMarginExpand("a two-value array", [5, 10], [5,10,5,10]);
+__testDomainMarginExpand("a three-value array", [5, 10, 15], [5,10,15,10]);
+__testDomainMarginExpand("a four-value array", [5, 10, 15, 20], [5,10,15,20]);
+__testDomainMarginExpand("a six-value array", [5, 10, 15, 20, 30, 40], [5,10,15,20]);
+__testDomainMarginExpand("an invalid (string) value fallback to 0", "string", [0,0,0,0]);
+__testDomainMarginExpand("an invalid (empty string) value fallback to 0", "", [0,0,0,0]);
+
+
+
+module("API: init(legendMargin)");
+
+function __testDomainLegendExpand(title, margin, expectedMargin) {
+	test("Test expanding " + title, function() {
+		expect(1);
+
+		var cal = createCalendar({ legendMargin: margin });
+		deepEqual(cal.options.legendMargin, expectedMargin, (Array.isArray(margin) ? "["+margin.join(", ")+"]" : margin) + " is expanded to [" + expectedMargin.join(", ") + "]");
+	});
+}
+
+__testDomainLegendExpand("a null integer", 0, [0,0,0,0]);
+__testDomainLegendExpand("a non-null integer", 10, [10,10,10,10]);
+__testDomainLegendExpand("a one-value (zero) array", [0], [0,0,0,0]);
+__testDomainLegendExpand("a one-value (five) array", [5], [5,5,5,5]);
+__testDomainLegendExpand("a two-value array", [5, 10], [5,10,5,10]);
+__testDomainLegendExpand("a three-value array", [5, 10, 15], [5,10,15,10]);
+__testDomainLegendExpand("a four-value array", [5, 10, 15, 20], [5,10,15,20]);
+__testDomainLegendExpand("a six-value array", [5, 10, 15, 20, 30, 40], [5,10,15,20]);
+__testDomainLegendExpand("an invalid (string) value fallback to 0", "string", [0,0,0,0]);
+__testDomainLegendExpand("an invalid (empty string) value fallback to 0", "", [0,0,0,0]);
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test highlight setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(highlight)");
+
+function __testHighlightSetting(title, highlight, expected) {
+	test("Test expanding " + title, function() {
+		expect(1);
+
+		var cal = createCalendar({ highlight: highlight });
+		deepEqual(cal.options.highlight, expected, (Array.isArray(highlight) ? "["+highlight.join(", ")+"]" : highlight) + " is expanded to [" + expected.join(", ") + "]");
+	});
+}
+
+__testHighlightSetting("a null string", "", []);
+__testHighlightSetting("a non-valid string", "date", []);
+__testHighlightSetting("an empty array", [], []);
+__testHighlightSetting("a non-empty array, with no valid data", ["date", 0], []);
+__testHighlightSetting("a non-empty array, with one date object", [new Date(2000, 0)], [new Date(2000, 0)]);
+__testHighlightSetting("a non-empty array, with multiple date objects", [new Date(2000, 0), new Date(2001, 0)], [new Date(2000, 0), new Date(2001, 0)]);
+__testHighlightSetting("null", null, []);
+__testHighlightSetting("a boolean", false, []);
+
+test("Test expanding NOW string", function() {
+	expect(3);
+
+	var cal = createCalendar({ highlight: "now" });
+	ok(Array.isArray(cal.options.highlight));
+	equal(cal.options.highlight.length, 1);
+	ok(cal.options.highlight[0] instanceof Date);
+});
+
+test("Test expanding NOW string inside an array of valid dates", function() {
+	expect(4);
+
+	var cal = createCalendar({ highlight: ["now", new Date()] });
+	ok(Array.isArray(cal.options.highlight));
+	equal(cal.options.highlight.length, 2);
+	ok(cal.options.highlight[0] instanceof Date);
+	ok(cal.options.highlight[1] instanceof Date);
+});
+
+test("Test expanding NOW string inside an array of invalid dates", function() {
+	expect(3);
+
+	var cal = createCalendar({ highlight: ["now", "tomorrow"] });
+	ok(Array.isArray(cal.options.highlight));
+	equal(cal.options.highlight.length, 1);
+	ok(cal.options.highlight[0] instanceof Date);
+});
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test itemName setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(itemName)");
+
+function __testItemNameSetting(title, value, expected) {
+	test("Set itemName from " + title, function() {
+		expect(1);
+
+		var cal = createCalendar({ itemName: value });
+		deepEqual(cal.options.itemName, expected, "itemName is set to " + expected);
+	});
+}
+
+__testItemNameSetting("null will fallback to default itemName", null, ["item", "items"]);
+__testItemNameSetting("false will fallback to default itemName", false, ["item", "items"]);
+__testItemNameSetting("an invalid value (number) will fallback to default itemName", 0, ["item", "items"]);
+__testItemNameSetting("an empty string will set an empty string for the singular and plural form", "", ["", ""]);
+__testItemNameSetting("a string will guess the plural form", "cat", ["cat", "cats"]);
+__testItemNameSetting("a 1-value array will guess the plural form", ["cat"], ["cat", "cats"]);
+__testItemNameSetting("a 2-value array will do nothing", ["child", "children"], ["child", "children"]);
+__testItemNameSetting("a 3-value array will only keeps the first 2 values", ["child", "children", "bomb"], ["child", "children"]);
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test itemNamespace setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(itemNamespace)");
+
+function __testItemNamespaceSetting(title, value, expected) {
+	test(title, function() {
+		expect(1);
+
+		var cal = createCalendar({ itemNamespace: value });
+		equal(cal.options.itemNamespace, expected, "itemNamespace is set to " + expected);
+	});
+}
+
+__testItemNamespaceSetting("null will fallback to default namespace", null, "cal-heatmap");
+__testItemNamespaceSetting("false will fallback to default namespace", false, "cal-heatmap");
+__testItemNamespaceSetting("empty string will fallback to default namespace", "", "cal-heatmap");
+__testItemNamespaceSetting("invalid value (array) will fallback to default namespace", [], "cal-heatmap");
+__testItemNamespaceSetting("invalid value (object) will fallback to default namespace", {}, "cal-heatmap");
+__testItemNamespaceSetting("invalid value (number) will fallback to default namespace", 126, "cal-heatmap");
+__testItemNamespaceSetting("Setting a valid namespace from a string", "test-namespace", "test-namespace");
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
 	Test options passed to init()
 	-----------------------------------------------------------------
  */
@@ -96,7 +337,6 @@ test("Allow only known subDomain", function() {
 	equal(c.init({subDomain:"year", domain: "year"}), false, "Min is a valid domain but not a valid subdomain");
 	equal(c.init({subDomain:"notvalid", domain: "month"}), false, "Fail when subdomain is not valid");
 	equal(c.init({subDomain:null, domain: "month"}), false, "Fail when subdomain is null");
-
 });
 
 test("SubDomain must be smaller than domain", function() {
@@ -108,8 +348,6 @@ test("SubDomain must be smaller than domain", function() {
 	equal(c.init({subDomain:"min", domain: "month"}), true, "VALID : subdomain is lower level than domain");
 	equal(c.init({subDomain:"month", domain: "month"}), false, "NOT VALID : subdomain is same level than domain");
 	equal(c.init({subDomain:"year", domain: "month"}), false, "NOT VALID : subdomain is greater level than domain");
-
-
 });
 
 test("Set default domain and subDomain", function() {
@@ -287,64 +525,7 @@ test("Auto align domain label horizontally when rotated", function() {
 
 });
 
-test("Setting namespace", function() {
-	expect(6);
 
-	var cal = new CalHeatMap();
-
-	cal.init({paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not specified");
-
-	cal.init({itemNamespace: "test", paintOnLoad: false});
-	equal(cal.options.itemNamespace, "test", "Namespace can be set via init()");
-
-	cal.init({itemNamespace: "", paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not empty");
-
-	cal.init({itemNamespace: [], paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (array)");
-
-	cal.init({itemNamespace: {}, paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (object)");
-
-	cal.init({itemNamespace: 100, paintOnLoad: false});
-	equal(cal.options.itemNamespace, "cal-heatmap", "Namespace fallback to default when not valid (number)");
-});
-
-test("Set itemName from a string", function() {
-	expect(3);
-
-	var cal = new CalHeatMap();
-
-	cal.init({paintOnLoad: false});
-	equal(cal.options.itemName.toString(), ["item", "items"].toString(), "Setting default itemName");
-
-	cal.init({itemName: "car", paintOnLoad: false});
-	equal(cal.options.itemName.toString(), ["car", "cars"].toString(), "Expanding itemName from a string");
-
-	cal.init({itemName: ["car"], paintOnLoad: false});
-	equal(cal.options.itemName.toString(), ["car", "cars"].toString(), "Expanding itemName from an array");
-});
-
-
-test("Highlight consider 'now' string as now", function() {
-	expect(6);
-
-	var cal = new CalHeatMap();
-
-	cal.init({paintOnLoad: false, highlight: "now"});
-	var arr = cal.options.highlight;
-	equal(arr.length, 1, "Convert the string 'now' into an array");
-	equal(arr[0] instanceof Date, true, "'now' is converted to a Date");
-
-	var now = new Date();
-	cal.init({paintOnLoad: false, highlight: ["now", now]});
-	arr = cal.options.highlight;
-	equal(arr.length, 2, "Convert the string 'now' into an array");
-	equal(arr[0] instanceof Date, true, "Date 1 is a Date");
-	equal(arr[1] instanceof Date, true, "Date 2 is a Date");
-	equal(arr[0].getTime(), now.getTime());
-});
 
 /*
 	-----------------------------------------------------------------
@@ -893,6 +1074,31 @@ test("Show not existing legend", function() {
 	notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend is now added into the DOM");
 });
 
+
+/*
+	-----------------------------------------------------------------
+	DATE
+	-----------------------------------------------------------------
+ */
+
+module("Date computation : isNow()");
+
+
+test("Now is equal to now", function() {
+	expect(1);
+
+	var cal = createCalendar({});
+
+	ok(cal.isNow(new Date()));
+});
+
+test("Passed date is not equal to now", function() {
+	expect(1);
+
+	var cal = createCalendar({});
+
+	equal(cal.isNow(new Date(2000, 0)), false);
+});
 
 /*
 	-----------------------------------------------------------------
