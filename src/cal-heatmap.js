@@ -1296,7 +1296,7 @@ CalHeatMap.prototype = {
 			}
 
 			if (!Array.isArray(value)) {
-				console.log("Margin only takes an integer of an array of integers");
+				console.log("Margin only takes an integer or an array of integers");
 				value = [0];
 			}
 
@@ -2393,10 +2393,8 @@ CalHeatMap.prototype = {
 					d3.text(this.parseURI(source, startDate, endDate), "text/plain", _callback);
 					break;
 				}
-
-				return false;
 			}
-			break;
+			return false;
 		case "object":
 			// Check that source is really a valid json object
 			if (source === Object(source) && Object.prototype.toString.call(source) !== "[object Array]") {
@@ -2919,11 +2917,7 @@ Legend.prototype.redraw = function(width) {
 		;
 	} else {
 		// Creating the new legend DOM if it doesn't already exist
-		if (calendar.options.legendVerticalPosition === "top") {
-			legend = legend.insert("svg", ".graph");
-		} else {
-			legend = legend.append("svg");
-		}
+		legend = calendar.options.legendVerticalPosition === "top" ? legend.insert("svg", ".graph") : legend.append("svg");
 
 		legend
 			.attr("x", getLegendXPosition())
@@ -2987,24 +2981,24 @@ Legend.prototype.redraw = function(width) {
 	}
 
 	legendItem.select("title").text(function(d, i) {
-			if (i === 0) {
-				return (calendar.options.legendTitleFormat.lower).format({
-					min: calendar.options.legend[i],
-					name: calendar.options.itemName[1]
-				});
-			} else if (i === _legend.length-1) {
-				return (calendar.options.legendTitleFormat.upper).format({
-					max: calendar.options.legend[i-1],
-					name: calendar.options.itemName[1]
-				});
-			} else {
-				return (calendar.options.legendTitleFormat.inner).format({
-					down: calendar.options.legend[i-1],
-					up: calendar.options.legend[i],
-					name: calendar.options.itemName[1]
-				});
-			}
-		})
+		if (i === 0) {
+			return (calendar.options.legendTitleFormat.lower).format({
+				min: calendar.options.legend[i],
+				name: calendar.options.itemName[1]
+			});
+		} else if (i === _legend.length-1) {
+			return (calendar.options.legendTitleFormat.upper).format({
+				max: calendar.options.legend[i-1],
+				name: calendar.options.itemName[1]
+			});
+		} else {
+			return (calendar.options.legendTitleFormat.inner).format({
+				down: calendar.options.legend[i-1],
+				up: calendar.options.legend[i],
+				name: calendar.options.itemName[1]
+			});
+		}
+	})
 	;
 
 	legend.transition().duration(calendar.options.animationDuration)
