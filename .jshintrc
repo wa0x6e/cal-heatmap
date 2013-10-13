@@ -1,23 +1,33 @@
 {
+	"camelcase": true,
 	"curly":	 true,
 	"eqeqeq":	 true,
+	"forin": 	 true,
+	"immed":	 true,
+	"indent":	 4,
+	"newcap": 	 true,
 	"noarg":	 true,
 	"noempty":	 true,
-	"undef":	 true,
+	"nonew":	 true,
 	"quotmark":	 "double",
+	"undef":	 true,
+	"unused": 	 true,
+	"strict":    true,
+	"trailing":	 true,
+	"maxparams": 6,
+	"maxdepth":  3,
+	"maxstatements": 75,
+	"maxcomplexity": 75,
+
 	"boss":	 true,
-	"regexdash":	 true,
+
 	"browser":	 true,
 	"devel":	 true,
-	"wsh":	 true,
-	"trailing":	 true,
 	"jquery":	 true,
-	"loopfunc":	 true,
-	"unused": true,
+	"phantom":	 true,
 
-	"predef" : [
-		"d3",
-		"define",
-		"Element"
-	]
+	"globals" : {
+		"d3": true,
+		"define": true
+	}
 }

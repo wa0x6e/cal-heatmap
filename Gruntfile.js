@@ -19,7 +19,7 @@ module.exports = function(grunt) {
                 jshintrc: ".jshintrc"
             },
             lib: {
-                src: ["<%= pkg.name %>.js"]
+                src: ["src/<%= pkg.name %>.js"]
             },
             test: {
                 options: {
