@@ -1,10 +1,9 @@
 var CalHeatMap = function() {
-
 	"use strict";
 
 	var self = this;
 
-	var allowedDataType = ["json", "csv", "tsv", "txt"];
+	this.allowedDataType = ["json", "csv", "tsv", "txt"];
 
 	// Default settings
 	this.options = {
@@ -64,7 +63,7 @@ var CalHeatMap = function() {
 		// URL, where to fetch the original datas
 		data: "",
 
-		dataType: allowedDataType[0],
+		dataType: this.allowedDataType[0],
 
 		// Whether to consider missing date:value from the datasource
 		// as equal to 0, or just leave them as missing
@@ -635,7 +634,7 @@ var CalHeatMap = function() {
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
 	 */
-	function _init() {
+	this._init = function() {
 
 		self.getDomain(self.options.start).map(function(d) { return d.getTime(); }).map(function(d) {
 			self._domains.set(d, self.getSubDomain(d).map(function(d) { return {t: self._domainType[self.options.subDomain].extractUnit(d), v: null}; }));
@@ -728,7 +727,7 @@ var CalHeatMap = function() {
 		}
 
 		return true;
-	}
+	};
 
 	// Return the width of the domain block, without the domain gutter
 	// @param int d Domain start timestamp
@@ -1118,6 +1117,247 @@ var CalHeatMap = function() {
 		self.resize();
 	};
 
+
+
+
+
+
+};
+
+CalHeatMap.prototype = {
+
+	init: function(settings) {
+		"use strict";
+
+		var parent = this;
+
+		parent.options = mergeRecursive(parent.options, settings);
+
+		try {
+			validateDomainType();
+			validateSelector(parent.options.itemSelector, false, "itemSelector");
+			validateSelector(parent.options.nextSelector, true, "nextSelector");
+			validateSelector(parent.options.previousSelector, true, "previousSelector");
+		} catch(error) {
+			console.log(error.message);
+			return false;
+		}
+
+		if (!settings.hasOwnProperty("subDomain")) {
+			this.options.subDomain = getOptimalSubDomain(settings.domain);
+		}
+
+		if (parent.allowedDataType.indexOf(parent.options.dataType) < 0) {
+			console.log("The data type '" + parent.options.dataType + "' is not valid data type");
+			return false;
+		}
+
+		if (d3.select(parent.options.itemSelector)[0][0] === null) {
+			console.log("The node specified in itemSelector does not exists");
+			return false;
+		}
+
+		if (typeof parent.options.itemNamespace !== "string" || parent.options.itemNamespace === "") {
+			console.log("itemNamespace can not be empty, falling back to cal-heatmap");
+			parent.options.itemNamespace = "cal-heatmap";
+		}
+
+		if (settings.hasOwnProperty("rowLimit") && settings.hasOwnProperty("colLimit") && settings.rowLimit > 0 && settings.colLimit > 0) {
+			console.log("colLimit and rowLimit are mutually exclusive, rowLimit will be ignored");
+			parent.options.rowLimit = null;
+		}
+
+		if (typeof parent.options.itemName === "string") {
+			parent.options.itemName = [parent.options.itemName, parent.options.itemName + "s"];
+		} else if (Array.isArray(parent.options.itemName) && parent.options.itemName.length === 1) {
+			parent.options.itemName = [parent.options.itemName[0], parent.options.itemName[0] + "s"];
+		}
+
+		// Don't touch these settings
+		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
+
+		for (var k in s) {
+			if (settings.hasOwnProperty(s[k])) {
+				parent.options[s[k]] = settings[s[k]];
+			}
+		}
+
+		if (typeof parent.options.highlight === "string") {
+			if (parent.options.highlight === "now") {
+				parent.options.highlight = [new Date()];
+			} else {
+				parent.options.highlight = [];
+			}
+		} else if (Array.isArray(parent.options.highlight)) {
+			var i = parent.options.highlight.indexOf("now");
+			if (i !== -1) {
+				parent.options.highlight.splice(i, 1);
+				parent.options.highlight.push(new Date());
+			}
+		}
+
+		parent.options.subDomainDateFormat = parent.options.subDomainDateFormat || this._domainType[parent.options.subDomain].format.date;
+		parent.options.domainLabelFormat = parent.options.domainLabelFormat || this._domainType[parent.options.domain].format.legend;
+		parent.options.domainMargin = expandMarginSetting(parent.options.domainMargin);
+		parent.options.legendMargin = expandMarginSetting(parent.options.legendMargin);
+		autoAddLegendMargin();
+		autoAlignLabel();
+
+		/**
+		 * Validate that a queryString is valid
+		 *
+		 * @param  {Element|string|bool} selector   The queryString to test
+		 * @param  {bool}	canBeFalse	Whether false is an accepted and valid value
+		 * @param  {string} name		Name of the tested selector
+		 * @throws {Error}				If the selector is not valid
+		 * @return {bool}				True if the selector is a valid queryString
+		 */
+		function validateSelector(selector, canBeFalse, name) {
+			if (((canBeFalse && selector === false) || selector instanceof Element || typeof selector === "string") && selector !== "") {
+				return true;
+			}
+			throw new Error("The " + name + " is not valid");
+		}
+
+		/**
+		 * Return the optimal subDomain for the specified domain
+		 *
+		 * @param  {string} domain a domain name
+		 * @return {string}        the subDomain name
+		 */
+		function getOptimalSubDomain(domain) {
+			switch(domain) {
+			case "year":
+				return "month";
+			case "month":
+				return "day";
+			case "week":
+				return "day";
+			case "day":
+				return "hour";
+			default:
+				return "min";
+			}
+		}
+
+		/**
+		 * Ensure that the domain and subdomain are valid
+		 *
+		 * @throw {Error} when domain or subdomain are not valid
+		 * @return {bool} True if domain and subdomain are valid and compatible
+		 */
+		function validateDomainType() {
+			if (!parent._domainType.hasOwnProperty(parent.options.domain) || parent.options.domain === "min" || parent.options.domain.substring(0, 2) === "x_") {
+				throw new Error("The domain '" + parent.options.domain + "' is not valid");
+			}
+
+			if (!parent._domainType.hasOwnProperty(parent.options.subDomain) || parent.options.subDomain === "year") {
+				throw new Error("The subDomain '" + parent.options.subDomain + "' is not valid");
+			}
+
+			if (parent._domainType[parent.options.domain].level <= parent._domainType[parent.options.subDomain].level) {
+				throw new Error("'" + parent.options.subDomain + "' is not a valid subDomain to '" + parent.options.domain +  "'");
+			}
+
+			return true;
+		}
+
+		/**
+		 * Fine-tune the label alignement depending on its position
+		 *
+		 * @return void
+		 */
+		function autoAlignLabel() {
+			// Auto-align label, depending on it's position
+			if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("align"))) {
+				switch(parent.options.label.position) {
+				case "left":
+					parent.options.label.align = "right";
+					break;
+				case "right":
+					parent.options.label.align = "left";
+					break;
+				default:
+					parent.options.label.align = "center";
+				}
+
+				if (parent.options.label.rotate === "left") {
+					parent.options.label.align = "right";
+				} else if (parent.options.label.rotate === "right") {
+					parent.options.label.align = "left";
+				}
+
+			}
+
+			if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
+				if (parent.options.label.position === "left" || parent.options.label.position === "right") {
+					parent.options.label.offset = {
+						x: 10,
+						y: 15
+					};
+				}
+			}
+		}
+
+		/**
+		 * If not specified, add some margin around the legend depending on its position
+		 *
+		 * @return void
+		 */
+		function autoAddLegendMargin() {
+			if (!settings.hasOwnProperty("legendMargin")) {
+				if (parent.options.legendVerticalPosition === "top") {
+					parent.options.legendMargin[0] = parent.DEFAULT_LEGEND_MARGIN;
+				} else if (parent.options.legendVerticalPosition === "bottom") {
+					parent.options.legendMargin[2] = parent.DEFAULT_LEGEND_MARGIN;
+				}
+
+				if (parent.options.legendHorizontalPosition === "middle" || parent.options.legendHorizontalPosition === "center") {
+					if (parent.options.legendVerticalPosition === "left") {
+						parent.options.legendMargin[1] = parent.DEFAULT_LEGEND_MARGIN;
+					} else if (parent.options.legendVerticalPosition === "right") {
+						parent.options.legendMargin[3] = parent.DEFAULT_LEGEND_MARGIN;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Expand a number of an array of numbers to an usable 4 values array
+		 *
+		 * @param  {integer|array} value
+		 * @return {array}        array
+		 */
+		function expandMarginSetting(value) {
+			if (typeof value === "number") {
+				value = [value];
+			}
+
+			if (!Array.isArray(value)) {
+				console.log("Margin only takes an integer of an array of integers");
+				value = [0];
+			}
+
+			switch(value.length) {
+			case 0:
+				return [0, 0, 0, 0];
+			case 1:
+				return [value, value, value, value];
+			case 2:
+				return [value[0], value[1], value[0], value[1]];
+			case 3:
+				return [value[0], value[1], value[2], value[1]];
+			case 4:
+				return value;
+			default:
+				return value.slice(0, 4);
+			}
+		}
+
+		return this._init();
+
+	},
+
 	/**
 	 * Fill the calendar by coloring the cells
 	 *
@@ -1125,53 +1365,57 @@ var CalHeatMap = function() {
 	 *                  It's used to limit the painting to only a subset of the calendar
 	 * @return void
 	 */
-	this.fill = function(svg) {
+	fill: function(svg) {
+		"use strict";
+
+		var parent = this;
+
 		if (arguments.length === 0) {
-			svg = self.root.selectAll(".graph-domain");
+			svg = parent.root.selectAll(".graph-domain");
 		}
 
 		var rect = svg
 			.selectAll("svg").selectAll("g")
-			.data(function(d) { return self._domains.get(d); })
+			.data(function(d) { return parent._domains.get(d); })
 		;
 
 		/**
 		 * Colorize the cell via a style attribute if enabled
 		 */
 		function addStyle(element) {
-			if (self.legendScale === null) {
+			if (parent.legendScale === null) {
 				return false;
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === 0 && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("empty")) {
-					return self.options.legendColors.empty;
+				if (d.v === 0 && parent.options.legendColors !== null && parent.options.legendColors.hasOwnProperty("empty")) {
+					return parent.options.legendColors.empty;
 				}
 
-				if (d.v < 0 && self.options.legend[0] > 0 && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("overflow")) {
-					return self.options.legendColors.overflow;
+				if (d.v < 0 && parent.options.legend[0] > 0 && parent.options.legendColors !== null && parent.options.legendColors.hasOwnProperty("overflow")) {
+					return parent.options.legendColors.overflow;
 				}
 
-				return self.legendScale(Math.min(d.v, self.options.legend[self.options.legend.length-2]));
+				return parent.legendScale(Math.min(d.v, parent.options.legend[parent.options.legend.length-2]));
 			});
 		}
 
-		rect.transition().duration(self.options.animationDuration).select("rect")
+		rect.transition().duration(parent.options.animationDuration).select("rect")
 			.attr("class", function(d) {
 
-				var htmlClass = self.getHighlightClassName(d.t);
+				var htmlClass = parent.getHighlightClassName(d.t);
 
-				if (self.legendScale === null) {
+				if (parent.legendScale === null) {
 					htmlClass += " graph-rect";
 				}
 
 				if (d.v !== null) {
-					htmlClass += " " + self.Legend.getClass(d.v, (self.legendScale === null));
-				} else if (self.options.considerMissingDataAsZero) {
-					htmlClass += " " + self.Legend.getClass(0, (self.legendScale === null));
+					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
+				} else if (parent.options.considerMissingDataAsZero) {
+					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
 
-				if (self.options.onClick !== null) {
+				if (parent.options.onClick !== null) {
 					htmlClass += " hover_cursor";
 				}
 
@@ -1180,206 +1424,10 @@ var CalHeatMap = function() {
 			.call(addStyle)
 		;
 
-		rect.transition().duration(self.options.animationDuration).select("title")
-			.text(function(d) { return self.getSubDomainTitle(d); })
+		rect.transition().duration(parent.options.animationDuration).select("title")
+			.text(function(d) { return parent.getSubDomainTitle(d); })
 		;
-	};
-
-	this.init = function(settings) {
-
-		self.options = mergeRecursive(self.options, settings);
-
-		if (!this._domainType.hasOwnProperty(self.options.domain) || self.options.domain === "min" || self.options.domain.substring(0, 2) === "x_") {
-			console.log("The domain '" + self.options.domain + "' is not valid");
-			return false;
-		}
-
-		if (!this._domainType.hasOwnProperty(self.options.subDomain) || self.options.subDomain === "year") {
-			console.log("The subDomain '" + self.options.subDomain + "' is not valid");
-			return false;
-		}
-
-		if (this._domainType[self.options.domain].level <= this._domainType[self.options.subDomain].level) {
-			console.log("'" + self.options.subDomain + "' is not a valid subDomain to '" + self.options.domain +  "'");
-			return false;
-		}
-
-		// Set the most suitable subdomain for the domain
-		// if subDomain is not explicitly specified
-		if (!settings.hasOwnProperty("subDomain")) {
-			switch(self.options.domain) {
-			case "year":
-				self.options.subDomain = "month";
-				break;
-			case "month":
-				self.options.subDomain = "day";
-				break;
-			case "week":
-				self.options.subDomain = "day";
-				break;
-			case "day":
-				self.options.subDomain = "hour";
-				break;
-			default:
-				self.options.subDomain = "min";
-			}
-		}
-
-		if (allowedDataType.indexOf(self.options.dataType) < 0) {
-			console.log("The data type '" + self.options.dataType + "' is not valid data type");
-			return false;
-		}
-
-		if (self.options.subDomainDateFormat === null) {
-			self.options.subDomainDateFormat = this._domainType[self.options.subDomain].format.date;
-		}
-
-		if (self.options.domainLabelFormat === null) {
-			self.options.domainLabelFormat = this._domainType[self.options.domain].format.legend;
-		}
-
-		// Auto-align label, depending on it's position
-		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("align"))) {
-			switch(self.options.label.position) {
-			case "left":
-				self.options.label.align = "right";
-				break;
-			case "right":
-				self.options.label.align = "left";
-				break;
-			default:
-				self.options.label.align = "center";
-			}
-
-			if (self.options.label.rotate === "left") {
-				self.options.label.align = "right";
-			} else if (self.options.label.rotate === "right") {
-				self.options.label.align = "left";
-			}
-
-		}
-
-		if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
-			if (self.options.label.position === "left" || self.options.label.position === "right") {
-				self.options.label.offset = {
-					x: 10,
-					y: 15
-				};
-			}
-		}
-
-		if (validateSelector(self.options.itemSelector)) {
-			console.log("The itemSelector is invalid");
-			return false;
-		}
-
-		if (d3.select(self.options.itemSelector)[0][0] === null) {
-			console.log("The node specified in itemSelector does not exists");
-			return false;
-		}
-
-		if (self.options.nextSelector !== false && validateSelector(self.options.nextSelector)) {
-			console.log("The nextSelector is invalid");
-			return false;
-		}
-
-		if (self.options.previousSelector !== false && validateSelector(self.options.previousSelector)) {
-			console.log("The previousSelector is invalid");
-			return false;
-		}
-
-		if (typeof self.options.itemNamespace !== "string" || self.options.itemNamespace === "") {
-			console.log("itemNamespace can not be empty, falling back to cal-heatmap");
-			self.options.itemNamespace = "cal-heatmap";
-		}
-
-		if (typeof self.options.domainMargin === "number") {
-			self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
-		}
-
-		if (settings.hasOwnProperty("rowLimit") && settings.hasOwnProperty("colLimit") && settings.rowLimit > 0 && settings.colLimit > 0) {
-			console.log("colLimit and rowLimit are mutually exclusive, rowLimit will be ignored");
-			self.options.rowLimit = null;
-		}
-
-		if (Array.isArray(self.options.domainMargin)) {
-			switch(self.options.domainMargin.length) {
-			case 0:
-				self.options.domainMargin = [0, 0, 0, 0];
-				break;
-			case 1:
-				self.options.domainMargin = [self.options.domainMargin, self.options.domainMargin, self.options.domainMargin, self.options.domainMargin];
-				break;
-			case 2:
-				self.options.domainMargin = [self.options.domainMargin[0], self.options.domainMargin[1], self.options.domainMargin[0], self.options.domainMargin[1]];
-				break;
-			case 3:
-				self.options.domainMargin = [self.options.domainMargin[0], self.options.domainMargin[1], self.options.domainMargin[2], self.options.domainMargin[1]];
-				break;
-			case 4:
-				self.options.domainMargin = self.options.domainMargin;
-				break;
-			default:
-				self.options.domainMargin.splice(4);
-			}
-		}
-
-		if (typeof self.options.itemName === "string") {
-			self.options.itemName = [self.options.itemName, self.options.itemName + "s"];
-		} else if (Array.isArray(self.options.itemName) && self.options.itemName.length === 1) {
-			self.options.itemName = [self.options.itemName[0], self.options.itemName[0] + "s"];
-		}
-
-		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
-
-		for (var k in s) {
-			if (settings.hasOwnProperty(s[k])) {
-				self.options[s[k]] = settings[s[k]];
-			}
-		}
-
-		if (typeof self.options.highlight === "string") {
-			if (self.options.highlight === "now") {
-				self.options.highlight = [new Date()];
-			} else {
-				self.options.highlight = [];
-			}
-		} else if (Array.isArray(self.options.highlight)) {
-			var i = self.options.highlight.indexOf("now");
-			if (i !== -1) {
-				self.options.highlight.splice(i, 1);
-				self.options.highlight.push(new Date());
-			}
-		}
-
-		if (!settings.hasOwnProperty("legendMargin")) {
-			if (self.options.legendVerticalPosition === "top") {
-				self.options.legendMargin[0] = self.DEFAULT_LEGEND_MARGIN;
-			} else if (self.options.legendVerticalPosition === "bottom") {
-				self.options.legendMargin[2] = self.DEFAULT_LEGEND_MARGIN;
-			}
-
-			if (self.options.legendHorizontalPosition === "middle" || self.options.legendHorizontalPosition === "center") {
-				if (self.options.legendVerticalPosition === "left") {
-					self.options.legendMargin[1] = self.DEFAULT_LEGEND_MARGIN;
-				} else if (self.options.legendVerticalPosition === "right") {
-					self.options.legendMargin[3] = self.DEFAULT_LEGEND_MARGIN;
-				}
-			}
-		}
-
-
-		function validateSelector(selector) {
-			return ((!(selector instanceof Element) && typeof selector !== "string") || selector === "");
-		}
-
-		return _init();
-
-	};
-};
-
-CalHeatMap.prototype = {
+	},
 
 	// =========================================================================//
 	// EVENTS CALLBACK															//
