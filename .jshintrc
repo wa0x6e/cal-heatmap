@@ -17,7 +17,7 @@
 	"maxparams": 6,
 	"maxdepth":  3,
 	"maxstatements": 40,
-	"maxcomplexity": 10,
+	"maxcomplexity": 15,
 
 	"boss":	 true,
 
