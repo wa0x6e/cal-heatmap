@@ -2,11 +2,15 @@ CalHeatMap.prototype.svg = function() {
 	return this.root.selectAll(".graph-domain");
 };
 
-function createCalendar(settings) {
-
-	$("#cal-heatmap").remove();
-
+QUnit.testStart(function( details ) {
 	$("body").append("<div id='cal-heatmap' style='display:none;'></div>");
+});
+
+QUnit.testDone(function( details ) {
+	$("#cal-heatmap").remove();
+});
+
+function createCalendar(settings) {
 
 	var cal = new CalHeatMap();
 	if (!settings.hasOwnProperty("loadOnInit")) {

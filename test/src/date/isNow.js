@@ -6,7 +6,6 @@
 
 module("Date computation : isNow()");
 
-
 test("Now is equal to now", function() {
 	expect(1);
 
