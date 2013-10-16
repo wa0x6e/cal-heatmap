@@ -2410,8 +2410,6 @@ CalHeatMap.prototype = {
 			_callback({});
 			return true;
 		}
-
-		return true;
 	},
 
 	/**
