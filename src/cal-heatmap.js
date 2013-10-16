@@ -2393,7 +2393,7 @@ CalHeatMap.prototype = {
 				case "tsv":
 					d3.tsv(this.parseURI(source, startDate, endDate), _callback);
 					break;
-				case "text":
+				case "txt":
 					d3.text(this.parseURI(source, startDate, endDate), "text/plain", _callback);
 					break;
 				}
