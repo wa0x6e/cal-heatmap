@@ -2366,7 +2366,6 @@ CalHeatMap.prototype = {
 					data = self.options.afterLoadData(data);
 				} else {
 					console.log("Provided callback for afterLoadData is not a function.");
-					return {};
 				}
 			} else if (self.options.dataType === "csv" || self.options.dataType === "tsv") {
 				data = this.interpretCSV(data);
