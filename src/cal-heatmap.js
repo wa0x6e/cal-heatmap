@@ -2368,9 +2368,13 @@ CalHeatMap.prototype = {
 					console.log("Provided callback for afterLoadData is not a function.");
 					return {};
 				}
+			} else if (self.options.dataType === "csv" || self.options.dataType === "tsv") {
+				data = this.interpretCSV(data);
 			}
 			self.parseDatas(data, updateMode, startDate, endDate);
-			callback();
+			if (typeof callback === "function") {
+				callback();
+			}
 		};
 
 		switch(typeof source) {
@@ -2401,6 +2405,10 @@ CalHeatMap.prototype = {
 				_callback(source);
 				return false;
 			}
+			/* falls through */
+		default:
+			_callback({});
+			return true;
 		}
 
 		return true;
@@ -2468,6 +2476,18 @@ CalHeatMap.prototype = {
 		str = str.replace(/\{\{d:end\}\}/g, endDate.toISOString());
 
 		return str;
+	},
+
+	interpretCSV: function(data) {
+		"use strict";
+
+		var d = {};
+		var keys = Object.keys(data[0]);
+		var i, total;
+		for (i = 0, total = data.length; i < total; i++) {
+			d[data[i][keys[0]]] = +data[i][keys[1]];
+		}
+		return d;
 	},
 
 	/**
