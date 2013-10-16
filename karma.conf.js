@@ -17,7 +17,11 @@ module.exports = function(config) {
 			"test/d3.min.js",
 			"src/cal-heatmap.js",
 			"test/jquery-1.9.1.js",
-			"test/test.js"
+			"test/test.js",
+			{
+				pattern: "test/data/data.*",
+				included: false
+			}
 		],
 
 
@@ -68,7 +72,7 @@ module.exports = function(config) {
 		// - Safari (only Mac)
 		// - PhantomJS
 		// - IE (only Windows)
-		browsers: [],
+		browsers: ["PhantomJS"],
 
 
 		// If browser does not capture in given timeout [ms], kill it
