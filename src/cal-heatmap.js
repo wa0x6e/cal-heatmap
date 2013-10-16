@@ -1161,7 +1161,7 @@ CalHeatMap.prototype = {
 		parent.options.domainLabelFormat = parent.options.domainLabelFormat || this._domainType[parent.options.domain].format.legend;
 		parent.options.domainMargin = expandMarginSetting(parent.options.domainMargin);
 		parent.options.legendMargin = expandMarginSetting(parent.options.legendMargin);
-		parent.options.highlight = expandDateSetting(parent.options.highlight);
+		parent.options.highlight = parent.expandDateSetting(parent.options.highlight);
 		parent.options.itemName = expandItemName(parent.options.itemName);
 		parent.options.colLimit = parseColLimit(parent.options.colLimit);
 		parent.options.rowLimit = parseRowLimit(parent.options.rowLimit);
@@ -1317,33 +1317,6 @@ CalHeatMap.prototype = {
 		}
 
 		/**
-		 * Convert a keyword or an array of keyword/date to an array of date objects
-		 *
-		 * @param  {string|array|Date} value Data to convert
-		 * @return {array}       An array of Dates
-		 */
-		function expandDateSetting(value) {
-			if (typeof value === "string") {
-				if (value === "now") {
-					return [new Date()];
-				} else {
-					return [];
-				}
-			} else if (Array.isArray(value)) {
-				return value.map(function(data) {
-					if (data === "now") {
-						return new Date();
-					}
-					if (data instanceof Date) {
-						return data;
-					}
-					return false;
-				}).filter(function(d) { return d !== false; });
-			}
-			return [];
-		}
-
-		/**
 		 * Convert a string to an array like [singular-form, plural-form]
 		 *
 		 * @param  {string|array} value Date to convert
@@ -1381,6 +1354,30 @@ CalHeatMap.prototype = {
 
 		return this._init();
 
+	},
+
+	/**
+	 * Convert a keyword or an array of keyword/date to an array of date objects
+	 *
+	 * @param  {string|array|Date} value Data to convert
+	 * @return {array}       An array of Dates
+	 */
+	expandDateSetting: function(value) {
+		"use strict";
+
+		if (!Array.isArray(value)) {
+			value = [value];
+		}
+
+		return value.map(function(data) {
+				if (data === "now") {
+					return new Date();
+				}
+				if (data instanceof Date) {
+					return data;
+				}
+				return false;
+			}).filter(function(d) { return d !== false; });
 	},
 
 	/**
@@ -2694,6 +2691,16 @@ CalHeatMap.prototype = {
 		this.options.displayLegend = true;
 		this.Legend.redraw(this.graphDim.width - this.options.domainGutter - this.options.cellPadding);
 		return true;
+	},
+
+	highlight: function(args) {
+		"use strict";
+
+		if ((this.options.highlight = this.expandDateSetting(args)) !== []) {
+			this.fill();
+			return true;
+		}
+		return false;
 	},
 
 	getSVG: function() {
