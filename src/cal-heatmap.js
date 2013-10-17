@@ -1119,19 +1119,20 @@ CalHeatMap.prototype = {
 
 		// Fatal errors
 		// Stop script execution on error
+		validateDomainType();
+		validateSelector(parent.options.itemSelector, false, "itemSelector");
+
+		if (parent.allowedDataType.indexOf(parent.options.dataType) < 0) {
+			throw new Error("The data type '" + parent.options.dataType + "' is not valid data type");
+		}
+
+		if (d3.select(parent.options.itemSelector)[0][0] === null) {
+			throw new Error("The node '" + parent.options.itemSelector + "' specified in itemSelector does not exists");
+		}
+
 		try {
-			validateDomainType();
-			validateSelector(parent.options.itemSelector, false, "itemSelector");
 			validateSelector(parent.options.nextSelector, true, "nextSelector");
 			validateSelector(parent.options.previousSelector, true, "previousSelector");
-
-			if (parent.allowedDataType.indexOf(parent.options.dataType) < 0) {
-				throw new Error("The data type '" + parent.options.dataType + "' is not valid data type");
-			}
-
-			if (d3.select(parent.options.itemSelector)[0][0] === null) {
-				throw new Error("The node specified in itemSelector does not exists");
-			}
 		} catch(error) {
 			console.log(error.message);
 			return false;
@@ -1157,8 +1158,9 @@ CalHeatMap.prototype = {
 			}
 		}
 
-		parent.options.subDomainDateFormat = parent.options.subDomainDateFormat || this._domainType[parent.options.subDomain].format.date;
-		parent.options.domainLabelFormat = parent.options.domainLabelFormat || this._domainType[parent.options.domain].format.legend;
+		parent.options.subDomainDateFormat = (typeof parent.options.subDomainDateFormat === "string" || typeof parent.options.subDomainDateFormat === "function" ? parent.options.subDomainDateFormat : this._domainType[parent.options.subDomain].format.date);
+		parent.options.domainLabelFormat = (typeof parent.options.domainLabelFormat === "string" || typeof parent.options.domainLabelFormat === "function" ? parent.options.domainLabelFormat : this._domainType[parent.options.domain].format.legend);
+		parent.options.subDomainTextFormat = ((typeof parent.options.subDomainTextFormat === "string" && parent.options.subDomainTextFormat !== "") || typeof parent.options.subDomainTextFormat === "function" ? parent.options.subDomainTextFormat : null);
 		parent.options.domainMargin = expandMarginSetting(parent.options.domainMargin);
 		parent.options.legendMargin = expandMarginSetting(parent.options.legendMargin);
 		parent.options.highlight = parent.expandDateSetting(parent.options.highlight);
@@ -2895,16 +2897,13 @@ var Legend = function(calendar) {
 Legend.prototype.computeDim = function() {
 	"use strict";
 
-	/*
-		1 extra pixel is added to the width and height
-		to avoid the stroke displayed on hover clipped on webkit
-	 */
+	var options = this.calendar.options; // Shorter accessor for variable name mangling when minifying
 	this.dim = {
 		width:
-			this.calendar.options.legendCellSize * (this.calendar.options.legend.length+1) +
-			this.calendar.options.legendCellPadding * (this.calendar.options.legend.length) + 1,
+			options.legendCellSize * (options.legend.length+1) +
+			options.legendCellPadding * (options.legend.length),
 		height:
-			this.calendar.options.legendCellSize + 1
+			options.legendCellSize
 	};
 };
 
@@ -2926,10 +2925,11 @@ Legend.prototype.redraw = function(width) {
 	var calendar = this.calendar;
 	var legend = calendar.root;
 	var legendItem;
+	var options = calendar.options; // Shorter accessor for variable name mangling when minifying
 
 	this.computeDim();
 
-	var _legend = calendar.options.legend.slice(0);
+	var _legend = options.legend.slice(0);
 	_legend.push(_legend[_legend.length-1]+1);
 
 	var legendElement = calendar.root.select(".graph-legend");
@@ -2941,7 +2941,7 @@ Legend.prototype.redraw = function(width) {
 		;
 	} else {
 		// Creating the new legend DOM if it doesn't already exist
-		legend = calendar.options.legendVerticalPosition === "top" ? legend.insert("svg", ".graph") : legend.append("svg");
+		legend = options.legendVerticalPosition === "top" ? legend.insert("svg", ".graph") : legend.append("svg");
 
 		legend
 			.attr("x", getLegendXPosition())
@@ -2964,18 +2964,18 @@ Legend.prototype.redraw = function(width) {
 		.attr("class", function(d){ return calendar.Legend.getClass(d, (calendar.legendScale === null)); })
 		.attr("fill-opacity", 0)
 		.call(function(selection) {
-			if (calendar.legendScale !== null && calendar.options.legendColors !== null && calendar.options.legendColors.hasOwnProperty("base")) {
-				selection.attr("fill", calendar.options.legendColors.base);
+			if (calendar.legendScale !== null && options.legendColors !== null && options.legendColors.hasOwnProperty("base")) {
+				selection.attr("fill", options.legendColors.base);
 			}
 		})
 		.append("title")
 	;
 
-	legendItem.exit().transition().duration(calendar.options.animationDuration)
+	legendItem.exit().transition().duration(options.animationDuration)
 	.attr("fill-opacity", 0)
 	.remove();
 
-	legendItem.transition().delay(function(d, i) { return calendar.options.animationDuration * i/10; })
+	legendItem.transition().delay(function(d, i) { return options.animationDuration * i/10; })
 		.call(legendCellLayout)
 		.attr("fill-opacity", 1)
 		.call(function(element) {
@@ -2987,7 +2987,7 @@ Legend.prototype.redraw = function(width) {
 				if (i === 0) {
 					return calendar.legendScale(d - 1);
 				}
-				return calendar.legendScale(calendar.options.legend[i-1]);
+				return calendar.legendScale(options.legend[i-1]);
 			});
 
 			element.attr("class", function(d) { return calendar.Legend.getClass(d, (calendar.legendScale === null)); });
@@ -2996,74 +2996,74 @@ Legend.prototype.redraw = function(width) {
 
 	function legendCellLayout(selection) {
 		selection
-			.attr("width", calendar.options.legendCellSize)
-			.attr("height", calendar.options.legendCellSize)
+			.attr("width", options.legendCellSize)
+			.attr("height", options.legendCellSize)
 			.attr("x", function(d, i) {
-				return i * (calendar.options.legendCellSize + calendar.options.legendCellPadding);
+				return i * (options.legendCellSize + options.legendCellPadding);
 			})
 		;
 	}
 
 	legendItem.select("title").text(function(d, i) {
 		if (i === 0) {
-			return (calendar.options.legendTitleFormat.lower).format({
-				min: calendar.options.legend[i],
-				name: calendar.options.itemName[1]
+			return (options.legendTitleFormat.lower).format({
+				min: options.legend[i],
+				name: options.itemName[1]
 			});
 		} else if (i === _legend.length-1) {
-			return (calendar.options.legendTitleFormat.upper).format({
-				max: calendar.options.legend[i-1],
-				name: calendar.options.itemName[1]
+			return (options.legendTitleFormat.upper).format({
+				max: options.legend[i-1],
+				name: options.itemName[1]
 			});
 		} else {
-			return (calendar.options.legendTitleFormat.inner).format({
-				down: calendar.options.legend[i-1],
-				up: calendar.options.legend[i],
-				name: calendar.options.itemName[1]
+			return (options.legendTitleFormat.inner).format({
+				down: options.legend[i-1],
+				up: options.legend[i],
+				name: options.itemName[1]
 			});
 		}
 	})
 	;
 
-	legend.transition().duration(calendar.options.animationDuration)
+	legend.transition().duration(options.animationDuration)
 		.attr("x", getLegendXPosition())
 		.attr("y", getLegendYPosition())
 		.attr("width", parent.getDim("width"))
 		.attr("height", parent.getDim("height"))
 	;
 
-	legend.select("g").transition().duration(calendar.options.animationDuration)
+	legend.select("g").transition().duration(options.animationDuration)
 		.attr("transform", function() {
-			if (calendar.options.legendOrientation === "vertical")	{
-				return "rotate(90 " + calendar.options.legendCellSize/2 + " " + calendar.options.legendCellSize/2 + ")";
+			if (options.legendOrientation === "vertical")	{
+				return "rotate(90 " + options.legendCellSize/2 + " " + options.legendCellSize/2 + ")";
 			}
 			return "";
 		})
 	;
 
 	function getLegendXPosition() {
-		switch(calendar.options.legendHorizontalPosition) {
+		switch(options.legendHorizontalPosition) {
 		case "right":
-			if (calendar.options.legendVerticalPosition === "center" || calendar.options.legendVerticalPosition === "middle") {
-				return width + calendar.options.legendMargin[3];
+			if (options.legendVerticalPosition === "center" || options.legendVerticalPosition === "middle") {
+				return width + options.legendMargin[3];
 			}
-			return width - parent.getDim("width") - calendar.options.legendMargin[1];
+			return width - parent.getDim("width") - options.legendMargin[1];
 		case "middle":
 		case "center":
 			return Math.round(width/2 - parent.getDim("width")/2);
 		default:
-			return calendar.options.legendMargin[3];
+			return options.legendMargin[3];
 		}
 	}
 
 	function getLegendYPosition() {
-		switch(calendar.options.legendVerticalPosition) {
+		switch(options.legendVerticalPosition) {
 		case "center":
 		case "middle":
 		case "top":
-			return calendar.options.legendMargin[0];
+			return options.legendMargin[0];
 		case "bottom":
-			return calendar.graphDim.height + calendar.options.legendMargin[0];
+			return calendar.graphDim.height + options.legendMargin[0] - options.domainGutter - options.cellPadding;
 		}
 	}
 
@@ -3092,23 +3092,25 @@ Legend.prototype.getDim = function(axis) {
 Legend.prototype.buildColors = function() {
 	"use strict";
 
-	if (this.calendar.options.legendColors === null) {
+	var options = this.calendar.options; // Shorter accessor for variable name mangling when minifying
+
+	if (options.legendColors === null) {
 		this.calendar.legendScale = null;
 		return false;
 	}
 
 	var _colorRange = [];
 
-	if (Array.isArray(this.calendar.options.legendColors)) {
-		_colorRange = this.calendar.options.legendColors;
-	} else if (this.calendar.options.legendColors.hasOwnProperty("min") && this.calendar.options.legendColors.hasOwnProperty("max")) {
-		_colorRange = [this.calendar.options.legendColors.min, this.calendar.options.legendColors.max];
+	if (Array.isArray(options.legendColors)) {
+		_colorRange = options.legendColors;
+	} else if (options.legendColors.hasOwnProperty("min") && options.legendColors.hasOwnProperty("max")) {
+		_colorRange = [options.legendColors.min, options.legendColors.max];
 	} else {
-		this.calendar.options.legendColors = null;
+		options.legendColors = null;
 		return false;
 	}
 
-	var _legend = this.calendar.options.legend.slice(0);
+	var _legend = options.legend.slice(0);
 
 	if (_legend[0] > 0) {
 		_legend.unshift(0);
@@ -3124,7 +3126,7 @@ Legend.prototype.buildColors = function() {
 	;
 
 	var legendColors = _legend.map(function(element) { return colorScale(element); });
-	this.calendar.legendScale = d3.scale.threshold().domain(this.calendar.options.legend).range(legendColors);
+	this.calendar.legendScale = d3.scale.threshold().domain(options.legend).range(legendColors);
 
 	return true;
 };
