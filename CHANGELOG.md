@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.3.5 [2013-10-16]
+
+* [new] Add `highlight()` method to change highlighted date after calendar initialization
+* [new] CSV files works out-of-the-box, as long as the first 2 columns are the timestamp and value.
+* [change] Fatal errors throws errors intead of a simply console.log()
+* [fix] Fix bug when trying to load plain text file as datasource
+* More test and code improvement
+
 ## v3.3.4 [2013-10-10]
 
 * [fix] Fix #47: Increase d3 version dependency
