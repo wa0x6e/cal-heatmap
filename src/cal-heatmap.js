@@ -738,6 +738,8 @@ var CalHeatMap = function() {
 	 */
 	this.paint = function(navigationDir) {
 
+		var options = self.options;
+
 		if (arguments.length === 0) {
 			navigationDir = false;
 		}
@@ -771,7 +773,7 @@ var CalHeatMap = function() {
 				return h(d, true);
 			})
 			.attr("x", function(d) {
-				if (self.options.verticalOrientation) {
+				if (options.verticalOrientation) {
 					self.graphDim.width = w(d, true);
 					return 0;
 				} else {
@@ -779,7 +781,7 @@ var CalHeatMap = function() {
 				}
 			})
 			.attr("y", function(d) {
-				if (self.options.verticalOrientation) {
+				if (options.verticalOrientation) {
 					return getDomainPosition(d, self.graphDim, "height", h(d, true));
 				} else {
 					self.graphDim.height = h(d, true);
@@ -789,7 +791,7 @@ var CalHeatMap = function() {
 			.attr("class", function(d) {
 				var classname = "graph-domain";
 				var date = new Date(d);
-				switch(self.options.domain) {
+				switch(options.domain) {
 				case "hour":
 					classname += " h_" + date.getHours();
 					/* falls through */
@@ -843,8 +845,8 @@ var CalHeatMap = function() {
 		}
 
 		svg.append("rect")
-			.attr("width", function(d) { return w(d, true) - self.options.domainGutter - self.options.cellPadding; })
-			.attr("height", function(d) { return h(d, true) - self.options.domainGutter - self.options.cellPadding; })
+			.attr("width", function(d) { return w(d, true) - options.domainGutter - options.cellPadding; })
+			.attr("height", function(d) { return h(d, true) - options.domainGutter - options.cellPadding; })
 			.attr("class", "domain-background")
 		;
 
@@ -853,17 +855,17 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		var subDomainSvgGroup = svg.append("svg")
 			.attr("x", function() {
-				if (self.options.label.position === "left") {
-					return self.domainHorizontalLabelWidth + self.options.domainMargin[3];
+				if (options.label.position === "left") {
+					return self.domainHorizontalLabelWidth + options.domainMargin[3];
 				} else {
-					return self.options.domainMargin[3];
+					return options.domainMargin[3];
 				}
 			})
 			.attr("y", function() {
-				if (self.options.label.position === "top") {
-					return self.domainVerticalLabelHeight + self.options.domainMargin[0];
+				if (options.label.position === "top") {
+					return self.domainVerticalLabelHeight + options.domainMargin[0];
 				} else {
-					return self.options.domainMargin[0];
+					return options.domainMargin[0];
 				}
 			})
 			.attr("class", "graph-subdomain-group")
@@ -879,30 +881,30 @@ var CalHeatMap = function() {
 		rect
 			.append("rect")
 			.attr("class", function(d) {
-				return "graph-rect" + self.getHighlightClassName(d.t) + (self.options.onClick !== null ? " hover_cursor": "");
+				return "graph-rect" + self.getHighlightClassName(d.t) + (options.onClick !== null ? " hover_cursor": "");
 			})
-			.attr("width", self.options.cellSize)
-			.attr("height", self.options.cellSize)
+			.attr("width", options.cellSize)
+			.attr("height", options.cellSize)
 			.attr("x", function(d) { return self.positionSubDomainX(d.t); })
 			.attr("y", function(d) { return self.positionSubDomainY(d.t); })
 			.on("click", function(d) {
-				if (self.options.onClick !== null) {
+				if (options.onClick !== null) {
 					return self.onClick(new Date(d.t), d.v);
 				}
 			})
 			.call(function(selection) {
-				if (self.options.cellRadius > 0) {
+				if (options.cellRadius > 0) {
 					selection
-						.attr("rx", self.options.cellRadius)
-						.attr("ry", self.options.cellRadius)
+						.attr("rx", options.cellRadius)
+						.attr("ry", options.cellRadius)
 					;
 				}
 
-				if (self.legendScale !== null && self.options.legendColors !== null && self.options.legendColors.hasOwnProperty("base")) {
-					selection.attr("fill", self.options.legendColors.base);
+				if (self.legendScale !== null && options.legendColors !== null && options.legendColors.hasOwnProperty("base")) {
+					selection.attr("fill", options.legendColors.base);
 				}
 
-				if (self.options.tooltip) {
+				if (options.tooltip) {
 					selection.on("mouseover", function(d) {
 						var domainNode = this.parentNode.parentNode.parentNode;
 
@@ -913,8 +915,8 @@ var CalHeatMap = function() {
 
 						self.tooltip.attr("style",
 							"display: block; " +
-							"left: " + (self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + self.options.cellSize/2 + parseInt(domainNode.getAttribute("x"), 10)) + "px; " +
-							"top: " + (self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - self.options.cellSize/2 + parseInt(domainNode.getAttribute("y"), 10)) + "px;")
+							"left: " + (self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2 + parseInt(domainNode.getAttribute("x"), 10)) + "px; " +
+							"top: " + (self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2 + parseInt(domainNode.getAttribute("y"), 10)) + "px;")
 						;
 					});
 
@@ -928,19 +930,19 @@ var CalHeatMap = function() {
 		;
 
 		// Appending a title to each subdomain
-		if (!self.options.tooltip) {
-			rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainDateFormat); });
+		if (!options.tooltip) {
+			rect.append("title").text(function(d){ return self.formatDate(new Date(d.t), options.subDomainDateFormat); });
 		}
 
 		// =========================================================================//
 		// PAINTING LABEL															//
 		// =========================================================================//
-		if (self.options.domainLabelFormat !== "") {
+		if (options.domainLabelFormat !== "") {
 			svg.append("text")
 				.attr("class", "graph-label")
 				.attr("y", function(d) {
-					var y = self.options.domainMargin[0];
-					switch(self.options.label.position) {
+					var y = options.domainMargin[0];
+					switch(options.label.position) {
 					case "top":
 						y += self.domainVerticalLabelHeight/2;
 						break;
@@ -948,16 +950,16 @@ var CalHeatMap = function() {
 						y += h(d) + self.domainVerticalLabelHeight/2;
 					}
 
-					return y + self.options.label.offset.y *
+					return y + options.label.offset.y *
 					(
-						((self.options.label.rotate === "right" && self.options.label.position === "right") ||
-						(self.options.label.rotate === "left" && self.options.label.position === "left")) ?
+						((options.label.rotate === "right" && options.label.position === "right") ||
+						(options.label.rotate === "left" && options.label.position === "left")) ?
 						-1: 1
 					);
 				})
 				.attr("x", function(d){
-					var x = self.options.domainMargin[3];
-					switch(self.options.label.position) {
+					var x = options.domainMargin[3];
+					switch(options.label.position) {
 					case "right":
 						x += w(d);
 						break;
@@ -966,15 +968,15 @@ var CalHeatMap = function() {
 						x += w(d)/2;
 					}
 
-					if (self.options.label.align === "right") {
-						return x + self.domainHorizontalLabelWidth - self.options.label.offset.x *
-						(self.options.label.rotate === "right" ? -1: 1);
+					if (options.label.align === "right") {
+						return x + self.domainHorizontalLabelWidth - options.label.offset.x *
+						(options.label.rotate === "right" ? -1: 1);
 					}
-					return x + self.options.label.offset.x;
+					return x + options.label.offset.x;
 
 				})
 				.attr("text-anchor", function() {
-					switch(self.options.label.align) {
+					switch(options.label.align) {
 					case "start":
 					case "left":
 						return "start";
@@ -986,18 +988,18 @@ var CalHeatMap = function() {
 					}
 				})
 				.attr("dominant-baseline", function() { return self.verticalDomainLabel ? "middle": "top"; })
-				.text(function(d) { return self.formatDate(new Date(d), self.options.domainLabelFormat); })
+				.text(function(d) { return self.formatDate(new Date(d), options.domainLabelFormat); })
 				.call(domainRotate)
 			;
 		}
 
 		function domainRotate(selection) {
-			switch (self.options.label.rotate) {
+			switch (options.label.rotate) {
 			case "right":
 				selection
 				.attr("transform", function(d) {
 					var s = "rotate(90), ";
-					switch(self.options.label.position) {
+					switch(options.label.position) {
 					case "right":
 						s += "translate(-" + w(d) + " , -" + w(d) + ")";
 						break;
@@ -1013,7 +1015,7 @@ var CalHeatMap = function() {
 				selection
 				.attr("transform", function(d) {
 					var s = "rotate(270), ";
-					switch(self.options.label.position) {
+					switch(options.label.position) {
 					case "right":
 						s += "translate(-" + (w(d) + self.domainHorizontalLabelWidth) + " , " + w(d) + ")";
 						break;
@@ -1031,15 +1033,15 @@ var CalHeatMap = function() {
 		// =========================================================================//
 		// PAINTING DOMAIN SUBDOMAIN CONTENT										//
 		// =========================================================================//
-		if (self.options.subDomainTextFormat !== null) {
+		if (options.subDomainTextFormat !== null) {
 			rect
 				.append("text")
 				.attr("class", function(d) { return "subdomain-text" + self.getHighlightClassName(d.t); })
-				.attr("x", function(d) { return self.positionSubDomainX(d.t) + self.options.cellSize/2; })
-				.attr("y", function(d) { return self.positionSubDomainY(d.t) + self.options.cellSize/2; })
+				.attr("x", function(d) { return self.positionSubDomainX(d.t) + options.cellSize/2; })
+				.attr("y", function(d) { return self.positionSubDomainY(d.t) + options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
-				.text(function(d){ return self.formatDate(new Date(d.t), self.options.subDomainTextFormat); })
+				.text(function(d){ return self.formatDate(new Date(d.t), options.subDomainTextFormat); })
 			;
 		}
 
@@ -1048,12 +1050,12 @@ var CalHeatMap = function() {
 		// =========================================================================//
 
 		if (navigationDir !== false) {
-			domainSvg.transition().duration(self.options.animationDuration)
+			domainSvg.transition().duration(options.animationDuration)
 				.attr("x", function(d){
-					return self.options.verticalOrientation ? 0: self.domainPosition.getPosition(d);
+					return options.verticalOrientation ? 0: self.domainPosition.getPosition(d);
 				})
 				.attr("y", function(d){
-					return self.options.verticalOrientation? self.domainPosition.getPosition(d): 0;
+					return options.verticalOrientation? self.domainPosition.getPosition(d): 0;
 				})
 			;
 		}
@@ -1061,16 +1063,16 @@ var CalHeatMap = function() {
 		var tempWidth = self.graphDim.width;
 		var tempHeight = self.graphDim.height;
 
-		if (self.options.verticalOrientation) {
+		if (options.verticalOrientation) {
 			self.graphDim.height += enteringDomainDim - exitingDomainDim;
 		} else {
 			self.graphDim.width += enteringDomainDim - exitingDomainDim;
 		}
 
 		// At the time of exit, domainsWidth and domainsHeight already automatically shifted
-		domainSvg.exit().transition().duration(self.options.animationDuration)
+		domainSvg.exit().transition().duration(options.animationDuration)
 			.attr("x", function(d){
-				if (self.options.verticalOrientation) {
+				if (options.verticalOrientation) {
 					return 0;
 				} else {
 					switch(navigationDir) {
@@ -1082,7 +1084,7 @@ var CalHeatMap = function() {
 				}
 			})
 			.attr("y", function(d){
-				if (self.options.verticalOrientation) {
+				if (options.verticalOrientation) {
 					switch(navigationDir) {
 					case self.NAVIGATE_LEFT:
 						return Math.min(self.graphDim.height, tempHeight);
@@ -1116,23 +1118,24 @@ CalHeatMap.prototype = {
 		var parent = this;
 
 		parent.options = mergeRecursive(parent.options, settings);
+		var options = parent.options;
 
 		// Fatal errors
 		// Stop script execution on error
 		validateDomainType();
-		validateSelector(parent.options.itemSelector, false, "itemSelector");
+		validateSelector(options.itemSelector, false, "itemSelector");
 
-		if (parent.allowedDataType.indexOf(parent.options.dataType) < 0) {
-			throw new Error("The data type '" + parent.options.dataType + "' is not valid data type");
+		if (parent.allowedDataType.indexOf(options.dataType) < 0) {
+			throw new Error("The data type '" + options.dataType + "' is not valid data type");
 		}
 
-		if (d3.select(parent.options.itemSelector)[0][0] === null) {
-			throw new Error("The node '" + parent.options.itemSelector + "' specified in itemSelector does not exists");
+		if (d3.select(options.itemSelector)[0][0] === null) {
+			throw new Error("The node '" + options.itemSelector + "' specified in itemSelector does not exists");
 		}
 
 		try {
-			validateSelector(parent.options.nextSelector, true, "nextSelector");
-			validateSelector(parent.options.previousSelector, true, "previousSelector");
+			validateSelector(options.nextSelector, true, "nextSelector");
+			validateSelector(options.previousSelector, true, "previousSelector");
 		} catch(error) {
 			console.log(error.message);
 			return false;
@@ -1144,9 +1147,9 @@ CalHeatMap.prototype = {
 			this.options.subDomain = getOptimalSubDomain(settings.domain);
 		}
 
-		if (typeof parent.options.itemNamespace !== "string" || parent.options.itemNamespace === "") {
+		if (typeof options.itemNamespace !== "string" || options.itemNamespace === "") {
 			console.log("itemNamespace can not be empty, falling back to cal-heatmap");
-			parent.options.itemNamespace = "cal-heatmap";
+			options.itemNamespace = "cal-heatmap";
 		}
 
 		// Don't touch these settings
@@ -1154,19 +1157,19 @@ CalHeatMap.prototype = {
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
-				parent.options[s[k]] = settings[s[k]];
+				options[s[k]] = settings[s[k]];
 			}
 		}
 
-		parent.options.subDomainDateFormat = (typeof parent.options.subDomainDateFormat === "string" || typeof parent.options.subDomainDateFormat === "function" ? parent.options.subDomainDateFormat : this._domainType[parent.options.subDomain].format.date);
-		parent.options.domainLabelFormat = (typeof parent.options.domainLabelFormat === "string" || typeof parent.options.domainLabelFormat === "function" ? parent.options.domainLabelFormat : this._domainType[parent.options.domain].format.legend);
-		parent.options.subDomainTextFormat = ((typeof parent.options.subDomainTextFormat === "string" && parent.options.subDomainTextFormat !== "") || typeof parent.options.subDomainTextFormat === "function" ? parent.options.subDomainTextFormat : null);
-		parent.options.domainMargin = expandMarginSetting(parent.options.domainMargin);
-		parent.options.legendMargin = expandMarginSetting(parent.options.legendMargin);
-		parent.options.highlight = parent.expandDateSetting(parent.options.highlight);
-		parent.options.itemName = expandItemName(parent.options.itemName);
-		parent.options.colLimit = parseColLimit(parent.options.colLimit);
-		parent.options.rowLimit = parseRowLimit(parent.options.rowLimit);
+		options.subDomainDateFormat = (typeof options.subDomainDateFormat === "string" || typeof options.subDomainDateFormat === "function" ? options.subDomainDateFormat : this._domainType[options.subDomain].format.date);
+		options.domainLabelFormat = (typeof options.domainLabelFormat === "string" || typeof options.domainLabelFormat === "function" ? options.domainLabelFormat : this._domainType[options.domain].format.legend);
+		options.subDomainTextFormat = ((typeof options.subDomainTextFormat === "string" && options.subDomainTextFormat !== "") || typeof options.subDomainTextFormat === "function" ? options.subDomainTextFormat : null);
+		options.domainMargin = expandMarginSetting(options.domainMargin);
+		options.legendMargin = expandMarginSetting(options.legendMargin);
+		options.highlight = parent.expandDateSetting(options.highlight);
+		options.itemName = expandItemName(options.itemName);
+		options.colLimit = parseColLimit(options.colLimit);
+		options.rowLimit = parseRowLimit(options.rowLimit);
 		if (!settings.hasOwnProperty("legendMargin")) {
 			autoAddLegendMargin();
 		}
@@ -1216,16 +1219,16 @@ CalHeatMap.prototype = {
 		 * @return {bool} True if domain and subdomain are valid and compatible
 		 */
 		function validateDomainType() {
-			if (!parent._domainType.hasOwnProperty(parent.options.domain) || parent.options.domain === "min" || parent.options.domain.substring(0, 2) === "x_") {
-				throw new Error("The domain '" + parent.options.domain + "' is not valid");
+			if (!parent._domainType.hasOwnProperty(options.domain) || options.domain === "min" || options.domain.substring(0, 2) === "x_") {
+				throw new Error("The domain '" + options.domain + "' is not valid");
 			}
 
-			if (!parent._domainType.hasOwnProperty(parent.options.subDomain) || parent.options.subDomain === "year") {
-				throw new Error("The subDomain '" + parent.options.subDomain + "' is not valid");
+			if (!parent._domainType.hasOwnProperty(options.subDomain) || options.subDomain === "year") {
+				throw new Error("The subDomain '" + options.subDomain + "' is not valid");
 			}
 
-			if (parent._domainType[parent.options.domain].level <= parent._domainType[parent.options.subDomain].level) {
-				throw new Error("'" + parent.options.subDomain + "' is not a valid subDomain to '" + parent.options.domain +  "'");
+			if (parent._domainType[options.domain].level <= parent._domainType[options.subDomain].level) {
+				throw new Error("'" + options.subDomain + "' is not a valid subDomain to '" + options.domain +  "'");
 			}
 
 			return true;
@@ -1239,27 +1242,27 @@ CalHeatMap.prototype = {
 		function autoAlignLabel() {
 			// Auto-align label, depending on it's position
 			if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("align"))) {
-				switch(parent.options.label.position) {
+				switch(options.label.position) {
 				case "left":
-					parent.options.label.align = "right";
+					options.label.align = "right";
 					break;
 				case "right":
-					parent.options.label.align = "left";
+					options.label.align = "left";
 					break;
 				default:
-					parent.options.label.align = "center";
+					options.label.align = "center";
 				}
 
-				if (parent.options.label.rotate === "left") {
-					parent.options.label.align = "right";
-				} else if (parent.options.label.rotate === "right") {
-					parent.options.label.align = "left";
+				if (options.label.rotate === "left") {
+					options.label.align = "right";
+				} else if (options.label.rotate === "right") {
+					options.label.align = "left";
 				}
 			}
 
 			if (!settings.hasOwnProperty("label") || (settings.hasOwnProperty("label") && !settings.label.hasOwnProperty("offset"))) {
-				if (parent.options.label.position === "left" || parent.options.label.position === "right") {
-					parent.options.label.offset = {
+				if (options.label.position === "left" || options.label.position === "right") {
+					options.label.offset = {
 						x: 10,
 						y: 15
 					};
@@ -1273,16 +1276,16 @@ CalHeatMap.prototype = {
 		 * @return void
 		 */
 		function autoAddLegendMargin() {
-			switch(parent.options.legendVerticalPosition) {
+			switch(options.legendVerticalPosition) {
 			case "top":
-				parent.options.legendMargin[2] = parent.DEFAULT_LEGEND_MARGIN;
+				options.legendMargin[2] = parent.DEFAULT_LEGEND_MARGIN;
 				break;
 			case "bottom":
-				parent.options.legendMargin[0] = parent.DEFAULT_LEGEND_MARGIN;
+				options.legendMargin[0] = parent.DEFAULT_LEGEND_MARGIN;
 				break;
 			case "middle":
 			case "center":
-				parent.options.legendMargin[parent.options.legendHorizontalPosition === "right" ? 3 : 1] = parent.DEFAULT_LEGEND_MARGIN;
+				options.legendMargin[options.legendHorizontalPosition === "right" ? 3 : 1] = parent.DEFAULT_LEGEND_MARGIN;
 			}
 		}
 
@@ -1347,7 +1350,7 @@ CalHeatMap.prototype = {
 		}
 
 		function parseRowLimit(value) {
-			if (value > 0 && parent.options.colLimit > 0) {
+			if (value > 0 && options.colLimit > 0) {
 				console.log("colLimit and rowLimit are mutually exclusive, rowLimit will be ignored");
 				return null;
 			}
@@ -1393,6 +1396,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		var parent = this;
+		var options = parent.options;
 
 		if (arguments.length === 0) {
 			svg = parent.root.selectAll(".graph-domain");
@@ -1412,19 +1416,19 @@ CalHeatMap.prototype = {
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === 0 && parent.options.legendColors !== null && parent.options.legendColors.hasOwnProperty("empty")) {
-					return parent.options.legendColors.empty;
+				if (d.v === 0 && options.legendColors !== null && options.legendColors.hasOwnProperty("empty")) {
+					return options.legendColors.empty;
 				}
 
-				if (d.v < 0 && parent.options.legend[0] > 0 && parent.options.legendColors !== null && parent.options.legendColors.hasOwnProperty("overflow")) {
-					return parent.options.legendColors.overflow;
+				if (d.v < 0 && options.legend[0] > 0 && options.legendColors !== null && options.legendColors.hasOwnProperty("overflow")) {
+					return options.legendColors.overflow;
 				}
 
-				return parent.legendScale(Math.min(d.v, parent.options.legend[parent.options.legend.length-2]));
+				return parent.legendScale(Math.min(d.v, options.legend[options.legend.length-2]));
 			});
 		}
 
-		rect.transition().duration(parent.options.animationDuration).select("rect")
+		rect.transition().duration(options.animationDuration).select("rect")
 			.attr("class", function(d) {
 
 				var htmlClass = parent.getHighlightClassName(d.t);
@@ -1435,11 +1439,11 @@ CalHeatMap.prototype = {
 
 				if (d.v !== null) {
 					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (parent.options.considerMissingDataAsZero) {
+				} else if (options.considerMissingDataAsZero) {
 					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
 
-				if (parent.options.onClick !== null) {
+				if (options.onClick !== null) {
 					htmlClass += " hover_cursor";
 				}
 
@@ -1448,7 +1452,7 @@ CalHeatMap.prototype = {
 			.call(addStyle)
 		;
 
-		rect.transition().duration(parent.options.animationDuration).select("title")
+		rect.transition().duration(options.animationDuration).select("title")
 			.text(function(d) { return parent.getSubDomainTitle(d); })
 		;
 	},
@@ -2499,38 +2503,39 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		var parent = this;
-		var legendWidth = parent.options.displayLegend ? (parent.Legend.getDim("width") + parent.options.legendMargin[1] + parent.options.legendMargin[3]) : 0;
-		var legendHeight = parent.options.displayLegend ? (parent.Legend.getDim("height") + parent.options.legendMargin[0] + parent.options.legendMargin[2]) : 0;
+		var options = parent.options;
+		var legendWidth = options.displayLegend ? (parent.Legend.getDim("width") + options.legendMargin[1] + options.legendMargin[3]) : 0;
+		var legendHeight = options.displayLegend ? (parent.Legend.getDim("height") + options.legendMargin[0] + options.legendMargin[2]) : 0;
 
-		var graphWidth = parent.graphDim.width - parent.options.domainGutter - parent.options.cellPadding;
-		var graphHeight = parent.graphDim.height - parent.options.domainGutter - parent.options.cellPadding;
+		var graphWidth = parent.graphDim.width - options.domainGutter - options.cellPadding;
+		var graphHeight = parent.graphDim.height - options.domainGutter - options.cellPadding;
 
-		this.root.transition().duration(parent.options.animationDuration)
+		this.root.transition().duration(options.animationDuration)
 			.attr("width", function() {
-				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
+				if (options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") {
 					return graphWidth + legendWidth;
 				}
 				return Math.max(graphWidth, legendWidth);
 			})
 			.attr("height", function() {
-				if (parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") {
+				if (options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") {
 					return Math.max(graphHeight, legendHeight);
 				}
 				return graphHeight + legendHeight;
 			})
 		;
 
-		this.root.select(".graph").transition().duration(parent.options.animationDuration)
+		this.root.select(".graph").transition().duration(options.animationDuration)
 			.attr("y", function() {
-				if (parent.options.legendVerticalPosition === "top") {
+				if (options.legendVerticalPosition === "top") {
 					return legendHeight;
 				}
 				return 0;
 			})
 			.attr("x", function() {
 				if (
-					(parent.options.legendVerticalPosition === "middle" || parent.options.legendVerticalPosition === "center") &&
-					parent.options.legendHorizontalPosition === "left") {
+					(options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") &&
+					options.legendHorizontalPosition === "left") {
 					return legendWidth;
 				}
 				return 0;
