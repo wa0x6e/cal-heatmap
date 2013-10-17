@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.5 (Wed Oct 16 2013 23:03:43)
+/*! cal-heatmap v3.3.5 (Wed Oct 16 2013 23:46:44)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -145,7 +145,7 @@ test("RowLimit is disabled when colLimit is set", function() {
 module("API: init(dataType)");
 
 test("Allow only valid data type", function() {
-	var types = ["json", "txt", "csv"];
+	var types = ["json", "txt", "csv", "tsv"];
 	expect(types.length);
 	var cal = new CalHeatMap();
 
@@ -269,6 +269,19 @@ _testSubDomainSmallerThanDomain("week", "day");
 _testSubDomainSmallerThanDomain("month", "week");
 _testSubDomainSmallerThanDomain("year", "month");
 _testSubDomainSmallerThanDomain("year", "week");
+
+function _testInvalidSubDomainForDomain(domain, subDomain) {
+	test(subDomain + " is not a valid subDomain for " + domain, function() {
+		expect(1);
+
+		throws(function() { createCalendar({domain: domain, subDomain: subDomain}); });
+	});
+}
+
+_testInvalidSubDomainForDomain("hour", "day");
+_testInvalidSubDomainForDomain("day", "week");
+_testInvalidSubDomainForDomain("week", "month");
+_testInvalidSubDomainForDomain("month", "year");
 
 function _testDefaultSubDomain(domain, subDomain) {
 	test(subDomain + " is the default subDomain for " + domain, function() {
@@ -1626,6 +1639,43 @@ _testJump(
 	new Date(2000, 11, 31, 23, 0),
 	-30, "day"
 );
+
+/*
+	-----------------------------------------------------------------
+	Unit Test
+	Test getHighlightClassName()
+	-----------------------------------------------------------------
+ */
+
+module("Unit Test: getHighlightClassName()");
+
+test("Return the highlight classname if a date should be highlighted", function() {
+	expect(1);
+
+	var cal = createCalendar({highlight: [new Date(2000, 0, 1), new Date(2000, 0, 2)]});
+	strictEqual(cal.getHighlightClassName(new Date(2000, 0, 1)), " highlight");
+});
+
+test("Return the highlight and now classname if a date should be highlighted and is now", function() {
+	expect(1);
+
+	var cal = createCalendar({highlight: [new Date(2000, 0, 1), new Date()]});
+	strictEqual(cal.getHighlightClassName(new Date()), " highlight now");
+});
+
+test("Return an empty string if a date is not in the highlight list", function() {
+	expect(1);
+
+	var cal = createCalendar({highlight: [new Date(2000, 0, 1)]});
+	strictEqual(cal.getHighlightClassName(new Date(2000, 0, 2)), "");
+});
+
+test("Return an empty string if the highlight list is empty", function() {
+	expect(1);
+
+	var cal = createCalendar({});
+	strictEqual(cal.getHighlightClassName(new Date()), "");
+});
 
 /*
 	-----------------------------------------------------------------

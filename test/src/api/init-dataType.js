@@ -8,7 +8,7 @@
 module("API: init(dataType)");
 
 test("Allow only valid data type", function() {
-	var types = ["json", "txt", "csv"];
+	var types = ["json", "txt", "csv", "tsv"];
 	expect(types.length);
 	var cal = new CalHeatMap();
 

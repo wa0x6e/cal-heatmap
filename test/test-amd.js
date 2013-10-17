@@ -11,10 +11,15 @@ require.config({
 require(["d3", "jquery", "cal-heatmap"], function(d3, $, CalHeatMap) {
 
 	test("Module is loaded via RequireJS", function() {
-		expect(2);
-		equal(typeof CalHeatMap, "function", "CalHeatMap was loaded with RequireJS");
+		$("body").append("<div id=cal-heatmap style=\"display:none;\"></div>");
+
+		expect(3);
+		strictEqual(typeof CalHeatMap, "function", "CalHeatMap was loaded with RequireJS");
 		var cal = new CalHeatMap();
-		equal(typeof cal, "object", "CalHeatMap can be initialized");
+		ok(cal instanceof CalHeatMap, "CalHeatMap can be initialized");
+
+		cal.init({});
+		ok($(".graph").length > 0, "The graph was added into the DOM");
 	});
 
 });

@@ -99,6 +99,19 @@ _testSubDomainSmallerThanDomain("month", "week");
 _testSubDomainSmallerThanDomain("year", "month");
 _testSubDomainSmallerThanDomain("year", "week");
 
+function _testInvalidSubDomainForDomain(domain, subDomain) {
+	test(subDomain + " is not a valid subDomain for " + domain, function() {
+		expect(1);
+
+		throws(function() { createCalendar({domain: domain, subDomain: subDomain}); });
+	});
+}
+
+_testInvalidSubDomainForDomain("hour", "day");
+_testInvalidSubDomainForDomain("day", "week");
+_testInvalidSubDomainForDomain("week", "month");
+_testInvalidSubDomainForDomain("month", "year");
+
 function _testDefaultSubDomain(domain, subDomain) {
 	test(subDomain + " is the default subDomain for " + domain, function() {
 		expect(2);
