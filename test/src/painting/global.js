@@ -107,12 +107,14 @@ test("Attach events to not-valid namespace fallback to default namespace", funct
 	createCalendar({
 		paintOnLoad: true,
 		nextSelector: "#next",
-		previousSelector: "#previous",
-		itemSelector: ""
+		previousSelector: "#previous"
 	});
 
 	equal(typeof d3.select("#next").on("click.cal-heatmap"), "function", "loadNextDomain is attached to defaultNamespace");
 	equal(typeof d3.select("#previous").on("click.cal-heatmap"), "function", "loadPreviousDomain is attached to defaultNamespace");
+
+	$("body").remove("#next");
+	$("body").remove("#previous");
 });
 
 

@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.3 (Tue Oct 15 2013 22:30:10)
+/*! cal-heatmap v3.3.5 (Wed Oct 16 2013 23:03:43)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -134,6 +134,203 @@ test("RowLimit is disabled when colLimit is set", function() {
 	var cal = createCalendar({ colLimit: 5, rowLimit: 5 });
 	deepEqual(cal.options.rowLimit, null, "rowLimit is disabled");
 });
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test dataType options passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(dataType)");
+
+test("Allow only valid data type", function() {
+	var types = ["json", "txt", "csv"];
+	expect(types.length);
+	var cal = new CalHeatMap();
+
+	for(var i = 0, total = types.length; i < total; i++) {
+		ok(cal.init({range:1, dataType: types[i], loadOnInit: false, paintOnLoad: false}), types[i] + " is a valid domain");
+	}
+});
+
+function _testInvalidDataType(name, input) {
+	test("Invalid dataType (" + name + ") throws an Error", function() {
+		expect(1);
+
+		throws(function() { cal.init({dataType: input}); });
+	});
+}
+
+_testInvalidDataType("empty string", "");
+_testInvalidDataType("null", null);
+_testInvalidDataType("false", false);
+_testInvalidDataType("undefined", undefined);
+_testInvalidDataType("random string", "random string");
+_testInvalidDataType("number", 15);
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test domain and subDomain options passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(domain)");
+
+(function() {
+	function _testValidDomain(d) {
+		test("Testing that " + d + " is a valid domain", function() {
+			expect(1);
+
+			var cal = createCalendar({domain: d});
+			strictEqual(cal.options.domain, d);
+		});
+	}
+
+	var domains = ["hour", "day", "week", "month", "year"];
+	for(var i = 0, total = domains.length; i < total; i++) {
+		_testValidDomain(domains[i]);
+	}
+}());
+
+function _testInvalidDomain(name, input) {
+	test("Invalid domain (" + name + ") throws an Error", function() {
+		expect(1);
+
+		throws(function() { createCalendar({domain: input}); });
+	});
+}
+
+_testInvalidDomain("empty string", "");
+_testInvalidDomain("null", null);
+_testInvalidDomain("false", false);
+_testInvalidDomain("not-valid domain type", "random-value");
+_testInvalidDomain("min", "min"); // Min is a valid subDomain but not domain
+
+test("Set default domain and subDomain", function() {
+	expect(2);
+
+	var cal = createCalendar({});
+
+	strictEqual(cal.options.domain, "hour", "Default domain is HOUR");
+	strictEqual(cal.options.subDomain, "min", "Default subDomain is MIN");
+});
+
+
+module("API: init(subDomain)");
+
+(function() {
+	function _testValidSubDomain(d) {
+		test("Testing that " + d + " is a valid subDomains", function() {
+			expect(1);
+
+			var cal = createCalendar({subDomains: d});
+			strictEqual(cal.options.subDomains, d);
+		});
+	}
+
+	var subDomains = ["min", "x_min", "hour", "x_hour", "day", "x_day", "week", "x_week", "month", "x_month"];
+	for(var i = 0, total = subDomains.length; i < total; i++) {
+		_testValidSubDomain(subDomains[i]);
+	}
+}());
+
+function _testInvalidSubDomain(name, input) {
+	test("Invalid subDomain (" + name + ") throws an Error", function() {
+		expect(1);
+
+		throws(function() { createCalendar({subDomain: input}); });
+	});
+}
+
+_testInvalidSubDomain("empty string", "");
+_testInvalidSubDomain("null", null);
+_testInvalidSubDomain("false", false);
+_testInvalidSubDomain("not-valid subDomain type", "random-value");
+_testInvalidSubDomain("year", "year"); // Year is a valid domain but not subDomain
+
+function _testSubDomainSmallerThanDomain(domain, subDomain) {
+	test(subDomain + " is a valid subDomain for " + domain, function() {
+		expect(2);
+
+		var cal = createCalendar({domain: domain, subDomain: subDomain});
+		strictEqual(cal.options.domain, domain);
+		strictEqual(cal.options.subDomain, subDomain);
+	});
+}
+
+_testSubDomainSmallerThanDomain("hour", "min");
+_testSubDomainSmallerThanDomain("day", "min");
+_testSubDomainSmallerThanDomain("day", "hour");
+_testSubDomainSmallerThanDomain("week", "hour");
+_testSubDomainSmallerThanDomain("week", "min");
+_testSubDomainSmallerThanDomain("week", "day");
+_testSubDomainSmallerThanDomain("month", "week");
+_testSubDomainSmallerThanDomain("year", "month");
+_testSubDomainSmallerThanDomain("year", "week");
+
+function _testDefaultSubDomain(domain, subDomain) {
+	test(subDomain + " is the default subDomain for " + domain, function() {
+		expect(2);
+
+		var cal = createCalendar({domain: domain});
+		strictEqual(cal.options.domain, domain);
+		strictEqual(cal.options.subDomain, subDomain);
+	});
+}
+
+_testDefaultSubDomain("hour", "min");
+_testDefaultSubDomain("day", "hour");
+_testDefaultSubDomain("week", "day");
+_testDefaultSubDomain("month", "day");
+_testDefaultSubDomain("year", "month");
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test domainLabelFormat setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(domainLabelFormat)");
+
+test("Passing an empty string", function() {
+	expect(1);
+
+	var cal = createCalendar({ domainLabelFormat: "" });
+	strictEqual(cal.options.domainLabelFormat, "");
+});
+
+test("Passing a non-empty string", function() {
+	expect(1);
+
+	var cal = createCalendar({ domainLabelFormat: "R" });
+	strictEqual(cal.options.domainLabelFormat, "R");
+});
+
+test("Passing a function", function() {
+	expect(1);
+
+	var cal = createCalendar({ domainLabelFormat: function() {} });
+	ok(typeof cal.options.domainLabelFormat === "function");
+});
+
+function _testdomainLabelFormatWithInvalidInput(title, input) {
+	test("Passing a not-valid input (" + title + ")", function() {
+		expect(1);
+
+		var cal = createCalendar({ domainLabelFormat: input });
+		strictEqual(cal.options.domainLabelFormat, cal._domainType.hour.format.legend, "Invalid input should fallback to the domain default legend format");
+	});
+}
+
+_testdomainLabelFormatWithInvalidInput("number", 10);
+_testdomainLabelFormatWithInvalidInput("undefined", undefined);
+_testdomainLabelFormatWithInvalidInput("false", false);
+_testdomainLabelFormatWithInvalidInput("null", null);
+_testdomainLabelFormatWithInvalidInput("array", []);
+_testdomainLabelFormatWithInvalidInput("object", {});
 
 /*
 	-----------------------------------------------------------------
@@ -299,108 +496,11 @@ __testItemNamespaceSetting("Setting a valid namespace from a string", "test-name
 /*
 	-----------------------------------------------------------------
 	SETTINGS
-	Test options passed to init()
+	Test itemSelector options passed to init()
 	-----------------------------------------------------------------
  */
 
-module("API: init()");
-
-test("Allow only valid domain", function() {
-
-	expect(9);
-
-	var domains = ["hour", "day", "week", "month", "year"];
-
-	for(var i = 0, total = domains.length; i < total; i++) {
-		var cal = createCalendar({range:1});
-		ok(cal.init({domain:domains[i]}), domains[i] + " is a valid domain");
-	}
-
-	var c = createCalendar({});
-
-	equal(c.init({domain:"min"}), false, "Min is a valid subdomain but not a valid domain");
-	equal(c.init({domain:"x_hour"}), false, "x_hour is a valid subdomain but not a valid domain");
-	equal(c.init({domain:"notvalid"}), false, "Fail when domain is not valid");
-	equal(c.init({domain:null}), false, "Fail when domain is null");
-
-});
-
-test("Allow only known subDomain", function() {
-
-	expect(13);
-
-	var subDomains = ["min", "x_min", "hour", "x_hour", "day", "x_day", "week", "x_week", "month", "x_month"];
-
-	for(var i = 0, total = subDomains.length; i < total; i++) {
-		var cal = createCalendar({range:1});
-		ok(cal.init({subDomain:subDomains[i], domain: "year"}), subDomains[i] + " is a valid subDomain");
-	}
-
-	var c = createCalendar({});
-
-	equal(c.init({subDomain:"year", domain: "year"}), false, "Min is a valid domain but not a valid subdomain");
-	equal(c.init({subDomain:"notvalid", domain: "month"}), false, "Fail when subdomain is not valid");
-	equal(c.init({subDomain:null, domain: "month"}), false, "Fail when subdomain is null");
-});
-
-test("SubDomain must be smaller than domain", function() {
-
-	expect(3);
-
-	var c = createCalendar({});
-
-	equal(c.init({subDomain:"min", domain: "month"}), true, "VALID : subdomain is lower level than domain");
-	equal(c.init({subDomain:"month", domain: "month"}), false, "NOT VALID : subdomain is same level than domain");
-	equal(c.init({subDomain:"year", domain: "month"}), false, "NOT VALID : subdomain is greater level than domain");
-});
-
-test("Set default domain and subDomain", function() {
-	expect(2);
-
-	var cal = createCalendar({});
-
-	equal(cal.options.domain, "hour", "Default domain is HOUR");
-	equal(cal.options.subDomain, "min", "Default subDomain is MIN");
-});
-
-test("Set default subDomain according to domain", function() {
-	expect(5);
-
-	var cal = createCalendar({domain: "hour"});
-	equal(cal.options.subDomain, "min", "HOUR default subDomain is MIN");
-
-	cal = createCalendar({domain: "day"});
-	equal(cal.options.subDomain, "hour", "DAY default subDomain is HOUR");
-
-	cal = createCalendar({domain: "week"});
-	equal(cal.options.subDomain, "day", "WEEK default subDomain is DAY");
-
-	cal = createCalendar({domain: "month"});
-	equal(cal.options.subDomain, "day", "MONTH default subDomain is DAY");
-
-	cal = createCalendar({domain: "year"});
-	equal(cal.options.subDomain, "month", "YEAR default subDomain is MONTH");
-});
-
-test("Allow only valid data type", function() {
-	var types = ["json", "txt", "csv"];
-	expect(types.length);
-	var cal = new CalHeatMap();
-
-	for(var i = 0, total = types.length; i < total; i++) {
-		ok(cal.init({range:1, dataType: types[i], loadOnInit: false, paintOnLoad: false}), types[i] + " is a valid domain");
-	}
-});
-
-test("Don't allow not valid data type", function() {
-	var types = ["min", "html", "jpg"];
-	expect(types.length);
-	var cal = new CalHeatMap();
-
-	for(var i = 0, total = types.length; i < total; i++) {
-		equal(cal.init({dataType: types[i]}), false, types[i] + " is not a valid domain");
-	}
-});
+module("API: init(itemSelector)");
 
 test("itemSelector accept a valid document.querySelector or CSS3 string value", function() {
 
@@ -452,51 +552,117 @@ test("itemSelector accept a valid Element object", function() {
 	$("#test").remove();
 });
 
-test("itemSelector does not accept invalid values", function() {
-	expect(6);
+function _testInvalidItemSelector(name, input) {
+	test("Invalid itemSelector (" + name + ") throws an Error", function() {
+		expect(1);
 
-	var cal = new CalHeatMap();
-	equal(cal.init({itemSelector: "", paintOnLoad: false}), false, "Empty string is not a valid itemSelector");
-	equal(cal.init({itemSelector: [], paintOnLoad: false}), false, "Empty array is not a valid itemSelector");
-	equal(cal.init({itemSelector: 125.69, paintOnLoad: false}), false, "Float is not a valid itemSelector");
-	equal(cal.init({itemSelector: 125, paintOnLoad: false}), false, "Integer is not a valid itemSelector");
-	equal(cal.init({itemSelector: {}, paintOnLoad: false}), false, "Empty object is not a valid itemSelector");
-	equal(cal.init({itemSelector: function() {}, paintOnLoad: false}), false, "Function is not a valid itemSelector");
-});
+		throws(function() { createCalendar({itemSelector: input}); });
+	});
+}
+
+_testInvalidItemSelector("empty string", "");
+_testInvalidItemSelector("array", []);
+_testInvalidItemSelector("number", 15);
+_testInvalidItemSelector("function", function() {});
 
 test("itemSelector target does not exists", function() {
 	expect(1);
 
-	var cal = new CalHeatMap();
-	equal(cal.init({itemSelector: "#test", paintOnLoad: false}), false, "Die when target itemSelector does not exists");
+	throws(function() { createCalendar({itemSelector: "#test"}); }, "Non-existent itemSelector raises an Error");
 });
 
-test("Domain Margin can takes various format", function() {
-	expect(7);
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test subDomainDateFormat setting passed to init()
+	-----------------------------------------------------------------
+ */
 
-	var a = [0, 2, 3, 4];
+module("API: init(subDomainDateFormat)");
 
-	var cal = createCalendar({domainMargin: a});
-	equal(cal.options.domainMargin, a, "Array of 4");
+test("Passing an empty string", function() {
+	expect(1);
 
-	cal.init({domainMargin: 5, paintOnLoad: false});
-	equal(cal.options.domainMargin.toString(), [5,5,5,5].toString(), "Fill the array with the specified values");
-
-	cal.init({domainMargin: [], paintOnLoad: false});
-	equal(cal.options.domainMargin.toString(), [0,0,0,0].toString(), "Fill array with 0");
-
-	cal.init({domainMargin: [5], paintOnLoad: false});
-	equal(cal.options.domainMargin.toString(), [5,5,5,5].toString(), "Copy first values of array to the other 3");
-
-	cal.init({domainMargin: [5, 10], paintOnLoad: false});
-	equal(cal.options.domainMargin.toString(), [5,10,5,10].toString(), "Array of 2 values is expanded to 4");
-
-	cal.init({domainMargin: [5, 10, 15], paintOnLoad: false});
-	equal(cal.options.domainMargin.toString(), [5,10,15,10].toString(), "Array of 3 values is expanded to 4");
-
-	cal.init({domainMargin: [0,0,0,0,0], paintOnLoad: false});
-	equal(cal.options.domainMargin.toString(), [0,0,0,0].toString(), "Values in array length greater than 4 are ignored");
+	var cal = createCalendar({ subDomainDateFormat: "" });
+	strictEqual(cal.options.subDomainDateFormat, "");
 });
+
+test("Passing a non-empty string", function() {
+	expect(1);
+
+	var cal = createCalendar({ subDomainDateFormat: "R" });
+	strictEqual(cal.options.subDomainDateFormat, "R");
+});
+
+test("Passing a function", function() {
+	expect(1);
+
+	var cal = createCalendar({ subDomainDateFormat: function() {} });
+	ok(typeof cal.options.subDomainDateFormat === "function");
+});
+
+function _testsubDomainDateFormatWithInvalidInput(title, input) {
+	test("Passing a not-valid input (" + title + ")", function() {
+		expect(1);
+
+		var cal = createCalendar({ subDomainDateFormat: input });
+		strictEqual(cal.options.subDomainDateFormat, cal._domainType.min.format.date, "Invalid input should fallback to the subDomain default date format");
+	});
+}
+
+_testsubDomainDateFormatWithInvalidInput("number", 10);
+_testsubDomainDateFormatWithInvalidInput("undefined", undefined);
+_testsubDomainDateFormatWithInvalidInput("false", false);
+_testsubDomainDateFormatWithInvalidInput("null", null);
+_testsubDomainDateFormatWithInvalidInput("array", []);
+_testsubDomainDateFormatWithInvalidInput("object", {});
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test subDomainTextFormat setting passed to init()
+	-----------------------------------------------------------------
+ */
+
+module("API: init(subDomainTextFormat)");
+
+test("Passing a non-empty string", function() {
+	expect(1);
+
+	var cal = createCalendar({ subDomainTextFormat: "R" });
+	strictEqual(cal.options.subDomainTextFormat, "R");
+});
+
+test("Passing a function", function() {
+	expect(1);
+
+	var cal = createCalendar({ subDomainTextFormat: function() {} });
+	ok(typeof cal.options.subDomainTextFormat === "function");
+});
+
+function _testsubDomainTextFormatWithInvalidInput(title, input) {
+	test("Passing a not-valid input (" + title + ")", function() {
+		expect(1);
+
+		var cal = createCalendar({ subDomainTextFormat: input });
+		strictEqual(cal.options.subDomainTextFormat, null, "Invalid input should fallback to null");
+	});
+}
+
+_testsubDomainTextFormatWithInvalidInput("empty string", "");
+_testsubDomainTextFormatWithInvalidInput("number", 10);
+_testsubDomainTextFormatWithInvalidInput("undefined", undefined);
+_testsubDomainTextFormatWithInvalidInput("false", false);
+_testsubDomainTextFormatWithInvalidInput("null", null);
+_testsubDomainTextFormatWithInvalidInput("array", []);
+_testsubDomainTextFormatWithInvalidInput("object", {});
+
+/*
+	-----------------------------------------------------------------
+	SETTINGS
+	Test options passed to init()
+	-----------------------------------------------------------------
+ */
 
 test("Auto align domain label horizontally", function() {
 	expect(4);
@@ -3527,12 +3693,14 @@ test("Attach events to not-valid namespace fallback to default namespace", funct
 	createCalendar({
 		paintOnLoad: true,
 		nextSelector: "#next",
-		previousSelector: "#previous",
-		itemSelector: ""
+		previousSelector: "#previous"
 	});
 
 	equal(typeof d3.select("#next").on("click.cal-heatmap"), "function", "loadNextDomain is attached to defaultNamespace");
 	equal(typeof d3.select("#previous").on("click.cal-heatmap"), "function", "loadPreviousDomain is attached to defaultNamespace");
+
+	$("body").remove("#next");
+	$("body").remove("#previous");
 });
 
 
