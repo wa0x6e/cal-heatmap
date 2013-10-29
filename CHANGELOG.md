@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.6 [2013-10-28]
+
+* [new] Add `destroy()` method
+
 ## v3.3.5 [2013-10-16]
 
 * [new] Add `highlight()` method to change highlighted date after calendar initialization

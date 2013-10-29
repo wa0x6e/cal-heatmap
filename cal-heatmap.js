@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.5 (Wed Oct 16 2013 23:56:23)
+/*! cal-heatmap v3.3.6 (Mon Oct 28 2013 22:39:46)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -2708,6 +2708,15 @@ CalHeatMap.prototype = {
 		return true;
 	},
 
+	/**
+	 * Highlight dates
+	 *
+	 * Add a highlight class to a set of dates
+	 *
+	 * @since  3.3.5
+	 * @param  array Array of dates to highlight
+	 * @return bool True if dates were highlighted
+	 */
 	highlight: function(args) {
 		"use strict";
 
@@ -2716,6 +2725,34 @@ CalHeatMap.prototype = {
 			return true;
 		}
 		return false;
+	},
+
+	/**
+	 * Destroy the calendar
+	 *
+	 * Usage: cal = cal.destroy();
+	 *
+	 * @since  3.3.6
+	 * @param function A callback function to trigger after destroying the calendar
+	 * @return null
+	 */
+	destroy: function(callback) {
+		"use strict";
+
+		this.root.transition().duration(this.options.animationDuration)
+			.attr("width", 0)
+			.attr("height", 0)
+			.remove()
+			.each("end", function() {
+				if (typeof callback === "function") {
+					callback();
+				} else {
+					console.log("Provided callback for destroy() is not a function.");
+				}
+			})
+		;
+
+		return null;
 	},
 
 	getSVG: function() {
@@ -2774,8 +2811,7 @@ CalHeatMap.prototype = {
 				continue;
 			}
 
-			// The DOM Level 2 CSS wa
-			// y
+			// The DOM Level 2 CSS way
 			/* jshint maxdepth: false */
 			if ("getComputedStyle" in window) {
 				var cs = getComputedStyle(dom, null);
