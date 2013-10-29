@@ -3086,7 +3086,33 @@ cal.highlight(cal.options.highlight.push(new Date(2000, 0, 5)));
 			<div class="option-type"></div>
 			<p>Return the SVG source code with the appropriate CSS</p>
 
-			<p class="alert alert-error">Still buggy</p>
+			<p>The returned string code is valid and ready to be placed in a .svg file.</p>
+
+			<div class="example clearfix full-width empty-calendar">
+				<div>
+					<div id="example-getsvg"></div>
+					<textarea style="width: 95%; display: block; margin-top: 20px;" id="example-getsvg-textarea" placeholder="Click on the button below to get the calendar SVG code"></textarea>
+					<button class="btn" id="example-getsvg-button">Get the calendar SVG code</button>
+
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#example-getsvg",
+	range: 2
+});
+
+d3.select("#example-getsvg-button").on("click", function() {
+	d3.event.preventDefault();
+	d3.select("#example-getsvg-textarea").text(cal.getSVG());
+});
+						})();
+					</script>
+				</div>
+
+
+			</div>
+
 
 			<h4 id="setLegend">setLegend(legend, legendColors)</h4> <b class="version-added">3.3.0+</b>
 			<div class="option-type"></div>
