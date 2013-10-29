@@ -130,6 +130,7 @@
 						<li><a href="#setLegend">setLegend</a></li>
 						<li><a href="#removeLegend">removeLegend</a></li>
 						<li><a href="#showLegend">showLegend</a></li>
+						<li><a href="#destroy">destroy</a></li>
 					</ul>
 				</li>
 				<li>
@@ -3142,6 +3143,23 @@ cal.setLegend();
 			<p>Display the legend, if not already shown</p>
 
 			<p class="alert alert-info">Check the <a href="#legend-playground">legend playground</a> for example.</p>
+
+			<h4 id="destroy">destroy(callback)</h4> <b class="version-added">3.3.6+</b>
+			<div class="option-type">Function</div>
+			<p>Remove the calendar from the DOM</p>
+
+			<p><code>destroy()</code> always return <code>null</code>.</p>
+
+			<p>It can take a function as argument, that will be executed when the calendar is removed from the DOM, at the end of the animation.</p>
+
+			<p><em>Remember to self-assign the result of <code>destroy()</code> to your calendar instance, or it'll lead to a memory leak.</em></p>
+
+			<pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({}); // Creating the calendar
+cal = cal.destroy(); // Remove the calendar from the DOM, and assign the 'cal' variable to `null`
+</code></pre>
+
+
 
 
 		<h3 id="events">Events</h3>
