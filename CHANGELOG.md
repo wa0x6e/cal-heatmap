@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.7 [2013-10-29]
+
+* [fix] Fix `getSVG()` not returning all needed classes
+
 ## v3.3.6 [2013-10-28]
 
 * [new] Add `destroy()` method

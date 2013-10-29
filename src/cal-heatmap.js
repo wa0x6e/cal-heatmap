@@ -2751,6 +2751,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		var styles = {
+			".cal-heatmap-container": {},
 			".graph": {},
 			".graph-rect": {},
 			"rect.highlight": {},
@@ -2760,10 +2761,11 @@ CalHeatMap.prototype = {
 			".domain-background": {},
 			".graph-label": {},
 			".subdomain-text": {},
+			".q0": {},
 			".qi": {}
 		};
 
-		for (var j = 0, total = this.options.legend.length; j < total; j++) {
+		for (var j = 1, total = this.options.legend.length+1; j <= total; j++) {
 			styles[".q" + j] = {};
 		}
 
@@ -2843,8 +2845,7 @@ CalHeatMap.prototype = {
 		}
 
 		string += "]]></style>";
-		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][0]);
-		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][1]);
+		string += new XMLSerializer().serializeToString(this.root[0][0]);
 		string += "</svg>";
 
 		return string;

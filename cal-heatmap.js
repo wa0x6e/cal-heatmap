@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.6 (Mon Oct 28 2013 22:39:46)
+/*! cal-heatmap v3.3.7 (Mon Oct 28 2013 23:17:15)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -2759,6 +2759,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		var styles = {
+			".cal-heatmap-container": {},
 			".graph": {},
 			".graph-rect": {},
 			"rect.highlight": {},
@@ -2768,10 +2769,11 @@ CalHeatMap.prototype = {
 			".domain-background": {},
 			".graph-label": {},
 			".subdomain-text": {},
+			".q0": {},
 			".qi": {}
 		};
 
-		for (var j = 0, total = this.options.legend.length; j < total; j++) {
+		for (var j = 1, total = this.options.legend.length+1; j <= total; j++) {
 			styles[".q" + j] = {};
 		}
 
@@ -2851,8 +2853,7 @@ CalHeatMap.prototype = {
 		}
 
 		string += "]]></style>";
-		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][0]);
-		string += new XMLSerializer().serializeToString(this.root.selectAll("svg")[0][1]);
+		string += new XMLSerializer().serializeToString(this.root[0][0]);
 		string += "</svg>";
 
 		return string;
