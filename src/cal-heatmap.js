@@ -2735,7 +2735,13 @@ CalHeatMap.prototype = {
 			.attr("width", 0)
 			.attr("height", 0)
 			.remove()
-			.each("end", function() { if (typeof callback === "function") { callback(); } })
+			.each("end", function() {
+				if (typeof callback === "function") {
+					callback();
+				} else {
+					console.log("Provided callback for destroy() is not a function.");
+				}
+			})
 		;
 
 		return null;

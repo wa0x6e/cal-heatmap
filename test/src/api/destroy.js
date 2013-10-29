@@ -6,7 +6,7 @@
 
 module("API : destroy()");
 
-test("Destroying the calendar", function() {
+asyncTest("Destroying the calendar", function() {
 	expect(3);
 
 	var node = d3.select("body").append("div").attr("id", "test-destroy");
@@ -16,6 +16,7 @@ test("Destroying the calendar", function() {
 
 	cal = cal.destroy(function() {
 		ok("callback called");
+		start();
 	});
 
 	ok(cal === null, "the instance is deleted");
