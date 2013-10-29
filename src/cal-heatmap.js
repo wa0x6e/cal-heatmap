@@ -2735,7 +2735,7 @@ CalHeatMap.prototype = {
 			.attr("width", 0)
 			.attr("height", 0)
 			.remove()
-			.call(callback)
+			.each("end", function() { if (typeof callback === "function") { callback(); } })
 		;
 
 		return null;
@@ -2797,8 +2797,7 @@ CalHeatMap.prototype = {
 				continue;
 			}
 
-			// The DOM Level 2 CSS wa
-			// y
+			// The DOM Level 2 CSS way
 			/* jshint maxdepth: false */
 			if ("getComputedStyle" in window) {
 				var cs = getComputedStyle(dom, null);
