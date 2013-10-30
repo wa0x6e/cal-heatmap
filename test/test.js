@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.7 (Mon Oct 28 2013 23:17:15)
+/*! cal-heatmap v3.3.7 (Wed Oct 30 2013 11:38:30)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -234,11 +234,12 @@ test("Allow only valid data type", function() {
 function _testInvalidDataType(name, input) {
 	test("Invalid dataType (" + name + ") throws an Error", function() {
 		expect(1);
-
+		var cal = new CalHeatMap();
 		throws(function() { cal.init({dataType: input}); });
 	});
 }
 
+_testInvalidDataType("not supported extension", "html");
 _testInvalidDataType("empty string", "");
 _testInvalidDataType("null", null);
 _testInvalidDataType("false", false);

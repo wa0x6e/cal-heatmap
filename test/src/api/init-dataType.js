@@ -20,11 +20,12 @@ test("Allow only valid data type", function() {
 function _testInvalidDataType(name, input) {
 	test("Invalid dataType (" + name + ") throws an Error", function() {
 		expect(1);
-
+		var cal = new CalHeatMap();
 		throws(function() { cal.init({dataType: input}); });
 	});
 }
 
+_testInvalidDataType("not supported extension", "html");
 _testInvalidDataType("empty string", "");
 _testInvalidDataType("null", null);
 _testInvalidDataType("false", false);
