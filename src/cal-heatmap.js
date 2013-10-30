@@ -266,7 +266,7 @@ var CalHeatMap = function() {
 			level: 10,
 			maxItemNumber: 60,
 			defaultRowNumber: 10,
-			defaultColNumber: 6,
+			defaultColumnNumber: 6,
 			row: function(d) { return self.getSubDomainRowNumber(d); },
 			column: function(d) { return self.getSubDomainColumnNumber(d); },
 			position: {
@@ -296,7 +296,7 @@ var CalHeatMap = function() {
 				}
 			},
 			defaultRowNumber: 6,
-			defaultColNumber: function(d) {
+			defaultColumnNumber: function(d) {
 				switch(self.options.domain) {
 				case "day":
 					return 4;
@@ -360,7 +360,7 @@ var CalHeatMap = function() {
 					return self.options.domainDynamicDimension ? self.getDayCountInYear(d) : 366;
 				}
 			},
-			defaultColNumber: function(d) {
+			defaultColumnNumber: function(d) {
 				d = new Date(d);
 				switch(self.options.domain) {
 				case "week":
@@ -1756,7 +1756,7 @@ CalHeatMap.prototype = {
 			return Math.ceil(i / this.options.rowLimit);
 		}
 
-		var j = this._domainType[this.options.subDomain].defaultColNumber;
+		var j = this._domainType[this.options.subDomain].defaultColumnNumber;
 		if (typeof j === "function") {
 			j = j(d);
 
