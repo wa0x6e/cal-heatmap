@@ -293,7 +293,7 @@ var CalHeatMap = function() {
 				case "week":
 					return 24 * 7;
 				case "month":
-					return 24 * (self.options.domainDynamicDimension ? self.getEndOfMonth(d).getDate(): 31);
+					return 24 * (self.options.domainDynamicDimension ? self.getDayCountInMonth(d): 31);
 				}
 			},
 			defaultRowNumber: 6,
@@ -304,7 +304,7 @@ var CalHeatMap = function() {
 				case "week":
 					return 28;
 				case "month":
-					return self.options.domainDynamicDimension ? self.getEndOfMonth(d).getDate(): 31;
+					return self.options.domainDynamicDimension ? self.getDayCountInMonth(d): 31;
 				}
 			},
 			row: function(d) { return self.getSubDomainRowNumber(d); },
@@ -325,16 +325,18 @@ var CalHeatMap = function() {
 					return Math.floor(d.getHours() / self._domainType.hour.row(d));
 				},
 				y: function(d) {
+					var p = d.getHours();
 					if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
 						switch(self.options.domain) {
 						case "month":
-							return Math.floor((d.getHours() + (d.getDate()-1)*24) % self._domainType.hour.row(d));
+							p += (d.getDate()-1) * 24;
+							break;
 						case "week":
-							return Math.floor((d.getHours() + self.getWeekDay(d)*24) % self._domainType.hour.row(d));
+							p += self.getWeekDay(d) * 24;
+							break;
 						}
-
 					}
-					return d.getHours() % self._domainType.hour.row(d);
+					return Math.floor(p % self._domainType.hour.row(d));
 				}
 			},
 			format: {
@@ -391,18 +393,21 @@ var CalHeatMap = function() {
 					}
 				},
 				y: function(d) {
+					var p = self.getWeekDay(d);
 					if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
 						switch(self.options.domain) {
 						case "year":
-							return Math.floor((self.getDayOfYear(d) - 1) % self._domainType.day.row(d));
+							p = self.getDayOfYear(d) - 1;
+							break;
 						case "week":
-							return Math.floor(self.getWeekDay(d) % self._domainType.day.row(d));
+							p = self.getWeekDay(d);
+							break;
 						case "month":
-							return Math.floor((d.getDate() - 1) % self._domainType.day.row(d));
+							p = d.getDate() - 1;
+							break;
 						}
-
 					}
-					return self.getWeekDay(d) % self._domainType.day.row(d);
+					return Math.floor(p % self._domainType.day.row(d));
 				}
 			},
 			format: {
