@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.7 (Wed Oct 30 2013 11:38:30)
+/*! cal-heatmap v3.3.7 (Wed Oct 30 2013 11:48:12)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -441,7 +441,7 @@ function __testDomainMarginExpand(title, margin, expectedMargin) {
 	});
 }
 
-__testDomainMarginExpand("a null integer", 0, [0,0,0,0]);
+__testDomainMarginExpand("an empty integer", 0, [0,0,0,0]);
 __testDomainMarginExpand("a non-null integer", 10, [10,10,10,10]);
 __testDomainMarginExpand("a one-value (zero) array", [0], [0,0,0,0]);
 __testDomainMarginExpand("a one-value (five) array", [5], [5,5,5,5]);
@@ -465,7 +465,7 @@ function __testDomainLegendExpand(title, margin, expectedMargin) {
 	});
 }
 
-__testDomainLegendExpand("a null integer", 0, [0,0,0,0]);
+__testDomainLegendExpand("an empty integer", 0, [0,0,0,0]);
 __testDomainLegendExpand("a non-null integer", 10, [10,10,10,10]);
 __testDomainLegendExpand("a one-value (zero) array", [0], [0,0,0,0]);
 __testDomainLegendExpand("a one-value (five) array", [5], [5,5,5,5]);

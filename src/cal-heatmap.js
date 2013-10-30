@@ -1305,8 +1305,6 @@ CalHeatMap.prototype = {
 			}
 
 			switch(value.length) {
-			case 0:
-				return [0, 0, 0, 0];
 			case 1:
 				return [value[0], value[0], value[0], value[0]];
 			case 2:
