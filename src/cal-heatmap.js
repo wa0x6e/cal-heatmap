@@ -1117,15 +1117,14 @@ CalHeatMap.prototype = {
 
 		var parent = this;
 
-		parent.options = mergeRecursive(parent.options, settings);
-		var options = parent.options;
+		var options = parent.options = mergeRecursive(parent.options, settings);
 
 		// Fatal errors
 		// Stop script execution on error
 		validateDomainType();
 		validateSelector(options.itemSelector, false, "itemSelector");
 
-		if (parent.allowedDataType.indexOf(options.dataType) < 0) {
+		if (parent.allowedDataType.indexOf(options.dataType) === -1) {
 			throw new Error("The data type '" + options.dataType + "' is not valid data type");
 		}
 
