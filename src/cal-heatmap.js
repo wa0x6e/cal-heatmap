@@ -2709,7 +2709,7 @@ CalHeatMap.prototype = {
 	highlight: function(args) {
 		"use strict";
 
-		if ((this.options.highlight = this.expandDateSetting(args)) !== []) {
+		if ((this.options.highlight = this.expandDateSetting(args)).length > 0) {
 			this.fill();
 			return true;
 		}
@@ -2735,7 +2735,7 @@ CalHeatMap.prototype = {
 			.each("end", function() {
 				if (typeof callback === "function") {
 					callback();
-				} else {
+				} else if (arguments.length > 0) {
 					console.log("Provided callback for destroy() is not a function.");
 				}
 			})

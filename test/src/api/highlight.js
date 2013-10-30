@@ -50,3 +50,18 @@ asyncTest("Highlighting multiple dates", function() {
 
 });
 
+
+function _testInvalidHighlight(input) {
+	test("Testing invalid values", function() {
+		expect(1);
+
+		var cal = createCalendar({});
+		strictEqual(cal.highlight(input), false);
+		console.log(cal.options.highlight);
+	});
+}
+
+_testInvalidHighlight("");
+_testInvalidHighlight([]);
+_testInvalidHighlight("tomorrow");
+_testInvalidHighlight(2000);
