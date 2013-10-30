@@ -57,7 +57,6 @@ function _testInvalidHighlight(input) {
 
 		var cal = createCalendar({});
 		strictEqual(cal.highlight(input), false);
-		console.log(cal.options.highlight);
 	});
 }
 
