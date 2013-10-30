@@ -1,4 +1,3 @@
-/* jshint maxstatements: false */
 var CalHeatMap = function() {
 	"use strict";
 
@@ -439,17 +438,9 @@ var CalHeatMap = function() {
 				x: function(d) {
 					switch(self.options.domain) {
 					case "year":
-						if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
-							return Math.floor(self.getWeekNumber(d) / self._domainType.week.row(d));
-						}
-						return self.getWeekNumber(d);
+						return Math.floor(self.getWeekNumber(d) / self._domainType.week.row(d));
 					case "month":
-						var weekNumberInMonth = self.getMonthWeekNumber(d);
-						if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
-
-							return Math.floor((weekNumberInMonth - 1) / self._domainType.week.row(d));
-						}
-						return weekNumberInMonth;
+						return Math.floor(self.getMonthWeekNumber(d) / self._domainType.week.row(d));
 					}
 				},
 				y: function(d) {
@@ -515,39 +506,24 @@ var CalHeatMap = function() {
 
 	for (var type in this._domainType) {
 		if (this._domainType.hasOwnProperty(type)) {
-			this._domainType["x_" + type] = {};
-			this._domainType["x_" + type].name = "x_" + type;
-			this._domainType["x_" + type].level = this._domainType[type].level;
-			this._domainType["x_" + type].maxItemNumber = this._domainType[type].maxItemNumber;
-			this._domainType["x_" + type].row = this._domainType[type].column;
-			this._domainType["x_" + type].column = this._domainType[type].row;
-			this._domainType["x_" + type].defaultRowNumber = this._domainType[type].defaultRowNumber;
-			this._domainType["x_" + type].defaultColumnNumber = this._domainType[type].defaultColumnNumber;
-			this._domainType["x_" + type].position = {};
-			this._domainType["x_" + type].position.x = this._domainType[type].position.y;
-			this._domainType["x_" + type].position.y = this._domainType[type].position.x;
-			this._domainType["x_" + type].format = this._domainType[type].format;
-			this._domainType["x_" + type].extractUnit = this._domainType[type].extractUnit;
+			var d = this._domainType[type];
+			this._domainType["x_" + type] = {
+				name: "x_" + type,
+				level: d.type,
+				maxItemNumber: d.maxItemNumber,
+				defaultRowNumber: d.defaultRowNumber,
+				defaultColumnNumber: d.defaultColumnNumber,
+				row: d.column,
+				column: d.row,
+				position: {
+					x: d.position.y,
+					y: d.position.x,
+				},
+				format: d.format,
+				extractUnit: d.extractUnit
+			};
 		}
 	}
-
-	// Exception: always return the maximum number of weeks
-	// to align the label vertically
-	/* jshint camelcase:false */
-	this._domainType.x_day.row = function(d) {
-		d = new Date(d);
-		switch(self.options.domain) {
-		case "year":
-			return (self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) - self.getWeekNumber(new Date(d.getFullYear(), 0)) + 1): 54);
-		case "month":
-			if (!self.options.verticalOrientation) {
-				return 6;
-			}
-			return self.options.domainDynamicDimension ? (self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) + 1): 6;
-		case "week":
-			return 1;
-		}
-	};
 
 	// Record the address of the last inserted domain when browsing
 	this.lastInsertedSvg = null;
