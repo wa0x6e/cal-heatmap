@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.3.8 [2013-10-31]
+
+* [new] Add `rewind()` method to navigate the calendar back to the starting date
+* [change] Code improvement and cleaning 
+
 ## v3.3.7 [2013-10-29]
 
 * [fix] Fix `getSVG()` not returning all needed classes
