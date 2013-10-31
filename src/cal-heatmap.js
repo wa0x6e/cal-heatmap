@@ -576,7 +576,9 @@ var CalHeatMap = function() {
 
 		self.root = d3.select(self.options.itemSelector).append("svg").attr("class", "cal-heatmap-container");
 
-		self.tooltip = d3.select(self.options.itemSelector).attr("style", d3.select(self.options.itemSelector).attr("style") + "position:relative;").append("div")
+		self.tooltip = d3.select(self.options.itemSelector)
+			.attr("style", d3.select(self.options.itemSelector).attr("style") + "position:relative;")
+			.append("div")
 			.attr("class", "ch-tooltip")
 		;
 
@@ -2578,6 +2580,18 @@ CalHeatMap.prototype = {
 		}
 
 		return false;
+	},
+
+	/**
+	 * Navigate back to the start date
+	 *
+	 * @since  3.3.8
+	 * @return void
+	 */
+	rewind: function() {
+		"use strict";
+
+		this.jumpTo(this.options.start, true);
 	},
 
 	/**
