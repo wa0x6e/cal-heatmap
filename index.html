@@ -123,7 +123,8 @@
 					<ul>
 						<li><a href="#previous">previous</a></li>
 						<li><a href="#next">next</a></li>
-						<li><a href="#jumpto">jumpto</a></li>
+						<li><a href="#jumpto">jumpTo</a></li>
+						<li><a href="#rewind">rewind</a></li>
 						<li><a href="#update">update</a></li>
 						<li><a href="#highlight-method">highlight</a></li>
 						<li><a href="#getSVG">getSVG</a></li>
@@ -2842,9 +2843,39 @@ $("#jumpTo-b-btn").on("click", function(event) {
 						})();
 					</script>
 				</div>
+			</div>
+
+			<h4 id="rewind">rewind()</h4> <strong class="version-added">3.3.8+</strong>
+			<div class="option-type"></div>
+			<p>Reset the calendar back to the start date</p>
+
+			<div class="example clearfix empty-calendar">
 
 
+				<div>
+					<div id="rewind-a"></div>
+					<p>The following calendar will jump 5 domains forward immediatly on load. Use the Rewind button to reset to the initial start date.</p>
 
+					<div style="float:none;margin-top: 20px;">
+						<button class="btn" id="rewind-a-btn">Rewind</button>
+					</div>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#rewind-a",
+	start: new Date(2000, 0),
+	domain: "month",
+	range: 4
+});
+cal.next(3);
+
+$("#rewind-a-btn").on("click", function(event) {
+	cal.rewind();
+});
+						})();
+					</script>
+				</div>
 			</div>
 
 			<h4 id="update">update(data, afterLoad, updateMode)</h4> <strong class="version-added">3.1.0+</strong>
