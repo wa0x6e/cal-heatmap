@@ -2025,7 +2025,8 @@ CalHeatMap.prototype = {
 		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
-			stop = new Date(start.getTime() + 60 * 1000 * range);
+			stop = new Date(start);
+			stop.setMinutes(stop.getMinutes() + range);
 		}
 
 		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
@@ -2046,7 +2047,8 @@ CalHeatMap.prototype = {
 		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
-			stop = new Date(start.getTime() + 3600 * 1000 * range);
+			stop = new Date(start);
+			stop.setHours(stop.getHours() + range);
 		}
 
 		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
