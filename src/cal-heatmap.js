@@ -2376,8 +2376,7 @@ CalHeatMap.prototype = {
 			}
 			return false;
 		case "object":
-			// Check that source is really a valid json object
-			if (source === Object(source) && Object.prototype.toString.call(source) !== "[object Array]") {
+			if (source === Object(source)) {
 				_callback(source);
 				return false;
 			}
