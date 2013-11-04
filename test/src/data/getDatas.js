@@ -58,19 +58,20 @@ test("Invalid data (number) is ignore and treated as an empty object", function(
 	));
 });
 
-test("Invalid data (array) is ignore and treated as an empty object", function() {
+test("Object is left untouched", function() {
 	expect(4);
 
-	var cal = createCalendar({data: [0]});
+	var d = [0, 1];
+	var cal = createCalendar({data: d});
 
-	deepEqual(cal.options.data, [0]);
-	ok(cal.getDatas(
-		[0],
+	deepEqual(cal.options.data, d);
+	equal(cal.getDatas(
+		d,
 		new Date(),
 		new Date(),
 		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, {}, "array is equivalent to an empty object"); }
-	));
+		function(data) { deepEqual(data, d); }
+	), false);
 });
 
 test("Empty string is treated as an empty object", function() {
