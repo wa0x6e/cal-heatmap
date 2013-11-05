@@ -564,6 +564,10 @@ var CalHeatMap = function() {
 	this.Legend = null;
 	this.legendScale = null;
 
+	// List of domains that are skipped because of DST
+	// All times belonging to these domains should be re-assigned to the previous domain
+	this.DSTDomain = [];
+
 	/**
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
@@ -2025,10 +2029,8 @@ CalHeatMap.prototype = {
 		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
-			stop = new Date(start);
-			stop.setMinutes(stop.getMinutes() + range);
+			stop = new Date(+start + range * 1000 * 60);
 		}
-
 		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
 	},
 
@@ -2051,7 +2053,28 @@ CalHeatMap.prototype = {
 			stop.setHours(stop.getHours() + range);
 		}
 
-		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+		var domains = d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+
+		// Passing from DST to standard time
+		// If there are 25 hours, let's compress the duplicate hours
+		var i = 0;
+		var total = domains.length;
+		for(i = 0; i < total; i++) {
+			if (i > 0 && (domains[i].getHours() === domains[i-1].getHours())) {
+				this.DSTDomain.push(domains[i].getTime());
+				domains.splice(i, 1);
+				break;
+			}
+		}
+
+		// d3.time.hours is returning more hours than needed when changing
+		// from DST to standard time, because there is really 2 hours between
+		// 1am and 2am!
+		if (typeof range === "number" && domains.length > Math.abs(range)) {
+			domains.splice(domains.length-1, 1);
+		}
+
+		return domains;
 	},
 
 	/**
@@ -2410,13 +2433,37 @@ CalHeatMap.prototype = {
 			});
 		}
 
-		var domainKeys = this._domains.keys();
-		var subDomainStep = this._domains.get(domainKeys[0])[1].t - this._domains.get(domainKeys[0])[0].t;
+	//	this._domains.forEach(function(key, value) {
+				//console.log(key);
+				//console.log(new Date(parseInt(key, 10)));
+				/*value.forEach(function(element, index, array) {
+
+				});*/
+		//	});
+
+		//var domainKeys = this._domains.keys();
+		//var subDomainStep = this._domains.get(domainKeys[0])[1].t - this._domains.get(domainKeys[0])[0].t;
+
+		var temp = {};
+
+		var extractTime = function(d) { return d.t; };
 
 		/*jshint forin:false */
 		for (var d in data) {
 			var date = new Date(d*1000);
 			var domainUnit = this.getDomain(date)[0].getTime();
+
+			// The current data belongs to a domain that was compressed
+			// Compress the data for the two duplicate hours into the same hour
+			if (this.DSTDomain.indexOf(domainUnit) >= 0) {
+
+				// Re-assign all data to the first or the second duplicate hours
+				// depending on which is visible
+				if (this._domains.has(domainUnit - 3600 * 1000)) {
+					domainUnit -= 3600 * 1000;
+				}
+
+			}
 
 			// Skip if data is not relevant to current domain
 			if (isNaN(d) || !data.hasOwnProperty(d) || !this._domains.has(domainUnit) || !(domainUnit >= +startDate && domainUnit < +endDate)) {
@@ -2425,7 +2472,14 @@ CalHeatMap.prototype = {
 
 			var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 			var subDomainsData = this._domains.get(domainUnit);
-			var index = Math.round((subDomainUnit - domainUnit) / subDomainStep);
+			//var index = Math.round((subDomainUnit - domainUnit) / subDomainStep);
+
+			if (!temp.hasOwnProperty(domainUnit)) {
+				temp[domainUnit] = subDomainsData.map(extractTime);
+			}
+
+			var index = temp[domainUnit].indexOf(subDomainUnit);
+		//	console.log(index);
 
 			if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 				subDomainsData[index].v = data[d];
