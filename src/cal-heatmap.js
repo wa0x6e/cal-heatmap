@@ -2433,17 +2433,6 @@ CalHeatMap.prototype = {
 			});
 		}
 
-	//	this._domains.forEach(function(key, value) {
-				//console.log(key);
-				//console.log(new Date(parseInt(key, 10)));
-				/*value.forEach(function(element, index, array) {
-
-				});*/
-		//	});
-
-		//var domainKeys = this._domains.keys();
-		//var subDomainStep = this._domains.get(domainKeys[0])[1].t - this._domains.get(domainKeys[0])[0].t;
-
 		var temp = {};
 
 		var extractTime = function(d) { return d.t; };
@@ -2462,7 +2451,6 @@ CalHeatMap.prototype = {
 				if (this._domains.has(domainUnit - 3600 * 1000)) {
 					domainUnit -= 3600 * 1000;
 				}
-
 			}
 
 			// Skip if data is not relevant to current domain
@@ -2470,16 +2458,13 @@ CalHeatMap.prototype = {
 				continue;
 			}
 
-			var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 			var subDomainsData = this._domains.get(domainUnit);
-			//var index = Math.round((subDomainUnit - domainUnit) / subDomainStep);
 
 			if (!temp.hasOwnProperty(domainUnit)) {
 				temp[domainUnit] = subDomainsData.map(extractTime);
 			}
 
-			var index = temp[domainUnit].indexOf(subDomainUnit);
-		//	console.log(index);
+			var index = temp[domainUnit].indexOf(this._domainType[this.options.subDomain].extractUnit(date));
 
 			if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 				subDomainsData[index].v = data[d];
