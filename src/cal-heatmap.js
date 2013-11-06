@@ -2200,7 +2200,18 @@ CalHeatMap.prototype = {
 
 		switch(this.options.domain) {
 		case "hour" :
-			return this.getHourDomain(date, range);
+			var domains = this.getHourDomain(date, range);
+
+			// Case where an hour is missing, when passing from standard time to DST
+			// Missing hour is perfectly acceptabl in subDomain, but not in domains
+			if (typeof range === "number" && domains.length < range) {
+				if (range > 0) {
+					domains.push(this.getHourDomain(domains[domains.length-1], 2)[1]);
+				} else {
+					this.getHourDomain(domains[0], -1);
+				}
+			}
+			return domains;
 		case "day"  :
 			return this.getDayDomain(date, range);
 		case "week" :
