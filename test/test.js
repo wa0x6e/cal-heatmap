@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.8 (Tue Nov 05 2013 16:40:31)
+/*! cal-heatmap v3.3.8 (Tue Nov 05 2013 21:46:35)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -1608,12 +1608,11 @@ module("Date computation : jump()");
 
 function _testJump(date, expectedDate, count, step) {
 	test("Jumping " + count + " " + step + "s " + (count > 0 ? "forward" : "backward"), function() {
-		expect(2);
+		expect(1);
 
 		var cal = createCalendar({});
 
-		equal(cal.jumpDate(date, count, step).getTime(), expectedDate.getTime());
-		notEqual(date.getTime(), expectedDate.getTime());
+		deepEqual(cal.jumpDate(date, count, step), expectedDate, date + " " + (count < 0 ? "-" : "+") + " " + Math.abs(count) + " " + step +  " should outpout " + expectedDate);
 	});
 }
 
@@ -1731,6 +1730,112 @@ _testJump(
 	new Date(2001, 0, 30, 23, 0),
 	new Date(2000, 11, 31, 23, 0),
 	-30, "day"
+);
+
+// DST to Standard Time ----------------------------------
+// Date jumping should be DST independent, and works normally
+// without any artifact
+_testJump(
+	new Date(2013, 10, 4, 0),
+	new Date(2013, 10, 4, 1),
+	1, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 0),
+	new Date(2013, 10, 4, 2),
+	2, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 0),
+	new Date(2013, 10, 4, 3),
+	3, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 1),
+	new Date(2013, 10, 4, 2),
+	1, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 1),
+	new Date(2013, 10, 4, 3),
+	2, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 3),
+	new Date(2013, 10, 4, 2),
+	-1, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 3),
+	new Date(2013, 10, 4, 1),
+	-2, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 3),
+	new Date(2013, 10, 4, 0),
+	-3, "hour"
+);
+
+_testJump(
+	new Date(2013, 10, 4, 1),
+	new Date(2013, 10, 4, 0),
+	-1, "hour"
+);
+
+// Standard Time to DST ----------------------------------
+_testJump(
+	new Date(2013, 2, 10, 0),
+	new Date(2013, 2, 10, 1),
+	1, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 0),
+	new Date(2013, 2, 10, 2),
+	2, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 0),
+	new Date(2013, 2, 10, 3),
+	3, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 1),
+	new Date(2013, 2, 10, 2),
+	1, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 1),
+	new Date(2013, 2, 10, 0),
+	-1, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 2), // 2am => inexisting hour, considered 1am
+	new Date(2013, 2, 9, 23),
+	-2, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 3),
+	new Date(2013, 2, 10, 0),
+	-3, "hour"
+);
+
+_testJump(
+	new Date(2013, 2, 10, 2), // 2am => inexisting hour, considered 1am
+	new Date(2013, 2, 10, 0),
+	-1, "hour"
 );
 
 /*
