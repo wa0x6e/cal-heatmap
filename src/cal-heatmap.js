@@ -2208,7 +2208,7 @@ CalHeatMap.prototype = {
 				if (range > 0) {
 					domains.push(this.getHourDomain(domains[domains.length-1], 2)[1]);
 				} else {
-					this.getHourDomain(domains[0], -1);
+					domains.shift(this.getHourDomain(domains[0], -2)[0]);
 				}
 			}
 			return domains;

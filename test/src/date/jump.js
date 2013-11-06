@@ -189,51 +189,61 @@ _testJump(
 	-1, "hour"
 );
 
-// Standard Time to DST ----------------------------------
-_testJump(
-	new Date(2013, 2, 10, 0),
-	new Date(2013, 2, 10, 1),
-	1, "hour"
-);
+(function() {
 
-_testJump(
-	new Date(2013, 2, 10, 0),
-	new Date(2013, 2, 10, 2),
-	2, "hour"
-);
+	var startDate = new Date(2013, 10, 3, 0);
 
-_testJump(
-	new Date(2013, 2, 10, 0),
-	new Date(2013, 2, 10, 3),
-	3, "hour"
-);
+	// Skip the test if your DST change is not following the North American standard
+	if (new Date(+startDate + 3600 * 1000 * 2).getHours() === 2) {
+		return true;
+	}
 
-_testJump(
-	new Date(2013, 2, 10, 1),
-	new Date(2013, 2, 10, 2),
-	1, "hour"
-);
+	// Standard Time to DST ----------------------------------
+	_testJump(
+		new Date(2013, 2, 10, 0),
+		new Date(2013, 2, 10, 1),
+		1, "hour"
+	);
 
-_testJump(
-	new Date(2013, 2, 10, 1),
-	new Date(2013, 2, 10, 0),
-	-1, "hour"
-);
+	_testJump(
+		new Date(2013, 2, 10, 0),
+		new Date(2013, 2, 10, 2),
+		2, "hour"
+	);
 
-_testJump(
-	new Date(2013, 2, 10, 2), // 2am => inexisting hour, considered 1am
-	new Date(2013, 2, 9, 23),
-	-2, "hour"
-);
+	_testJump(
+		new Date(2013, 2, 10, 0),
+		new Date(2013, 2, 10, 3),
+		3, "hour"
+	);
 
-_testJump(
-	new Date(2013, 2, 10, 3),
-	new Date(2013, 2, 10, 0),
-	-3, "hour"
-);
+	_testJump(
+		new Date(2013, 2, 10, 1),
+		new Date(2013, 2, 10, 2),
+		1, "hour"
+	);
 
-_testJump(
-	new Date(2013, 2, 10, 2), // 2am => inexisting hour, considered 1am
-	new Date(2013, 2, 10, 0),
-	-1, "hour"
-);
+	_testJump(
+		new Date(2013, 2, 10, 1),
+		new Date(2013, 2, 10, 0),
+		-1, "hour"
+	);
+
+	_testJump(
+		new Date(2013, 2, 10, 2), // 2am => inexisting hour, considered 1am
+		new Date(2013, 2, 9, 23),
+		-2, "hour"
+	);
+
+	_testJump(
+		new Date(2013, 2, 10, 3),
+		new Date(2013, 2, 10, 0),
+		-3, "hour"
+	);
+
+	_testJump(
+		new Date(2013, 2, 10, 2), // 2am => inexisting hour, considered 1am
+		new Date(2013, 2, 10, 0),
+		-1, "hour"
+	);
+})();
