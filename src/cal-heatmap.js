@@ -1944,7 +1944,7 @@ CalHeatMap.prototype = {
 		if (typeof d === "number") {
 			d = new Date(d);
 		}
-		return (d.getFullYear() % 400 === 0) ? 366 : 365;
+		return (new Date(d.getFullYear(), 1, 29).getMonth() === 1) ? 366 : 365;
 	},
 
 	/**
