@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.8 (Wed Oct 30 2013 17:32:05)
+/*! cal-heatmap v3.3.9 (Sun Nov 24 2013 15:00:55)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -572,6 +572,10 @@ var CalHeatMap = function() {
 	this.Legend = null;
 	this.legendScale = null;
 
+	// List of domains that are skipped because of DST
+	// All times belonging to these domains should be re-assigned to the previous domain
+	this.DSTDomain = [];
+
 	/**
 	 * Display the graph for the first time
 	 * @return bool True if the calendar is created
@@ -584,7 +588,9 @@ var CalHeatMap = function() {
 
 		self.root = d3.select(self.options.itemSelector).append("svg").attr("class", "cal-heatmap-container");
 
-		self.tooltip = d3.select(self.options.itemSelector).attr("style", d3.select(self.options.itemSelector).attr("style") + "position:relative;").append("div")
+		self.tooltip = d3.select(self.options.itemSelector)
+			.attr("style", d3.select(self.options.itemSelector).attr("style") + "position:relative;")
+			.append("div")
 			.attr("class", "ch-tooltip")
 		;
 
@@ -719,7 +725,7 @@ var CalHeatMap = function() {
 			})
 			.attr("x", function(d) {
 				if (options.verticalOrientation) {
-					self.graphDim.width = w(d, true);
+					self.graphDim.width = Math.max(self.graphDim.width, w(d, true));
 					return 0;
 				} else {
 					return getDomainPosition(d, self.graphDim, "width", w(d, true));
@@ -729,7 +735,7 @@ var CalHeatMap = function() {
 				if (options.verticalOrientation) {
 					return getDomainPosition(d, self.graphDim, "height", h(d, true));
 				} else {
-					self.graphDim.height = h(d, true);
+					self.graphDim.height = Math.max(self.graphDim.height, h(d, true));
 					return 0;
 				}
 			})
@@ -1946,7 +1952,7 @@ CalHeatMap.prototype = {
 		if (typeof d === "number") {
 			d = new Date(d);
 		}
-		return (d.getFullYear() % 400 === 0) ? 366 : 365;
+		return (new Date(d.getFullYear(), 1, 29).getMonth() === 1) ? 366 : 365;
 	},
 
 	/**
@@ -2031,9 +2037,8 @@ CalHeatMap.prototype = {
 		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
-			stop = new Date(start.getTime() + 60 * 1000 * range);
+			stop = new Date(+start + range * 1000 * 60);
 		}
-
 		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
 	},
 
@@ -2052,10 +2057,32 @@ CalHeatMap.prototype = {
 		if (range instanceof Date) {
 			stop = new Date(range.getFullYear(), range.getMonth(), range.getDate(), range.getHours());
 		} else {
-			stop = new Date(start.getTime() + 3600 * 1000 * range);
+			stop = new Date(start);
+			stop.setHours(stop.getHours() + range);
 		}
 
-		return d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+		var domains = d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+
+		// Passing from DST to standard time
+		// If there are 25 hours, let's compress the duplicate hours
+		var i = 0;
+		var total = domains.length;
+		for(i = 0; i < total; i++) {
+			if (i > 0 && (domains[i].getHours() === domains[i-1].getHours())) {
+				this.DSTDomain.push(domains[i].getTime());
+				domains.splice(i, 1);
+				break;
+			}
+		}
+
+		// d3.time.hours is returning more hours than needed when changing
+		// from DST to standard time, because there is really 2 hours between
+		// 1am and 2am!
+		if (typeof range === "number" && domains.length > Math.abs(range)) {
+			domains.splice(domains.length-1, 1);
+		}
+
+		return domains;
 	},
 
 	/**
@@ -2181,7 +2208,18 @@ CalHeatMap.prototype = {
 
 		switch(this.options.domain) {
 		case "hour" :
-			return this.getHourDomain(date, range);
+			var domains = this.getHourDomain(date, range);
+
+			// Case where an hour is missing, when passing from standard time to DST
+			// Missing hour is perfectly acceptabl in subDomain, but not in domains
+			if (typeof range === "number" && domains.length < range) {
+				if (range > 0) {
+					domains.push(this.getHourDomain(domains[domains.length-1], 2)[1]);
+				} else {
+					domains.shift(this.getHourDomain(domains[0], -2)[0]);
+				}
+			}
+			return domains;
 		case "day"  :
 			return this.getDayDomain(date, range);
 		case "week" :
@@ -2382,8 +2420,7 @@ CalHeatMap.prototype = {
 			}
 			return false;
 		case "object":
-			// Check that source is really a valid json object
-			if (source === Object(source) && Object.prototype.toString.call(source) !== "[object Array]") {
+			if (source === Object(source)) {
 				_callback(source);
 				return false;
 			}
@@ -2415,22 +2452,38 @@ CalHeatMap.prototype = {
 			});
 		}
 
-		var domainKeys = this._domains.keys();
-		var subDomainStep = this._domains.get(domainKeys[0])[1].t - this._domains.get(domainKeys[0])[0].t;
+		var temp = {};
+
+		var extractTime = function(d) { return d.t; };
 
 		/*jshint forin:false */
 		for (var d in data) {
 			var date = new Date(d*1000);
 			var domainUnit = this.getDomain(date)[0].getTime();
 
+			// The current data belongs to a domain that was compressed
+			// Compress the data for the two duplicate hours into the same hour
+			if (this.DSTDomain.indexOf(domainUnit) >= 0) {
+
+				// Re-assign all data to the first or the second duplicate hours
+				// depending on which is visible
+				if (this._domains.has(domainUnit - 3600 * 1000)) {
+					domainUnit -= 3600 * 1000;
+				}
+			}
+
 			// Skip if data is not relevant to current domain
 			if (isNaN(d) || !data.hasOwnProperty(d) || !this._domains.has(domainUnit) || !(domainUnit >= +startDate && domainUnit < +endDate)) {
 				continue;
 			}
 
-			var subDomainUnit = this._domainType[this.options.subDomain].extractUnit(date);
 			var subDomainsData = this._domains.get(domainUnit);
-			var index = Math.round((subDomainUnit - domainUnit) / subDomainStep);
+
+			if (!temp.hasOwnProperty(domainUnit)) {
+				temp[domainUnit] = subDomainsData.map(extractTime);
+			}
+
+			var index = temp[domainUnit].indexOf(this._domainType[this.options.subDomain].extractUnit(date));
 
 			if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 				subDomainsData[index].v = data[d];
