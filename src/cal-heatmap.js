@@ -717,7 +717,7 @@ var CalHeatMap = function() {
 			})
 			.attr("x", function(d) {
 				if (options.verticalOrientation) {
-					self.graphDim.width = w(d, true);
+					self.graphDim.width = Math.max(self.graphDim.width, w(d, true));
 					return 0;
 				} else {
 					return getDomainPosition(d, self.graphDim, "width", w(d, true));
@@ -727,7 +727,7 @@ var CalHeatMap = function() {
 				if (options.verticalOrientation) {
 					return getDomainPosition(d, self.graphDim, "height", h(d, true));
 				} else {
-					self.graphDim.height = h(d, true);
+					self.graphDim.height = Math.max(self.graphDim.height, h(d, true));
 					return 0;
 				}
 			})
