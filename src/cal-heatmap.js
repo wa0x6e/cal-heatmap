@@ -1364,7 +1364,7 @@ CalHeatMap.prototype = {
 					return options.legendColors.overflow;
 				}
 
-				return parent.legendScale(Math.min(d.v, options.legend[options.legend.length-2]));
+				return parent.legendScale(Math.min(d.v, options.legend[options.legend.length-1]));
 			});
 		}
 
