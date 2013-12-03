@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "3.3.9",
+  "version": "3.3.10",
   "description": "Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data",
   "keywords": [
     "calendar",
@@ -28,7 +28,6 @@
     "karma-qunit": "~0.1.0",
     "grunt-karma-coveralls": "~2.0.2",
     "grunt-contrib-watch": "~0.5.3",
-    "karma-phantomjs-launcher": "0.0.2",
     "phantomjs": "~1.9.1-0",
     "grunt-contrib-qunit": "~0.3.0"
   },

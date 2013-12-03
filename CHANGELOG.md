@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.3.10 [2013-12-03]
+
+* [fix] Fix #58 Legend colors are shifted
+* [fix] Fix #62 Bug when calendar container already have a style attribute
+
 ## v3.3.9 [2013-11-24]
 
 * [new] Fix hidden day cells for leap year in some domain/subDomainc configuration
