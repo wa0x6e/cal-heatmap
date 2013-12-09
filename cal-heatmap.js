@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.10 (Tue Dec 03 2013 19:30:01)
+/*! cal-heatmap v3.3.10 (Mon Dec 09 2013 13:11:58)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -1876,6 +1876,24 @@ CalHeatMap.prototype = {
 			return false;
 		}
 	},
+
+
+    /**
+     * Returns weather or not dateA is less than or equal to dateB.  Performs automatic conversion of values.
+     * @param dateA may be a number or a Date
+     * @param dateB may be a number or a Date
+     * @returns {boolean}
+     */
+    dateIsLessThan: function(dateA, dateB) {
+        if(!(dateA instanceof Date))
+            dateA = new Date(dateA);
+
+        if (!(dateB instanceof Date))
+            dateB = new Date(dateB);
+
+        return dateA.getTime() <= dateB.getTime();
+    },
+
 
 	// =========================================================================//
 	// DATE COMPUTATION															//
