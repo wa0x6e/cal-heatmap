@@ -1382,7 +1382,8 @@ CalHeatMap.prototype = {
 
 				if (d.v !== null) {
 					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero) {
+				} else if (options.considerMissingDataAsZero && 
+					parent.dateIsLessThan(d.t, new Date())) {
 					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
 
@@ -1868,6 +1869,49 @@ CalHeatMap.prototype = {
 			return false;
 		}
 	},
+
+
+    /**
+     * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware. 
+     * Performs automatic conversion of values.
+     * @param dateA may be a number or a Date
+     * @param dateB may be a number or a Date
+     * @returns {boolean}
+     */
+    dateIsLessThan: function(dateA, dateB) {
+        "use strict";
+
+        if(!(dateA instanceof Date))
+            dateA = new Date(dateA);
+
+        if (!(dateB instanceof Date))
+            dateB = new Date(dateB);
+
+       
+        function normalizedMillis(date, subdomain) {
+        	switch(subdomain) {
+			case "x_min":
+			case "min":
+				return new Date(date.getFullYear(), date.getMonth(), date.getDay(), date.getHours(), date.getMinutes()).getTime();
+			case "x_hour":
+			case "hour":
+				return new Date(date.getFullYear(), date.getMonth(), date.getDay(), date.getHours()).getTime();
+			case "x_day":
+			case "day":
+				return new Date(date.getFullYear(), date.getMonth(), date.getDay()).getTime();
+			case "x_week":
+			case "week":
+			case "x_month":
+			case "month":
+				return new Date(date.getFullYear(), date.getMonth()).getTime();
+			default:
+				return date.getTime();
+			}
+        }
+
+		return normalizedMillis(dateA, this.options.subDomain) < normalizedMillis(dateB, this.options.subDomain);
+    },
+
 
 	// =========================================================================//
 	// DATE COMPUTATION															//
