@@ -1382,7 +1382,8 @@ CalHeatMap.prototype = {
 
 				if (d.v !== null) {
 					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero) {
+				} else if (options.considerMissingDataAsZero && 
+					parent.dateIsLessThan(d.t, new Date())) {
 					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
 
