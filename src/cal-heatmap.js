@@ -1892,13 +1892,13 @@ CalHeatMap.prototype = {
         	switch(subdomain) {
 			case "x_min":
 			case "min":
-				return new Date(date.getFullYear(), date.getMonth(), date.getDay(), date.getHours(), date.getMinutes()).getTime();
+				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()).getTime();
 			case "x_hour":
 			case "hour":
-				return new Date(date.getFullYear(), date.getMonth(), date.getDay(), date.getHours()).getTime();
+				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).getTime();
 			case "x_day":
 			case "day":
-				return new Date(date.getFullYear(), date.getMonth(), date.getDay()).getTime();
+				return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 			case "x_week":
 			case "week":
 			case "x_month":
