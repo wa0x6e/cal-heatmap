@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.3.10 (Tue Dec 03 2013 19:30:01)
+/*! cal-heatmap v3.3.10 (Mon Dec 09 2013 14:28:41)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -1390,7 +1390,8 @@ CalHeatMap.prototype = {
 
 				if (d.v !== null) {
 					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero) {
+				} else if (options.considerMissingDataAsZero && 
+					parent.dateIsLessThan(d.t, new Date())) {
 					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
 
@@ -1876,6 +1877,49 @@ CalHeatMap.prototype = {
 			return false;
 		}
 	},
+
+
+    /**
+     * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware. 
+     * Performs automatic conversion of values.
+     * @param dateA may be a number or a Date
+     * @param dateB may be a number or a Date
+     * @returns {boolean}
+     */
+    dateIsLessThan: function(dateA, dateB) {
+        "use strict";
+
+        if(!(dateA instanceof Date))
+            dateA = new Date(dateA);
+
+        if (!(dateB instanceof Date))
+            dateB = new Date(dateB);
+
+       
+        function normalizedMillis(date, subdomain) {
+        	switch(subdomain) {
+			case "x_min":
+			case "min":
+				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()).getTime();
+			case "x_hour":
+			case "hour":
+				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).getTime();
+			case "x_day":
+			case "day":
+				return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+			case "x_week":
+			case "week":
+			case "x_month":
+			case "month":
+				return new Date(date.getFullYear(), date.getMonth()).getTime();
+			default:
+				return date.getTime();
+			}
+        }
+
+		return normalizedMillis(dateA, this.options.subDomain) < normalizedMillis(dateB, this.options.subDomain);
+    },
+
 
 	// =========================================================================//
 	// DATE COMPUTATION															//
