@@ -8,7 +8,7 @@ module.exports = function(grunt) {
                 " *  <%= pkg.homepage %>\n" +
 
                 " *  Licensed under the <%= pkg.license %> license\n" +
-                " *  Copyright 2013 <%= pkg.author.name %>\n" +
+                " *  Copyright 2014 <%= pkg.author.name %>\n" +
                 " */\n";
 
     // Project configuration.
@@ -39,8 +39,7 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: headerComment,
-                sourceMap: "<%= pkg.name %>.source-map.js"
+                banner: headerComment
             },
             base: {
                 files: {

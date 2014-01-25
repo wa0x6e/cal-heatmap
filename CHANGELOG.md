@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.3.11 [2014-01-26]
+
+* [new] Only consider entries less than now (in the subdomain) as zero, when considering null as zero (Peter Schwarz)
+* [change] Remove sourcemaps comment in js
+
 ## v3.3.10 [2013-12-03]
 
 * [fix] Fix #58 Legend colors are shifted
