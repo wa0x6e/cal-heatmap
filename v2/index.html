@@ -1013,6 +1013,7 @@ var parser = function(data) {
 	}
 	return stats;
 };
+
 // Parser will output the object
 //{
 //	"946702811": 15,
@@ -1020,9 +1021,10 @@ var parser = function(data) {
 //	"946702813": 10
 }
 
-var cal = createCalendar({
-	data: datas,
-	afterLoadData: parser
+var calendar = new CalHeatMap();
+calendar.init({
+  data: datas,
+  afterLoadData: parser
 });
 </code></pre>
 
