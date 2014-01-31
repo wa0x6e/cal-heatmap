@@ -1875,25 +1875,27 @@ CalHeatMap.prototype = {
 	},
 
 
-    /**
-     * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware.
-     * Performs automatic conversion of values.
-     * @param dateA may be a number or a Date
-     * @param dateB may be a number or a Date
-     * @returns {boolean}
-     */
-    dateIsLessThan: function(dateA, dateB) {
-        "use strict";
+	/**
+	 * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware.
+	 * Performs automatic conversion of values.
+	 * @param dateA may be a number or a Date
+	 * @param dateB may be a number or a Date
+	 * @returns {boolean}
+	 */
+	dateIsLessThan: function(dateA, dateB) {
+		"use strict";
 
-        if(!(dateA instanceof Date))
-            dateA = new Date(dateA);
+		if(!(dateA instanceof Date)) {
+			dateA = new Date(dateA);
+		}
 
-        if (!(dateB instanceof Date))
-            dateB = new Date(dateB);
+		if (!(dateB instanceof Date)) {
+			dateB = new Date(dateB);
+		}
 
 
-        function normalizedMillis(date, subdomain) {
-        	switch(subdomain) {
+		function normalizedMillis(date, subdomain) {
+			switch(subdomain) {
 			case "x_min":
 			case "min":
 				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()).getTime();
@@ -1911,10 +1913,10 @@ CalHeatMap.prototype = {
 			default:
 				return date.getTime();
 			}
-        }
+		}
 
 		return normalizedMillis(dateA, this.options.subDomain) < normalizedMillis(dateB, this.options.subDomain);
-    },
+	},
 
 
 	// =========================================================================//
@@ -3350,30 +3352,30 @@ function mergeRecursive(obj1, obj2) {
 function arrayEquals(arrayA, arrayB) {
 	"use strict";
 
-    // if the other array is a falsy value, return
-    if (!arrayB || !arrayA) {
-        return false;
-    }
+	// if the other array is a falsy value, return
+	if (!arrayB || !arrayA) {
+		return false;
+	}
 
-    // compare lengths - can save a lot of time
-    if (arrayA.length !== arrayB.length) {
-        return false;
-    }
+	// compare lengths - can save a lot of time
+	if (arrayA.length !== arrayB.length) {
+		return false;
+	}
 
-    for (var i = 0; i < arrayA.length; i++) {
-        // Check if we have nested arrays
-        if (arrayA[i] instanceof Array && arrayB[i] instanceof Array) {
-            // recurse into the nested arrays
-            if (!arrayEquals(arrayA[i], arrayB[i])) {
-                return false;
-            }
-        }
-        else if (arrayA[i] !== arrayB[i]) {
-            // Warning - two different object instances will never be equal: {x:20} != {x:20}
-            return false;
-        }
-    }
-    return true;
+	for (var i = 0; i < arrayA.length; i++) {
+		// Check if we have nested arrays
+		if (arrayA[i] instanceof Array && arrayB[i] instanceof Array) {
+			// recurse into the nested arrays
+			if (!arrayEquals(arrayA[i], arrayB[i])) {
+				return false;
+			}
+		}
+		else if (arrayA[i] !== arrayB[i]) {
+			// Warning - two different object instances will never be equal: {x:20} != {x:20}
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
