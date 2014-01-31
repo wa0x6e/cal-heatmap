@@ -1382,7 +1382,7 @@ CalHeatMap.prototype = {
 
 				if (d.v !== null) {
 					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero && 
+				} else if (options.considerMissingDataAsZero &&
 					parent.dateIsLessThan(d.t, new Date())) {
 					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
@@ -1398,6 +1398,10 @@ CalHeatMap.prototype = {
 
 		rect.transition().duration(options.animationDuration).select("title")
 			.text(function(d) { return parent.getSubDomainTitle(d); })
+		;
+
+		rect.transition().duration(options.animationDuration).select("text")
+			.attr("class", function(d) { return "subdomain-text" + parent.getHighlightClassName(d.t); })
 		;
 	},
 
@@ -1872,7 +1876,7 @@ CalHeatMap.prototype = {
 
 
     /**
-     * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware. 
+     * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware.
      * Performs automatic conversion of values.
      * @param dateA may be a number or a Date
      * @param dateB may be a number or a Date
@@ -1887,7 +1891,7 @@ CalHeatMap.prototype = {
         if (!(dateB instanceof Date))
             dateB = new Date(dateB);
 
-       
+
         function normalizedMillis(date, subdomain) {
         	switch(subdomain) {
 			case "x_min":
