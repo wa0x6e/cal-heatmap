@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.12 [2014-01-31]
+
+* [fix] Fix #69 the 'now' and 'highlight' classes are not applied to subdomain text
+
 ## v3.3.11 [2014-01-26]
 
 * [new] Only consider entries less than now (in the subdomain) as zero, when considering null as zero (Peter Schwarz)
