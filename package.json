@@ -16,20 +16,17 @@
     "d3": ">= v3.0.6"
   },
   "devDependencies": {
-    "grunt": "~0.4.0",
+    "grunt": "~0.4.2",
     "grunt-css": "~0.5.3",
-    "grunt-contrib-uglify": "~0.1.1",
+    "grunt-contrib-uglify": "~0.3.2",
     "grunt-contrib-copy": "~0.4.0",
-    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-jshint": "~0.8.0",
     "grunt-replace": "~0.4.0",
     "grunt-contrib-concat": "~0.3.0",
-    "karma": "~0.9",
-    "karma-coverage": "~0.1.0",
-    "karma-qunit": "~0.1.0",
     "grunt-karma-coveralls": "~2.0.2",
     "grunt-contrib-watch": "~0.5.3",
     "phantomjs": "~1.9.1-0",
-    "grunt-contrib-qunit": "~0.3.0"
+    "grunt-contrib-qunit": "~0.4.0"
   },
   "scripts": {
     "test": "grunt travis --verbose; ./node_modules/.bin/karma start --single-run --browsers PhantomJS"
