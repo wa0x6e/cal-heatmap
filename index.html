@@ -2402,40 +2402,46 @@ cal.init({
 
 			<p>Format of the text inside a subDomain cell.</p>
 
-			<p>Disabled by default, you can display a text inside each subDomain cell. Works exactly like <code>subDomainDateFormat</code>.</p>
+			<p>Disabled by default, you can display a text inside each subDomain cell. Works exactly like <code>subDomainDateFormat</code>, except that the function takes the cell value as second argument.</p>
 
 			<div class="example clearfix empty-calendar">
 				<div>
 					<div id="subDomainTextFormat-a"></div>
-					<p>Default, no text</p>
-					<script>
-						(function() {
-var cal = new CalHeatMap();
-cal.init({
-	itemSelector: "#subDomainTextFormat-a",
-	domain: "month",
-	subDomain: "x_day",
-	cellSize: 20,
-	range: 1,
-	displayLegend: false
-});
-						})();
-					</script>
-				</div>
-				<div>
-					<div id="subDomainTextFormat-b"></div>
 					<p>Display the date in cell</p>
 					<script>
 						(function() {
 var cal = new CalHeatMap();
 cal.init({
-	itemSelector: "#subDomainTextFormat-b",
+	itemSelector: "#subDomainTextFormat-a",
+	start: new Date(2000, 0, 1, 1),
 	domain: "month",
 	subDomain: "x_day",
 	cellSize: 20,
 	range: 1,
 	displayLegend: false,
 	subDomainTextFormat: "%d"
+});
+						})();
+					</script>
+				</div>
+				<div>
+					<div id="subDomainTextFormat-b"></div>
+					<p>Display the value in cell</p>
+					<script>
+						(function() {
+var cal = new CalHeatMap();
+cal.init({
+	itemSelector: "#subDomainTextFormat-b",
+	start: new Date(2000, 0, 1, 1),
+	data: "datas-years.json",
+	domain: "month",
+	subDomain: "x_day",
+	cellSize: 20,
+	range: 1,
+	displayLegend: false,
+	subDomainTextFormat: function(date ,value) {
+		return value;
+	}
 });
 						})();
 					</script>
