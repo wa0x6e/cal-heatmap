@@ -987,7 +987,9 @@ var CalHeatMap = function() {
 				.attr("y", function(d) { return self.positionSubDomainY(d.t) + options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
-				.text(function(d){ return self.formatDate(new Date(d.t), options.subDomainTextFormat); })
+				.text(function(d){
+					return self.formatDate(new Date(d.t), options.subDomainTextFormat);
+				})
 			;
 		}
 
@@ -1400,8 +1402,20 @@ CalHeatMap.prototype = {
 			.text(function(d) { return parent.getSubDomainTitle(d); })
 		;
 
+		function formatSubDomainText(element) {
+			if (typeof options.subDomainTextFormat === "function") {
+				element.text(function(d) { return options.subDomainTextFormat(d.t, d.v); });
+			}
+		}
+
+		/**
+		 * Change the subDomainText class if necessary
+		 * Also change the text, e.g when text is representing the value
+		 * instead of the date
+		 */
 		rect.transition().duration(options.animationDuration).select("text")
 			.attr("class", function(d) { return "subdomain-text" + parent.getHighlightClassName(d.t); })
+			.call(formatSubDomainText)
 		;
 	},
 
