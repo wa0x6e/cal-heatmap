@@ -26,7 +26,10 @@
     "grunt-karma-coveralls": "~2.0.2",
     "grunt-contrib-watch": "~0.5.3",
     "phantomjs": "~1.9.1-0",
-    "grunt-contrib-qunit": "~0.4.0"
+    "grunt-contrib-qunit": "~0.4.0",
+    "karma": "~0.9",
+    "karma-coverage": "~0.1.0",
+    "karma-qunit": "~0.1.0"
   },
   "scripts": {
     "test": "grunt travis --verbose; ./node_modules/.bin/karma start --single-run --browsers PhantomJS"
