@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "3.3.12",
+  "version": "3.4.0",
   "description": "Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data",
   "keywords": [
     "calendar",

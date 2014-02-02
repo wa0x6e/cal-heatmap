@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.4.0 [2014-02-02]
+
+* [fix] Fix #57 display data values in subdomain
+
 ## v3.3.12 [2014-01-31]
 
 * [fix] Fix #69 the 'now' and 'highlight' classes are not applied to subdomain text
