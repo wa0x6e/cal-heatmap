@@ -1369,7 +1369,7 @@ CalHeatMap.prototype = {
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === 0 && options.legendColors !== null && options.legendColors.hasOwnProperty("empty")) {
+				if (d.v === null && options.legendColors !== null && options.legendColors.hasOwnProperty("empty")) {
 					return options.legendColors.empty;
 				}
 
