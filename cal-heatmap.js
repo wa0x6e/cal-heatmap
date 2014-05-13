@@ -232,6 +232,12 @@ var CalHeatMap = function() {
 		// Callback when clicking on a time block
 		onClick: null,
 
+		// Callback when hovering on a time block
+		onMouseOver: null,
+
+		// Callback when hovering on a time block
+		onMouseOut: null,
+
 		// Callback after painting the empty calendar
 		// Can be used to trigger an API call, once the calendar is ready to be filled
 		afterLoad: null,
@@ -846,6 +852,16 @@ var CalHeatMap = function() {
 					return self.onClick(new Date(d.t), d.v);
 				}
 			})
+			.on("mouseover", function(d) {
+				if (options.onMouseOver !== null) {
+					return self.onMouseOver(new Date(d.t), d.v);
+				}
+			})
+			.on("mouseout", function(d) {
+				if (options.onMouseOut !== null) {
+					return self.onMouseOut(new Date(d.t), d.v);
+				}
+			})
 			.call(function(selection) {
 				if (options.cellRadius > 0) {
 					selection
@@ -1108,7 +1124,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
+		var s = ["data", "onComplete", "onClick", "onMouseOver", "onMouseOut", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
@@ -1467,6 +1483,30 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		return this.triggerEvent("onClick", [d, itemNb]);
+	},
+
+	/**
+	 * Event triggered when the mouse cursor enteres a subDomain cell
+	 *
+	 * @param  Date		d		Date of the subdomain block
+	 * @param  int		itemNb	Number of items in that date
+	 */
+	onMouseOver: function(d, itemNb) {
+		"use strict";
+
+		return this.triggerEvent("onMouseOver", [d, itemNb]);
+	},
+
+	/**
+	 * Event triggered when the mouse cursor leaves a subDomain cell
+	 *
+	 * @param  Date		d		Date of the subdomain block
+	 * @param  int		itemNb	Number of items in that date
+	 */
+	onMouseOut: function(d, itemNb) {
+		"use strict";
+
+		return this.triggerEvent("onMouseOut", [d, itemNb]);
 	},
 
 	/**
