@@ -1,10 +1,12 @@
-/*! cal-heatmap v3.4.0 (Sun Feb 02 2014 13:03:14)
+/*! cal-heatmap v3.4.0 (Tue May 13 2014 12:22:20)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
  *  Licensed under the MIT license
  *  Copyright 2014 Wan Qi Chen
  */
+
+var d3 = typeof require === "function" ? require("d3") : window.d3;
 
 var CalHeatMap = function() {
 	"use strict";
@@ -3409,4 +3411,8 @@ if (typeof define === "function" && define.amd) {
 
 		return CalHeatMap;
 	});
+} else if (typeof module === "object" && module.exports) {
+	module.exports = CalHeatMap;
+} else {
+	window.CalHeatMap = CalHeatMap;
 }
