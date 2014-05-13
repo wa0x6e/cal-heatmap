@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.6.2 (Sun Nov 06 2022 19:13:50)
+/*! cal-heatmap v3.6.2 (Sun Nov 06 2022 21:44:33)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/wa0x6e/cal-heatmap
@@ -251,6 +251,12 @@ var CalHeatMap = function() {
 		// Callback when clicking on a time block
 		onClick: null,
 
+		// Callback when hovering on a time block
+		onMouseOver: null,
+
+		// Callback when hovering on a time block
+		onMouseOut: null,
+
 		// Callback after painting the empty calendar
 		// Can be used to trigger an API call, once the calendar is ready to be filled
 		afterLoad: null,
@@ -287,7 +293,11 @@ var CalHeatMap = function() {
 		//
 		// This callback is also executed once, after calling next(),
 		// only when the min domain is reached
-		onMinDomainReached: null
+		onMinDomainReached: null,
+
+		// Callback when hovering over a time block
+		onTooltip: function(title) { return title; }
+
 	};
 
 	this._domainType = {
@@ -868,6 +878,16 @@ var CalHeatMap = function() {
 					return self.onClick(new Date(d.t), d.v);
 				}
 			})
+			.on("mouseover", function(d) {
+				if (options.onMouseOver !== null) {
+					return self.onMouseOver(new Date(d.t), d.v);
+				}
+			})
+			.on("mouseout", function(d) {
+				if (options.onMouseOut !== null) {
+					return self.onMouseOut(new Date(d.t), d.v);
+				}
+			})
 			.call(function(selection) {
 				if (options.cellRadius > 0) {
 					selection
@@ -884,31 +904,41 @@ var CalHeatMap = function() {
 					selection.on("mouseover", function(d) {
 						var domainNode = this.parentNode.parentNode;
 
-						self.tooltip
-						.html(self.getSubDomainTitle(d))
-						.attr("style", "display: block;")
-						;
+						var showTooltip = function (title) {
 
-						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
-						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
+							self.tooltip
+							.html(title)
+							.attr("style", "display: block;")
+							;
 
-						// Offset by the domain position
-						tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
-						tooltipPositionY += parseInt(domainNode.getAttribute("y"), 10);
+							var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
+							var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
 
-						// Offset by the calendar position (when legend is left/top)
-						tooltipPositionX += parseInt(self.root.select(".graph").attr("x"), 10);
-						tooltipPositionY += parseInt(self.root.select(".graph").attr("y"), 10);
+							// Offset by the domain position
+							tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
+							tooltipPositionY += parseInt(domainNode.getAttribute("y"), 10);
 
-						// Offset by the inside domain position (when label is left/top)
-						tooltipPositionX += parseInt(domainNode.parentNode.getAttribute("x"), 10);
-						tooltipPositionY += parseInt(domainNode.parentNode.getAttribute("y"), 10);
+							// Offset by the calendar position (when legend is left/top)
+							tooltipPositionX += parseInt(self.root.select(".graph").attr("x"), 10);
+							tooltipPositionY += parseInt(self.root.select(".graph").attr("y"), 10);
 
-						self.tooltip.attr("style",
-						"display: block; " +
-						"left: " + tooltipPositionX + "px; " +
-						"top: " + tooltipPositionY + "px;")
-						;
+							// Offset by the inside domain position (when label is left/top)
+							tooltipPositionX += parseInt(domainNode.parentNode.getAttribute("x"), 10);
+							tooltipPositionY += parseInt(domainNode.parentNode.getAttribute("y"), 10);
+
+							self.tooltip.attr("style",
+								"display: block; " +
+								"left: " + tooltipPositionX + "px; " +
+								"top: " + tooltipPositionY + "px;")
+							;
+						};
+
+						if(!!options.onTooltip) {
+							showTooltip(self.options.onTooltip(new Date(d.t), d.v));
+						} else {
+							showTooltip(self.getSubDomainTitle(d));
+						}
+
 					});
 
 					selection.on("mouseout", function() {
@@ -1145,7 +1175,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate"];
+		var s = ["data", "onComplete", "onClick", "onMouseOver", "onMouseOut", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate", "onTooltip"];
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
@@ -1541,6 +1571,30 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		return this.triggerEvent("onClick", [d, itemNb]);
+	},
+
+	/**
+	 * Event triggered when the mouse cursor enteres a subDomain cell
+	 *
+	 * @param  Date		d		Date of the subdomain block
+	 * @param  int		itemNb	Number of items in that date
+	 */
+	onMouseOver: function(d, itemNb) {
+		"use strict";
+
+		return this.triggerEvent("onMouseOver", [d, itemNb]);
+	},
+
+	/**
+	 * Event triggered when the mouse cursor leaves a subDomain cell
+	 *
+	 * @param  Date		d		Date of the subdomain block
+	 * @param  int		itemNb	Number of items in that date
+	 */
+	onMouseOut: function(d, itemNb) {
+		"use strict";
+
+		return this.triggerEvent("onMouseOut", [d, itemNb]);
 	},
 
 	/**
