@@ -1879,6 +1879,8 @@ CalHeatMap.prototype = {
 				dateA.getDate() === dateB.getDate();
 		case "x_week":
 		case "week":
+			return dateA.getFullYear() === dateB.getFullYear() &&
+				this.getWeekNumber(dateA) === this.getWeekNumber(dateB);
 		case "x_month":
 		case "month":
 			return dateA.getFullYear() === dateB.getFullYear() &&
