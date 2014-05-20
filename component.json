@@ -5,9 +5,9 @@
   "dependencies": {
     "mbostock/d3": ">= 3.0.6"
   },
-  "main": "cal-heatmap.js",
+  "main": "src/cal-heatmap.js",
   "scripts": [
-    "cal-heatmap.js"
+    "src/cal-heatmap.js"
   ],
   "styles": [
     "cal-heatmap.css"
