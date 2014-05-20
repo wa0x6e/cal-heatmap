@@ -224,6 +224,9 @@ var CalHeatMap = function() {
 		// Callback when clicking on a time block
 		onClick: null,
 
+		// Callback after a date is highlighted
+		onHighlight: null,
+
 		// Callback after painting the empty calendar
 		// Can be used to trigger an API call, once the calendar is ready to be filled
 		afterLoad: null,
@@ -1397,6 +1400,10 @@ CalHeatMap.prototype = {
 			})
 			.call(addStyle)
 		;
+
+		if (options.onHighlight !== null && options.highlight.length) {
+			options.onHighlight(options.highlight);
+		}
 
 		rect.transition().duration(options.animationDuration).select("title")
 			.text(function(d) { return parent.getSubDomainTitle(d); })
