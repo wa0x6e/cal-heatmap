@@ -25,6 +25,7 @@
 	"devel":	 true,
 	"jquery":	 true,
 	"phantom":	 true,
+	"node":		 true,
 
 	"globals" : {
 		"d3": true,
