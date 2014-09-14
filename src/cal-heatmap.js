@@ -452,7 +452,7 @@ var CalHeatMap = function() {
 			format: {
 				date: "%B Week #%W",
 				legend: "%B Week #%W",
-				connector: "on"
+				connector: "in"
 			},
 			extractUnit: function(d) {
 				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -480,7 +480,7 @@ var CalHeatMap = function() {
 			format: {
 				date: "%B %Y",
 				legend: "%B",
-				connector: "on"
+				connector: "in"
 			},
 			extractUnit: function(d) {
 				return new Date(d.getFullYear(), d.getMonth()).getTime();
@@ -498,7 +498,7 @@ var CalHeatMap = function() {
 			format: {
 				date: "%Y",
 				legend: "%Y",
-				connector: "on"
+				connector: "in"
 			},
 			extractUnit: function(d) {
 				return new Date(d.getFullYear()).getTime();
