@@ -1,12 +1,10 @@
-/*! cal-heatmap v3.4.0 (Tue May 13 2014 12:22:20)
+/*! cal-heatmap v3.4.0 (Sun Aug 31 2014 11:10:03)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
  *  Licensed under the MIT license
  *  Copyright 2014 Wan Qi Chen
  */
-
-var d3 = typeof require === "function" ? require("d3") : window.d3;
 
 var CalHeatMap = function() {
 	"use strict";
@@ -1889,6 +1887,8 @@ CalHeatMap.prototype = {
 				dateA.getDate() === dateB.getDate();
 		case "x_week":
 		case "week":
+			return dateA.getFullYear() === dateB.getFullYear() &&
+				this.getWeekNumber(dateA) === this.getWeekNumber(dateB);
 		case "x_month":
 		case "month":
 			return dateA.getFullYear() === dateB.getFullYear() &&
@@ -3403,16 +3403,22 @@ function arrayEquals(arrayA, arrayB) {
 }
 
 /**
- * AMD Loader
+ * UMD
  */
-if (typeof define === "function" && define.amd) {
-	define(["d3"], function() {
-		"use strict";
-
-		return CalHeatMap;
-	});
-} else if (typeof module === "object" && module.exports) {
-	module.exports = CalHeatMap;
-} else {
-	window.CalHeatMap = CalHeatMap;
-}
+(function (root, factory) {
+  if (typeof exports === 'object') {
+    // CommonJS
+    module.exports = factory(require('d3'));
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['d3'], function (d3) {
+      return (root.returnExportsGlobal = factory(d3));
+    });
+  } else {
+    // Global Variables
+    root.returnExportsGlobal = factory(root.d3);
+  }
+}(this, function (d3) {
+  // Your actual module
+  return CalHeatMap;
+}));

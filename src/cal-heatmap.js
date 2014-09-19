@@ -1,5 +1,3 @@
-var d3 = typeof require === "function" ? require("d3") : window.d3;
-
 var CalHeatMap = function() {
 	"use strict";
 
@@ -3397,16 +3395,22 @@ function arrayEquals(arrayA, arrayB) {
 }
 
 /**
- * AMD Loader
+ * UMD
  */
-if (typeof define === "function" && define.amd) {
-	define(["d3"], function() {
-		"use strict";
-
-		return CalHeatMap;
-	});
-} else if (typeof module === "object" && module.exports) {
-	module.exports = CalHeatMap;
-} else {
-	window.CalHeatMap = CalHeatMap;
-}
+(function (root, factory) {
+  if (typeof exports === 'object') {
+    // CommonJS
+    module.exports = factory(require('d3'));
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['d3'], function (d3) {
+      return (root.returnExportsGlobal = factory(d3));
+    });
+  } else {
+    // Global Variables
+    root.returnExportsGlobal = factory(root.d3);
+  }
+}(this, function (d3) {
+  // Your actual module
+  return CalHeatMap;
+}));
