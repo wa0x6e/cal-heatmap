@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.5.0 [2014-11-12]
+
+* [fix] Fix #84 Fixing highlighting for week subdomain (Dominic Barnes)
+* [new] Fix #85 Adding some CommonJS as well as Component support (Dominic Barnes)
+* [fix] Fix #107 Fix connectors for week/month/year (Andreas Jaggi)
+* [change] Use NPM to install jquery and qunit dev dependencies
+
 ## v3.4.0 [2014-02-02]
 
 * [fix] Fix #57 display data values in subdomain
