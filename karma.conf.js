@@ -16,7 +16,7 @@ module.exports = function(config) {
 		files: [
 			"test/d3.min.js",
 			"src/cal-heatmap.js",
-			"test/jquery-1.9.1.js",
+			"node_modules/jquery/jquery.min.js",
 			"test/test.js",
 			{
 				pattern: "test/data/data.*",
