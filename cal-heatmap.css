@@ -136,7 +136,7 @@ text.now
 	border-style: solid;
 	content: "";
 	padding: 0;
-	display: "block";
+	display: block;
 	bottom: -6px;
 	left: 50%;
 	margin-left: -6px;
