@@ -1393,24 +1393,28 @@ CalHeatMap.prototype = {
 		rect.transition().duration(options.animationDuration).select("rect")
 			.attr("class", function(d) {
 
-				var htmlClass = parent.getHighlightClassName(d.t);
+				var htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
+				var pastDate = parent.dateIsLessThan(d.t, new Date());
 
 				if (parent.legendScale === null) {
-					htmlClass += " graph-rect";
+					htmlClass.push("graph-rect");
+				}
+
+				if (!pastDate && htmlClass.indexOf("now") === -1) {
+					htmlClass.push("future");
 				}
 
 				if (d.v !== null) {
-					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero &&
-					parent.dateIsLessThan(d.t, new Date())) {
-					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
+					htmlClass.push(parent.Legend.getClass(d.v, (parent.legendScale === null)));
+				} else if (options.considerMissingDataAsZero && pastDate) {
+					htmlClass.push(parent.Legend.getClass(0, (parent.legendScale === null)));
 				}
 
 				if (options.onClick !== null) {
-					htmlClass += " hover_cursor";
+					htmlClass.push("hover_cursor");
 				}
 
-				return htmlClass;
+				return htmlClass.join(" ");
 			})
 			.call(addStyle)
 		;
@@ -1909,7 +1913,7 @@ CalHeatMap.prototype = {
 
 
 	/**
-	 * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware.
+	 * Returns wether or not dateA is less than or equal to dateB. This function is subdomain aware.
 	 * Performs automatic conversion of values.
 	 * @param dateA may be a number or a Date
 	 * @param dateB may be a number or a Date
