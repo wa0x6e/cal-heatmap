@@ -112,7 +112,7 @@ Remove comment to apply this style to date with value equal to 0
 	shape-rendering: crispedges
 }
 
-.cal-heatmap-container .ch-tooltip {
+.ch-tooltip {
 	padding: 10px;
 	background: #222;
 	color: #bbb;
@@ -128,7 +128,7 @@ Remove comment to apply this style to date with value equal to 0
 	box-sizing: border-box;
 }
 
-.cal-heatmap-container .ch-tooltip::after{
+.ch-tooltip::after{
 	position: absolute;
 	width: 0;
 	height: 0;
