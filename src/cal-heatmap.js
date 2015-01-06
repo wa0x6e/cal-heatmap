@@ -2865,7 +2865,7 @@ CalHeatMap.prototype = {
 			.each("end", function() {
 				if (typeof callback === "function") {
 					callback();
-				} else if (callback !== undefined) {
+				} else if (typeof callback !== "undefined") {
 					console.log("Provided callback for destroy() is not a function.");
 				}
 			})
