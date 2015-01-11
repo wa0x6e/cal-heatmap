@@ -2,4 +2,5 @@
 /jscoverage/
 /coverage/
 /report/
+/build/
 .DS_Store
