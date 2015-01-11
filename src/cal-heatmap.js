@@ -1,5 +1,3 @@
-var d3 = typeof require === "function" ? require("d3") : window.d3;
-
 var CalHeatMap = function() {
 	"use strict";
 
@@ -3413,19 +3411,4 @@ function arrayEquals(arrayA, arrayB) {
 		}
 	}
 	return true;
-}
-
-/**
- * AMD Loader
- */
-if (typeof define === "function" && define.amd) {
-	define(["d3"], function() {
-		"use strict";
-
-		return CalHeatMap;
-	});
-} else if (typeof module === "object" && module.exports) {
-	module.exports = CalHeatMap;
-} else {
-	window.CalHeatMap = CalHeatMap;
 }
