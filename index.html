@@ -3387,7 +3387,9 @@ cal.init({
 			<div class="option-type"></div>
 			<p>Called after drawing and filling the calendar.</p>
 
-			<p>Useful in case you're loading data via ajax, as it's loading data asynchronously.</p>
+			<p>Useful in case you're loading data via ajax, as it's loading data asynchronously. This event will wait for the ajax request to complete before triggering.</p>
+
+			<p>This event will only <strong>trigger once</strong>, on the initial setup. See <a href="#afterLoadPreviousDomain"><code>afterLoadPreviousDomain</code></a> and <a href="#afterLoadNextDomain"><code>afterLoadNextDomain</code></a> for callback events after a domain navigation.</p>
 
 			<div class="example clearfix empty-calendar">
 				<div class="expandable-source">
