@@ -7,7 +7,7 @@
     "d3js",
     "heat map"
   ],
-  "version": "3.4.0",
+  "version": "3.5.1",
   "main": ["./cal-heatmap.js", "./cal-heatmap.css"],
   "dependencies": {
     "d3": ">= v3.0.6"

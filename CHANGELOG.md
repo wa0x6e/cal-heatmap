@@ -1,5 +1,19 @@
 # Changelog
 
+## v3.5.1 [2015-01-19]
+
+* [fix] Fix #97 Make "class" of all elements more dedicated
+* [fix] Fix #93 Tooltip position due to legendOffset and domainLabel
+* [fix] Fix #89 Add a `.future` class to future subdomain cells
+* [fix] Fix false error output when no callback passed to `destroy()`
+
+## v3.5.0 [2014-11-12]
+
+* [fix] Fix #84 Fixing highlighting for week subdomain (Dominic Barnes)
+* [new] Fix #85 Adding some CommonJS as well as Component support (Dominic Barnes)
+* [fix] Fix #107 Fix connectors for week/month/year (Andreas Jaggi)
+* [change] Use NPM to install jquery and qunit dev dependencies
+
 ## v3.4.0 [2014-02-02]
 
 * [fix] Fix #57 display data values in subdomain
