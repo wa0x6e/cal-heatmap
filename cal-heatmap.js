@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.5.0 (Wed Nov 12 2014 16:19:34)
+/*! cal-heatmap v3.5.1 (Mon Jan 19 2015 17:28:39)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -862,17 +862,32 @@ var CalHeatMap = function() {
 
 				if (options.tooltip) {
 					selection.on("mouseover", function(d) {
-						var domainNode = this.parentNode.parentNode.parentNode;
+						var domainNode = this.parentNode.parentNode;
 
 						self.tooltip
 						.html(self.getSubDomainTitle(d))
 						.attr("style", "display: block;")
 						;
 
+						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
+						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
+
+						// Offset by the domain position
+						tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
+						tooltipPositionY += parseInt(domainNode.getAttribute("y"), 10);
+
+						// Offset by the calendar position (when legend is left/top)
+						tooltipPositionX += parseInt(self.root.select(".graph").attr("x"), 10);
+						tooltipPositionY += parseInt(self.root.select(".graph").attr("y"), 10);
+
+						// Offset by the inside domain position (when label is left/top)
+						tooltipPositionX += parseInt(domainNode.parentNode.getAttribute("x"), 10);
+						tooltipPositionY += parseInt(domainNode.parentNode.getAttribute("y"), 10);
+
 						self.tooltip.attr("style",
-							"display: block; " +
-							"left: " + (self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2 + parseInt(domainNode.getAttribute("x"), 10)) + "px; " +
-							"top: " + (self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2 + parseInt(domainNode.getAttribute("y"), 10)) + "px;")
+						"display: block; " +
+						"left: " + tooltipPositionX + "px; " +
+						"top: " + tooltipPositionY + "px;")
 						;
 					});
 
@@ -1371,7 +1386,7 @@ CalHeatMap.prototype = {
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === null && options.legendColors !== null && options.legendColors.hasOwnProperty("empty")) {
+				if (d.v === 0 && options.legendColors !== null && options.legendColors.hasOwnProperty("empty")) {
 					return options.legendColors.empty;
 				}
 
@@ -1386,24 +1401,28 @@ CalHeatMap.prototype = {
 		rect.transition().duration(options.animationDuration).select("rect")
 			.attr("class", function(d) {
 
-				var htmlClass = parent.getHighlightClassName(d.t);
+				var htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
+				var pastDate = parent.dateIsLessThan(d.t, new Date());
 
 				if (parent.legendScale === null) {
-					htmlClass += " graph-rect";
+					htmlClass.push("graph-rect");
+				}
+
+				if (!pastDate && htmlClass.indexOf("now") === -1) {
+					htmlClass.push("future");
 				}
 
 				if (d.v !== null) {
-					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero &&
-					parent.dateIsLessThan(d.t, new Date())) {
-					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
+					htmlClass.push(parent.Legend.getClass(d.v, (parent.legendScale === null)));
+				} else if (options.considerMissingDataAsZero && pastDate) {
+					htmlClass.push(parent.Legend.getClass(0, (parent.legendScale === null)));
 				}
 
 				if (options.onClick !== null) {
-					htmlClass += " hover_cursor";
+					htmlClass.push("hover_cursor");
 				}
 
-				return htmlClass;
+				return htmlClass.join(" ");
 			})
 			.call(addStyle)
 		;
@@ -1902,7 +1921,7 @@ CalHeatMap.prototype = {
 
 
 	/**
-	 * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware.
+	 * Returns wether or not dateA is less than or equal to dateB. This function is subdomain aware.
 	 * Performs automatic conversion of values.
 	 * @param dateA may be a number or a Date
 	 * @param dateB may be a number or a Date
@@ -2854,7 +2873,7 @@ CalHeatMap.prototype = {
 			.each("end", function() {
 				if (typeof callback === "function") {
 					callback();
-				} else if (arguments.length > 0) {
+				} else if (typeof callback !== "undefined") {
 					console.log("Provided callback for destroy() is not a function.");
 				}
 			})
