@@ -1378,14 +1378,14 @@ CalHeatMap.prototype = {
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === null && !options.considerMissingDataAsZero) {
+				if (d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero)) {
 					if (options.legendColors.hasOwnProperty("base")) {
 						return options.legendColors.base;
 					}
 				}
 
 				if (options.legendColors !== null && options.legendColors.hasOwnProperty("empty") &&
-					(d.v === 0 || (d.v === null && options.considerMissingDataAsZero))
+					(d.v === 0 || (d.v === null && options.hasOwnProperty("considerMissingDataAsZero") && options.considerMissingDataAsZero))
 				) {
 					return options.legendColors.empty;
 				}
@@ -1405,9 +1405,9 @@ CalHeatMap.prototype = {
 				var pastDate = parent.dateIsLessThan(d.t, new Date());
 
 				if (parent.legendScale === null ||
-					(d.v === null && !options.considerMissingDataAsZero &&!options.legendColors.hasOwnProperty("base"))
+					(d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero) &&!options.legendColors.hasOwnProperty("base"))
 				) {
-					htmlClass += " graph-rect";
+					htmlClass.push("graph-rect");
 				}
 
 				if (!pastDate && htmlClass.indexOf("now") === -1) {
