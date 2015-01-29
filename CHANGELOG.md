@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.5.1 [2015-01-19]
+
+* [fix] Fix #97 Make "class" of all elements more dedicated
+* [fix] Fix #93 Tooltip position due to legendOffset and domainLabel
+* [fix] Fix #89 Add a `.future` class to future subdomain cells
+* [fix] Fix false error output when no callback passed to `destroy()`
+
 ## v3.5.0 [2014-11-12]
 
 * [fix] Fix #84 Fixing highlighting for week subdomain (Dominic Barnes)
