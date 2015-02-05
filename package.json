@@ -25,12 +25,12 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-karma-coveralls": "~2.0.2",
     "grunt-contrib-watch": "~0.5.3",
-    "phantomjs": "~1.9.1-0",
     "grunt-contrib-qunit": "~0.4.0",
-    "karma": "~0.9",
-    "karma-coverage": "~0.1.0",
-    "karma-qunit": "~0.1.0",
-    "qunitjs": "~1.12",
+    "phantomjs": "~1.9.15",
+    "karma": "~0.12.31",
+    "karma-coverage": "~0.2.7",
+    "karma-qunit": "~0.1.4",
+    "qunitjs": "~1.17.0",
     "jquery": "~1.9.1"
   },
   "scripts": {
