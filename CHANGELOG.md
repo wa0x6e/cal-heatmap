@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.5.2 [2015-02-05]
+
+* [fix] Fix #74: Let `empty` target cells with no data
+
 ## v3.5.1 [2015-01-19]
 
 * [fix] Fix #97 Make "class" of all elements more dedicated
