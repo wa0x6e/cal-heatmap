@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <link rel="stylesheet" type="text/css" href="../../cal-heatmap.css" />
+
+    </head>
+    <body>
+        <p>
+            Colors used:
+            <span id="colorMin">min</span>
+            <span id="colorMax">max</span>
+            <span id="colorBase">base</span>
+            <span id="colorEmpty">empty</span>
+        </p>
+    	<h2>No legendColors, considerMissingValueAs0 is false</h2>
+    	<p>When legendColors is not specified, cal-heatmaps falls back to the default color scheme. There, cells with value 0 get the minimal color of the legend scale and cells with value null get the base color, grey.</p>
+        <div id="map_no_legendcolors" class="chart"></div>
+        
+        <h2>legendColors with base and empty specified, considerMissingValueAs0 is false</h2>
+    	<p>When legendColors is specified with base and empty, cells with value null should have the base color, while cells with value 0 have the empty color.</p>
+        <div id="map_legendcolors_with_base_and_empty" class="chart"></div>
+
+        <h2>legendColors specified, but base is not given. ConsiderMissingValueAs0 is false</h2>
+        <p>When legendColors is specified but base is not given, cells with value null should have the default base color (grey), while cells with value 0 have the empty color.</p>
+        <div id="map_legendcolors_with_empty" class="chart"></div>
+        
+        <h2>legendColors with base and empty specified, and considerMissingValueAs0 is true</h2>
+    	<p>In this case, both cells with value null and 0 should be colored </p>
+        <div id="map_legendcolors_with_base_and_empty_missing_0" class="chart"></div>
+
+    </body>
+    <script src="http://d3js.org/d3.v3.min.js" type="application/javascript"></script>
+    <script src="../../src/cal-heatmap.js" type="application/javascript"></script>
+
+<script>
+
+    var colorMin = "#9cEcEc";
+    var colorMax = "#4A6785";
+    var colorBase = "#00FF99";
+    var colorEmpty = "#FF00FF";
+
+    d3.select("#colorMin").style("background-color", colorMin);
+    d3.select("#colorMax").style("background-color", colorMax);
+    d3.select("#colorBase").style("background-color", colorBase);
+    d3.select("#colorEmpty").style("background-color", colorEmpty);
+
+    function createCalendar(DOMElID, legendcolors, considermData) {
+        yearcal = new CalHeatMap();
+        yearcal.init({
+            subDomain: "day",
+            domain: "month",
+            displayLegend: true,
+            legendColors: legendcolors,
+            considerMissingDataAsZero: considermData,
+            itemSelector: DOMElID,
+            start: new Date(2000, 0, 1),
+            data: "datas-hours.json"
+        });
+    }
+
+    createCalendar("#map_no_legendcolors", {}, false);
+    createCalendar("#map_legendcolors_with_base_and_empty", {"min": colorMin, "max": colorMax, "base": colorBase, "empty": colorEmpty}, false);
+    createCalendar("#map_legendcolors_with_empty", {"min": colorMin, "max": colorMax, "empty": colorEmpty}, false);
+    createCalendar("#map_legendcolors_with_base_and_empty_missing_0", {"min": colorMin, "max": colorMax, "base": colorBase, "empty": colorEmpty}, true);
+</script>
+
+</html>

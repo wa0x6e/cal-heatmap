@@ -1378,7 +1378,15 @@ CalHeatMap.prototype = {
 			}
 
 			element.attr("fill", function(d) {
-				if (d.v === 0 && options.legendColors !== null && options.legendColors.hasOwnProperty("empty")) {
+				if (d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero)) {
+					if (options.legendColors.hasOwnProperty("base")) {
+						return options.legendColors.base;
+					}
+				}
+
+				if (options.legendColors !== null && options.legendColors.hasOwnProperty("empty") &&
+					(d.v === 0 || (d.v === null && options.hasOwnProperty("considerMissingDataAsZero") && options.considerMissingDataAsZero))
+				) {
 					return options.legendColors.empty;
 				}
 
@@ -1396,7 +1404,9 @@ CalHeatMap.prototype = {
 				var htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
 				var pastDate = parent.dateIsLessThan(d.t, new Date());
 
-				if (parent.legendScale === null) {
+				if (parent.legendScale === null ||
+					(d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero) &&!options.legendColors.hasOwnProperty("base"))
+				) {
 					htmlClass.push("graph-rect");
 				}
 
