@@ -213,6 +213,9 @@ var CalHeatMap = function() {
 		// for accepted date formatting used by d3.time.format()
 		subDomainTextFormat: null,
 
+
+		subDomainValueFormat: null,
+
 		// Formatting of the title displayed when hovering a legend cell
 		legendTitleFormat: {
 			lower: "less than {min} {name}",
@@ -1140,6 +1143,7 @@ CalHeatMap.prototype = {
 		options.subDomainDateFormat = (typeof options.subDomainDateFormat === "string" || typeof options.subDomainDateFormat === "function" ? options.subDomainDateFormat : this._domainType[options.subDomain].format.date);
 		options.domainLabelFormat = (typeof options.domainLabelFormat === "string" || typeof options.domainLabelFormat === "function" ? options.domainLabelFormat : this._domainType[options.domain].format.legend);
 		options.subDomainTextFormat = ((typeof options.subDomainTextFormat === "string" && options.subDomainTextFormat !== "") || typeof options.subDomainTextFormat === "function" ? options.subDomainTextFormat : null);
+		options.subDomainValueFormat = ((typeof options.subDomainValueFormat === "string" && options.subDomainValueFormat !== "") || typeof options.subDomainValueFormat === "function" ? options.subDomainValueFormat : null);
 		options.domainMargin = expandMarginSetting(options.domainMargin);
 		options.legendMargin = expandMarginSetting(options.legendMargin);
 		options.highlight = parent.expandDateSetting(options.highlight);
@@ -1612,7 +1616,20 @@ CalHeatMap.prototype = {
 	// FORMATTER																//
 	// =========================================================================//
 
-	formatNumber: d3.format(",g"),
+	formatNumber: function(d, format){
+		"use strict";
+
+		if (arguments.length < 2) {
+			format = d3.format(",g");
+		}
+
+		if (typeof format === "function") {
+			return format(d);
+		} else {
+			var f = d3.format(",g");
+			return f(d);
+		}
+	},
 
 	formatDate: function(d, format) {
 		"use strict";
@@ -1644,7 +1661,7 @@ CalHeatMap.prototype = {
 			}
 
 			return (this.options.subDomainTitleFormat.filled).format({
-				count: this.formatNumber(value),
+				count: this.formatNumber(value, this.options.subDomainValueFormat),
 				name: this.options.itemName[(value !== 1 ? 1: 0)],
 				connector: this._domainType[this.options.subDomain].format.connector,
 				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
