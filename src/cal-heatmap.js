@@ -531,7 +531,7 @@ var CalHeatMap = function() {
 				column: d.row,
 				position: {
 					x: d.position.y,
-					y: d.position.x,
+					y: d.position.x
 				},
 				format: d.format,
 				extractUnit: d.extractUnit
