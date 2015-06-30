@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.5.2 (Thu Feb 05 2015 17:06:47)
+/*! cal-heatmap v3.5.2 (Tue Jun 02 2015 13:18:12)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -70,10 +70,22 @@ var CalHeatMap = function() {
 
 		maxDate: null,
 
+		// ================================================
+		// DATA
+		// ================================================
+
+		// Data source
 		// URL, where to fetch the original datas
 		data: "",
 
+		// Data type
+		// Default: json
 		dataType: this.allowedDataType[0],
+
+		// Payload sent when using POST http method
+		// Leave to null (default) for GET request
+		// Expect a string, formatted like "a=b;c=d"
+		dataPostPayload: null,
 
 		// Whether to consider missing date:value from the datasource
 		// as equal to 0, or just leave them as missing
@@ -226,6 +238,16 @@ var CalHeatMap = function() {
 		itemNamespace: "cal-heatmap",
 
 		tooltip: false,
+
+    // Possible values: 
+    //    hover: use mouseover and mouseout to show/hide the tooltip (default).
+    //    click: use clicking to show/hide (better for mobile).
+    //
+    // When tooltipAction is set to "click", clicking a cell will show the 
+    // tooltip, clicking on another cell will switch to that cell's tooltip, 
+    // clicking a cell already showing a tooltip will hide it, and
+    // clicking anywyere off the cal-heatmap will hide a showing tooltip.
+    tooltipAction: "hover",
 
 		// ================================================
 		// EVENTS CALLBACK
@@ -861,7 +883,11 @@ var CalHeatMap = function() {
 				}
 
 				if (options.tooltip) {
-					selection.on("mouseover", function(d) {
+
+          /* Define two function, showTooltip and hideTooltip that are used as would be expected. They are
+           * called using the same context as the event handlers. */
+
+          var showTooltip = function(d) {
 						var domainNode = this.parentNode.parentNode;
 
 						self.tooltip
@@ -889,13 +915,77 @@ var CalHeatMap = function() {
 						"left: " + tooltipPositionX + "px; " +
 						"top: " + tooltipPositionY + "px;")
 						;
-					});
+          };
 
-					selection.on("mouseout", function() {
+          var hideTooltip = function() {
 						self.tooltip
 						.attr("style", "display:none")
 						.html("");
-					});
+          };
+
+          // Use mouseover and mouseout to show/hide the tooltip.
+          if (options.tooltipAction === "hover") {
+            selection.on("mouseover", function(d) {
+              showTooltip.call(this, d);
+            });
+            selection.on("mouseout", function() {
+              hideTooltip.call(this);
+            });
+          }
+
+          // Use click to show/hide tooltips.
+          if (options.tooltipAction === "click") {
+            // Cache the cell associated with of the currently showing tooltip
+            // so that we can know whether a click should move the tooltip if
+            // a new cell is clicked or hide a tooltip if a cell already showing
+            // a tooltip is clicked.
+            var cellWithTip;
+
+            // Handler to show/hide based on clicks to calendar cells.
+            selection.on("click", function(d) {
+              // The cell that was clicked on.
+						  var cell = this;
+
+              if (cell === cellWithTip) {
+                // The cell already showing the tooltip was clicked. Hide that
+                // tip and indicate that no cell has a tooltip showing.
+                hideTooltip.call(this);
+                cellWithTip = null;
+              } else {
+                // A cell without a tooltip was clicked. Show the tooltip for
+                // that cell.
+                showTooltip.call(this, d);
+                cellWithTip = cell;
+              }
+            });
+
+            // In order to faciliate clearing a tooltip, allow any click that
+            // does not originate from inside the calendar to clear a currently
+            // showing tooltip.
+            d3.select("body").on("click", function() {
+              // Nothing to do if there's not a tip showing
+              if (!cellWithTip) {
+                return;
+              }
+              // Clicks that originate at or inside the firewall will not cause
+              // a tooltip to hide via this mechanism.
+              var firewall = self.root.node();
+              var n = d3.event.target;
+              // Iterate up the chain of parents from the event target until we
+              // either get to the top (and hide the tooltip) or we get to the
+              // firewall, at which point we can quit.
+              while (n) {
+                if (n === firewall) {
+                  return;
+                }
+                n = n.parentNode;
+              }
+              // If we got here, we didn't encounter the firewall and we should
+              // hide the tip.
+              hideTooltip.call(this);
+              cellWithTip = null;
+            });
+          }
 				}
 			})
 		;
@@ -2503,18 +2593,28 @@ CalHeatMap.prototype = {
 				_callback({});
 				return true;
 			} else {
+				var url = this.parseURI(source, startDate, endDate);
+				var requestType = "GET";
+				if (self.options.dataPostPayload !== null ) {
+					requestType = "POST";
+				}
+				var payload = null;
+				if (self.options.dataPostPayload !== null) {
+					payload = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+				}
+
 				switch(this.options.dataType) {
 				case "json":
-					d3.json(this.parseURI(source, startDate, endDate), _callback);
+					d3.json(url, _callback).send(requestType, payload);
 					break;
 				case "csv":
-					d3.csv(this.parseURI(source, startDate, endDate), _callback);
+					d3.csv(url, _callback).send(requestType, payload);
 					break;
 				case "tsv":
-					d3.tsv(this.parseURI(source, startDate, endDate), _callback);
+					d3.tsv(url, _callback).send(requestType, payload);
 					break;
 				case "txt":
-					d3.text(this.parseURI(source, startDate, endDate), "text/plain", _callback);
+					d3.text(url, "text/plain", _callback).send(requestType, payload);
 					break;
 				}
 			}
