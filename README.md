@@ -6,4 +6,4 @@ This module will help you to create a calendar, like the *[contribution calendar
 
 ![image](https://raw.github.com/kamisama/cal-heatmap/gh-pages/img/screenshot.png)
 
-See [documentation](http://kamisama.github.com/cal-heatmap/) for examples.
+See [documentation](http://cal-heatmap.com) for examples.
