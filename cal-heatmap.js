@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.5.2 (Thu Feb 05 2015 17:06:47)
+/*! cal-heatmap v3.5.3 (Thu Jul 23 2015 01:27:26)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
@@ -70,10 +70,22 @@ var CalHeatMap = function() {
 
 		maxDate: null,
 
+		// ================================================
+		// DATA
+		// ================================================
+
+		// Data source
 		// URL, where to fetch the original datas
 		data: "",
 
+		// Data type
+		// Default: json
 		dataType: this.allowedDataType[0],
+
+		// Payload sent when using POST http method
+		// Leave to null (default) for GET request
+		// Expect a string, formatted like "a=b;c=d"
+		dataPostPayload: null,
 
 		// Whether to consider missing date:value from the datasource
 		// as equal to 0, or just leave them as missing
@@ -438,7 +450,7 @@ var CalHeatMap = function() {
 				case "year":
 					return self._domainType.week.maxItemNumber;
 				case "month":
-					return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d);
+					return self.options.domainDynamicDimension ? self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) : 5;
 				}
 			},
 			defaultRowNumber: 1,
@@ -527,7 +539,7 @@ var CalHeatMap = function() {
 				column: d.row,
 				position: {
 					x: d.position.y,
-					y: d.position.x,
+					y: d.position.x
 				},
 				format: d.format,
 				extractUnit: d.extractUnit
@@ -2503,18 +2515,28 @@ CalHeatMap.prototype = {
 				_callback({});
 				return true;
 			} else {
+				var url = this.parseURI(source, startDate, endDate);
+				var requestType = "GET";
+				if (self.options.dataPostPayload !== null ) {
+					requestType = "POST";
+				}
+				var payload = null;
+				if (self.options.dataPostPayload !== null) {
+					payload = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+				}
+
 				switch(this.options.dataType) {
 				case "json":
-					d3.json(this.parseURI(source, startDate, endDate), _callback);
+					d3.json(url, _callback).send(requestType, payload);
 					break;
 				case "csv":
-					d3.csv(this.parseURI(source, startDate, endDate), _callback);
+					d3.csv(url, _callback).send(requestType, payload);
 					break;
 				case "tsv":
-					d3.tsv(this.parseURI(source, startDate, endDate), _callback);
+					d3.tsv(url, _callback).send(requestType, payload);
 					break;
 				case "txt":
-					d3.text(this.parseURI(source, startDate, endDate), "text/plain", _callback);
+					d3.text(url, "text/plain", _callback).send(requestType, payload);
 					break;
 				}
 			}

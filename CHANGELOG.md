@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.5.3 [2015-07-23]
+
+* [fix] Fix #156 Remove trailing comma in object literal
+* [fix] Fix #161 `domainDynamicDimension` not working with x_week subdomain
+
 ## v3.5.2 [2015-02-05]
 
 * [fix] Fix #74: Let `empty` target cells with no data
