@@ -442,7 +442,7 @@ var CalHeatMap = function() {
 				case "year":
 					return self._domainType.week.maxItemNumber;
 				case "month":
-					return self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d);
+					return self.options.domainDynamicDimension ? self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()+1, 0)) - self.getWeekNumber(d) : 5;
 				}
 			},
 			defaultRowNumber: 1,
