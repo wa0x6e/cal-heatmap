@@ -289,11 +289,11 @@ var CalHeatMap = function() {
 			maxItemNumber: 60,
 			defaultRowNumber: 10,
 			defaultColumnNumber: 6,
-			row: function(d) { return self.getSubDomainRowNumber(d); },
+			row: function(d) { return self.getSubDomainRowNumber(d) / self.options.subDomainStep; },
 			column: function(d) { return self.getSubDomainColumnNumber(d); },
 			position: {
-				x: function(d) { return Math.floor(d.getMinutes() / self._domainType.min.row(d)); },
-				y: function(d) { return d.getMinutes() % self._domainType.min.row(d); }
+			    x: function(d) { return Math.floor(d.getMinutes() / self.options.subDomainStep / self._domainType.min.row(d)); },
+			    y: function(d) { return (d.getMinutes() / self.options.subDomainStep) % self._domainType.min.row(d); }
 			},
 			format: {
 				date: "%H:%M, %A %B %-e, %Y",
@@ -1154,6 +1154,7 @@ CalHeatMap.prototype = {
 		options.itemName = expandItemName(options.itemName);
 		options.colLimit = parseColLimit(options.colLimit);
 		options.rowLimit = parseRowLimit(options.rowLimit);
+		options.subDomainStep = parseSubDomainStepLimit(options.subDomainStep);
 		if (!settings.hasOwnProperty("legendMargin")) {
 			autoAddLegendMargin();
 		}
@@ -1325,6 +1326,10 @@ CalHeatMap.prototype = {
 			}
 
 			return ["item", "items"];
+		}
+		
+		function parseSubDomainStepLimit(value){
+		    return value > 0 ? value : 1;
 		}
 
 		function parseColLimit(value) {
@@ -2139,9 +2144,10 @@ CalHeatMap.prototype = {
 	 *
 	 * @param  Date	d	date	A date
 	 * @param  int|date	range	Number of minutes in the range, or a stop date
+	 * @param  int      step    Number of interval. For example, a step of 5 will return 0,5,10 etc.
 	 * @return array	An array of minutes
 	 */
-	getMinuteDomain: function (d, range) {
+	getMinuteDomain: function (d, range, step) {
 		"use strict";
 
 		var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
@@ -2151,7 +2157,7 @@ CalHeatMap.prototype = {
 		} else {
 			stop = new Date(+start + range * 1000 * 60);
 		}
-		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
+		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop), step);
 	},
 
 	/**
@@ -2418,7 +2424,7 @@ CalHeatMap.prototype = {
 		switch(this.options.subDomain) {
 		case "x_min":
 		case "min"  :
-			return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain));
+		    return this.getMinuteDomain(date, computeMinSubDomainSize(date, this.options.domain), this.options.subDomainStep);
 		case "x_hour":
 		case "hour" :
 			return this.getHourDomain(date, computeHourSubDomainSize(date, this.options.domain));
@@ -2610,11 +2616,14 @@ CalHeatMap.prototype = {
 			if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 				subDomainsData[index].v = data[d];
 			} else {
+			 // If subDomainStep is inputed, index may be -1 due to no display cell is matched with data 
+		      if (index > -1) {
 				if (!isNaN(subDomainsData[index].v)) {
 					subDomainsData[index].v += data[d];
 				} else {
 					subDomainsData[index].v = data[d];
 				}
+		      }
 			}
 		}
 	},
