@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.5.4 [2015-08-24]
+
+* [fix] Update all references to github account new username
+
 ## v3.5.3 [2015-07-23]
 
 * [fix] Fix #156 Remove trailing comma in object literal
