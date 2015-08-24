@@ -12,7 +12,7 @@
   "dependencies": {
     "d3": ">= v3.0.6"
   },
-  "location": "https://github.com/kamisama/cal-heatmap",
+  "location": "https://github.com/wa0x6e/cal-heatmap",
   "licence": "MIT",
   "ignore": [
     "test/",
@@ -25,9 +25,9 @@
     "name": "Wan Qi Chen",
     "url": "http://www.kamisama.me"
   },
-  "homepage": "https://github.com/kamisama/cal-heatmap",
+  "homepage": "https://github.com/wa0x6e/cal-heatmap",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kamisama/cal-heatmap.git"
+    "url": "https://github.com/wa0x6e/cal-heatmap.git"
   }
 }

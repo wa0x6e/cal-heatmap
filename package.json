@@ -42,9 +42,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kamisama/cal-heatmap.git"
+    "url": "https://github.com/wa0x6e/cal-heatmap.git"
   },
-  "homepage": "https://github.com/kamisama/cal-heatmap",
+  "homepage": "https://github.com/wa0x6e/cal-heatmap",
   "author": {
     "name": "Wan Qi Chen",
     "url": "http://www.kamisama.me"
@@ -61,8 +61,8 @@
       "d3": ">=3.0.6"
     }
   },
-  "bugs": "https://github.com/kamisama/cal-heatmap/issues",
-  "github": "https://github.com/kamisama/cal-heatmap",
+  "bugs": "https://github.com/wa0x6e/cal-heatmap/issues",
+  "github": "https://github.com/wa0x6e/cal-heatmap",
   "categories": [
     "Data",
     "Visualization"
