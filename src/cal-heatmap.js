@@ -279,7 +279,11 @@ var CalHeatMap = function() {
 		//
 		// This callback is also executed once, after calling next(),
 		// only when the min domain is reached
-		onMinDomainReached: null
+		onMinDomainReached: null,
+
+		// Callback when hovering over a time block
+		onTooltip: function(title) { return title; }
+
 	};
 
 	this._domainType = {
@@ -876,31 +880,41 @@ var CalHeatMap = function() {
 					selection.on("mouseover", function(d) {
 						var domainNode = this.parentNode.parentNode;
 
-						self.tooltip
-						.html(self.getSubDomainTitle(d))
-						.attr("style", "display: block;")
-						;
+						var showTooltip = function (title) {
 
-						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
-						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
+							self.tooltip
+							.html(title)
+							.attr("style", "display: block;")
+							;
 
-						// Offset by the domain position
-						tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
-						tooltipPositionY += parseInt(domainNode.getAttribute("y"), 10);
+							var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
+							var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
 
-						// Offset by the calendar position (when legend is left/top)
-						tooltipPositionX += parseInt(self.root.select(".graph").attr("x"), 10);
-						tooltipPositionY += parseInt(self.root.select(".graph").attr("y"), 10);
+							// Offset by the domain position
+							tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
+							tooltipPositionY += parseInt(domainNode.getAttribute("y"), 10);
 
-						// Offset by the inside domain position (when label is left/top)
-						tooltipPositionX += parseInt(domainNode.parentNode.getAttribute("x"), 10);
-						tooltipPositionY += parseInt(domainNode.parentNode.getAttribute("y"), 10);
+							// Offset by the calendar position (when legend is left/top)
+							tooltipPositionX += parseInt(self.root.select(".graph").attr("x"), 10);
+							tooltipPositionY += parseInt(self.root.select(".graph").attr("y"), 10);
 
-						self.tooltip.attr("style",
-						"display: block; " +
-						"left: " + tooltipPositionX + "px; " +
-						"top: " + tooltipPositionY + "px;")
-						;
+							// Offset by the inside domain position (when label is left/top)
+							tooltipPositionX += parseInt(domainNode.parentNode.getAttribute("x"), 10);
+							tooltipPositionY += parseInt(domainNode.parentNode.getAttribute("y"), 10);
+
+							self.tooltip.attr("style",
+								"display: block; " +
+								"left: " + tooltipPositionX + "px; " +
+								"top: " + tooltipPositionY + "px;")
+							;
+						};
+
+						if(!!options.onTooltip) {
+							showTooltip(self.options.onTooltip(new Date(d.t), d.v));
+						} else {
+							showTooltip(self.getSubDomainTitle(d));
+						}
+
 					});
 
 					selection.on("mouseout", function() {
@@ -1137,7 +1151,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate"];
+		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate", "onTooltip"];
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
