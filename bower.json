@@ -13,7 +13,7 @@
     "d3": ">= v3.0.6"
   },
   "location": "https://github.com/wa0x6e/cal-heatmap",
-  "licence": "MIT",
+  "license": "MIT",
   "ignore": [
     "test/",
     "src/",
@@ -21,10 +21,10 @@
     "karma.conf.js",
     "package.json"
   ],
-  "author": {
+  "authors": [{
     "name": "Wan Qi Chen",
-    "url": "http://www.kamisama.me"
-  },
+    "homepage": "http://www.kamisama.me"
+  }],
   "homepage": "https://github.com/wa0x6e/cal-heatmap",
   "repository": {
     "type": "git",
