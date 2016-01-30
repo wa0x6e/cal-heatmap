@@ -18,7 +18,7 @@ test("Return the highlight and now classname if a date should be highlighted and
 	expect(1);
 
 	var cal = createCalendar({highlight: [new Date(2000, 0, 1), new Date()]});
-	strictEqual(cal.getHighlightClassName(new Date()), " highlight now");
+	strictEqual(cal.getHighlightClassName(new Date()), " highlight-now");
 });
 
 test("Return an empty string if a date is not in the highlight list", function() {

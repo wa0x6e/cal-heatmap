@@ -1415,6 +1415,7 @@ CalHeatMap.prototype = {
 
 				var htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
 				var pastDate = parent.dateIsLessThan(d.t, new Date());
+        var sameDate = parent.dateIsEqual(d.t, new Date());
 
 				if (parent.legendScale === null ||
 					(d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero) &&!options.legendColors.hasOwnProperty("base"))
@@ -1422,9 +1423,11 @@ CalHeatMap.prototype = {
 					htmlClass.push("graph-rect");
 				}
 
-				if (!pastDate && htmlClass.indexOf("now") === -1) {
-					htmlClass.push("future");
-				}
+        if (sameDate) {
+          htmlClass.push("now");
+        } else if (!pastDate) {
+          htmlClass.push("future");
+        }
 
 				if (d.v !== null) {
 					htmlClass.push(parent.Legend.getClass(d.v, (parent.legendScale === null)));
@@ -1867,8 +1870,8 @@ CalHeatMap.prototype = {
 
 		if (this.options.highlight.length > 0) {
 			for (var i in this.options.highlight) {
-				if (this.options.highlight[i] instanceof Date && this.dateIsEqual(this.options.highlight[i], d)) {
-					return " highlight" + (this.isNow(this.options.highlight[i]) ? " now": "");
+				if (this.dateIsEqual(this.options.highlight[i], d)) {
+					return this.isNow(this.options.highlight[i]) ? " highlight-now": " highlight";
 				}
 			}
 		}
@@ -1900,6 +1903,14 @@ CalHeatMap.prototype = {
 	/* jshint maxcomplexity: false */
 	dateIsEqual: function(dateA, dateB) {
 		"use strict";
+
+		if(!(dateA instanceof Date)) {
+			dateA = new Date(dateA);
+		}
+
+		if (!(dateB instanceof Date)) {
+			dateB = new Date(dateB);
+		}
 
 		switch(this.options.subDomain) {
 		case "x_min":
@@ -2915,8 +2926,10 @@ CalHeatMap.prototype = {
 			".graph-rect": {},
 			"rect.highlight": {},
 			"rect.now": {},
+			"rect.highlight-now": {},
 			"text.highlight": {},
 			"text.now": {},
+			"text.highlight-now": {},
 			".domain-background": {},
 			".graph-label": {},
 			".subdomain-text": {},
