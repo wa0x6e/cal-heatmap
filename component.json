@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "3.5.4",
+  "version": "3.6.0",
   "repository": "wa0x6e/cal-heatmap",
   "dependencies": {
     "mbostock/d3": ">= 3.0.6"

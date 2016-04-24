@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.6.0 [2016-04-24]
+
+* [fix] Fix #183 Fix/add now without highlight
+
 ## v3.5.4 [2015-08-24]
 
 * [fix] Update all references to github account new username
