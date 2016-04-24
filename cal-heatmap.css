@@ -96,12 +96,12 @@ Remove comment to apply this style to date with value equal to 0
 	fill: #444
 }
 
-.cal-heatmap-container rect.now
+.cal-heatmap-container rect.highlight-now
 {
 	stroke: red
 }
 
-.cal-heatmap-container text.now
+.cal-heatmap-container text.highlight-now
 {
 	fill: red;
 	font-weight: 800
