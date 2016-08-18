@@ -10,7 +10,7 @@
   "version": "3.6.0",
   "main": ["./cal-heatmap.js", "./cal-heatmap.css"],
   "dependencies": {
-    "d3": ">= v3.0.6"
+    "d3": ">=3.0.6 <4.0.0"
   },
   "location": "https://github.com/wa0x6e/cal-heatmap",
   "license": "MIT",
