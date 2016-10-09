@@ -469,7 +469,7 @@ var CalHeatMap = function() {
 			extractUnit: function(d) {
 				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 				// According to ISO-8601, week number computation are based on week starting on Monday
-				var weekDay = dt.getDay()-1;
+				var weekDay = dt.getDay() - (self.options.weekStartOnMonday ? 1 : 0);
 				if (weekDay < 0) {
 					weekDay = 6;
 				}
