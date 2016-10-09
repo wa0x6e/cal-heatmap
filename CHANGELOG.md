@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.6.2 [2016-10-09]
+
+* [fix] Fix #217 Month domain and week subdomain not working when week start set to sunday
+
+> From now, 3.x branch will only include bugfixes, all new features will go to 4.x branch
+
+## v3.6.1 [2016-08-30]
+
+* [fix] Fix #207 Locking d3.js version to v3.x
+
 ## v3.6.0 [2016-04-24]
 
 * [fix] Fix #183 Fix/add now without highlight

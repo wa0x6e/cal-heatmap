@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.6.1 (Tue Aug 30 2016 02:31:17)
+/*! cal-heatmap v3.6.2 (Mon Oct 10 2016 01:36:20)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/wa0x6e/cal-heatmap
@@ -477,7 +477,7 @@ var CalHeatMap = function() {
 			extractUnit: function(d) {
 				var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 				// According to ISO-8601, week number computation are based on week starting on Monday
-				var weekDay = dt.getDay()-1;
+				var weekDay = dt.getDay() - (self.options.weekStartOnMonday ? 1 : 0);
 				if (weekDay < 0) {
 					weekDay = 6;
 				}
