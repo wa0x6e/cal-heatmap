@@ -1465,6 +1465,26 @@ CalHeatMap.prototype = {
 		;
 	},
 
+	/**
+	 * Sprintf like function.
+	 * Replaces placeholders {0} in string with values from provided object.
+	 * 
+	 * @param string formatted String containing placeholders.
+	 * @param object args Object with properties to replace placeholders in string.
+	 * 
+	 * @return String
+	 */
+	formatStringWithObject: function (formatted, args) {
+		"use strict";
+		for (var prop in args) {
+			if (args.hasOwnProperty(prop)) {
+				var regexp = new RegExp("\\{" + prop + "\\}", "gi");
+				formatted = formatted.replace(regexp, args[prop]);
+			}
+		}
+		return formatted;
+	},
+
 	// =========================================================================//
 	// EVENTS CALLBACK															//
 	// =========================================================================//
@@ -1636,7 +1656,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		if (d.v === null && !this.options.considerMissingDataAsZero) {
-			return (this.options.subDomainTitleFormat.empty).format({
+			return this.formatStringWithObject(this.options.subDomainTitleFormat.empty , {
 				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
 			});
 		} else {
@@ -1646,7 +1666,7 @@ CalHeatMap.prototype = {
 				value = 0;
 			}
 
-			return (this.options.subDomainTitleFormat.filled).format({
+			return this.formatStringWithObject(this.options.subDomainTitleFormat.filled, {
 				count: this.formatNumber(value),
 				name: this.options.itemName[(value !== 1 ? 1: 0)],
 				connector: this._domainType[this.options.subDomain].format.connector,
@@ -3220,17 +3240,17 @@ Legend.prototype.redraw = function(width) {
 
 	legendItem.select("title").text(function(d, i) {
 		if (i === 0) {
-			return (options.legendTitleFormat.lower).format({
+			return calendar.formatStringWithObject(options.legendTitleFormat.lower, {
 				min: options.legend[i],
 				name: options.itemName[1]
 			});
 		} else if (i === _legend.length-1) {
-			return (options.legendTitleFormat.upper).format({
+			return calendar.formatStringWithObject(options.legendTitleFormat.upper, {
 				max: options.legend[i-1],
 				name: options.itemName[1]
 			});
 		} else {
-			return (options.legendTitleFormat.inner).format({
+			return calendar.formatStringWithObject(options.legendTitleFormat.inner, {
 				down: options.legend[i-1],
 				up: options.legend[i],
 				name: options.itemName[1]
@@ -3380,24 +3400,6 @@ Legend.prototype.getClass = function(n, withCssClass) {
 
 	index.unshift("");
 	return (index.join(" r") + (withCssClass ? index.join(" q"): "")).trim();
-};
-
-/**
- * Sprintf like function
- * @source http://stackoverflow.com/a/4795914/805649
- * @return String
- */
-String.prototype.format = function () {
-	"use strict";
-
-	var formatted = this;
-	for (var prop in arguments[0]) {
-		if (arguments[0].hasOwnProperty(prop)) {
-			var regexp = new RegExp("\\{" + prop + "\\}", "gi");
-			formatted = formatted.replace(regexp, arguments[0][prop]);
-		}
-	}
-	return formatted;
 };
 
 /**
