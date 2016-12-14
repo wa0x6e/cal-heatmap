@@ -3346,7 +3346,7 @@ Legend.prototype.buildColors = function() {
 
 	if (_legend[0] > 0) {
 		_legend.unshift(0);
-	} else if (_legend[0] < 0) {
+	} else if (_legend[0] <= 0) {
 		// Let's guess the leftmost value, it we have to add one
 		_legend.unshift(_legend[0] - (_legend[_legend.length-1] - _legend[0])/_legend.length);
 	}
