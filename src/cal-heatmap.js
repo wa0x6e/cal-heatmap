@@ -182,11 +182,11 @@ var CalHeatMap = function() {
 
 		// Formatting of the domain label
 		// @default: null, will use the formatting according to domain type
-		// Accept a string used as specifier by d3.time.format()
+		// Accept a string used as specifier by d3.timeFormat()
 		// or a function
 		//
 		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-		// for accepted date formatting used by d3.time.format()
+		// for accepted date formatting used by d3.timeFormat()
 		domainLabelFormat: null,
 
 		// Formatting of the title displayed when hovering a subDomain cell
@@ -197,20 +197,20 @@ var CalHeatMap = function() {
 
 		// Formatting of the {date} used in subDomainTitleFormat
 		// @default: null, will use the formatting according to subDomain type
-		// Accept a string used as specifier by d3.time.format()
+		// Accept a string used as specifier by d3.timeFormat()
 		// or a function
 		//
 		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-		// for accepted date formatting used by d3.time.format()
+		// for accepted date formatting used by d3.timeFormat()
 		subDomainDateFormat: null,
 
 		// Formatting of the text inside each subDomain cell
 		// @default: null, no text
-		// Accept a string used as specifier by d3.time.format()
+		// Accept a string used as specifier by d3.timeFormat()
 		// or a function
 		//
 		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-		// for accepted date formatting used by d3.time.format()
+		// for accepted date formatting used by d3.timeFormat()
 		subDomainTextFormat: null,
 
 		// Formatting of the title displayed when hovering a legend cell
@@ -868,13 +868,8 @@ var CalHeatMap = function() {
 					selection.on("mouseover", function(d) {
 						var domainNode = this.parentNode.parentNode;
 
-						self.tooltip
-						.html(self.getSubDomainTitle(d))
-						.attr("style", "display: block;")
-						;
-
-						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
-						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
+						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip.node().offsetWidth/2 + options.cellSize/2;
+						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip.node().offsetHeight - options.cellSize/2;
 
 						// Offset by the domain position
 						tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
@@ -888,7 +883,9 @@ var CalHeatMap = function() {
 						tooltipPositionX += parseInt(domainNode.parentNode.getAttribute("x"), 10);
 						tooltipPositionY += parseInt(domainNode.parentNode.getAttribute("y"), 10);
 
-						self.tooltip.attr("style",
+						self.tooltip
+						.html(self.getSubDomainTitle(d))
+						.attr("style",
 						"display: block; " +
 						"left: " + tooltipPositionX + "px; " +
 						"top: " + tooltipPositionY + "px;")
@@ -1105,7 +1102,7 @@ CalHeatMap.prototype = {
 			throw new Error("The data type '" + options.dataType + "' is not valid data type");
 		}
 
-		if (d3.select(options.itemSelector)[0][0] === null) {
+		if (d3.select(options.itemSelector).empty()) {
 			throw new Error("The node '" + options.itemSelector + "' specified in itemSelector does not exists");
 		}
 
@@ -1647,7 +1644,7 @@ CalHeatMap.prototype = {
 		if (typeof format === "function") {
 			return format(d);
 		} else {
-			var f = d3.time.format(format);
+			var f = d3.timeFormat(format);
 			return f(d);
 		}
 	},
@@ -2018,7 +2015,7 @@ CalHeatMap.prototype = {
 	 * @param	Date
 	 * @return  int Day of the year [1,366]
 	 */
-	getDayOfYear: d3.time.format("%j"),
+	getDayOfYear: d3.timeFormat("%j"),
 
 	/**
 	 * Return the week number of the year
@@ -2028,7 +2025,7 @@ CalHeatMap.prototype = {
 	getWeekNumber: function(d) {
 		"use strict";
 
-		var f = this.options.weekStartOnMonday === true ? d3.time.format("%W"): d3.time.format("%U");
+		var f = this.options.weekStartOnMonday === true ? d3.timeFormat("%W"): d3.timeFormat("%U");
 		return f(d);
 	},
 
@@ -2174,7 +2171,7 @@ CalHeatMap.prototype = {
 		} else {
 			stop = new Date(+start + range * 1000 * 60);
 		}
-		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeMinutes(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2196,7 +2193,7 @@ CalHeatMap.prototype = {
 			stop.setHours(stop.getHours() + range);
 		}
 
-		var domains = d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+		var domains = d3.timeHours(Math.min(start, stop), Math.max(start, stop));
 
 		// Passing from DST to standard time
 		// If there are 25 hours, let's compress the duplicate hours
@@ -2210,7 +2207,7 @@ CalHeatMap.prototype = {
 			}
 		}
 
-		// d3.time.hours is returning more hours than needed when changing
+		// d3.timeHours is returning more hours than needed when changing
 		// from DST to standard time, because there is really 2 hours between
 		// 1am and 2am!
 		if (typeof range === "number" && domains.length > Math.abs(range)) {
@@ -2239,7 +2236,7 @@ CalHeatMap.prototype = {
 			stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
 		}
 
-		return d3.time.days(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeDays(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2275,8 +2272,8 @@ CalHeatMap.prototype = {
 		}
 
 		return (this.options.weekStartOnMonday === true) ?
-			d3.time.mondays(Math.min(weekStart, stop), Math.max(weekStart, stop)):
-			d3.time.sundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
+			d3.timeMondays(Math.min(weekStart, stop), Math.max(weekStart, stop)):
+			d3.timeSundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
 		;
 	},
 
@@ -2299,7 +2296,7 @@ CalHeatMap.prototype = {
 			stop = stop.setMonth(stop.getMonth()+range);
 		}
 
-		return d3.time.months(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeMonths(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2320,7 +2317,7 @@ CalHeatMap.prototype = {
 			stop = new Date(d.getFullYear()+range, 0);
 		}
 
-		return d3.time.years(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeYears(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2982,7 +2979,7 @@ CalHeatMap.prototype = {
 		};
 
 		var getElement = function(e) {
-			return root.select(e)[0][0];
+			return root.select(e).node();
 		};
 
 		/* jshint forin:false */
@@ -3167,7 +3164,7 @@ Legend.prototype.redraw = function(width) {
 	_legend.push(_legend[_legend.length-1]+1);
 
 	var legendElement = calendar.root.select(".graph-legend");
-	if (legendElement[0][0] !== null) {
+	if (!legendElement.empty()) {
 		legend = legendElement;
 		legendItem = legend
 			.select("g")
@@ -3351,14 +3348,14 @@ Legend.prototype.buildColors = function() {
 		_legend.unshift(_legend[0] - (_legend[_legend.length-1] - _legend[0])/_legend.length);
 	}
 
-	var colorScale = d3.scale.linear()
+	var colorScale = d3.scaleLinear()
 		.range(_colorRange)
 		.interpolate(d3.interpolateHcl)
 		.domain([d3.min(_legend), d3.max(_legend)])
 	;
 
 	var legendColors = _legend.map(function(element) { return colorScale(element); });
-	this.calendar.legendScale = d3.scale.threshold().domain(options.legend).range(legendColors);
+	this.calendar.legendScale = d3.scaleThreshold().domain(options.legend).range(legendColors);
 
 	return true;
 };
