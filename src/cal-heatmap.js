@@ -1468,10 +1468,10 @@ CalHeatMap.prototype = {
 	/**
 	 * Sprintf like function.
 	 * Replaces placeholders {0} in string with values from provided object.
-	 * 
+	 *
 	 * @param string formatted String containing placeholders.
 	 * @param object args Object with properties to replace placeholders in string.
-	 * 
+	 *
 	 * @return String
 	 */
 	formatStringWithObject: function (formatted, args) {
@@ -2808,6 +2808,9 @@ CalHeatMap.prototype = {
 	update: function(dataSource, afterLoad, updateMode) {
 		"use strict";
 
+		if (arguments.length === 0) {
+			dataSource = this.options.data;
+		}
 		if (arguments.length < 2) {
 			afterLoad = true;
 		}
