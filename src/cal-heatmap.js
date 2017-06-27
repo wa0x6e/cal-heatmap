@@ -79,6 +79,11 @@ var CalHeatMap = function() {
 		// Expect a string, formatted like "a=b;c=d"
 		dataPostPayload: null,
 
+		// Additional headers sent when requesting data
+		// Expect an object formatted like:
+		// { 'X-CSRF-TOKEN': 'token' }
+		dataRequestHeaders: null,
+
 		// Whether to consider missing date:value from the datasource
 		// as equal to 0, or just leave them as missing
 		considerMissingDataAsZero: false,
@@ -2548,20 +2553,32 @@ CalHeatMap.prototype = {
 					payload = this.parseURI(self.options.dataPostPayload, startDate, endDate);
 				}
 
+				var xhr = null;
 				switch(this.options.dataType) {
 				case "json":
-					d3.json(url, _callback).send(requestType, payload);
+					xhr = d3.json(url, _callback);
 					break;
 				case "csv":
-					d3.csv(url, _callback).send(requestType, payload);
+					xhr = d3.csv(url, _callback);
 					break;
 				case "tsv":
-					d3.tsv(url, _callback).send(requestType, payload);
+					xhr = d3.tsv(url, _callback);
 					break;
 				case "txt":
-					d3.text(url, "text/plain", _callback).send(requestType, payload);
+					xhr = d3.text(url, "text/plain", _callback);
 					break;
 				}
+
+				// jshint maxdepth:5
+				if (self.options.dataRequestHeaders !== null) {
+					for (var header in self.options.dataRequestHeaders) {
+						if (self.options.dataRequestHeaders.hasOwnProperty(header)) {
+							xhr.header(header, self.options.dataRequestHeaders[header]);
+						}
+					}
+				}
+
+				xhr.send(requestType, payload);
 			}
 			return false;
 		case "object":
