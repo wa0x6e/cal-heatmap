@@ -2519,7 +2519,7 @@ CalHeatMap.prototype = {
 		if (arguments.length < 6) {
 			updateMode = this.APPEND_ON_UPDATE;
 		}
-		var _callback = function(data) {
+		var _callback = function(error, data) {
 			if (afterLoad !== false) {
 				if (typeof afterLoad === "function") {
 					data = afterLoad(data);
@@ -2540,7 +2540,7 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 		case "string":
 			if (source === "") {
-				_callback({});
+				_callback(null, {});
 				return true;
 			} else {
 				var url = this.parseURI(source, startDate, endDate);
@@ -2556,16 +2556,16 @@ CalHeatMap.prototype = {
 				var xhr = null;
 				switch(this.options.dataType) {
 				case "json":
-					xhr = d3.json(url, _callback);
+					xhr = d3.json(url);
 					break;
 				case "csv":
-					xhr = d3.csv(url, _callback);
+					xhr = d3.csv(url);
 					break;
 				case "tsv":
-					xhr = d3.tsv(url, _callback);
+					xhr = d3.tsv(url);
 					break;
 				case "txt":
-					xhr = d3.text(url, "text/plain", _callback);
+					xhr = d3.text(url, "text/plain");
 					break;
 				}
 
@@ -2578,17 +2578,17 @@ CalHeatMap.prototype = {
 					}
 				}
 
-				xhr.send(requestType, payload);
+				xhr.send(requestType, payload, _callback);
 			}
 			return false;
 		case "object":
 			if (source === Object(source)) {
-				_callback(source);
+				_callback(null, source);
 				return false;
 			}
 			/* falls through */
 		default:
-			_callback({});
+			_callback(null, {});
 			return true;
 		}
 	},
