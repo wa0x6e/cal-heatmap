@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.6.3 [Unreleased]
+
+* [fix] Fix #223 Fix an issue the max color becomes black when legend starts with 0
+* [fix] Fix #190 Ajax requests sent twice
+* [fix] Fix #229 Calling `update()` without arguments refresh the calendar with original data
+* [new] Fix #194 Add `afterUpdate()` callback
+* [new] Fix #234 Pass custom headers to XHR request
+* [change] Moved format function in library implementation (#220)
+
 ## v3.6.2 [2016-10-09]
 
 * [fix] Fix #217 Month domain and week subdomain not working when week start set to sunday
