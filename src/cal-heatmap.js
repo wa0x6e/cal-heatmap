@@ -262,6 +262,9 @@ var CalHeatMap = function() {
 		// formatted like {timestamp:count, timestamp2:count2},
 		afterLoadData: function(data) { return data; },
 
+		// Callback triggered after calling and completing update().
+		afterUpdate: null,
+
 		// Callback triggered after calling next().
 		// The `status` argument is equal to true if there is no
 		// more next domain to load
@@ -1134,7 +1137,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
+		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate"];
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
@@ -1634,6 +1637,12 @@ CalHeatMap.prototype = {
 				this.onMinDomainReached(false);
 			}
 		}
+	},
+
+	afterUpdate: function() {
+		"use strict";
+
+		return this.triggerEvent("afterUpdate");
 	},
 
 	// =========================================================================//
@@ -2843,6 +2852,7 @@ CalHeatMap.prototype = {
 			this.getSubDomain(domains[domains.length-1]).pop(),
 			function() {
 				self.fill();
+				self.afterUpdate();
 			},
 			afterLoad,
 			updateMode
