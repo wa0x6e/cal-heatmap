@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.6.2 (Mon Oct 10 2016 01:36:20)
+/*! cal-heatmap v3.6.2 (Thu Mar 01 2018 16:03:46)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/wa0x6e/cal-heatmap
@@ -62,6 +62,9 @@ var CalHeatMap = function() {
 		// 0 to start the week on Sunday
 		weekStartOnMonday: true,
 
+		//Show week name when showing full month
+    dayLabel: false,
+
 		// Start date of the graph
 		// @default now
 		start: new Date(),
@@ -86,6 +89,11 @@ var CalHeatMap = function() {
 		// Leave to null (default) for GET request
 		// Expect a string, formatted like "a=b;c=d"
 		dataPostPayload: null,
+
+		// Additional headers sent when requesting data
+		// Expect an object formatted like:
+		// { 'X-CSRF-TOKEN': 'token' }
+		dataRequestHeaders: null,
 
 		// Whether to consider missing date:value from the datasource
 		// as equal to 0, or just leave them as missing
@@ -264,6 +272,9 @@ var CalHeatMap = function() {
 		// Takes the fetched "data" object as argument, must return a json object
 		// formatted like {timestamp:count, timestamp2:count2},
 		afterLoadData: function(data) { return data; },
+
+		// Callback triggered after calling and completing update().
+		afterUpdate: null,
 
 		// Callback triggered after calling next().
 		// The `status` argument is equal to true if there is no
@@ -728,6 +739,57 @@ var CalHeatMap = function() {
 		var exitingDomainDim = 0;
 
 		// =========================================================================//
+		// DAY LABEl															//
+		// =========================================================================//
+		if (options.dayLabel && options.domain === "month") {
+			// Create a list of all day names starting with Sunday or Monday, depending on configuration
+			var daysOfTheWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+			if (options.weekStartOnMonday) {
+				daysOfTheWeek.push("sunday");
+			} else {
+				daysOfTheWeek.shif("sunday");
+			}
+			// Get the first character of the day name
+			var daysOfTheWeekAbbr = daysOfTheWeek
+				.map(function(day) {
+					return self.formatDate(d3.time[day](new Date()), "%a").charAt(0);
+				});
+			// Append "day-name" group to SVG
+			var dayLabelSvgGroup = this.root.append("svg")
+				.attr("class", "day-name")
+				.attr("x", 0)
+				.attr("y", 0);
+
+			var dayLabelSvg = dayLabelSvgGroup
+				.selectAll("g")
+				.data(daysOfTheWeekAbbr)
+				.enter()
+				.append("g");
+			// Styling "day-name-rect" elements
+			dayLabelSvg
+				.append("rect")
+				.attr("class", "day-name-rect")
+				.attr("width", options.cellSize)
+				.attr("height", options.cellSize)
+				.attr("x", 0)
+				.attr("y", function(data, index) {
+					return index * options.cellSize + index * options.cellPadding;
+				});
+			// Adding day names to SVG
+			dayLabelSvg
+				.append("text")
+				.attr("class", "day-name-text")
+				.attr("dominant-baseline", "central")
+				.attr("x", 0 )
+				.attr("y", function(data, index) {
+					return index * options.cellSize + index * options.cellPadding + options.cellSize/2;
+				})
+				.text(function(data) {
+					return data;
+				});
+		}
+
+		// =========================================================================//
 		// PAINTING DOMAIN															//
 		// =========================================================================//
 
@@ -1137,7 +1199,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain"];
+		var s = ["data", "onComplete", "onClick", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate"];
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
@@ -1473,6 +1535,26 @@ CalHeatMap.prototype = {
 		;
 	},
 
+	/**
+	 * Sprintf like function.
+	 * Replaces placeholders {0} in string with values from provided object.
+	 *
+	 * @param string formatted String containing placeholders.
+	 * @param object args Object with properties to replace placeholders in string.
+	 *
+	 * @return String
+	 */
+	formatStringWithObject: function (formatted, args) {
+		"use strict";
+		for (var prop in args) {
+			if (args.hasOwnProperty(prop)) {
+				var regexp = new RegExp("\\{" + prop + "\\}", "gi");
+				formatted = formatted.replace(regexp, args[prop]);
+			}
+		}
+		return formatted;
+	},
+
 	// =========================================================================//
 	// EVENTS CALLBACK															//
 	// =========================================================================//
@@ -1619,6 +1701,12 @@ CalHeatMap.prototype = {
 		}
 	},
 
+	afterUpdate: function() {
+		"use strict";
+
+		return this.triggerEvent("afterUpdate");
+	},
+
 	// =========================================================================//
 	// FORMATTER																//
 	// =========================================================================//
@@ -1644,7 +1732,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		if (d.v === null && !this.options.considerMissingDataAsZero) {
-			return (this.options.subDomainTitleFormat.empty).format({
+			return this.formatStringWithObject(this.options.subDomainTitleFormat.empty , {
 				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
 			});
 		} else {
@@ -1654,7 +1742,7 @@ CalHeatMap.prototype = {
 				value = 0;
 			}
 
-			return (this.options.subDomainTitleFormat.filled).format({
+			return this.formatStringWithObject(this.options.subDomainTitleFormat.filled, {
 				count: this.formatNumber(value),
 				name: this.options.itemName[(value !== 1 ? 1: 0)],
 				connector: this._domainType[this.options.subDomain].format.connector,
@@ -2502,7 +2590,7 @@ CalHeatMap.prototype = {
 		if (arguments.length < 6) {
 			updateMode = this.APPEND_ON_UPDATE;
 		}
-		var _callback = function(data) {
+		var _callback = function(error, data) {
 			if (afterLoad !== false) {
 				if (typeof afterLoad === "function") {
 					data = afterLoad(data);
@@ -2523,7 +2611,7 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 		case "string":
 			if (source === "") {
-				_callback({});
+				_callback(null, {});
 				return true;
 			} else {
 				var url = this.parseURI(source, startDate, endDate);
@@ -2536,30 +2624,42 @@ CalHeatMap.prototype = {
 					payload = this.parseURI(self.options.dataPostPayload, startDate, endDate);
 				}
 
+				var xhr = null;
 				switch(this.options.dataType) {
 				case "json":
-					d3.json(url, _callback).send(requestType, payload);
+					xhr = d3.json(url);
 					break;
 				case "csv":
-					d3.csv(url, _callback).send(requestType, payload);
+					xhr = d3.csv(url);
 					break;
 				case "tsv":
-					d3.tsv(url, _callback).send(requestType, payload);
+					xhr = d3.tsv(url);
 					break;
 				case "txt":
-					d3.text(url, "text/plain", _callback).send(requestType, payload);
+					xhr = d3.text(url, "text/plain");
 					break;
 				}
+
+				// jshint maxdepth:5
+				if (self.options.dataRequestHeaders !== null) {
+					for (var header in self.options.dataRequestHeaders) {
+						if (self.options.dataRequestHeaders.hasOwnProperty(header)) {
+							xhr.header(header, self.options.dataRequestHeaders[header]);
+						}
+					}
+				}
+
+				xhr.send(requestType, payload, _callback);
 			}
 			return false;
 		case "object":
 			if (source === Object(source)) {
-				_callback(source);
+				_callback(null, source);
 				return false;
 			}
 			/* falls through */
 		default:
-			_callback({});
+			_callback(null, {});
 			return true;
 		}
 	},
@@ -2699,12 +2799,16 @@ CalHeatMap.prototype = {
 				return 0;
 			})
 			.attr("x", function() {
+				var xPosition = 0;
+				if (options.dayLabel && options.domain === "month") {
+					xPosition = options.cellSize + options.cellPadding;
+				}
 				if (
 					(options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") &&
 					options.legendHorizontalPosition === "left") {
-					return legendWidth;
+					return legendWidth + xPosition;
 				}
-				return 0;
+				return xPosition;
 
 			})
 		;
@@ -2796,6 +2900,9 @@ CalHeatMap.prototype = {
 	update: function(dataSource, afterLoad, updateMode) {
 		"use strict";
 
+		if (arguments.length === 0) {
+			dataSource = this.options.data;
+		}
 		if (arguments.length < 2) {
 			afterLoad = true;
 		}
@@ -2811,6 +2918,7 @@ CalHeatMap.prototype = {
 			this.getSubDomain(domains[domains.length-1]).pop(),
 			function() {
 				self.fill();
+				self.afterUpdate();
 			},
 			afterLoad,
 			updateMode
@@ -3228,17 +3336,17 @@ Legend.prototype.redraw = function(width) {
 
 	legendItem.select("title").text(function(d, i) {
 		if (i === 0) {
-			return (options.legendTitleFormat.lower).format({
+			return calendar.formatStringWithObject(options.legendTitleFormat.lower, {
 				min: options.legend[i],
 				name: options.itemName[1]
 			});
 		} else if (i === _legend.length-1) {
-			return (options.legendTitleFormat.upper).format({
+			return calendar.formatStringWithObject(options.legendTitleFormat.upper, {
 				max: options.legend[i-1],
 				name: options.itemName[1]
 			});
 		} else {
-			return (options.legendTitleFormat.inner).format({
+			return calendar.formatStringWithObject(options.legendTitleFormat.inner, {
 				down: options.legend[i-1],
 				up: options.legend[i],
 				name: options.itemName[1]
@@ -3334,7 +3442,7 @@ Legend.prototype.buildColors = function() {
 
 	if (_legend[0] > 0) {
 		_legend.unshift(0);
-	} else if (_legend[0] < 0) {
+	} else if (_legend[0] <= 0) {
 		// Let's guess the leftmost value, it we have to add one
 		_legend.unshift(_legend[0] - (_legend[_legend.length-1] - _legend[0])/_legend.length);
 	}
@@ -3388,24 +3496,6 @@ Legend.prototype.getClass = function(n, withCssClass) {
 
 	index.unshift("");
 	return (index.join(" r") + (withCssClass ? index.join(" q"): "")).trim();
-};
-
-/**
- * Sprintf like function
- * @source http://stackoverflow.com/a/4795914/805649
- * @return String
- */
-String.prototype.format = function () {
-	"use strict";
-
-	var formatted = this;
-	for (var prop in arguments[0]) {
-		if (arguments[0].hasOwnProperty(prop)) {
-			var regexp = new RegExp("\\{" + prop + "\\}", "gi");
-			formatted = formatted.replace(regexp, arguments[0][prop]);
-		}
-	}
-	return formatted;
 };
 
 /**
