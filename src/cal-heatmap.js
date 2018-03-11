@@ -1670,22 +1670,31 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		if (d.v === null && !this.options.considerMissingDataAsZero) {
-			return this.formatStringWithObject(this.options.subDomainTitleFormat.empty , {
+			var emptyObject = {
 				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
-			});
+			};
+			if (typeof this.options.subDomainTitleFormat === "function") {
+				return this.options.subDomainTitleFormat(true, emptyObject, d);
+			} else {
+				return this.formatStringWithObject(this.options.subDomainTitleFormat.empty, emptyObject);
+			}
 		} else {
 			var value = d.v;
 			// Consider null as 0
 			if (value === null && this.options.considerMissingDataAsZero) {
 				value = 0;
 			}
-
-			return this.formatStringWithObject(this.options.subDomainTitleFormat.filled, {
+			var object = {
 				count: this.formatNumber(value),
 				name: this.options.itemName[(value !== 1 ? 1: 0)],
 				connector: this._domainType[this.options.subDomain].format.connector,
 				date: this.formatDate(new Date(d.t), this.options.subDomainDateFormat)
-			});
+			};
+			if (typeof this.options.subDomainTitleFormat === "function") {
+				return this.options.subDomainTitleFormat(false, object, d);
+			} else {
+				return this.formatStringWithObject(this.options.subDomainTitleFormat.filled, object);
+			}
 		}
 	},
 
