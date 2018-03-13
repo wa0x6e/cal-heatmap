@@ -84,6 +84,10 @@ var CalHeatMap = function() {
 		// { 'X-CSRF-TOKEN': 'token' }
 		dataRequestHeaders: null,
 
+		getDataValue: null,
+
+		combineDataKeys: null,
+
 		// Whether to consider missing date:value from the datasource
 		// as equal to 0, or just leave them as missing
 		considerMissingDataAsZero: false,
@@ -2656,13 +2660,28 @@ CalHeatMap.prototype = {
 
 			var index = temp[domainUnit].indexOf(this._domainType[this.options.subDomain].extractUnit(date));
 
-			if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
-				subDomainsData[index].v = data[d];
+			var value = data[d];
+
+			if (typeof this.options.getDataValue === "string" && typeof value === "object") {
+				value = value[this.options.getDataValue];
+			} else if (typeof this.options.getDataValue === "function") {
+				value = this.options.getDataValue(value);
+			}
+
+			if (updateMode === this.RESET_SINGLE_ON_UPDATE || isNaN(subDomainsData[index].v)) {
+				subDomainsData[index].v = value;
+				if (this.options.combineDataKeys === true) {
+					subDomainsData[index].ks = [d];
+				} else if (typeof this.options.combineDataKeys === "function") {
+					subDomainsData[index].ks = this.options.combineDataKeys(subDomainsData[index].ks, d, value);
+				}
 			} else {
-				if (!isNaN(subDomainsData[index].v)) {
-					subDomainsData[index].v += data[d];
-				} else {
-					subDomainsData[index].v = data[d];
+				subDomainsData[index].v += value;
+				if (this.options.combineDataKeys === true) {
+					subDomainsData[index].ks = subDomainsData[index].ks || [];
+					subDomainsData[index].ks.push(d);
+				} else if (typeof this.options.combineDataKeys === "function") {
+					subDomainsData[index].ks = this.options.combineDataKeys(subDomainsData[index].ks, d, value);
 				}
 			}
 		}
