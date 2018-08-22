@@ -13,7 +13,7 @@
     "test": "test"
   },
   "dependencies": {
-    "d3": "^3.0.6"
+    "d3": "4.x.x"
   },
   "devDependencies": {
     "grunt": "~1.4.1",
