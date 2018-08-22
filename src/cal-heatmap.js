@@ -2616,7 +2616,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		if (updateMode === this.RESET_ALL_ON_UPDATE) {
-			this._domains.each(function(value, key) {
+			this._domains.each(function(value) {
 				value.forEach(function(element, index, array) {
 					array[index].v = null;
 				});
@@ -2955,7 +2955,7 @@ CalHeatMap.prototype = {
 			.attr("width", 0)
 			.attr("height", 0)
 			.remove()
-			.each("end", function() {
+			.each( function() {
 				if (typeof callback === "function") {
 					callback();
 				} else if (typeof callback !== "undefined") {
