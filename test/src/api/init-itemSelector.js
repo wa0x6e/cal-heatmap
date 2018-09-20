@@ -70,7 +70,7 @@ _testInvalidItemSelector("array", []);
 _testInvalidItemSelector("number", 15);
 _testInvalidItemSelector("function", function() {});
 
-test("itemSelector target does not exists", function() {
+test("itemSelector target does not exist", function() {
 	expect(1);
 
 	throws(function() { createCalendar({itemSelector: "#test"}); }, "Non-existent itemSelector raises an Error");
