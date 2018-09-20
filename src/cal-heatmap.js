@@ -2671,6 +2671,9 @@ CalHeatMap.prototype = {
 	parseURI: function(str, startDate, endDate) {
 		"use strict";
 
+		// Added to correct bug in date selection
+		endDate.setDate(endDate.getDate() + 1);
+		
 		// Use a timestamp in seconds
 		str = str.replace(/\{\{t:start\}\}/g, startDate.getTime()/1000);
 		str = str.replace(/\{\{t:end\}\}/g, endDate.getTime()/1000);
