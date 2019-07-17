@@ -2621,11 +2621,13 @@ CalHeatMap.prototype = {
 			if (updateMode === this.RESET_SINGLE_ON_UPDATE) {
 				subDomainsData[index].v = data[d];
 			} else {
+				if(index!==-1){
 				if (!isNaN(subDomainsData[index].v)) {
 					subDomainsData[index].v += data[d];
 				} else {
 					subDomainsData[index].v = data[d];
 				}
+			       }	
 			}
 		}
 	},
