@@ -1386,7 +1386,7 @@ CalHeatMap.prototype = {
 
 		var rect = svg
 			.selectAll("svg").selectAll("g")
-			.data(function(d) { return parent._domains.get(d); })
+			.data(function(d) { return parent._domains.get(d) || []; })
 		;
 
 		/**
