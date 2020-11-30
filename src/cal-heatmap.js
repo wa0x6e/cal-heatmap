@@ -554,7 +554,7 @@ var CalHeatMap = function() {
 
 	// Record all the valid domains
 	// Each domain value is a timestamp in milliseconds
-	this._domains = d3.map();
+	this._domains = new Map();
 
 	this.graphDim = {
 		width: 0,
@@ -1034,6 +1034,16 @@ var CalHeatMap = function() {
 		// ANIMATION																//
 		// =========================================================================//
 
+		domainSvg = self.root.select(".graph")
+			.selectAll(".graph-domain")
+			.data(
+				function() {
+					var data = self.getDomainKeys();
+					return navigationDir === self.NAVIGATE_LEFT ? data.reverse(): data;
+				},
+				function(d) { return d; }
+			)
+		;
 		if (navigationDir !== false) {
 			domainSvg.transition().duration(options.animationDuration)
 				.attr("x", function(d){
@@ -1423,19 +1433,12 @@ CalHeatMap.prototype = {
 
 				var htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
 				var pastDate = parent.dateIsLessThan(d.t, new Date());
-        var sameDate = parent.dateIsEqual(d.t, new Date());
 
 				if (parent.legendScale === null ||
 					(d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero) &&!options.legendColors.hasOwnProperty("base"))
 				) {
 					htmlClass.push("graph-rect");
 				}
-
-        if (sameDate) {
-          htmlClass.push("now");
-        } else if (!pastDate) {
-          htmlClass.push("future");
-        }
 
 				if (d.v !== null) {
 					htmlClass.push(parent.Legend.getClass(d.v, (parent.legendScale === null)));
@@ -1649,7 +1652,7 @@ CalHeatMap.prototype = {
 	// FORMATTER																//
 	// =========================================================================//
 
-	formatNumber: d3.format(",g"),
+	formatNumber: d3.format(",d"),
 
 	formatDate: function(d, format) {
 		"use strict";
@@ -1772,7 +1775,7 @@ CalHeatMap.prototype = {
 				this.getSubDomain(newDomains[i]).map(buildSubDomain)
 			);
 
-			this._domains.remove(backward ? domains.pop() : domains.shift());
+			this._domains.delete(backward ? domains.pop() : domains.shift());
 		}
 
 		domains = this.getDomainKeys();
@@ -1830,7 +1833,7 @@ CalHeatMap.prototype = {
 	getDomainKeys: function() {
 		"use strict";
 
-		return this._domains.keys()
+		return Array.from(this._domains.keys())
 			.map(function(d) { return parseInt(d, 10); })
 			.sort(function(a,b) { return a-b; });
 	},
@@ -2528,7 +2531,7 @@ CalHeatMap.prototype = {
 		if (arguments.length < 6) {
 			updateMode = this.APPEND_ON_UPDATE;
 		}
-		var _callback = function(error, data) {
+		var _callback = function(data) {
 			if (afterLoad !== false) {
 				if (typeof afterLoad === "function") {
 					data = afterLoad(data);
@@ -2549,55 +2552,56 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 		case "string":
 			if (source === "") {
-				_callback(null, {});
+				_callback({});
 				return true;
 			} else {
 				var url = this.parseURI(source, startDate, endDate);
-				var requestType = "GET";
+
+				var reqInit = {"method": "GET"};
 				if (self.options.dataPostPayload !== null ) {
-					requestType = "POST";
+					reqInit["method"] = "POST";
 				}
 				var payload = null;
 				if (self.options.dataPostPayload !== null) {
-					payload = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+					reqInit["body"] = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+				}
+				// jshint maxdepth:5
+				if (self.options.dataRequestHeaders !== null) {
+					var myheaders = new Headers();
+					for (var header in self.options.dataRequestHeaders) {
+						if (self.options.dataRequestHeaders.hasOwnProperty(header)) {
+							myheaders.append(header, self.options.dataRequestHeaders[header]);
+						}
+					}
+					reqInit["headers"] = myheaders;
 				}
 
 				var xhr = null;
 				switch(this.options.dataType) {
 				case "json":
-					xhr = d3.json(url);
+					xhr = d3.json(url, reqInit);
 					break;
 				case "csv":
-					xhr = d3.csv(url);
+					xhr = d3.csv(url, reqInit);
 					break;
 				case "tsv":
-					xhr = d3.tsv(url);
+					xhr = d3.dsv("\t", url, reqInit);
 					break;
 				case "txt":
-					xhr = d3.text(url, "text/plain");
+					xhr = d3.text(url, reqInit);
 					break;
 				}
-
-				// jshint maxdepth:5
-				if (self.options.dataRequestHeaders !== null) {
-					for (var header in self.options.dataRequestHeaders) {
-						if (self.options.dataRequestHeaders.hasOwnProperty(header)) {
-							xhr.header(header, self.options.dataRequestHeaders[header]);
-						}
-					}
-				}
-
-				xhr.send(requestType, payload, _callback);
+				xhr.then(_callback);
 			}
 			return false;
 		case "object":
 			if (source === Object(source)) {
-				_callback(null, source);
+				_callback(source);
 				return false;
 			}
 			/* falls through */
 		default:
-			_callback(null, {});
+			_callback({});
 			return true;
 		}
 	},
@@ -3084,7 +3088,7 @@ CalHeatMap.prototype = {
 var DomainPosition = function() {
 	"use strict";
 
-	this.positions = d3.map();
+	this.positions = new Map();
 };
 
 DomainPosition.prototype.getPosition = function(d) {
@@ -3116,29 +3120,33 @@ DomainPosition.prototype.setPosition = function(d, dim) {
 DomainPosition.prototype.shiftRightBy = function(exitingDomainDim) {
 	"use strict";
 
-	this.positions.each(function(value, key) {
-		this.set(key, value - exitingDomainDim);
+	var mypos = this.positions;
+	var mythis = this;
+	mypos.forEach(function(value, key) {
+		mythis.positions.set(key, value - exitingDomainDim);
 	});
 
 	var domains = this.getKeys();
-	this.positions.remove(domains[0]);
+	this.positions.delete(domains[0]);
 };
 
 DomainPosition.prototype.shiftLeftBy = function(enteringDomainDim) {
 	"use strict";
 
-	this.positions.forEach(function(key, value) {
-		this.set(key, value + enteringDomainDim);
+	var mypos = this.positions;
+	var mythis = this;
+	mypos.forEach(function(value, key) {
+		mythis.positions.set(key, value + enteringDomainDim);
 	});
 
 	var domains = this.getKeys();
-	this.positions.remove(domains[domains.length-1]);
+	this.positions.delete(domains[domains.length-1]);
 };
 
 DomainPosition.prototype.getKeys = function() {
 	"use strict";
 
-	return this.positions.keys().sort(function(a, b) {
+	return Array.from(this.positions.keys()).sort(function(a, b) {
 		return parseInt(a, 10) - parseInt(b, 10);
 	});
 };
