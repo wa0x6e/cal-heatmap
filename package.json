@@ -31,7 +31,7 @@
 
     "phantomjs": "~2.1.1",
     "karma": "~6.3.14",
-    "karma-coverage": "~0.2.7",
+    "karma-coverage": "~0.5.3",
     "karma-qunit": "~0.1.4",
     "karma-phantomjs-launcher": "~1.0.0",
     "grunt-karma-coveralls": "~2.5.3",
