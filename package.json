@@ -20,6 +20,8 @@
     "grunt-contrib-uglify": "~0.7.0",
     "grunt-contrib-copy": "~0.7.0",
     "grunt-contrib-jshint": "~3.1.0",
+    "grunt-contrib-copy": "~0.8.2",
+    "grunt-contrib-jshint": "~3.1.0",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-contrib-qunit": "~0.5.2",
@@ -28,13 +30,13 @@
     "grunt-replace": "~0.8.0",
 
     "phantomjs": "~1.9.15",
-    "karma": "~0.12.31",
+    "karma": "~6.3.14",
     "karma-coverage": "~0.2.7",
     "karma-qunit": "~0.1.4",
     "karma-phantomjs-launcher": "~0.1.4",
     "grunt-karma-coveralls": "~2.5.3",
 
-    "qunitjs": "~1.17.0",
+    "qunitjs": "~1.23.1",
     "jquery": "~1.9.1"
   },
   "scripts": {
