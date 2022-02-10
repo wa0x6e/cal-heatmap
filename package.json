@@ -24,16 +24,16 @@
     "grunt-contrib-jshint": "~3.1.0",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-watch": "~1.0.1",
-    "grunt-contrib-qunit": "~0.5.2",
+    "grunt-contrib-qunit": "~1.0.0",
 
     "grunt-css": "~0.5.4",
     "grunt-replace": "~2.0.0",
 
-    "phantomjs": "~1.9.15",
+    "phantomjs": "~2.1.1",
     "karma": "~6.3.14",
     "karma-coverage": "~0.2.7",
     "karma-qunit": "~0.1.4",
-    "karma-phantomjs-launcher": "~0.1.4",
+    "karma-phantomjs-launcher": "~0.2.0",
     "grunt-karma-coveralls": "~2.5.3",
 
     "qunitjs": "~1.23.1",
