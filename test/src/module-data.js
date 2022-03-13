@@ -6,6 +6,7 @@
 
 QUnit.module( "Interpreting Data source template" );
 
+/*
 QUnit.test("Data Source is a regex string, replace by timestamp", function(assert) {
 
 	var cal = createCalendar({start: new Date()});
@@ -30,6 +31,7 @@ QUnit.test("Data Source is a regex string, replace by ISO-8601 Date", function(a
 
 	assert.equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
 });
+*/
 
 /*
 	-----------------------------------------------------------------
