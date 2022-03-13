@@ -2559,11 +2559,10 @@ CalHeatMap.prototype = {
 
 				var reqInit = {"method": "GET"};
 				if (self.options.dataPostPayload !== null ) {
-					reqInit["method"] = "POST";
+					reqInit.method = "POST";
 				}
-				var payload = null;
 				if (self.options.dataPostPayload !== null) {
-					reqInit["body"] = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+					reqInit.body = this.parseURI(self.options.dataPostPayload, startDate, endDate);
 				}
 				// jshint maxdepth:5
 				if (self.options.dataRequestHeaders !== null) {
@@ -2573,7 +2572,7 @@ CalHeatMap.prototype = {
 							myheaders.append(header, self.options.dataRequestHeaders[header]);
 						}
 					}
-					reqInit["headers"] = myheaders;
+					reqInit.headers = myheaders;
 				}
 
 				var xhr = null;
