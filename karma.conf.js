@@ -1,6 +1,8 @@
 // Karma configuration
 // Generated on Thu Sep 05 2013 14:14:49 GMT-0400 (EDT)
 
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+
 module.exports = function(config) {
 	config.set({
 
@@ -72,7 +74,7 @@ module.exports = function(config) {
 		// - Safari (only Mac)
 		// - PhantomJS
 		// - IE (only Windows)
-		browsers: ["Chrome"],
+		browsers: ["ChromeHeadless"],
 
 
 		// If browser does not capture in given timeout [ms], kill it
