@@ -24,8 +24,9 @@
 	"browser":	 true,
 	"devel":	 true,
 	"jquery":	 true,
-	"phantom":	 true,
 	"node":		 true,
+
+	"esversion":	6,
 
 	"globals" : {
 		"d3": true,
