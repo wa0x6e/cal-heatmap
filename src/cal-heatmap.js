@@ -187,11 +187,11 @@ var CalHeatMap = function() {
 
 		// Formatting of the domain label
 		// @default: null, will use the formatting according to domain type
-		// Accept a string used as specifier by d3.time.format()
+		// Accept a string used as specifier by d3.timeFormat()
 		// or a function
 		//
 		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-		// for accepted date formatting used by d3.time.format()
+		// for accepted date formatting used by d3.timeFormat()
 		domainLabelFormat: null,
 
 		// Formatting of the title displayed when hovering a subDomain cell
@@ -202,20 +202,20 @@ var CalHeatMap = function() {
 
 		// Formatting of the {date} used in subDomainTitleFormat
 		// @default: null, will use the formatting according to subDomain type
-		// Accept a string used as specifier by d3.time.format()
+		// Accept a string used as specifier by d3.timeFormat()
 		// or a function
 		//
 		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-		// for accepted date formatting used by d3.time.format()
+		// for accepted date formatting used by d3.timeFormat()
 		subDomainDateFormat: null,
 
 		// Formatting of the text inside each subDomain cell
 		// @default: null, no text
-		// Accept a string used as specifier by d3.time.format()
+		// Accept a string used as specifier by d3.timeFormat()
 		// or a function
 		//
 		// Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-		// for accepted date formatting used by d3.time.format()
+		// for accepted date formatting used by d3.timeFormat()
 		subDomainTextFormat: null,
 
 		// Formatting of the title displayed when hovering a legend cell
@@ -554,7 +554,7 @@ var CalHeatMap = function() {
 
 	// Record all the valid domains
 	// Each domain value is a timestamp in milliseconds
-	this._domains = d3.map();
+	this._domains = new Map();
 
 	this.graphDim = {
 		width: 0,
@@ -643,15 +643,15 @@ var CalHeatMap = function() {
 		// ATTACHING DOMAIN NAVIGATION EVENT										//
 		// =========================================================================//
 		if (self.options.nextSelector !== false) {
-			d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function() {
-				d3.event.preventDefault();
+			d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function(ev) {
+				ev.preventDefault();
 				return self.loadNextDomain(1);
 			});
 		}
 
 		if (self.options.previousSelector !== false) {
-			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function() {
-				d3.event.preventDefault();
+			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(ev) {
+				ev.preventDefault();
 				return self.loadPreviousDomain(1);
 			});
 		}
@@ -855,7 +855,7 @@ var CalHeatMap = function() {
 			.attr("height", options.cellSize)
 			.attr("x", function(d) { return self.positionSubDomainX(d.t); })
 			.attr("y", function(d) { return self.positionSubDomainY(d.t); })
-			.on("click", function(d) {
+			.on("click", function(ev, d) {
 				if (options.onClick !== null) {
 					return self.onClick(new Date(d.t), d.v);
 				}
@@ -873,7 +873,7 @@ var CalHeatMap = function() {
 				}
 
 				if (options.tooltip) {
-					selection.on("mouseover", function(d) {
+					selection.on("mouseover", function(ev, d) {
 						var domainNode = this.parentNode.parentNode;
 
 						self.tooltip
@@ -881,8 +881,8 @@ var CalHeatMap = function() {
 						.attr("style", "display: block;")
 						;
 
-						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip[0][0].offsetWidth/2 + options.cellSize/2;
-						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip[0][0].offsetHeight - options.cellSize/2;
+						var tooltipPositionX = self.positionSubDomainX(d.t) - self.tooltip.node().offsetWidth/2 + options.cellSize/2;
+						var tooltipPositionY = self.positionSubDomainY(d.t) - self.tooltip.node().offsetHeight - options.cellSize/2;
 
 						// Offset by the domain position
 						tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
@@ -1034,6 +1034,16 @@ var CalHeatMap = function() {
 		// ANIMATION																//
 		// =========================================================================//
 
+		domainSvg = self.root.select(".graph")
+			.selectAll(".graph-domain")
+			.data(
+				function() {
+					var data = self.getDomainKeys();
+					return navigationDir === self.NAVIGATE_LEFT ? data.reverse(): data;
+				},
+				function(d) { return d; }
+			)
+		;
 		if (navigationDir !== false) {
 			domainSvg.transition().duration(options.animationDuration)
 				.attr("x", function(d){
@@ -1113,7 +1123,7 @@ CalHeatMap.prototype = {
 			throw new Error("The data type '" + options.dataType + "' is not valid data type");
 		}
 
-		if (d3.select(options.itemSelector)[0][0] === null) {
+		if (d3.select(options.itemSelector).empty()) {
 			throw new Error("The node '" + options.itemSelector + "' specified in itemSelector does not exist");
 		}
 
@@ -1423,19 +1433,12 @@ CalHeatMap.prototype = {
 
 				var htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
 				var pastDate = parent.dateIsLessThan(d.t, new Date());
-        var sameDate = parent.dateIsEqual(d.t, new Date());
 
 				if (parent.legendScale === null ||
 					(d.v === null && (options.hasOwnProperty("considerMissingDataAsZero") && !options.considerMissingDataAsZero) &&!options.legendColors.hasOwnProperty("base"))
 				) {
 					htmlClass.push("graph-rect");
 				}
-
-        if (sameDate) {
-          htmlClass.push("now");
-        } else if (!pastDate) {
-          htmlClass.push("future");
-        }
 
 				if (d.v !== null) {
 					htmlClass.push(parent.Legend.getClass(d.v, (parent.legendScale === null)));
@@ -1649,7 +1652,7 @@ CalHeatMap.prototype = {
 	// FORMATTER																//
 	// =========================================================================//
 
-	formatNumber: d3.format(",g"),
+	formatNumber: d3.format(",d"),
 
 	formatDate: function(d, format) {
 		"use strict";
@@ -1661,7 +1664,7 @@ CalHeatMap.prototype = {
 		if (typeof format === "function") {
 			return format(d);
 		} else {
-			var f = d3.time.format(format);
+			var f = d3.timeFormat(format);
 			return f(d);
 		}
 	},
@@ -1772,7 +1775,7 @@ CalHeatMap.prototype = {
 				this.getSubDomain(newDomains[i]).map(buildSubDomain)
 			);
 
-			this._domains.remove(backward ? domains.pop() : domains.shift());
+			this._domains.delete(backward ? domains.pop() : domains.shift());
 		}
 
 		domains = this.getDomainKeys();
@@ -1830,7 +1833,7 @@ CalHeatMap.prototype = {
 	getDomainKeys: function() {
 		"use strict";
 
-		return this._domains.keys()
+		return Array.from(this._domains.keys())
 			.map(function(d) { return parseInt(d, 10); })
 			.sort(function(a,b) { return a-b; });
 	},
@@ -2032,7 +2035,7 @@ CalHeatMap.prototype = {
 	 * @param	Date
 	 * @return  int Day of the year [1,366]
 	 */
-	getDayOfYear: d3.time.format("%j"),
+	getDayOfYear: d3.timeFormat("%j"),
 
 	/**
 	 * Return the week number of the year
@@ -2042,7 +2045,7 @@ CalHeatMap.prototype = {
 	getWeekNumber: function(d) {
 		"use strict";
 
-		var f = this.options.weekStartOnMonday === true ? d3.time.format("%W"): d3.time.format("%U");
+		var f = this.options.weekStartOnMonday === true ? d3.timeFormat("%W"): d3.timeFormat("%U");
 		return f(d);
 	},
 
@@ -2188,7 +2191,7 @@ CalHeatMap.prototype = {
 		} else {
 			stop = new Date(+start + range * 1000 * 60);
 		}
-		return d3.time.minutes(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeMinutes(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2210,7 +2213,7 @@ CalHeatMap.prototype = {
 			stop.setHours(stop.getHours() + range);
 		}
 
-		var domains = d3.time.hours(Math.min(start, stop), Math.max(start, stop));
+		var domains = d3.timeHours(Math.min(start, stop), Math.max(start, stop));
 
 		// Passing from DST to standard time
 		// If there are 25 hours, let's compress the duplicate hours
@@ -2224,7 +2227,7 @@ CalHeatMap.prototype = {
 			}
 		}
 
-		// d3.time.hours is returning more hours than needed when changing
+		// d3.timeHours is returning more hours than needed when changing
 		// from DST to standard time, because there is really 2 hours between
 		// 1am and 2am!
 		if (typeof range === "number" && domains.length > Math.abs(range)) {
@@ -2253,7 +2256,7 @@ CalHeatMap.prototype = {
 			stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
 		}
 
-		return d3.time.days(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeDays(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2289,8 +2292,8 @@ CalHeatMap.prototype = {
 		}
 
 		return (this.options.weekStartOnMonday === true) ?
-			d3.time.mondays(Math.min(weekStart, stop), Math.max(weekStart, stop)):
-			d3.time.sundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
+			d3.timeMondays(Math.min(weekStart, stop), Math.max(weekStart, stop)):
+			d3.timeSundays(Math.min(weekStart, stop), Math.max(weekStart, stop))
 		;
 	},
 
@@ -2313,7 +2316,7 @@ CalHeatMap.prototype = {
 			stop = stop.setMonth(stop.getMonth()+range);
 		}
 
-		return d3.time.months(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeMonths(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2334,7 +2337,7 @@ CalHeatMap.prototype = {
 			stop = new Date(d.getFullYear()+range, 0);
 		}
 
-		return d3.time.years(Math.min(start, stop), Math.max(start, stop));
+		return d3.timeYears(Math.min(start, stop), Math.max(start, stop));
 	},
 
 	/**
@@ -2528,7 +2531,7 @@ CalHeatMap.prototype = {
 		if (arguments.length < 6) {
 			updateMode = this.APPEND_ON_UPDATE;
 		}
-		var _callback = function(error, data) {
+		var _callback = function(data) {
 			if (afterLoad !== false) {
 				if (typeof afterLoad === "function") {
 					data = afterLoad(data);
@@ -2549,55 +2552,55 @@ CalHeatMap.prototype = {
 		switch(typeof source) {
 		case "string":
 			if (source === "") {
-				_callback(null, {});
+				_callback({});
 				return true;
 			} else {
 				var url = this.parseURI(source, startDate, endDate);
-				var requestType = "GET";
+
+				var reqInit = {"method": "GET"};
 				if (self.options.dataPostPayload !== null ) {
-					requestType = "POST";
+					reqInit.method = "POST";
 				}
-				var payload = null;
 				if (self.options.dataPostPayload !== null) {
-					payload = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+					reqInit.body = this.parseURI(self.options.dataPostPayload, startDate, endDate);
+				}
+				// jshint maxdepth:5
+				if (self.options.dataRequestHeaders !== null) {
+					var myheaders = new Headers();
+					for (var header in self.options.dataRequestHeaders) {
+						if (self.options.dataRequestHeaders.hasOwnProperty(header)) {
+							myheaders.append(header, self.options.dataRequestHeaders[header]);
+						}
+					}
+					reqInit.headers = myheaders;
 				}
 
 				var xhr = null;
 				switch(this.options.dataType) {
 				case "json":
-					xhr = d3.json(url);
+					xhr = d3.json(url, reqInit);
 					break;
 				case "csv":
-					xhr = d3.csv(url);
+					xhr = d3.csv(url, reqInit);
 					break;
 				case "tsv":
-					xhr = d3.tsv(url);
+					xhr = d3.dsv("\t", url, reqInit);
 					break;
 				case "txt":
-					xhr = d3.text(url, "text/plain");
+					xhr = d3.text(url, reqInit);
 					break;
 				}
-
-				// jshint maxdepth:5
-				if (self.options.dataRequestHeaders !== null) {
-					for (var header in self.options.dataRequestHeaders) {
-						if (self.options.dataRequestHeaders.hasOwnProperty(header)) {
-							xhr.header(header, self.options.dataRequestHeaders[header]);
-						}
-					}
-				}
-
-				xhr.send(requestType, payload, _callback);
+				xhr.then(_callback);
 			}
 			return false;
 		case "object":
 			if (source === Object(source)) {
-				_callback(null, source);
+				_callback(source);
 				return false;
 			}
 			/* falls through */
 		default:
-			_callback(null, {});
+			_callback({});
 			return true;
 		}
 	},
@@ -2616,7 +2619,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		if (updateMode === this.RESET_ALL_ON_UPDATE) {
-			this._domains.forEach(function(key, value) {
+			this._domains.forEach(function(value) {
 				value.forEach(function(element, index, array) {
 					array[index].v = null;
 				});
@@ -2955,7 +2958,7 @@ CalHeatMap.prototype = {
 			.attr("width", 0)
 			.attr("height", 0)
 			.remove()
-			.each("end", function() {
+			.each( function() {
 				if (typeof callback === "function") {
 					callback();
 				} else if (typeof callback !== "undefined") {
@@ -3012,7 +3015,7 @@ CalHeatMap.prototype = {
 		};
 
 		var getElement = function(e) {
-			return root.select(e)[0][0];
+			return root.select(e).node();
 		};
 
 		/* jshint forin:false */
@@ -3084,7 +3087,7 @@ CalHeatMap.prototype = {
 var DomainPosition = function() {
 	"use strict";
 
-	this.positions = d3.map();
+	this.positions = new Map();
 };
 
 DomainPosition.prototype.getPosition = function(d) {
@@ -3116,29 +3119,33 @@ DomainPosition.prototype.setPosition = function(d, dim) {
 DomainPosition.prototype.shiftRightBy = function(exitingDomainDim) {
 	"use strict";
 
-	this.positions.forEach(function(key, value) {
-		this.set(key, value - exitingDomainDim);
+	var mypos = this.positions;
+	var mythis = this;
+	mypos.forEach(function(value, key) {
+		mythis.positions.set(key, value - exitingDomainDim);
 	});
 
 	var domains = this.getKeys();
-	this.positions.remove(domains[0]);
+	this.positions.delete(domains[0]);
 };
 
 DomainPosition.prototype.shiftLeftBy = function(enteringDomainDim) {
 	"use strict";
 
-	this.positions.forEach(function(key, value) {
-		this.set(key, value + enteringDomainDim);
+	var mypos = this.positions;
+	var mythis = this;
+	mypos.forEach(function(value, key) {
+		mythis.positions.set(key, value + enteringDomainDim);
 	});
 
 	var domains = this.getKeys();
-	this.positions.remove(domains[domains.length-1]);
+	this.positions.delete(domains[domains.length-1]);
 };
 
 DomainPosition.prototype.getKeys = function() {
 	"use strict";
 
-	return this.positions.keys().sort(function(a, b) {
+	return Array.from(this.positions.keys()).sort(function(a, b) {
 		return parseInt(a, 10) - parseInt(b, 10);
 	});
 };
@@ -3197,7 +3204,7 @@ Legend.prototype.redraw = function(width) {
 	_legend.push(_legend[_legend.length-1]+1);
 
 	var legendElement = calendar.root.select(".graph-legend");
-	if (legendElement[0][0] !== null) {
+	if (!legendElement.empty()) {
 		legend = legendElement;
 		legendItem = legend
 			.select("g")
@@ -3381,14 +3388,14 @@ Legend.prototype.buildColors = function() {
 		_legend.unshift(_legend[0] - (_legend[_legend.length-1] - _legend[0])/_legend.length);
 	}
 
-	var colorScale = d3.scale.linear()
+	var colorScale = d3.scaleLinear()
 		.range(_colorRange)
 		.interpolate(d3.interpolateHcl)
 		.domain([d3.min(_legend), d3.max(_legend)])
 	;
 
 	var legendColors = _legend.map(function(element) { return colorScale(element); });
-	this.calendar.legendScale = d3.scale.threshold().domain(options.legend).range(legendColors);
+	this.calendar.legendScale = d3.scaleThreshold().domain(options.legend).range(legendColors);
 
 	return true;
 };

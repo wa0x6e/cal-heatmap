@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.6.2 (Sun Mar 13 2022 11:07:25)
+/*! cal-heatmap v3.6.2 (Sun Mar 13 2022 17:37:45)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/wa0x6e/cal-heatmap
@@ -66,8 +66,8 @@ QUnit.module("API : destroy()");
 QUnit.test("Destroying the calendar", function(assert) {
 	assert.expect(3);
 
-	var node = d3.select("body").append("div").attr("id", "test-destroy");
-	var cal = createCalendar({itemSelector: node[0][0], animationDuration: 0, paintOnLoad: true});
+	var node = d3.select("body").append("div").attr("id", "test-destroy").node();
+	var cal = createCalendar({itemSelector: node, animationDuration: 0, paintOnLoad: true});
 
 	assert.ok(cal !== null, "the instance is created");
 
@@ -94,12 +94,12 @@ QUnit.test("Highlighting one date", function(assert) {
 	var highlightedDate = new Date(2000, 0, 1);
 	var cal = createCalendar({ animationDuration: 0, paintOnLoad: true, start: new Date(2000, 0), domain: "month" });
 	assert.ok(cal.highlight(highlightedDate));
-	assert.strictEqual(d3.selectAll("#cal-heatmap .highlight")[0].length, 0);
+	assert.strictEqual(d3.selectAll("#cal-heatmap .highlight").nodes().length, 0);
 
 	var done = assert.async();
 	setTimeout(function() {
-		assert.strictEqual(d3.selectAll("#cal-heatmap .highlight")[0].length, 1);
-		assert.strictEqual(d3.selectAll("#cal-heatmap .highlight")[0][0].__data__.t, +highlightedDate);
+		assert.strictEqual(d3.selectAll("#cal-heatmap .highlight").nodes().length, 1);
+		assert.strictEqual(d3.selectAll("#cal-heatmap .highlight").nodes()[0].__data__.t, +highlightedDate);
 
 		done();
 	}, 50);
@@ -114,16 +114,16 @@ QUnit.test("Highlighting multiple dates", function(assert) {
 	var highlightedDate = [new Date(2000, 0, 1), new Date(2000, 0, 2), new Date(2001, 0, 1)];
 	var cal = createCalendar({ itemSelector: "#hglt2", highlight: [new Date(2000, 0, 3)], animationDuration: 0, paintOnLoad: true, start: new Date(2000, 0), domain: "month", range: 1 });
 	assert.ok(cal.highlight(highlightedDate));
-	assert.strictEqual(d3.selectAll("#hglt2 .highlight")[0].length, 1, "There is already one highlighted date, defined in init()");
+	assert.strictEqual(d3.selectAll("#hglt2 .highlight").nodes().length, 1, "There is already one highlighted date, defined in init()");
 
 	var done = assert.async();
 	setTimeout(function() {
-		var highlightedCells = d3.selectAll("#hglt2 .highlight")[0];
+		var highlightedCells = d3.selectAll("#hglt2 .highlight").nodes();
 		assert.strictEqual(highlightedCells.length, 2, "There is 2 highlighted dates");
 		assert.strictEqual(highlightedCells[0].__data__.t, +highlightedDate[0]);
 		assert.strictEqual(highlightedCells[1].__data__.t, +highlightedDate[1]);
 
-		var d = d3.selectAll("#hglt2 .m_1 .graph-rect")[0][2];
+		var d = d3.selectAll("#hglt2 .m_1 .graph-rect").nodes()[2];
 		assert.strictEqual(d.getAttribute("class").trim(), "graph-rect", "The initial highlighted date is not highlighted anymore");
 		assert.strictEqual(d.__data__.t, new Date(2000, 0, 3).getTime());
 
@@ -654,7 +654,7 @@ QUnit.test("itemSelector accept a valid Element object", function(assert) {
 	assert.equal(cal.init({itemSelector: document.getElementsByClassName("u")[0], paintOnLoad: false}), true, "document.getElementsByClassName(\".u\") is a valid itemSelector");
 	assert.equal($(".u .graph").length, 1, "Graph is appended to .u");
 
-	assert.equal(cal.init({itemSelector: d3.select("[data=y]")[0][0], paintOnLoad: false}), true, "d3.select(\"[data=y]\")[0][0] is a valid itemSelector");
+	assert.equal(cal.init({itemSelector: d3.select("[data=y]").node(), paintOnLoad: false}), true, "d3.select(\"[data=y]\").node() is a valid itemSelector");
 	assert.equal($("div[data=y] .graph").length, 1, "Graph is appended to div[data=y]");
 
 	$("#test").remove();
@@ -1314,11 +1314,11 @@ QUnit.test("Removing existing legend", function(assert) {
 	var cal = createCalendar({displayLegend: true, paintOnLoad: true});
 
 	assert.equal(cal.options.displayLegend, true, "displayLegend setting is set to true");
-	assert.notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend exists int DOM");
+	assert.notEqual(cal.root.select(".graph-legend").node(), null, "Legend exists int DOM");
 
 	assert.equal(cal.removeLegend(), true, "removeLegend() return true when legend does exist");
 	assert.equal(cal.options.displayLegend, false, "displayLegend setting is now set to false");
-	assert.equal(cal.root.select(".graph-legend")[0][0], null, "Legend is now removed from the DOM");
+	assert.equal(cal.root.select(".graph-legend").node(), null, "Legend is now removed from the DOM");
 });
 
 /*
@@ -1345,11 +1345,11 @@ QUnit.test("Show not existing legend", function(assert) {
 	var cal = createCalendar({displayLegend: false});
 
 	assert.equal(cal.options.displayLegend, false, "displayLegend setting is set to false");
-	assert.equal(cal.root.select(".graph-legend")[0][0], null, "There is no legend in the DOM");
+	assert.equal(cal.root.select(".graph-legend").node(), null, "There is no legend in the DOM");
 
 	assert.equal(cal.showLegend(), true, "showLegend() return true when legend does not exist yet");
 	assert.equal(cal.options.displayLegend, true, "displayLegend setting is now set to true");
-	assert.notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend is now added into the DOM");
+	assert.notEqual(cal.root.select(".graph-legend").node(), null, "Legend is now added into the DOM");
 });
 
 
@@ -1359,6 +1359,7 @@ QUnit.test("Show not existing legend", function(assert) {
 	-----------------------------------------------------------------
  */
 
+/*
 QUnit.module("Unit Test: getDatas()", {
 	before: function() {
 		path = (window.parent.document.title === "Karma" ? "base/test/" : "") + "data/";
@@ -1580,6 +1581,7 @@ QUnit.test("Parsing a TXT file", function(assert) {
 		}
 	), false);
 });
+*/
 
 
 QUnit.module("Date computation : dateLessThan()");
@@ -1948,26 +1950,26 @@ QUnit.module("DST: DST to Standard Time");
 		assert.expect(5);
 
 		var cal = createCalendar({start: startDate, range: 4, paintOnLoad: true});
-		var labels = cal.root.selectAll(".graph-label");
+		var labels = cal.root.selectAll(".graph-label").nodes();
 
-		assert.strictEqual(labels[0].length, 4, "There is 4 graph labels");
-		assert.equal(labels[0][0].firstChild.data, "00:00");
-		assert.equal(labels[0][1].firstChild.data, "01:00");
-		assert.equal(labels[0][2].firstChild.data, "02:00");
-		assert.equal(labels[0][3].firstChild.data, "03:00");
+		assert.strictEqual(labels.length, 4, "There is 4 graph labels");
+		assert.equal(labels[0].firstChild.data, "00:00");
+		assert.equal(labels[1].firstChild.data, "01:00");
+		assert.equal(labels[2].firstChild.data, "02:00");
+		assert.equal(labels[3].firstChild.data, "03:00");
 	});
 
 	QUnit.test("DAY DOMAIN: the duplicate hour is compressed into a single hour", function(assert) {
 		assert.expect(4);
 
 		var cal = createCalendar({start: startDate, range: 1, paintOnLoad: true, domain: "day"});
-		var cells = cal.root.selectAll(".graph-rect");
+		var cells = cal.root.selectAll(".graph-rect").nodes();
 
-		assert.strictEqual(cells[0].length, 24, "There is 24 subDomains cells");
+		assert.strictEqual(cells.length, 24, "There is 24 subDomains cells");
 
-		assert.equal(cells[0][0].__data__.t, startDate.getTime(), "The first cell is midnight");
-		assert.equal(cells[0][1].__data__.t, startDate.getTime() + 3600 * 1000 * 2, "The second cell is for the two 1am");
-		assert.equal(cells[0][2].__data__.t, startDate.getTime() + 3600 * 1000 * 3, "The third cell is for 2am");
+		assert.equal(cells[0].__data__.t, startDate.getTime(), "The first cell is midnight");
+		assert.equal(cells[0].__data__.t, startDate.getTime() + 3600 * 1000 * 2, "The second cell is for the two 1am");
+		assert.equal(cells[0].__data__.t, startDate.getTime() + 3600 * 1000 * 3, "The third cell is for 2am");
 	});
 })();
 
@@ -1987,26 +1989,26 @@ QUnit.module("DST: Standard Time to DST");
 		assert.expect(5);
 
 		var cal = createCalendar({start: startDate, range: 4, paintOnLoad: true});
-		var labels = cal.root.selectAll(".graph-label");
+		var labels = cal.root.selectAll(".graph-label").nodes();
 
-		assert.strictEqual(labels[0].length, 4, "There is 4 graph labels");
-		assert.equal(labels[0][0].firstChild.data, "00:00");
-		assert.equal(labels[0][1].firstChild.data, "01:00");
-		assert.equal(labels[0][2].firstChild.data, "03:00", "3am is following 2am, there is no 2 am");
-		assert.equal(labels[0][3].firstChild.data, "04:00");
+		assert.strictEqual(labels.length, 4, "There is 4 graph labels");
+		assert.equal(labels[0].firstChild.data, "00:00");
+		assert.equal(labels[1].firstChild.data, "01:00");
+		assert.equal(labels[2].firstChild.data, "03:00", "3am is following 2am, there is no 2 am");
+		assert.equal(labels[3].firstChild.data, "04:00");
 	});
 
 	QUnit.test("DAY DOMAIN: the missing hour is skipped", function(assert) {
 		assert.expect(4);
 
 		var cal = createCalendar({start: startDate, range: 1, paintOnLoad: true, domain: "day"});
-		var cells = cal.root.selectAll(".graph-rect");
+		var cells = cal.root.selectAll(".graph-rect").nodes();
 
-		assert.strictEqual(cells[0].length, 23, "There is 23 subDomains cells");
+		assert.strictEqual(cells.length, 23, "There is 23 subDomains cells");
 
-		assert.equal(cells[0][0].__data__.t, startDate.getTime(), "The first cell is midnight");
-		assert.equal(cells[0][1].__data__.t, startDate.getTime() + 3600 * 1000, "The second cell is for 1am");
-		assert.equal(cells[0][2].__data__.t, startDate.getTime() + 3600 * 1000 * 2, "The third cell is for 3am, there is no 2am");
+		assert.equal(cells[0].__data__.t, startDate.getTime(), "The first cell is midnight");
+		assert.equal(cells[1].__data__.t, startDate.getTime() + 3600 * 1000, "The second cell is for 1am");
+		assert.equal(cells[2].__data__.t, startDate.getTime() + 3600 * 1000 * 2, "The third cell is for 3am, there is no 2am");
 	});
 })();
 
@@ -2235,6 +2237,7 @@ QUnit.test("afterLoadData is not a valid callback", function(assert) {
 
 QUnit.module( "Interpreting Data source template" );
 
+/*
 QUnit.test("Data Source is a regex string, replace by timestamp", function(assert) {
 
 	var cal = createCalendar({start: new Date()});
@@ -2259,6 +2262,7 @@ QUnit.test("Data Source is a regex string, replace by ISO-8601 Date", function(a
 
 	assert.equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
 });
+*/
 
 /*
 	-----------------------------------------------------------------
@@ -3697,11 +3701,6 @@ QUnit.test("Also return the qn styling class", function(assert) {
 // Whether to split each domain>subDomain test into their own module
 var SPLIT_TEST = false;
 
-// Count the number of keys in an array
-function count(array) {
-	return d3.keys(array).length;
-}
-
 function _test(domain, subDomain, config_h, config_v, skipped) {
 
 	if (arguments.length < 5) {
@@ -3765,17 +3764,17 @@ function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRo
 		var rect = $("#cal-heatmap").find(".graph-rect");
 
 		var _count = {
-			column: [],
-			row: []
+			column: new Map(),
+			row: new Map()
 		};
 
 		rect.each(function() {
-			_count.column[$(this).attr("x")] = 0;
-			_count.row[$(this).attr("y")] = 0;
+			_count.column.set($(this).attr("x"), 0);
+			_count.row.set($(this).attr("y"), 0);
 		});
 
-		assert.equal(count(_count.column), expectedCol, "The domain was split into " + expectedCol + " columns");
-		assert.equal(count(_count.row), expectedRow, "The domain was split into " + expectedRow + " rows");
+		assert.equal(_count.column.size, expectedCol, "The domain was split into " + expectedCol + " columns");
+		assert.equal(_count.row.size, expectedRow, "The domain was split into " + expectedRow + " rows");
 	}
 }
 

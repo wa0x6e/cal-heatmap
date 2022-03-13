@@ -1,6 +1,8 @@
 // Karma configuration
 // Generated on Thu Sep 05 2013 14:14:49 GMT-0400 (EDT)
 
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+
 module.exports = function(config) {
 	config.set({
 
@@ -14,7 +16,7 @@ module.exports = function(config) {
 
 		// list of files / patterns to load in the browser
 		files: [
-			"test/d3.min.js",
+			"node_modules/d3/dist/d3.min.js",
 			"src/cal-heatmap.js",
 			"node_modules/jquery/dist/jquery.min.js",
 			"test/test.js",
@@ -72,7 +74,7 @@ module.exports = function(config) {
 		// - Safari (only Mac)
 		// - PhantomJS
 		// - IE (only Windows)
-		browsers: ["PhantomJS"],
+		browsers: ["ChromeHeadless"],
 
 
 		// If browser does not capture in given timeout [ms], kill it

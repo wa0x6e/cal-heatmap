@@ -22,9 +22,9 @@ QUnit.test("Removing existing legend", function(assert) {
 	var cal = createCalendar({displayLegend: true, paintOnLoad: true});
 
 	assert.equal(cal.options.displayLegend, true, "displayLegend setting is set to true");
-	assert.notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend exists int DOM");
+	assert.notEqual(cal.root.select(".graph-legend").node(), null, "Legend exists int DOM");
 
 	assert.equal(cal.removeLegend(), true, "removeLegend() return true when legend does exist");
 	assert.equal(cal.options.displayLegend, false, "displayLegend setting is now set to false");
-	assert.equal(cal.root.select(".graph-legend")[0][0], null, "Legend is now removed from the DOM");
+	assert.equal(cal.root.select(".graph-legend").node(), null, "Legend is now removed from the DOM");
 });

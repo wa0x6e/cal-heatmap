@@ -4,6 +4,7 @@
 	-----------------------------------------------------------------
  */
 
+/*
 QUnit.module("Unit Test: getDatas()", {
 	before: function() {
 		path = (window.parent.document.title === "Karma" ? "base/test/" : "") + "data/";
@@ -225,3 +226,4 @@ QUnit.test("Parsing a TXT file", function(assert) {
 		}
 	), false);
 });
+*/

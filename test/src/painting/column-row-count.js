@@ -13,11 +13,6 @@
 // Whether to split each domain>subDomain test into their own module
 var SPLIT_TEST = false;
 
-// Count the number of keys in an array
-function count(array) {
-	return d3.keys(array).length;
-}
-
 function _test(domain, subDomain, config_h, config_v, skipped) {
 
 	if (arguments.length < 5) {
@@ -81,17 +76,17 @@ function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRo
 		var rect = $("#cal-heatmap").find(".graph-rect");
 
 		var _count = {
-			column: [],
-			row: []
+			column: new Map(),
+			row: new Map()
 		};
 
 		rect.each(function() {
-			_count.column[$(this).attr("x")] = 0;
-			_count.row[$(this).attr("y")] = 0;
+			_count.column.set($(this).attr("x"), 0);
+			_count.row.set($(this).attr("y"), 0);
 		});
 
-		assert.equal(count(_count.column), expectedCol, "The domain was split into " + expectedCol + " columns");
-		assert.equal(count(_count.row), expectedRow, "The domain was split into " + expectedRow + " rows");
+		assert.equal(_count.column.size, expectedCol, "The domain was split into " + expectedCol + " columns");
+		assert.equal(_count.row.size, expectedRow, "The domain was split into " + expectedRow + " rows");
 	}
 }
 
