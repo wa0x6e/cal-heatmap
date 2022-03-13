@@ -903,7 +903,7 @@ var CalHeatMap = function() {
 						;
 					});
 
-					selection.on("mouseout", function(ev) {
+					selection.on("mouseout", function() {
 						self.tooltip
 						.attr("style", "display:none")
 						.html("");
