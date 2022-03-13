@@ -15,7 +15,7 @@ var SPLIT_TEST = false;
 
 // Count the number of keys in an array
 function count(array) {
-	return d3.keys(array).length;
+	return array.keys().length;
 }
 
 function _test(domain, subDomain, config_h, config_v, skipped) {
