@@ -29,18 +29,17 @@
     "grunt-contrib-csslint": "~2.0.0",
     "grunt-replace": "~2.0.0",
 
-    "phantomjs-prebuilt": "~2.1.14",
     "karma": "~6.3.14",
     "karma-coverage": "~2.1.0",
     "karma-qunit": "~4.1.2",
-    "karma-phantomjs-launcher": "~1.0.0",
+    "karma-chrome-launcher": "~3.1.1",
     "grunt-karma": "~4.0.2",
 
     "qunit": "~2.18.0",
     "jquery": "~3.6.0"
   },
   "scripts": {
-    "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
+    "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers Chrome"
   },
   "repository": {
     "type": "git",
