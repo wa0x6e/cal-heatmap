@@ -643,15 +643,15 @@ var CalHeatMap = function() {
 		// ATTACHING DOMAIN NAVIGATION EVENT										//
 		// =========================================================================//
 		if (self.options.nextSelector !== false) {
-			d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function() {
-				d3.event.preventDefault();
+			d3.select(self.options.nextSelector).on("click." + self.options.itemNamespace, function(ev) {
+				ev.preventDefault();
 				return self.loadNextDomain(1);
 			});
 		}
 
 		if (self.options.previousSelector !== false) {
-			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function() {
-				d3.event.preventDefault();
+			d3.select(self.options.previousSelector).on("click." + self.options.itemNamespace, function(ev) {
+				ev.preventDefault();
 				return self.loadPreviousDomain(1);
 			});
 		}
