@@ -5,14 +5,14 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(highlight)");
+QUnit.module("API: init(highlight)");
 
 function __testHighlightSetting(title, highlight, expected) {
-	test("Test expanding " + title, function() {
-		expect(1);
+	QUnit.test("Test expanding " + title, function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ highlight: highlight });
-		deepEqual(cal.options.highlight, expected, (Array.isArray(highlight) ? "["+highlight.join(", ")+"]" : highlight) + " is expanded to [" + expected.join(", ") + "]");
+		assert.deepEqual(cal.options.highlight, expected, (Array.isArray(highlight) ? "["+highlight.join(", ")+"]" : highlight) + " is expanded to [" + expected.join(", ") + "]");
 	});
 }
 
@@ -25,30 +25,30 @@ __testHighlightSetting("a non-empty array, with multiple date objects", [new Dat
 __testHighlightSetting("null", null, []);
 __testHighlightSetting("a boolean", false, []);
 
-test("Test expanding NOW string", function() {
-	expect(3);
+QUnit.test("Test expanding NOW string", function(assert) {
+	assert.expect(3);
 
 	var cal = createCalendar({ highlight: "now" });
-	ok(Array.isArray(cal.options.highlight));
-	equal(cal.options.highlight.length, 1);
-	ok(cal.options.highlight[0] instanceof Date);
+	assert.ok(Array.isArray(cal.options.highlight));
+	assert.equal(cal.options.highlight.length, 1);
+	assert.ok(cal.options.highlight[0] instanceof Date);
 });
 
-test("Test expanding NOW string inside an array of valid dates", function() {
-	expect(4);
+QUnit.test("Test expanding NOW string inside an array of valid dates", function(assert) {
+	assert.expect(4);
 
 	var cal = createCalendar({ highlight: ["now", new Date()] });
-	ok(Array.isArray(cal.options.highlight));
-	equal(cal.options.highlight.length, 2);
-	ok(cal.options.highlight[0] instanceof Date);
-	ok(cal.options.highlight[1] instanceof Date);
+	assert.ok(Array.isArray(cal.options.highlight));
+	assert.equal(cal.options.highlight.length, 2);
+	assert.ok(cal.options.highlight[0] instanceof Date);
+	assert.ok(cal.options.highlight[1] instanceof Date);
 });
 
-test("Test expanding NOW string inside an array of invalid dates", function() {
-	expect(3);
+QUnit.test("Test expanding NOW string inside an array of invalid dates", function(assert) {
+	assert.expect(3);
 
 	var cal = createCalendar({ highlight: ["now", "tomorrow"] });
-	ok(Array.isArray(cal.options.highlight));
-	equal(cal.options.highlight.length, 1);
-	ok(cal.options.highlight[0] instanceof Date);
+	assert.ok(Array.isArray(cal.options.highlight));
+	assert.equal(cal.options.highlight.length, 1);
+	assert.ok(cal.options.highlight[0] instanceof Date);
 });

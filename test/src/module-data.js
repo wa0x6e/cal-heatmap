@@ -4,9 +4,9 @@
 	-----------------------------------------------------------------
  */
 
-module( "Interpreting Data source template" );
+QUnit.module( "Interpreting Data source template" );
 
-test("Data Source is a regex string, replace by timestamp", function() {
+QUnit.test("Data Source is a regex string, replace by timestamp", function(assert) {
 
 	var cal = createCalendar({start: new Date()});
 	var uri = "get?start={{t:start}}&end={{t:end}}";
@@ -14,10 +14,10 @@ test("Data Source is a regex string, replace by timestamp", function() {
 
 	var parsedUri = "get?start=" + (domains[0]/1000) + "&end=" + (domains[domains.length-1]/1000);
 
-	equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a timestamp : " + parsedUri);
+	assert.equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a timestamp : " + parsedUri);
 });
 
-test("Data Source is a regex string, replace by ISO-8601 Date", function() {
+QUnit.test("Data Source is a regex string, replace by ISO-8601 Date", function(assert) {
 
 	var cal = createCalendar({start: new Date()});
 	var uri = "get?start={{d:start}}&end={{d:end}}";
@@ -28,7 +28,7 @@ test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 
 	var parsedUri = "get?start=" + startDate.toISOString() + "&end=" + endDate.toISOString();
 
-	equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
+	assert.equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
 });
 
 /*
@@ -37,10 +37,10 @@ test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 	-----------------------------------------------------------------
  */
 /*
-module( "Data processing" );
+QUnit.module( "Data processing" );
 
-test("Grouping datas by hour>min", function() {
-	expect(6);
+QUnit.test("Grouping datas by hour>min", function(assert) {
+	assert.expect(6);
 
 	var date = new Date(2000, 0, 1);
 	var date1 = date.getTime()/1000;
@@ -56,16 +56,16 @@ test("Grouping datas by hour>min", function() {
 
 	var calDatas = cal.parseDatas(datas);
 
-	equal(Object.keys(calDatas).length, 2, "Only datas for 2 hours");
-	equal(Object.keys(calDatas[date1*1000]).length, 1, "First hour contains 1 event");
-	equal(Object.keys(calDatas[date2*1000]).length, 2, "Second hour contains 2 events");
-	equal(calDatas[date1*1000]["0"], 15);
-	equal(calDatas[date2*1000]["0"], 25);
-	equal(calDatas[date2*1000]["1"], 1);
+	assert.equal(Object.keys(calDatas).length, 2, "Only datas for 2 hours");
+	assert.equal(Object.keys(calDatas[date1*1000]).length, 1, "First hour contains 1 event");
+	assert.equal(Object.keys(calDatas[date2*1000]).length, 2, "Second hour contains 2 events");
+	assert.equal(calDatas[date1*1000]["0"], 15);
+	assert.equal(calDatas[date2*1000]["0"], 25);
+	assert.equal(calDatas[date2*1000]["1"], 1);
 });
 
-test("Grouping datas by day>hour", function() {
-	expect(2);
+QUnit.test("Grouping datas by day>hour", function(assert) {
+	assert.expect(2);
 
 	var date = new Date(2000, 0, 1);
 	var date1 = date.getTime()/1000;
@@ -81,13 +81,13 @@ test("Grouping datas by day>hour", function() {
 
 	var calDatas = cal.parseDatas(datas);
 
-	equal(Object.keys(calDatas).length, 1, "Only datas for 1 day");
-	equal(Object.keys(calDatas[date1*1000]).length, 2, "Day contains datas for 2 hours");
+	assert.equal(Object.keys(calDatas).length, 1, "Only datas for 1 day");
+	assert.equal(Object.keys(calDatas[date1*1000]).length, 2, "Day contains datas for 2 hours");
 
 });
 
-test("Filter out datas not relevant to calendar domain", function() {
-	expect(4);
+QUnit.test("Filter out datas not relevant to calendar domain", function(assert) {
+	assert.expect(4);
 
 	var date = new Date(2000, 0, 1);
 	var date1 = date.getTime()/1000;
@@ -103,9 +103,9 @@ test("Filter out datas not relevant to calendar domain", function() {
 
 	var calDatas = cal.parseDatas(datas);
 
-	equal(Object.keys(calDatas).length, 1, "Only datas for 1 hour");
-	equal(calDatas.hasOwnProperty(date1*1000), false, "Datas for the first hour are filtered out");
-	equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
-	equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
+	assert.equal(Object.keys(calDatas).length, 1, "Only datas for 1 hour");
+	assert.equal(calDatas.hasOwnProperty(date1*1000), false, "Datas for the first hour are filtered out");
+	assert.equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
+	assert.equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
 
 });*/

@@ -4,20 +4,21 @@
 	-----------------------------------------------------------------
  */
 
-module("API : destroy()");
+QUnit.module("API : destroy()");
 
-asyncTest("Destroying the calendar", function() {
-	expect(3);
+QUnit.test("Destroying the calendar", function(assert) {
+	assert.expect(3);
 
 	var node = d3.select("body").append("div").attr("id", "test-destroy");
 	var cal = createCalendar({itemSelector: node[0][0], animationDuration: 0, paintOnLoad: true});
 
-	ok(cal !== null, "the instance is created");
+	assert.ok(cal !== null, "the instance is created");
 
+	var done = assert.async();
 	cal = cal.destroy(function() {
-		ok("callback called");
-		start();
+		assert.ok("callback called");
+		done();
 	});
 
-	ok(cal === null, "the instance is deleted");
+	assert.ok(cal === null, "the instance is deleted");
 });

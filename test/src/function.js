@@ -34,15 +34,15 @@ function createCalendar(settings) {
  * @link http://stackoverflow.com/questions/13748129/skipping-a-test-in-qunit
  * @return {[type]} [description]
  */
-QUnit.testSkip = function() {
-	QUnit.test(arguments[0] + ' (SKIPPED)', function() {
+QUnit.testSkip = function(assert) {
+	QUnit.test(arguments[0] + ' (SKIPPED)', function(assert) {
 		var li = document.getElementById(QUnit.config.current.id);
 		QUnit.done(function() {
 			if (li !== null) {
 				li.style.background = '#FFFF99';
 			}
 		});
-		ok(true);
+		assert.ok(true);
 	});
 };
 testSkip = QUnit.testSkip;

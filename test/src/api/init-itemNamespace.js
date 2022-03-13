@@ -5,14 +5,14 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(itemNamespace)");
+QUnit.module("API: init(itemNamespace)");
 
 function __testItemNamespaceSetting(title, value, expected) {
-	test(title, function() {
-		expect(1);
+	QUnit.test(title, function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ itemNamespace: value });
-		equal(cal.options.itemNamespace, expected, "itemNamespace is set to " + expected);
+		assert.equal(cal.options.itemNamespace, expected, "itemNamespace is set to " + expected);
 	});
 }
 

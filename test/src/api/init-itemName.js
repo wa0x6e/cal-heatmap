@@ -5,14 +5,14 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(itemName)");
+QUnit.module("API: init(itemName)");
 
 function __testItemNameSetting(title, value, expected) {
-	test("Set itemName from " + title, function() {
-		expect(1);
+	QUnit.test("Set itemName from " + title, function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ itemName: value });
-		deepEqual(cal.options.itemName, expected, "itemName is set to " + expected);
+		assert.deepEqual(cal.options.itemName, expected, "itemName is set to " + expected);
 	});
 }
 

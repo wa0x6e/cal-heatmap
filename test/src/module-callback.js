@@ -4,11 +4,11 @@
 	-----------------------------------------------------------------
  */
 
-module( "Callback" );
+QUnit.module( "Callback" );
 
-test("OnClick", function() {
+QUnit.test("OnClick", function(assert) {
 
-	expect(2);
+	assert.expect(2);
 
 	var testFunction = function(date, itemNb) { return {d:date, i:itemNb}; };
 
@@ -18,14 +18,14 @@ test("OnClick", function() {
 
 	var response = cal.onClick(date, 58);
 
-	equal(response.i, 58);
-	equal(response.d.getTime(), date.getTime());
+	assert.equal(response.i, 58);
+	assert.equal(response.d.getTime(), date.getTime());
 
 });
 
-test("afterLoad", function() {
+QUnit.test("afterLoad", function(assert) {
 
-	expect(1);
+	assert.expect(1);
 
 	$("#cal-heatmap").data("test", "Dummy Data");
 	var finalString = "Edited data";
@@ -33,12 +33,12 @@ test("afterLoad", function() {
 
 	createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: testFunction, paintOnLoad: true});
 
-	equal($("#cal-heatmap").data("test"), finalString);
+	assert.equal($("#cal-heatmap").data("test"), finalString);
 });
 
-test("onComplete", function() {
+QUnit.test("onComplete", function(assert) {
 
-	expect(1);
+	assert.expect(1);
 
 	$("body").data("test", "Dummy Data");
 	var finalString = "Edited data";
@@ -46,12 +46,12 @@ test("onComplete", function() {
 
 	createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: true});
 
-	equal($("body").data("test"), finalString);
+	assert.equal($("body").data("test"), finalString);
 });
 
-test("onComplete is ran even on loadOnInit = false", function() {
+QUnit.test("onComplete is ran even on loadOnInit = false", function(assert) {
 
-	expect(1);
+	assert.expect(1);
 
 	$("body").data("test", "Dummy Data");
 	var finalString = "Edited data";
@@ -59,12 +59,12 @@ test("onComplete is ran even on loadOnInit = false", function() {
 
 	createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: true, loadOnInit: false});
 
-	equal($("body").data("test"), finalString);
+	assert.equal($("body").data("test"), finalString);
 });
 
-test("onComplete does not run with paintOnLoad = false", function() {
+QUnit.test("onComplete does not run with paintOnLoad = false", function(assert) {
 
-	expect(1);
+	assert.expect(1);
 
 	$("body").data("test", "Dummy Data");
 	var finalString = "Edited data";
@@ -72,12 +72,12 @@ test("onComplete does not run with paintOnLoad = false", function() {
 
 	createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: testFunction, paintOnLoad: false});
 
-	equal($("body").data("test"), "Dummy Data");
+	assert.equal($("body").data("test"), "Dummy Data");
 });
 
-test("afterLoadPreviousDomain", function() {
+QUnit.test("afterLoadPreviousDomain", function(assert) {
 
-	expect(2);
+	assert.expect(2);
 
 	var testFunction = function(start, end) { return {start:start, end:end}; };
 
@@ -89,13 +89,13 @@ test("afterLoadPreviousDomain", function() {
 
 	var response = cal.afterLoadPreviousDomain(date);
 
-	equal(response.start.getTime(), previousDomainStart.getTime(), "Callback return first subdomain of the date");
-	equal(response.end.getTime(), previousDomainEnd.getTime(), "Callback return last subdomain of the date");
+	assert.equal(response.start.getTime(), previousDomainStart.getTime(), "Callback return first subdomain of the date");
+	assert.equal(response.end.getTime(), previousDomainEnd.getTime(), "Callback return last subdomain of the date");
 });
 
-test("afterLoadNextDomain", function() {
+QUnit.test("afterLoadNextDomain", function(assert) {
 
-	expect(2);
+	assert.expect(2);
 
 	var testFunction = function(start, end) { return {start:start, end:end}; };
 
@@ -107,60 +107,60 @@ test("afterLoadNextDomain", function() {
 
 	var response = cal.afterLoadNextDomain(date);
 
-	equal(response.start.getTime(), nextDomainStart.getTime(), "Callback return first subdomain of the date");
-	equal(response.end.getTime(), nextDomainEnd.getTime(), "Callback return last subdomain of the date");
+	assert.equal(response.start.getTime(), nextDomainStart.getTime(), "Callback return first subdomain of the date");
+	assert.equal(response.end.getTime(), nextDomainEnd.getTime(), "Callback return last subdomain of the date");
 });
 
-test("onClick is not a valid callback : object", function() {
-	expect(1);
+QUnit.test("onClick is not a valid callback : object", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onClick: {}});
-	equal(cal.onClick(), false);
+	assert.equal(cal.onClick(), false);
 });
 
-test("onClick is not a valid callback : string", function() {
-	expect(1);
+QUnit.test("onClick is not a valid callback : string", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onClick: "string"});
-	equal(cal.onClick(), false);
+	assert.equal(cal.onClick(), false);
 });
 
-test("afterLoad is not a valid callback : object", function() {
-	expect(1);
+QUnit.test("afterLoad is not a valid callback : object", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: {}});
-	equal(cal.afterLoad(), false);
+	assert.equal(cal.afterLoad(), false);
 });
 
-test("afterLoad is not a valid callback : string", function() {
-	expect(1);
+QUnit.test("afterLoad is not a valid callback : string", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoad: "null"});
-	equal(cal.afterLoad(), false);
+	assert.equal(cal.afterLoad(), false);
 });
 
-test("afterLoadNextDomain is not a valid callback : string", function() {
-	expect(1);
+QUnit.test("afterLoadNextDomain is not a valid callback : string", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadNextDomain: "null"});
-	equal(cal.afterLoadNextDomain(), false);
+	assert.equal(cal.afterLoadNextDomain(), false);
 });
 
-test("afterLoadPreviousDomain is not a valid callback : string", function() {
-	expect(1);
+QUnit.test("afterLoadPreviousDomain is not a valid callback : string", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, afterLoadPreviousDomain: "null"});
-	equal(cal.afterLoadPreviousDomain(null), false);
+	assert.equal(cal.afterLoadPreviousDomain(null), false);
 });
 
-test("onComplete is not a valid callback : object", function() {
-	expect(1);
+QUnit.test("onComplete is not a valid callback : object", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: {}, loadOnInit: true});
-	equal(cal.onComplete(), false);
+	assert.equal(cal.onComplete(), false);
 });
 
-test("onComplete is not a valid callback : string", function() {
-	expect(1);
+QUnit.test("onComplete is not a valid callback : string", function(assert) {
+	assert.expect(1);
 	var cal = createCalendar({domain: "hour", subDomain: "min", range:1, onComplete: "null", loadOnInit: true});
-	equal(cal.onComplete(), false);
+	assert.equal(cal.onComplete(), false);
 });
 
-test("afterLoadData is not a valid callback", function() {
-	expect(1);
+QUnit.test("afterLoadData is not a valid callback", function(assert) {
+	assert.expect(1);
 
 	var date = new Date(2000, 0, 1);
 	var date1 = date.getTime()/1000;
@@ -175,5 +175,5 @@ test("afterLoadData is not a valid callback", function() {
 	var parser = "";
 	var cal = createCalendar({data: datas, start: new Date(2000, 0, 1, 1), afterLoadData: parser, domain: "hour", subDomain: "min"});
 
-	equal(true, $.isEmptyObject(cal.parseDatas(datas)), "parseDatas return an empty object");
+	assert.equal(true, $.isEmptyObject(cal.parseDatas(datas)), "parseDatas return an empty object");
 });
