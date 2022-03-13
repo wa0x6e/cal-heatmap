@@ -1,0 +1,24 @@
+name: node
+
+on: push
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [14, 16]
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Install node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install dependencies
+      run: npm install
+    - name: Install grunt-cli
+      run: npm install -g grunt-cli
+    - name: Run tests
+      run: npm test
