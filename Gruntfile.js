@@ -73,9 +73,9 @@ module.exports = function(grunt) {
                 dest: "test/test.js"
             }
         },
-        coveralls: {
-            options: {
-                coverage_dir: "coverage/"
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
             }
         },
         watch: {
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-csslint");
     grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-concat");
-    grunt.loadNpmTasks("grunt-karma-coveralls");
+    grunt.loadNpmTasks("grunt-karma");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
     // TO RUN BEFORE COMMIT
