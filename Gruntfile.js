@@ -31,8 +31,9 @@ module.exports = function(grunt) {
         csslint: {
             base: {
                 src: "<%= pkg.name %>.css",
-                rules: {
+                options: {
                     "known-properties": false,
+                    "order-alphabetical": false,
                     "box-sizing": false
                 }
             }
@@ -97,7 +98,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-uglify");
-    grunt.loadNpmTasks("grunt-css");
+    grunt.loadNpmTasks("grunt-contrib-csslint");
     grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-karma-coveralls");
