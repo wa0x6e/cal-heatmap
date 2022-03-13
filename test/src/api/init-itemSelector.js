@@ -51,7 +51,7 @@ QUnit.test("itemSelector accept a valid Element object", function(assert) {
 	assert.equal(cal.init({itemSelector: document.getElementsByClassName("u")[0], paintOnLoad: false}), true, "document.getElementsByClassName(\".u\") is a valid itemSelector");
 	assert.equal($(".u .graph").length, 1, "Graph is appended to .u");
 
-	assert.equal(cal.init({itemSelector: d3.select("[data=y]")[0][0], paintOnLoad: false}), true, "d3.select(\"[data=y]\")[0][0] is a valid itemSelector");
+	assert.equal(cal.init({itemSelector: d3.select("[data=y]").node(), paintOnLoad: false}), true, "d3.select(\"[data=y]\").node() is a valid itemSelector");
 	assert.equal($("div[data=y] .graph").length, 1, "Graph is appended to div[data=y]");
 
 	$("#test").remove();
