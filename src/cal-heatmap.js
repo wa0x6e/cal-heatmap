@@ -855,7 +855,7 @@ var CalHeatMap = function() {
 			.attr("height", options.cellSize)
 			.attr("x", function(d) { return self.positionSubDomainX(d.t); })
 			.attr("y", function(d) { return self.positionSubDomainY(d.t); })
-			.on("click", function(d) {
+			.on("click", function(ev, d) {
 				if (options.onClick !== null) {
 					return self.onClick(new Date(d.t), d.v);
 				}
@@ -873,7 +873,7 @@ var CalHeatMap = function() {
 				}
 
 				if (options.tooltip) {
-					selection.on("mouseover", function(d) {
+					selection.on("mouseover", function(ev, d) {
 						var domainNode = this.parentNode.parentNode;
 
 						self.tooltip
@@ -903,7 +903,7 @@ var CalHeatMap = function() {
 						;
 					});
 
-					selection.on("mouseout", function() {
+					selection.on("mouseout", function(ev) {
 						self.tooltip
 						.attr("style", "display:none")
 						.html("");
@@ -2619,7 +2619,7 @@ CalHeatMap.prototype = {
 		"use strict";
 
 		if (updateMode === this.RESET_ALL_ON_UPDATE) {
-			this._domains.each(function(value) {
+			this._domains.forEach(function(value) {
 				value.forEach(function(element, index, array) {
 					array[index].v = null;
 				});
