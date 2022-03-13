@@ -16,7 +16,7 @@ module.exports = function(config) {
 
 		// list of files / patterns to load in the browser
 		files: [
-			"test/d3.min.js",
+			"node_modules/d3/dist/d3.min.js",
 			"src/cal-heatmap.js",
 			"node_modules/jquery/dist/jquery.min.js",
 			"test/test.js",
