@@ -37,7 +37,7 @@
     "grunt-karma-coveralls": "~2.5.3",
 
     "qunitjs": "~1.23.1",
-    "jquery": "~3.5.0"
+    "jquery": "~3.6.0"
   },
   "scripts": {
     "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
