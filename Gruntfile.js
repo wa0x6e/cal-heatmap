@@ -51,6 +51,14 @@ module.exports = function(grunt) {
         qunit: {
             options: {
                 "--web-security": "no",
+                puppeteer: {
+                    ignoreDefaultArgs: true,
+                    args: [
+                        "--headless",
+                        "--disable-web-security",
+                        "--allow-file-access-from-files"
+                    ]
+                },
                 coverage: {
                     src: ["src/*.js"],
                     instrumentedFiles: "temp/",
