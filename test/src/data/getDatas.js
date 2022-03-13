@@ -4,93 +4,93 @@
 	-----------------------------------------------------------------
  */
 
-module("Unit Test: getDatas()", {
-	setup: function() {
+QUnit.module("Unit Test: getDatas()", {
+	before: function() {
 		path = (window.parent.document.title === "Karma" ? "base/test/" : "") + "data/";
 	},
-	teardown: function() {
+	after: function() {
 		path = null;
 	}
 });
 
-test("Invalid data (undefined) is ignore and treated as an empty object", function() {
-	expect(4);
+QUnit.test("Invalid data (undefined) is ignore and treated as an empty object", function(assert) {
+	assert.expect(4);
 
 	var cal = createCalendar({data: undefined});
 
-	deepEqual(cal.options.data, undefined);
-	ok(cal.getDatas(
+	assert.deepEqual(cal.options.data, undefined);
+	assert.ok(cal.getDatas(
 		undefined,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, {}, "undefined is equivalent to an empty object"); }
+		function() { assert.ok(true, true, "Callback argument is called"); },
+		function(data) { assert.deepEqual(data, {}, "undefined is equivalent to an empty object"); }
 	));
 });
 
-test("Invalid data (null) is ignore and treated as an empty object", function() {
-	expect(4);
+QUnit.test("Invalid data (null) is ignore and treated as an empty object", function(assert) {
+	assert.expect(4);
 
 	var cal = createCalendar({data: null});
 
-	deepEqual(cal.options.data, null);
-	ok(cal.getDatas(
+	assert.deepEqual(cal.options.data, null);
+	assert.ok(cal.getDatas(
 		null,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, {}, "null is equivalent to an empty object"); }
+		function() { assert.ok(true, true, "Callback argument is called"); },
+		function(data) { assert.deepEqual(data, {}, "null is equivalent to an empty object"); }
 	));
 });
 
-test("Invalid data (number) is ignore and treated as an empty object", function() {
-	expect(4);
+QUnit.test("Invalid data (number) is ignore and treated as an empty object", function(assert) {
+	assert.expect(4);
 
 	var cal = createCalendar({data: 8});
 
-	deepEqual(cal.options.data, 8);
-	ok(cal.getDatas(
+	assert.deepEqual(cal.options.data, 8);
+	assert.ok(cal.getDatas(
 		8,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, {}, "number is equivalent to an empty object"); }
+		function() { assert.ok(true, true, "Callback argument is called"); },
+		function(data) { assert.deepEqual(data, {}, "number is equivalent to an empty object"); }
 	));
 });
 
-test("Object is left untouched", function() {
-	expect(4);
+QUnit.test("Object is left untouched", function(assert) {
+	assert.expect(4);
 
 	var d = [0, 1];
 	var cal = createCalendar({data: d});
 
-	deepEqual(cal.options.data, d);
-	equal(cal.getDatas(
+	assert.deepEqual(cal.options.data, d);
+	assert.equal(cal.getDatas(
 		d,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, d); }
+		function() { assert.ok(true, true, "Callback argument is called"); },
+		function(data) { assert.deepEqual(data, d); }
 	), false);
 });
 
-test("Empty string is treated as an empty object", function() {
-	expect(4);
+QUnit.test("Empty string is treated as an empty object", function(assert) {
+	assert.expect(4);
 
 	var cal = createCalendar({});
 
-	equal(cal.options.data, "");
-	ok(cal.getDatas(
+	assert.equal(cal.options.data, "");
+	assert.ok(cal.getDatas(
 		"",
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, {}, "empty string is equivalent to an empty object"); }
+		function() { assert.ok(true, true, "Callback argument is called"); },
+		function(data) { assert.deepEqual(data, {}, "empty string is equivalent to an empty object"); }
 	));
 });
 
-test("Passing directly an object", function() {
-	expect(4);
+QUnit.test("Passing directly an object", function(assert) {
+	assert.expect(4);
 
 	var dt = {
 		"946721039":1,
@@ -99,18 +99,18 @@ test("Passing directly an object", function() {
 	};
 	var cal = createCalendar({data: dt});
 
-	deepEqual(cal.options.data, dt);
-	equal(cal.getDatas(
+	assert.deepEqual(cal.options.data, dt);
+	assert.equal(cal.getDatas(
 		dt,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
-		function(data) { deepEqual(data, dt, "The passed object is used directly"); }
+		function() { assert.ok(true, true, "Callback argument is called"); },
+		function(data) { assert.deepEqual(data, dt, "The passed object is used directly"); }
 	), false);
 });
 
-asyncTest("Passing a non-empty string is interpreted as an URL, and parsed using JSON", function() {
-	expect(3);
+QUnit.test("Passing a non-empty string is interpreted as an URL, and parsed using JSON", function(assert) {
+	assert.expect(3);
 
 	var dt = path + "data.json";
 	var fileContent = {
@@ -120,22 +120,23 @@ asyncTest("Passing a non-empty string is interpreted as an URL, and parsed using
 	};
 	var cal = createCalendar({data: dt});
 
-	equal(cal.options.data, dt);
-	equal(cal.getDatas(
+	var done = assert.async();
+	assert.equal(cal.options.data, dt);
+	assert.equal(cal.getDatas(
 		dt,
 		new Date(),
 		new Date(),
 		function() {},
 		function(data) {
-			start();
-			deepEqual(data, fileContent, "The file is read, and converted to a json object");
+			done();
+			assert.deepEqual(data, fileContent, "The file is read, and converted to a json object");
 
 		}
 	), false);
 });
 
-asyncTest("Parsing a CSV file", function() {
-	expect(5);
+QUnit.test("Parsing a CSV file", function(assert) {
+	assert.expect(5);
 
 	var dt = path + "data.csv";
 	var fileContent = {
@@ -145,29 +146,30 @@ asyncTest("Parsing a CSV file", function() {
 	};
 	var cal = createCalendar({data: dt, dataType: "csv"});
 
-	equal(cal.options.data, dt);
-	equal(cal.getDatas(
+	var done = assert.async();
+	assert.equal(cal.options.data, dt);
+	assert.equal(cal.getDatas(
 		dt,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
+		function() { assert.ok(true, true, "Callback argument is called"); },
 		function(data) {
-			start();
-			deepEqual(data[0], {
+			done();
+			assert.deepEqual(data[0], {
 				"Date": "946721039",
 				"Value" : "1"
 			}, "The file content was interpreted by the CSV engine");
 
 			// Call CSV interpreter manually, since afterLoad is redefined
 			data = cal.interpretCSV(data);
-			deepEqual(data, fileContent, "The file is read, and converted to a json object");
+			assert.deepEqual(data, fileContent, "The file is read, and converted to a json object");
 
 		}
 	), false);
 });
 
-asyncTest("Parsing a TSV file", function() {
-	expect(5);
+QUnit.test("Parsing a TSV file", function(assert) {
+	assert.expect(5);
 
 	var dt = path + "data.tsv";
 	var fileContent = {
@@ -177,29 +179,30 @@ asyncTest("Parsing a TSV file", function() {
 	};
 	var cal = createCalendar({data: dt, dataType: "tsv"});
 
-	equal(cal.options.data, dt);
-	equal(cal.getDatas(
+	var done = assert.async();
+	assert.equal(cal.options.data, dt);
+	assert.equal(cal.getDatas(
 		dt,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
+		function() { assert.ok(true, true, "Callback argument is called"); },
 		function(data) {
-			start();
-			deepEqual(data[0], {
+			done();
+			assert.deepEqual(data[0], {
 				"Date": "946721039",
 				"Value" : "1"
 			}, "The file content was interpreted by the TSV engine");
 
 			// Call CSV interpreter manually, since afterLoad is redefined
 			data = cal.interpretCSV(data);
-			deepEqual(data, fileContent, "The file is read, and converted to a json object");
+			assert.deepEqual(data, fileContent, "The file is read, and converted to a json object");
 
 		}
 	), false);
 });
 
-asyncTest("Parsing a TXT file", function() {
-	expect(4);
+QUnit.test("Parsing a TXT file", function(assert) {
+	assert.expect(4);
 
 	var dt = path + "data.txt";
 	var fileContent = "{\n" +
@@ -209,15 +212,16 @@ asyncTest("Parsing a TXT file", function() {
 	"}";
 	var cal = createCalendar({data: dt, dataType: "txt"});
 
-	equal(cal.options.data, dt);
-	equal(cal.getDatas(
+	var done = assert.async();
+	assert.equal(cal.options.data, dt);
+	assert.equal(cal.getDatas(
 		dt,
 		new Date(),
 		new Date(),
-		function() { ok(true, true, "Callback argument is called"); },
+		function() { assert.ok(true, true, "Callback argument is called"); },
 		function(data) {
-			start();
-			equal(data, fileContent, "The file is read as a plain text file");
+			done();
+			assert.equal(data, fileContent, "The file is read as a plain text file");
 		}
 	), false);
 });

@@ -4,15 +4,15 @@
 	-----------------------------------------------------------------
  */
 
-module("Date computation : jump()");
+QUnit.module("Date computation : jump()");
 
 function _testJump(date, expectedDate, count, step) {
-	test("Jumping " + count + " " + step + "s " + (count > 0 ? "forward" : "backward"), function() {
-		expect(1);
+	QUnit.test("Jumping " + count + " " + step + "s " + (count > 0 ? "forward" : "backward"), function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({});
 
-		deepEqual(cal.jumpDate(date, count, step), expectedDate, date + " " + (count < 0 ? "-" : "+") + " " + Math.abs(count) + " " + step +  " should outpout " + expectedDate);
+		assert.deepEqual(cal.jumpDate(date, count, step), expectedDate, date + " " + (count < 0 ? "-" : "+") + " " + Math.abs(count) + " " + step +  " should outpout " + expectedDate);
 	});
 }
 

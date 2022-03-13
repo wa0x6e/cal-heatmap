@@ -5,28 +5,28 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(subDomainTextFormat)");
+QUnit.module("API: init(subDomainTextFormat)");
 
-test("Passing a non-empty string", function() {
-	expect(1);
+QUnit.test("Passing a non-empty string", function(assert) {
+	assert.expect(1);
 
 	var cal = createCalendar({ subDomainTextFormat: "R" });
-	strictEqual(cal.options.subDomainTextFormat, "R");
+	assert.strictEqual(cal.options.subDomainTextFormat, "R");
 });
 
-test("Passing a function", function() {
-	expect(1);
+QUnit.test("Passing a function", function(assert) {
+	assert.expect(1);
 
 	var cal = createCalendar({ subDomainTextFormat: function() {} });
-	ok(typeof cal.options.subDomainTextFormat === "function");
+	assert.ok(typeof cal.options.subDomainTextFormat === "function");
 });
 
 function _testsubDomainTextFormatWithInvalidInput(title, input) {
-	test("Passing a not-valid input (" + title + ")", function() {
-		expect(1);
+	QUnit.test("Passing a not-valid input (" + title + ")", function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ subDomainTextFormat: input });
-		strictEqual(cal.options.subDomainTextFormat, null, "Invalid input should fallback to null");
+		assert.strictEqual(cal.options.subDomainTextFormat, null, "Invalid input should fallback to null");
 	});
 }
 

@@ -5,15 +5,15 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(domain)");
+QUnit.module("API: init(domain)");
 
 (function() {
 	function _testValidDomain(d) {
-		test("Testing that " + d + " is a valid domain", function() {
-			expect(1);
+		QUnit.test("Testing that " + d + " is a valid domain", function(assert) {
+			assert.expect(1);
 
 			var cal = createCalendar({domain: d});
-			strictEqual(cal.options.domain, d);
+			assert.strictEqual(cal.options.domain, d);
 		});
 	}
 
@@ -24,10 +24,10 @@ module("API: init(domain)");
 }());
 
 function _testInvalidDomain(name, input) {
-	test("Invalid domain (" + name + ") throws an Error", function() {
-		expect(1);
+	QUnit.test("Invalid domain (" + name + ") throws an Error", function(assert) {
+		assert.expect(1);
 
-		throws(function() { createCalendar({domain: input}); });
+		assert.throws(function() { createCalendar({domain: input}); });
 	});
 }
 
@@ -37,25 +37,25 @@ _testInvalidDomain("false", false);
 _testInvalidDomain("not-valid domain type", "random-value");
 _testInvalidDomain("min", "min"); // Min is a valid subDomain but not domain
 
-test("Set default domain and subDomain", function() {
-	expect(2);
+QUnit.test("Set default domain and subDomain", function(assert) {
+	assert.expect(2);
 
 	var cal = createCalendar({});
 
-	strictEqual(cal.options.domain, "hour", "Default domain is HOUR");
-	strictEqual(cal.options.subDomain, "min", "Default subDomain is MIN");
+	assert.strictEqual(cal.options.domain, "hour", "Default domain is HOUR");
+	assert.strictEqual(cal.options.subDomain, "min", "Default subDomain is MIN");
 });
 
 
-module("API: init(subDomain)");
+QUnit.module("API: init(subDomain)");
 
 (function() {
 	function _testValidSubDomain(d) {
-		test("Testing that " + d + " is a valid subDomains", function() {
-			expect(1);
+		QUnit.test("Testing that " + d + " is a valid subDomains", function(assert) {
+			assert.expect(1);
 
 			var cal = createCalendar({subDomains: d});
-			strictEqual(cal.options.subDomains, d);
+			assert.strictEqual(cal.options.subDomains, d);
 		});
 	}
 
@@ -66,10 +66,10 @@ module("API: init(subDomain)");
 }());
 
 function _testInvalidSubDomain(name, input) {
-	test("Invalid subDomain (" + name + ") throws an Error", function() {
-		expect(1);
+	QUnit.test("Invalid subDomain (" + name + ") throws an Error", function(assert) {
+		assert.expect(1);
 
-		throws(function() { createCalendar({subDomain: input}); });
+		assert.throws(function() { createCalendar({subDomain: input}); });
 	});
 }
 
@@ -80,12 +80,12 @@ _testInvalidSubDomain("not-valid subDomain type", "random-value");
 _testInvalidSubDomain("year", "year"); // Year is a valid domain but not subDomain
 
 function _testSubDomainSmallerThanDomain(domain, subDomain) {
-	test(subDomain + " is a valid subDomain for " + domain, function() {
-		expect(2);
+	QUnit.test(subDomain + " is a valid subDomain for " + domain, function(assert) {
+		assert.expect(2);
 
 		var cal = createCalendar({domain: domain, subDomain: subDomain});
-		strictEqual(cal.options.domain, domain);
-		strictEqual(cal.options.subDomain, subDomain);
+		assert.strictEqual(cal.options.domain, domain);
+		assert.strictEqual(cal.options.subDomain, subDomain);
 	});
 }
 
@@ -100,10 +100,10 @@ _testSubDomainSmallerThanDomain("year", "month");
 _testSubDomainSmallerThanDomain("year", "week");
 
 function _testInvalidSubDomainForDomain(domain, subDomain) {
-	test(subDomain + " is not a valid subDomain for " + domain, function() {
-		expect(1);
+	QUnit.test(subDomain + " is not a valid subDomain for " + domain, function(assert) {
+		assert.expect(1);
 
-		throws(function() { createCalendar({domain: domain, subDomain: subDomain}); });
+		assert.throws(function() { createCalendar({domain: domain, subDomain: subDomain}); });
 	});
 }
 
@@ -113,12 +113,12 @@ _testInvalidSubDomainForDomain("week", "month");
 _testInvalidSubDomainForDomain("month", "year");
 
 function _testDefaultSubDomain(domain, subDomain) {
-	test(subDomain + " is the default subDomain for " + domain, function() {
-		expect(2);
+	QUnit.test(subDomain + " is the default subDomain for " + domain, function(assert) {
+		assert.expect(2);
 
 		var cal = createCalendar({domain: domain});
-		strictEqual(cal.options.domain, domain);
-		strictEqual(cal.options.subDomain, subDomain);
+		assert.strictEqual(cal.options.domain, domain);
+		assert.strictEqual(cal.options.subDomain, subDomain);
 	});
 }
 

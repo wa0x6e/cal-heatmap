@@ -6,17 +6,17 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(legendMargin)");
+QUnit.module("API: init(legendMargin)");
 
 function __testAutoSetLegendMarginSetting(title, ver, hor, autoMarginIndex) {
-	test("Automatically add margin to " + title, function() {
-		expect(1);
+	QUnit.test("Automatically add margin to " + title, function(assert) {
+		assert.expect(1);
 
 		var margin = [0, 0, 0, 0];
 		var cal = createCalendar({ legendVerticalPosition: ver, legendHorizontalPosition: hor });
 		margin[autoMarginIndex] = cal.DEFAULT_LEGEND_MARGIN;
 
-		deepEqual(cal.options.legendMargin, margin, "domainMargin is set to [" + margin.join(", ") + "]");
+		assert.deepEqual(cal.options.legendMargin, margin, "domainMargin is set to [" + margin.join(", ") + "]");
 	});
 }
 

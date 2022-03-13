@@ -25,7 +25,7 @@ function _test(domain, subDomain, config_h, config_v, skipped) {
 	}
 
 	if (SPLIT_TEST) {
-		module("Test painting " + domain + " > " + subDomain + " columns/rows");
+		QUnit.module("Test painting " + domain + " > " + subDomain + " columns/rows");
 	}
 
 	for(var i = 0, total = config_h.length; i < total; i++) {
@@ -69,11 +69,11 @@ function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRo
 	if (skipped) {
 		testSkip(testTitle, _t);
 	} else {
-		test(testTitle, _t);
+		QUnit.test(testTitle, _t);
 	}
 
-	function _t() {
-		expect(2);
+	function _t(assert) {
+		assert.expect(2);
 
 		var cal = createCalendar({domain: domain, subDomain: subDomain, colLimit: col, rowLimit: row,
 			start: new Date(2000, 0, 1), cellPadding: 0, paintOnLoad: true, range: 1});
@@ -90,13 +90,13 @@ function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRo
 			_count.row[$(this).attr("y")] = 0;
 		});
 
-		equal(count(_count.column), expectedCol, "The domain was split into " + expectedCol + " columns");
-		equal(count(_count.row), expectedRow, "The domain was split into " + expectedRow + " rows");
+		assert.equal(count(_count.column), expectedCol, "The domain was split into " + expectedCol + " columns");
+		assert.equal(count(_count.row), expectedRow, "The domain was split into " + expectedRow + " rows");
 	}
 }
 
 
-module("Painting column and row count");
+QUnit.module("Painting column and row count");
 /*
 	Each domain/subDomain couple will be tested with different configutations:
 	- Default

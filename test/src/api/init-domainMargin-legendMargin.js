@@ -5,14 +5,14 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(domainMargin)");
+QUnit.module("API: init(domainMargin)");
 
 function __testDomainMarginExpand(title, margin, expectedMargin) {
-	test("Test expanding " + title, function() {
-		expect(1);
+	QUnit.test("Test expanding " + title, function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ domainMargin: margin });
-		deepEqual(cal.options.domainMargin, expectedMargin, (Array.isArray(margin) ? "["+margin.join(", ")+"]" : margin) + " is expanded to [" + expectedMargin.join(", ") + "]");
+		assert.deepEqual(cal.options.domainMargin, expectedMargin, (Array.isArray(margin) ? "["+margin.join(", ")+"]" : margin) + " is expanded to [" + expectedMargin.join(", ") + "]");
 	});
 }
 
@@ -29,14 +29,14 @@ __testDomainMarginExpand("an invalid (empty string) value fallback to 0", "", [0
 
 
 
-module("API: init(legendMargin)");
+QUnit.module("API: init(legendMargin)");
 
 function __testDomainLegendExpand(title, margin, expectedMargin) {
-	test("Test expanding " + title, function() {
-		expect(1);
+	QUnit.test("Test expanding " + title, function(assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ legendMargin: margin });
-		deepEqual(cal.options.legendMargin, expectedMargin, (Array.isArray(margin) ? "["+margin.join(", ")+"]" : margin) + " is expanded to [" + expectedMargin.join(", ") + "]");
+		assert.deepEqual(cal.options.legendMargin, expectedMargin, (Array.isArray(margin) ? "["+margin.join(", ")+"]" : margin) + " is expanded to [" + expectedMargin.join(", ") + "]");
 	});
 }
 
