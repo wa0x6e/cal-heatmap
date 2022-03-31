@@ -13,7 +13,7 @@
     "test": "test"
   },
   "dependencies": {
-    "d3": "6.x.x"
+    "d3": "7.4.0"
   },
   "devDependencies": {
     "grunt": "1.4.1",
@@ -59,7 +59,7 @@
   },
   "jam": {
     "dependencies": {
-      "d3": "^6.x.x"
+      "d3": "^7.4.0"
     }
   },
   "bugs": "https://github.com/wa0x6e/cal-heatmap/issues",
