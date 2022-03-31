@@ -15,7 +15,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install dependencies
       run: npm install
     - name: Install grunt-cli
