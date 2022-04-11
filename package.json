@@ -16,7 +16,7 @@
     "d3": "7.4.4"
   },
   "devDependencies": {
-    "grunt": "1.4.1",
+    "grunt": "1.5.1",
     "grunt-contrib-uglify": "5.1.0",
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-jshint": "3.2.0",
