@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "grunt": "1.5.2",
-    "grunt-contrib-uglify": "5.1.0",
+    "grunt-contrib-uglify": "5.2.1",
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-jshint": "3.2.0",
     "grunt-contrib-concat": "2.1.0",
