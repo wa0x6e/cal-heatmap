@@ -22,10 +22,10 @@ QUnit.test("Show not existing legend", function(assert) {
 	var cal = createCalendar({displayLegend: false});
 
 	assert.equal(cal.options.displayLegend, false, "displayLegend setting is set to false");
-	assert.equal(cal.root.select(".graph-legend").node(), null, "There is no legend in the DOM");
+	assert.true(cal.root.select(".graph-legend").empty(), "There is no legend in the DOM");
 
 	assert.equal(cal.showLegend(), true, "showLegend() return true when legend does not exist yet");
 	assert.equal(cal.options.displayLegend, true, "displayLegend setting is now set to true");
-	assert.notEqual(cal.root.select(".graph-legend").node(), null, "Legend is now added into the DOM");
+	assert.false(cal.root.select(".graph-legend").empty(), "Legend is now added into the DOM");
 });
 

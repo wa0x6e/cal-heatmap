@@ -1,4 +1,4 @@
-/*! cal-heatmap v3.6.2 (Sun Mar 13 2022 17:37:45)
+/*! cal-heatmap v3.6.2 (Wed May 11 2022 20:38:11)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/wa0x6e/cal-heatmap
@@ -1314,11 +1314,11 @@ QUnit.test("Removing existing legend", function(assert) {
 	var cal = createCalendar({displayLegend: true, paintOnLoad: true});
 
 	assert.equal(cal.options.displayLegend, true, "displayLegend setting is set to true");
-	assert.notEqual(cal.root.select(".graph-legend").node(), null, "Legend exists int DOM");
+	assert.false(cal.root.select(".graph-legend").empty(), "Legend exists int DOM");
 
 	assert.equal(cal.removeLegend(), true, "removeLegend() return true when legend does exist");
 	assert.equal(cal.options.displayLegend, false, "displayLegend setting is now set to false");
-	assert.equal(cal.root.select(".graph-legend").node(), null, "Legend is now removed from the DOM");
+	assert.true(cal.root.select(".graph-legend").empty(), "Legend is now removed from the DOM");
 });
 
 /*
@@ -1345,11 +1345,11 @@ QUnit.test("Show not existing legend", function(assert) {
 	var cal = createCalendar({displayLegend: false});
 
 	assert.equal(cal.options.displayLegend, false, "displayLegend setting is set to false");
-	assert.equal(cal.root.select(".graph-legend").node(), null, "There is no legend in the DOM");
+	assert.true(cal.root.select(".graph-legend").empty(), "There is no legend in the DOM");
 
 	assert.equal(cal.showLegend(), true, "showLegend() return true when legend does not exist yet");
 	assert.equal(cal.options.displayLegend, true, "displayLegend setting is now set to true");
-	assert.notEqual(cal.root.select(".graph-legend").node(), null, "Legend is now added into the DOM");
+	assert.false(cal.root.select(".graph-legend").empty(), "Legend is now added into the DOM");
 });
 
 
