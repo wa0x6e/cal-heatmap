@@ -22,7 +22,7 @@
     "grunt-contrib-jshint": "3.2.0",
     "grunt-contrib-concat": "2.1.0",
     "grunt-contrib-watch": "1.1.0",
-    "grunt-contrib-qunit": "6.1.0",
+    "grunt-contrib-qunit": "6.2.0",
 
     "grunt-contrib-csslint": "2.0.0",
     "grunt-replace": "2.0.2",
