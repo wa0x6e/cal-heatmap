@@ -32,7 +32,7 @@
     "karma-qunit": "4.1.2",
     "grunt-karma": "4.0.2",
     "karma-chrome-launcher": "3.1.1",
-    "puppeteer": "16.1.0",
+    "puppeteer": "16.2.0",
 
     "qunit": "2.19.1",
     "jquery": "3.6.0"
