@@ -27,7 +27,7 @@
     "grunt-contrib-csslint": "2.0.0",
     "grunt-replace": "2.0.2",
 
-    "karma": "6.4.0",
+    "karma": "6.4.1",
     "karma-coverage": "2.2.0",
     "karma-qunit": "4.1.2",
     "grunt-karma": "4.0.2",
