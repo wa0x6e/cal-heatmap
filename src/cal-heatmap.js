@@ -262,6 +262,8 @@ var CalHeatMap = function() {
 		// Callback after finishing all actions on the calendar
 		onComplete: null,
 
+		onResize: null,
+
 		// Callback after fetching the datas, but before applying them to the calendar
 		// Used mainly to convert the datas if they're not formatted like expected
 		// Takes the fetched "data" object as argument, must return a json object
@@ -1167,7 +1169,7 @@ CalHeatMap.prototype = {
 		}
 
 		// Don't touch these settings
-		var s = ["data", "onComplete", "onClick", "onMouseOver", "onMouseOut", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate", "onTooltip"];
+		var s = ["data", "onComplete", "onClick", "onResize", "onMouseOver", "onMouseOut", "afterLoad", "afterLoadData", "afterLoadPreviousDomain", "afterLoadNextDomain", "afterUpdate", "onTooltip"];
 
 		for (var k in s) {
 			if (settings.hasOwnProperty(s[k])) {
@@ -1607,6 +1609,15 @@ CalHeatMap.prototype = {
 		var response = this.triggerEvent("onComplete", [], this._completed);
 		this._completed = true;
 		return response;
+	},
+
+	/**
+	 * Event triggered after resize event
+	 */
+	onResize: function(h, w) {
+		"use strict";
+
+		return this.triggerEvent("onResize", [h, w]);
 	},
 
 	/**
@@ -2768,19 +2779,23 @@ CalHeatMap.prototype = {
 		var graphWidth = parent.graphDim.width - options.domainGutter - options.cellPadding;
 		var graphHeight = parent.graphDim.height - options.domainGutter - options.cellPadding;
 
+		var getHeight = function() {
+			if (options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") {
+				return Math.max(graphHeight, legendHeight);
+			}
+			return graphHeight + legendHeight;
+		};
+
+		var getWidth = function() {
+			if (options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") {
+				return graphWidth + legendWidth;
+			}
+			return Math.max(graphWidth, legendWidth);
+		};
+
 		this.root.transition().duration(options.animationDuration)
-			.attr("width", function() {
-				if (options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") {
-					return graphWidth + legendWidth;
-				}
-				return Math.max(graphWidth, legendWidth);
-			})
-			.attr("height", function() {
-				if (options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") {
-					return Math.max(graphHeight, legendHeight);
-				}
-				return graphHeight + legendHeight;
-			})
+			.attr("width", getWidth())
+			.attr("height", getHeight())
 		;
 
 		this.root.select(".graph").transition().duration(options.animationDuration)
@@ -2800,6 +2815,7 @@ CalHeatMap.prototype = {
 
 			})
 		;
+		this.onResize(getHeight(), getWidth());
 	},
 
 	// =========================================================================//
