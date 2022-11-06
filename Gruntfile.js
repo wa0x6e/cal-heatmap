@@ -1,15 +1,14 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
+    "use strict";
 
-	"use strict";
-
-    var headerComment = "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
-                " *  ---------------------------------------------\n" +
-                " *  <%= pkg.description %>\n" +
-                " *  <%= pkg.homepage %>\n" +
-
-                " *  Licensed under the <%= pkg.license %> license\n" +
-                " *  Copyright 2014 <%= pkg.author.name %>\n" +
-                " */\n";
+    var headerComment =
+        "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
+        " *  ---------------------------------------------\n" +
+        " *  <%= pkg.description %>\n" +
+        " *  <%= pkg.homepage %>\n" +
+        " *  Licensed under the <%= pkg.license %> license\n" +
+        " *  Copyright 2014 <%= pkg.author.name %>\n" +
+        " */\n";
 
     // Project configuration.
     grunt.initConfig({
@@ -43,13 +42,12 @@ module.exports = function(grunt) {
             },
             base: {
                 files: {
-                    "<%= pkg.name %>.min.js" : ["<%= pkg.name %>.js"]
+                    "<%= pkg.name %>.min.js": ["<%= pkg.name %>.js"]
                 }
             }
         },
         qunit: {
             options: {
-                "--web-security": "no",
                 coverage: {
                     src: ["src/*.js"],
                     instrumentedFiles: "temp/",
@@ -57,7 +55,11 @@ module.exports = function(grunt) {
                     coberturaReport: "report/"
                 }
             },
-            all: ["test/*.html"]
+            all: {
+                options: {
+                    urls: ["http://localhost:8000/test/index.html"]
+                }
+            }
         },
         concat: {
             options: {
@@ -78,21 +80,29 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-			scripts: {
-				files: "test/src/**/*.js",
-				tasks: ["concat:test"],
-				options: {
-					interrupt: true,
-				}
-			},
-			lint: {
-				files: "src/*.js",
-				tasks: ["jshint:lib"],
-				options: {
-					interrupt: true,
-				}
-			}
-		}
+            scripts: {
+                files: "test/src/**/*.js",
+                tasks: ["concat:test"],
+                options: {
+                    interrupt: true
+                }
+            },
+            lint: {
+                files: "src/*.js",
+                tasks: ["jshint:lib"],
+                options: {
+                    interrupt: true
+                }
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8000,
+                    base: "."
+                }
+            }
+        }
     });
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
@@ -102,15 +112,22 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-karma-coveralls");
     grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-contrib-connect");
 
     // TO RUN BEFORE COMMIT
     // ====================
     grunt.registerTask("quick-build", ["csslint", "jshint"]);
 
     // Full build without version bump
-    grunt.registerTask("build", ["concat", "qunit", "csslint", "jshint", "uglify"]);
+    grunt.registerTask("build", [
+        "connect",
+        "concat",
+        "qunit",
+        "jshint",
+        "uglify"
+    ]);
 
     // FOR TRAVIS
     // ==========
-    grunt.registerTask("travis", ["jshint", "csslint"]);
+    grunt.registerTask("travis", ["jshint"]);
 };

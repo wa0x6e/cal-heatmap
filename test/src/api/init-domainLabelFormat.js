@@ -5,35 +5,39 @@
 	-----------------------------------------------------------------
  */
 
-module("API: init(domainLabelFormat)");
+QUnit.module("API: init(domainLabelFormat)");
 
-test("Passing an empty string", function() {
-	expect(1);
+QUnit.test("Passing an empty string", function (assert) {
+	assert.expect(1);
 
 	var cal = createCalendar({ domainLabelFormat: "" });
-	strictEqual(cal.options.domainLabelFormat, "");
+	assert.strictEqual(cal.options.domainLabelFormat, "");
 });
 
-test("Passing a non-empty string", function() {
-	expect(1);
+QUnit.test("Passing a non-empty string", function (assert) {
+	assert.expect(1);
 
 	var cal = createCalendar({ domainLabelFormat: "R" });
-	strictEqual(cal.options.domainLabelFormat, "R");
+	assert.strictEqual(cal.options.domainLabelFormat, "R");
 });
 
-test("Passing a function", function() {
-	expect(1);
+QUnit.test("Passing a function", function (assert) {
+	assert.expect(1);
 
-	var cal = createCalendar({ domainLabelFormat: function() {} });
-	ok(typeof cal.options.domainLabelFormat === "function");
+	var cal = createCalendar({ domainLabelFormat: function () {} });
+	assert.ok(typeof cal.options.domainLabelFormat === "function");
 });
 
 function _testdomainLabelFormatWithInvalidInput(title, input) {
-	test("Passing a not-valid input (" + title + ")", function() {
-		expect(1);
+	QUnit.test("Passing a not-valid input (" + title + ")", function (assert) {
+		assert.expect(1);
 
 		var cal = createCalendar({ domainLabelFormat: input });
-		strictEqual(cal.options.domainLabelFormat, cal._domainType.hour.format.legend, "Invalid input should fallback to the domain default legend format");
+		assert.strictEqual(
+			cal.options.domainLabelFormat,
+			cal._domainType.hour.format.legend,
+			"Invalid input should fallback to the domain default legend format"
+		);
 	});
 }
 

@@ -1,17 +1,16 @@
-CalHeatMap.prototype.svg = function() {
+CalHeatMap.prototype.svg = function () {
 	return this.root.selectAll(".graph-domain");
 };
 
-QUnit.testStart(function( details ) {
+QUnit.testStart(function (details) {
 	$("body").append("<div id='cal-heatmap' style='display:none;'></div>");
 });
 
-QUnit.testDone(function( details ) {
+QUnit.testDone(function (details) {
 	$("#cal-heatmap").remove();
 });
 
 function createCalendar(settings) {
-
 	var cal = new CalHeatMap();
 	if (!settings.hasOwnProperty("loadOnInit")) {
 		settings.loadOnInit = false;
@@ -34,15 +33,15 @@ function createCalendar(settings) {
  * @link http://stackoverflow.com/questions/13748129/skipping-a-test-in-qunit
  * @return {[type]} [description]
  */
-QUnit.testSkip = function() {
-	QUnit.test(arguments[0] + ' (SKIPPED)', function() {
+QUnit.testSkip = function () {
+	QUnit.test(arguments[0] + " (SKIPPED)", function (assert) {
 		var li = document.getElementById(QUnit.config.current.id);
-		QUnit.done(function() {
+		QUnit.done(function () {
 			if (li !== null) {
-				li.style.background = '#FFFF99';
+				li.style.background = "#FFFF99";
 			}
 		});
-		ok(true);
+		assert.ok(true);
 	});
 };
 testSkip = QUnit.testSkip;

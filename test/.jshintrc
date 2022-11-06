@@ -1,10 +1,5 @@
 {
 	"predef": [
-		"equal",
-		"expect",
-		"module",
-		"ok",
-	    "test",
-	    "CalHeatMap"
+		"CalHeatMap"
 	]
 }

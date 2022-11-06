@@ -4,28 +4,49 @@
 	-----------------------------------------------------------------
  */
 
-module("API : showLegend()");
+QUnit.module("API : showLegend()");
 
-test("Show already existing legend", function() {
+QUnit.test("Show already existing legend", function (assert) {
+	assert.expect(1);
 
-	expect(1);
+	var cal = createCalendar({ displayLegend: true });
 
-	var cal = createCalendar({displayLegend: true});
-
-	equal(cal.showLegend(), false, "showLegend() return false when legend already exists");
+	assert.equal(
+		cal.showLegend(),
+		false,
+		"showLegend() return false when legend already exists"
+	);
 });
 
-test("Show not existing legend", function() {
+QUnit.test("Show not existing legend", function (assert) {
+	assert.expect(5);
 
-	expect(5);
+	var cal = createCalendar({ displayLegend: false });
 
-	var cal = createCalendar({displayLegend: false});
+	assert.equal(
+		cal.options.displayLegend,
+		false,
+		"displayLegend setting is set to false"
+	);
+	assert.equal(
+		cal.root.select(".graph-legend")[0][0],
+		null,
+		"There is no legend in the DOM"
+	);
 
-	equal(cal.options.displayLegend, false, "displayLegend setting is set to false");
-	equal(cal.root.select(".graph-legend")[0][0], null, "There is no legend in the DOM");
-
-	equal(cal.showLegend(), true, "showLegend() return true when legend does not exist yet");
-	equal(cal.options.displayLegend, true, "displayLegend setting is now set to true");
-	notEqual(cal.root.select(".graph-legend")[0][0], null, "Legend is now added into the DOM");
+	assert.equal(
+		cal.showLegend(),
+		true,
+		"showLegend() return true when legend does not exist yet"
+	);
+	assert.equal(
+		cal.options.displayLegend,
+		true,
+		"displayLegend setting is now set to true"
+	);
+	assert.notEqual(
+		cal.root.select(".graph-legend")[0][0],
+		null,
+		"Legend is now added into the DOM"
+	);
 });
-

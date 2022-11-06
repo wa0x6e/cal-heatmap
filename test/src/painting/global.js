@@ -4,145 +4,221 @@
 	-----------------------------------------------------------------
  */
 
+QUnit.module("Painting");
 
-module( "Painting" );
+QUnit.test("Display empty calendar", function (assert) {
+	assert.expect(4);
 
-test("Display empty calendar", function() {
+	createCalendar({ paintOnLoad: true });
 
-	expect(4);
-
-	createCalendar({paintOnLoad: true});
-
-	equal($("#cal-heatmap .graph").length, 1, "Calendar was created");
-	equal($("#cal-heatmap .graph .graph-subdomain-group").length, 12, "The graph contains 12 hours");
-	equal($("#cal-heatmap .graph .graph-subdomain-group rect").length, 60*12, "The graph contains 720 minutes");
-	equal($("#cal-heatmap .graph-legend").length, 1, "A legend is created");
+	assert.equal($("#cal-heatmap .graph").length, 1, "Calendar was created");
+	assert.equal(
+		$("#cal-heatmap .graph .graph-subdomain-group").length,
+		12,
+		"The graph contains 12 hours"
+	);
+	assert.equal(
+		$("#cal-heatmap .graph .graph-subdomain-group rect").length,
+		60 * 12,
+		"The graph contains 720 minutes"
+	);
+	assert.equal(
+		$("#cal-heatmap .graph-legend").length,
+		1,
+		"A legend is created"
+	);
 });
 
-test("Don't display legend", function() {
+QUnit.test("Don't display legend", function (assert) {
+	assert.expect(1);
 
-	expect(1);
+	createCalendar({ displayLegend: false, paintOnLoad: true });
 
-	createCalendar({displayLegend: false, paintOnLoad: true});
-
-	equal($("#cal-heatmap .graph-legend").length, 0, "The legend is not created");
+	assert.equal(
+		$("#cal-heatmap .graph-legend").length,
+		0,
+		"The legend is not created"
+	);
 });
 
+QUnit.test("Display domain according to range number", function (assert) {
+	assert.expect(1);
 
-test("Display domain according to range number", function() {
+	createCalendar({ range: 5, paintOnLoad: true });
 
-	expect(1);
-
-	createCalendar({range: 5, paintOnLoad: true});
-
-	equal($("#cal-heatmap .graph .graph-subdomain-group").length, 5, "The graph contains only 5 hours");
-
+	assert.equal(
+		$("#cal-heatmap .graph .graph-subdomain-group").length,
+		5,
+		"The graph contains only 5 hours"
+	);
 });
 
-test("Append graph to the passed DOM ID", function() {
-
-	expect(2);
+QUnit.test("Append graph to the passed DOM ID", function (assert) {
+	assert.expect(2);
 
 	$("body").append("<div id=test-container style='display:hidden;'></div>");
 
-	createCalendar({itemSelector: "#test-container", paintOnLoad: true});
+	createCalendar({ itemSelector: "#test-container", paintOnLoad: true });
 
-	equal($("#test-container .graph").length, 1, "The graph is added to the specified ID");
-	equal($("#cal-heatmap .graph").length, 0, "Default ID is empty");
+	assert.equal(
+		$("#test-container .graph").length,
+		1,
+		"The graph is added to the specified ID"
+	);
+	assert.equal($("#cal-heatmap .graph").length, 0, "Default ID is empty");
 
 	$("#test-container").remove();
-
 });
 
-test("Attach events to next and previous selector on default namespace", function() {
+QUnit.test(
+	"Attach events to next and previous selector on default namespace",
+	function (assert) {
+		assert.expect(2);
 
-	expect(2);
+		$("body").append("<a id='next'></a>");
+		$("body").append("<a id='previous'></a>");
 
-	$("body").append("<a id='next'></a>");
-	$("body").append("<a id='previous'></a>");
+		var cal = createCalendar({
+			paintOnLoad: true,
+			nextSelector: "#next",
+			previousSelector: "#previous"
+		});
 
-	var cal = createCalendar({
-		paintOnLoad: true,
-		nextSelector: "#next",
-		previousSelector: "#previous"
-	});
+		assert.equal(
+			typeof d3.select("#next").on("click." + cal.options.itemNamespace),
+			"function",
+			"loadNextDomain is attached to nextSelector"
+		);
+		assert.equal(
+			typeof d3
+				.select("#previous")
+				.on("click." + cal.options.itemNamespace),
+			"function",
+			"loadPreviousDomain is attached to previousSelector"
+		);
+	}
+);
 
-	equal(typeof d3.select("#next").on("click." + cal.options.itemNamespace), "function", "loadNextDomain is attached to nextSelector");
-	equal(typeof d3.select("#previous").on("click." + cal.options.itemNamespace), "function", "loadPreviousDomain is attached to previousSelector");
-});
+QUnit.test(
+	"Attach events to next and previous selector on custom namespace",
+	function (assert) {
+		assert.expect(4);
 
-test("Attach events to next and previous selector on custom namespace", function() {
+		$("body").append("<a id='next'></a>");
+		$("body").append("<a id='previous'></a>");
 
-	expect(4);
+		var cal = createCalendar({
+			paintOnLoad: true,
+			nextSelector: "#next",
+			previousSelector: "#previous"
+		});
 
-	$("body").append("<a id='next'></a>");
-	$("body").append("<a id='previous'></a>");
+		createCalendar({
+			paintOnLoad: true,
+			nextSelector: "#next",
+			previousSelector: "#previous",
+			itemNamespace: "ns2"
+		});
 
-	var cal = createCalendar({
-		paintOnLoad: true,
-		nextSelector: "#next",
-		previousSelector: "#previous"
-	});
+		assert.equal(
+			typeof d3.select("#next").on("click." + cal.options.itemNamespace),
+			"function",
+			"loadNextDomain is attached to nextSelector on default namespace"
+		);
+		assert.equal(
+			typeof d3
+				.select("#previous")
+				.on("click." + cal.options.itemNamespace),
+			"function",
+			"loadPreviousDomain is attached to previousSelector on default namespace"
+		);
+		assert.equal(
+			typeof d3.select("#next").on("click.ns2"),
+			"function",
+			"loadNextDomain is attached to nextSelector on custom namespace"
+		);
+		assert.equal(
+			typeof d3.select("#previous").on("click.ns2"),
+			"function",
+			"loadPreviousDomain is attached to previousSelector on custom namespace"
+		);
+	}
+);
 
-	createCalendar({
-		paintOnLoad: true,
-		nextSelector: "#next",
-		previousSelector: "#previous",
-		itemNamespace: "ns2"
-	});
+QUnit.test(
+	"Attach events to not-valid namespace fallback to default namespace",
+	function (assert) {
+		assert.expect(2);
 
-	equal(typeof d3.select("#next").on("click." + cal.options.itemNamespace), "function", "loadNextDomain is attached to nextSelector on default namespace");
-	equal(typeof d3.select("#previous").on("click." + cal.options.itemNamespace), "function", "loadPreviousDomain is attached to previousSelector on default namespace");
-	equal(typeof d3.select("#next").on("click.ns2"), "function", "loadNextDomain is attached to nextSelector on custom namespace");
-	equal(typeof d3.select("#previous").on("click.ns2"), "function", "loadPreviousDomain is attached to previousSelector on custom namespace");
-});
+		$("body").append("<a id='next'></a>");
+		$("body").append("<a id='previous'></a>");
 
-test("Attach events to not-valid namespace fallback to default namespace", function() {
+		createCalendar({
+			paintOnLoad: true,
+			nextSelector: "#next",
+			previousSelector: "#previous"
+		});
 
-	expect(2);
+		assert.equal(
+			typeof d3.select("#next").on("click.cal-heatmap"),
+			"function",
+			"loadNextDomain is attached to defaultNamespace"
+		);
+		assert.equal(
+			typeof d3.select("#previous").on("click.cal-heatmap"),
+			"function",
+			"loadPreviousDomain is attached to defaultNamespace"
+		);
 
-	$("body").append("<a id='next'></a>");
-	$("body").append("<a id='previous'></a>");
+		$("body").remove("#next");
+		$("body").remove("#previous");
+	}
+);
 
-	createCalendar({
-		paintOnLoad: true,
-		nextSelector: "#next",
-		previousSelector: "#previous"
-	});
+QUnit.test(
+	"Custom date formatting with d3.js internal formatter",
+	function (assert) {
+		assert.expect(1);
 
-	equal(typeof d3.select("#next").on("click.cal-heatmap"), "function", "loadNextDomain is attached to defaultNamespace");
-	equal(typeof d3.select("#previous").on("click.cal-heatmap"), "function", "loadPreviousDomain is attached to defaultNamespace");
+		var date = new Date(2000, 0, 5);
 
-	$("body").remove("#next");
-	$("body").remove("#previous");
-});
+		createCalendar({
+			start: date,
+			loadOnInit: true,
+			paintOnLoad: true,
+			subDomainDateFormat: "==%B=="
+		});
 
+		assert.equal(
+			$("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild
+				.data,
+			"==January=="
+		);
+	}
+);
 
-
-test("Custom date formatting with d3.js internal formatter", function() {
-
-	expect(1);
+QUnit.test("Custom date formatting with custom function", function (assert) {
+	assert.expect(1);
 
 	var date = new Date(2000, 0, 5);
 
-	createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: "==%B=="});
+	createCalendar({
+		start: date,
+		loadOnInit: true,
+		paintOnLoad: true,
+		subDomainDateFormat: function (date) {
+			return date.getTime();
+		}
+	});
 
-	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, "==January==");
-
-});
-
-test("Custom date formatting with custom function", function() {
-
-	expect(1);
-
-	var date = new Date(2000, 0, 5);
-
-	createCalendar({start: date, loadOnInit: true, paintOnLoad: true, subDomainDateFormat: function(date) { return date.getTime();}});
-
-	equal($("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild.data, date.getTime());
+	assert.equal(
+		$("#cal-heatmap .graph .graph-subdomain-group title")[0].firstChild
+			.data,
+		date.getTime()
+	);
 });
 /*
-test("Cell label have different title formatting depending on whether it's filled or not", function() {
+Test("Cell label have different title formatting depending on whether it's filled or not", function() {
 
 	expect(2);
 
@@ -166,14 +242,32 @@ test("Cell label have different title formatting depending on whether it's fille
 	equal($("#cal-heatmap title")[1].textContent, title.empty);
 });*/
 
-test("Cell radius is applied", function() {
-
-	expect(2);
+QUnit.test("Cell radius is applied", function (assert) {
+	assert.expect(2);
 
 	var radius = 15;
 
-	createCalendar({paintOnLoad: true, domain: "day", subDomain: "hour", cellRadius: radius});
+	createCalendar({
+		paintOnLoad: true,
+		domain: "day",
+		subDomain: "hour",
+		cellRadius: radius
+	});
 
-	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "rx"), radius, "Horizontal cellRadius applied");
-	equal($("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(null, "ry"), radius, "Vertical cellRadius applied");
+	assert.equal(
+		$("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(
+			null,
+			"rx"
+		),
+		radius,
+		"Horizontal cellRadius applied"
+	);
+	assert.equal(
+		$("#cal-heatmap .graph .graph-subdomain-group rect")[0].getAttributeNS(
+			null,
+			"ry"
+		),
+		radius,
+		"Vertical cellRadius applied"
+	);
 });

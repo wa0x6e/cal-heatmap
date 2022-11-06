@@ -4,32 +4,60 @@
 	-----------------------------------------------------------------
  */
 
-module( "Interpreting Data source template" );
+QUnit.module("Interpreting Data source template");
 
-test("Data Source is a regex string, replace by timestamp", function() {
+QUnit.test(
+	"Data Source is a regex string, replace by timestamp",
+	function (assert) {
+		var cal = createCalendar({ start: new Date() });
+		var uri = "get?start={{t:start}}&end={{t:end}}";
+		var domains = cal._domains.keys();
 
-	var cal = createCalendar({start: new Date()});
-	var uri = "get?start={{t:start}}&end={{t:end}}";
-	var domains = cal._domains.keys();
+		var parsedUri =
+			"get?start=" +
+			domains[0] / 1000 +
+			"&end=" +
+			domains[domains.length - 1] / 1000;
 
-	var parsedUri = "get?start=" + (domains[0]/1000) + "&end=" + (domains[domains.length-1]/1000);
+		assert.equal(
+			cal.parseURI(
+				uri,
+				new Date(+domains[0]),
+				new Date(+domains[domains.length - 1])
+			),
+			parsedUri,
+			"Start and end token was replaced by a timestamp : " + parsedUri
+		);
+	}
+);
 
-	equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a timestamp : " + parsedUri);
-});
+QUnit.test(
+	"Data Source is a regex string, replace by ISO-8601 Date",
+	function (assert) {
+		var cal = createCalendar({ start: new Date() });
+		var uri = "get?start={{d:start}}&end={{d:end}}";
+		var domains = cal._domains.keys();
 
-test("Data Source is a regex string, replace by ISO-8601 Date", function() {
+		var startDate = new Date(+domains[0]);
+		var endDate = new Date(+domains[domains.length - 1]);
 
-	var cal = createCalendar({start: new Date()});
-	var uri = "get?start={{d:start}}&end={{d:end}}";
-	var domains = cal._domains.keys();
+		var parsedUri =
+			"get?start=" +
+			startDate.toISOString() +
+			"&end=" +
+			endDate.toISOString();
 
-	var startDate = new Date(+domains[0]);
-	var endDate = new Date(+domains[domains.length-1]);
-
-	var parsedUri = "get?start=" + startDate.toISOString() + "&end=" + endDate.toISOString();
-
-	equal(cal.parseURI(uri, new Date(+domains[0]), new Date(+domains[domains.length-1])), parsedUri, "Start and end token was replaced by a string : " + parsedUri);
-});
+		assert.equal(
+			cal.parseURI(
+				uri,
+				new Date(+domains[0]),
+				new Date(+domains[domains.length - 1])
+			),
+			parsedUri,
+			"Start and end token was replaced by a string : " + parsedUri
+		);
+	}
+);
 
 /*
 	-----------------------------------------------------------------
@@ -37,7 +65,7 @@ test("Data Source is a regex string, replace by ISO-8601 Date", function() {
 	-----------------------------------------------------------------
  */
 /*
-module( "Data processing" );
+Module( "Data processing" );
 
 test("Grouping datas by hour>min", function() {
 	expect(6);

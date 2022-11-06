@@ -4,10 +4,16 @@
 	-----------------------------------------------------------------
  */
 
-module("API : next()");
+QUnit.module("API : next()");
 
-function _testNext(title, count, expectedReturn, expectedStartDate, startDate, maxDate) {
-
+function _testNext(
+	title,
+	count,
+	expectedReturn,
+	expectedStartDate,
+	startDate,
+	maxDate
+) {
 	if (arguments.length < 5) {
 		startDate = new Date(2000, 0);
 	}
@@ -16,10 +22,10 @@ function _testNext(title, count, expectedReturn, expectedStartDate, startDate, m
 		maxDate = new Date(2000, 11);
 	}
 
-	test(title, function() {
-		expect(2);
+	QUnit.test(title, function (assert) {
+		assert.expect(2);
 
-		var cal = createCalendar( {
+		var cal = createCalendar({
 			domain: "month",
 			start: startDate,
 			range: 4,
@@ -28,8 +34,16 @@ function _testNext(title, count, expectedReturn, expectedStartDate, startDate, m
 			maxDate: maxDate
 		});
 
-		equal((count === null ? cal.next() : cal.next(count)), expectedReturn, "next() should return " + expectedReturn);
-		equal(cal.getDomainKeys()[0], +expectedStartDate, "Calendar should start on " + expectedStartDate.toDateString());
+		assert.equal(
+			count === null ? cal.next() : cal.next(count),
+			expectedReturn,
+			"next() should return " + expectedReturn
+		);
+		assert.equal(
+			cal.getDomainKeys()[0],
+			+expectedStartDate,
+			"Calendar should start on " + expectedStartDate.toDateString()
+		);
 	});
 }
 
@@ -63,19 +77,9 @@ _testNext(
 	new Date(2000, 8)
 );
 
-_testNext(
-	"Shifting does not go beyond maxDate",
-	11,
-	true,
-	new Date(2000, 8)
-);
+_testNext("Shifting does not go beyond maxDate", 11, true, new Date(2000, 8));
 
-_testNext(
-	"Shifting does not go beyond maxDate",
-	25,
-	true,
-	new Date(2000, 8)
-);
+_testNext("Shifting does not go beyond maxDate", 25, true, new Date(2000, 8));
 
 _testNext(
 	"next() do nothing when maxDate === startDate",
@@ -131,19 +135,30 @@ _testNext(
 	new Date(2000, 3)
 );
 
-test("Calling next when minDate is reached remove the minDomainReached state", function() {
-	expect(2);
+QUnit.test(
+	"Calling next when minDate is reached remove the minDomainReached state",
+	function (assert) {
+		assert.expect(2);
 
-	var cal = createCalendar( {
-		domain: "month",
-		start: new Date(2000, 0),
-		range: 4,
-		loadOnInit: true,
-		paintOnLoad: true,
-		minDate: new Date(2000, 0)
-	});
+		var cal = createCalendar({
+			domain: "month",
+			start: new Date(2000, 0),
+			range: 4,
+			loadOnInit: true,
+			paintOnLoad: true,
+			minDate: new Date(2000, 0)
+		});
 
-	equal(true, cal._minDomainReached, "Min domain is reached on calendar init");
-	cal.next();
-	equal(false, cal._minDomainReached, "Min domain is not reached after next()");
-});
+		assert.equal(
+			true,
+			cal._minDomainReached,
+			"Min domain is reached on calendar init"
+		);
+		cal.next();
+		assert.equal(
+			false,
+			cal._minDomainReached,
+			"Min domain is not reached after next()"
+		);
+	}
+);
