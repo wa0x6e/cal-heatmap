@@ -54,6 +54,9 @@ var CalHeatMap = function() {
 		// 0 to start the week on Sunday
 		weekStartOnMonday: true,
 
+		//Show week name when showing full month
+    dayLabel: false,
+
 		// Start date of the graph
 		// @default now
 		start: new Date(),
@@ -738,6 +741,57 @@ var CalHeatMap = function() {
 
 		var enteringDomainDim = 0;
 		var exitingDomainDim = 0;
+
+		// =========================================================================//
+		// DAY LABEl															//
+		// =========================================================================//
+		if (options.dayLabel && options.domain === "month" && options.subDomain === "day") {
+			// Create a list of all day names starting with Sunday or Monday, depending on configuration
+			var daysOfTheWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+			if (options.weekStartOnMonday) {
+				daysOfTheWeek.push("sunday");
+			} else {
+				daysOfTheWeek.shif("sunday");
+			}
+			// Get the first character of the day name
+			var daysOfTheWeekAbbr = daysOfTheWeek
+				.map(function(day) {
+					return self.formatDate(d3.time[day](new Date()), "%a").charAt(0);
+				});
+			// Append "day-name" group to SVG
+			var dayLabelSvgGroup = this.root.append("svg")
+				.attr("class", "day-name")
+				.attr("x", 0)
+				.attr("y", 0);
+
+			var dayLabelSvg = dayLabelSvgGroup
+				.selectAll("g")
+				.data(daysOfTheWeekAbbr)
+				.enter()
+				.append("g");
+			// Styling "day-name-rect" elements
+			dayLabelSvg
+				.append("rect")
+				.attr("class", "day-name-rect")
+				.attr("width", options.cellSize)
+				.attr("height", options.cellSize)
+				.attr("x", 0)
+				.attr("y", function(data, index) {
+					return index * options.cellSize + index * options.cellPadding;
+				});
+			// Adding day names to SVG
+			dayLabelSvg
+				.append("text")
+				.attr("class", "day-name-text")
+				.attr("dominant-baseline", "central")
+				.attr("x", 0 )
+				.attr("y", function(data, index) {
+					return index * options.cellSize + index * options.cellPadding + options.cellSize/2;
+				})
+				.text(function(data) {
+					return data;
+				});
+		}
 
 		// =========================================================================//
 		// PAINTING DOMAIN															//
@@ -2806,12 +2860,16 @@ CalHeatMap.prototype = {
 				return 0;
 			})
 			.attr("x", function() {
+				var xPosition = 0;
+				if (options.dayLabel && options.domain === "month" && options.subDomain === "day") {
+					xPosition = options.cellSize + options.cellPadding;
+				}
 				if (
 					(options.legendVerticalPosition === "middle" || options.legendVerticalPosition === "center") &&
 					options.legendHorizontalPosition === "left") {
-					return legendWidth;
+					return legendWidth + xPosition;
 				}
-				return 0;
+				return xPosition;
 
 			})
 		;
