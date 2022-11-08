@@ -1,14 +1,15 @@
-module.exports = function (grunt) {
-    "use strict";
+module.exports = function(grunt) {
 
-    var headerComment =
-        "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
-        " *  ---------------------------------------------\n" +
-        " *  <%= pkg.description %>\n" +
-        " *  <%= pkg.homepage %>\n" +
-        " *  Licensed under the <%= pkg.license %> license\n" +
-        " *  Copyright 2014 <%= pkg.author.name %>\n" +
-        " */\n";
+	"use strict";
+
+    var headerComment = "/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n" +
+                " *  ---------------------------------------------\n" +
+                " *  <%= pkg.description %>\n" +
+                " *  <%= pkg.homepage %>\n" +
+
+                " *  Licensed under the <%= pkg.license %> license\n" +
+                " *  Copyright 2014 <%= pkg.author.name %>\n" +
+                " */\n";
 
     // Project configuration.
     grunt.initConfig({
@@ -30,8 +31,9 @@ module.exports = function (grunt) {
         csslint: {
             base: {
                 src: "<%= pkg.name %>.css",
-                rules: {
+                options: {
                     "known-properties": false,
+                    "order-alphabetical": false,
                     "box-sizing": false
                 }
             }
@@ -42,12 +44,21 @@ module.exports = function (grunt) {
             },
             base: {
                 files: {
-                    "<%= pkg.name %>.min.js": ["<%= pkg.name %>.js"]
+                    "<%= pkg.name %>.min.js" : ["<%= pkg.name %>.js"]
                 }
             }
         },
         qunit: {
             options: {
+                "--web-security": "no",
+                puppeteer: {
+                    ignoreDefaultArgs: true,
+                    args: [
+                        "--headless",
+                        "--disable-web-security",
+                        "--allow-file-access-from-files"
+                    ]
+                },
                 coverage: {
                     src: ["src/*.js"],
                     instrumentedFiles: "temp/",
@@ -55,11 +66,7 @@ module.exports = function (grunt) {
                     coberturaReport: "report/"
                 }
             },
-            all: {
-                options: {
-                    urls: ["http://localhost:8000/test/index.html"]
-                }
-            }
+            all: ["test/*.html"]
         },
         concat: {
             options: {
@@ -74,60 +81,45 @@ module.exports = function (grunt) {
                 dest: "test/test.js"
             }
         },
-        coveralls: {
-            options: {
-                coverage_dir: "coverage/"
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
             }
         },
         watch: {
-            scripts: {
-                files: "test/src/**/*.js",
-                tasks: ["concat:test"],
-                options: {
-                    interrupt: true
-                }
-            },
-            lint: {
-                files: "src/*.js",
-                tasks: ["jshint:lib"],
-                options: {
-                    interrupt: true
-                }
-            }
-        },
-        connect: {
-            server: {
-                options: {
-                    port: 8000,
-                    base: "."
-                }
-            }
-        }
+			scripts: {
+				files: "test/src/**/*.js",
+				tasks: ["concat:test"],
+				options: {
+					interrupt: true,
+				}
+			},
+			lint: {
+				files: "src/*.js",
+				tasks: ["jshint:lib"],
+				options: {
+					interrupt: true,
+				}
+			}
+		}
     });
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-uglify");
-    grunt.loadNpmTasks("grunt-css");
+    grunt.loadNpmTasks("grunt-contrib-csslint");
     grunt.loadNpmTasks("grunt-contrib-qunit");
     grunt.loadNpmTasks("grunt-contrib-concat");
-    grunt.loadNpmTasks("grunt-karma-coveralls");
+    grunt.loadNpmTasks("grunt-karma");
     grunt.loadNpmTasks("grunt-contrib-watch");
-    grunt.loadNpmTasks("grunt-contrib-connect");
 
     // TO RUN BEFORE COMMIT
     // ====================
     grunt.registerTask("quick-build", ["csslint", "jshint"]);
 
     // Full build without version bump
-    grunt.registerTask("build", [
-        "connect",
-        "concat",
-        "qunit",
-        "jshint",
-        "uglify"
-    ]);
+    grunt.registerTask("build", ["concat", "qunit", "csslint", "jshint", "uglify"]);
 
     // FOR TRAVIS
     // ==========
-    grunt.registerTask("travis", ["jshint"]);
+    grunt.registerTask("travis", ["jshint", "csslint"]);
 };

@@ -13,31 +13,32 @@
     "test": "test"
   },
   "dependencies": {
-    "d3": "^3.0.6"
+    "d3": "7.6.1"
   },
   "devDependencies": {
-    "grunt": "^1.0.0",
-    "grunt-contrib-concat": "^2.0.0",
-    "grunt-contrib-connect": "^3.0.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-csslint": "^2.0.0",
-    "grunt-contrib-jshint": "^3.0.0",
-    "grunt-contrib-qunit": "^6.0.0",
-    "grunt-contrib-uglify": "^5.0.0",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-css": "^0.5.4",
-    "grunt-karma-coveralls": "^2.5.3",
-    "grunt-replace": "^2.0.0",
-    "jquery": "^3.0.0",
-    "karma": "^6.0.0",
-    "karma-coverage": "^2.0.0",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "karma-qunit": "^4.0.0",
-    "phantomjs": "^2.0.0",
-    "qunit": "^2.0.0"
+    "grunt": "1.5.3",
+    "grunt-contrib-uglify": "5.2.2",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-contrib-jshint": "3.2.0",
+    "grunt-contrib-concat": "2.1.0",
+    "grunt-contrib-watch": "1.1.0",
+    "grunt-contrib-qunit": "6.2.0",
+
+    "grunt-contrib-csslint": "2.0.0",
+    "grunt-replace": "2.0.2",
+
+    "karma": "6.4.1",
+    "karma-coverage": "2.2.0",
+    "karma-qunit": "4.1.2",
+    "grunt-karma": "4.0.2",
+    "karma-chrome-launcher": "3.1.1",
+    "puppeteer": "18.2.1",
+
+    "qunit": "2.19.1",
+    "jquery": "3.6.1"
   },
   "scripts": {
-    "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
+    "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless"
   },
   "repository": {
     "type": "git",
@@ -57,7 +58,7 @@
   },
   "jam": {
     "dependencies": {
-      "d3": "^3.0.6"
+      "d3": "^7.4.0"
     }
   },
   "bugs": "https://github.com/wa0x6e/cal-heatmap/issues",

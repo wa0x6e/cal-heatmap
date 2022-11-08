@@ -6,7 +6,7 @@
 
 QUnit.module("Date computation : isNow()");
 
-QUnit.test("Now is equal to now", function (assert) {
+QUnit.test("Now is equal to now", function(assert) {
 	assert.expect(1);
 
 	var cal = createCalendar({});
@@ -14,7 +14,7 @@ QUnit.test("Now is equal to now", function (assert) {
 	assert.ok(cal.isNow(new Date()));
 });
 
-QUnit.test("Passed date is not equal to now", function (assert) {
+QUnit.test("Passed date is not equal to now", function(assert) {
 	assert.expect(1);
 
 	var cal = createCalendar({});

@@ -6,14 +6,8 @@
 
 QUnit.module("API : previous()");
 
-function _testPrevious(
-	title,
-	count,
-	expectedReturn,
-	expectedStartDate,
-	startDate,
-	minDate
-) {
+function _testPrevious(title, count, expectedReturn, expectedStartDate, startDate, minDate) {
+
 	if (arguments.length < 5) {
 		startDate = new Date(2000, 0);
 	}
@@ -22,10 +16,10 @@ function _testPrevious(
 		minDate = new Date(1999, 2);
 	}
 
-	QUnit.test(title, function (assert) {
+	QUnit.test(title, function(assert) {
 		assert.expect(2);
 
-		var cal = createCalendar({
+		var cal = createCalendar( {
 			domain: "month",
 			start: startDate,
 			range: 4,
@@ -35,16 +29,8 @@ function _testPrevious(
 			maxDate: new Date(2000, 3)
 		});
 
-		assert.equal(
-			count === null ? cal.previous() : cal.previous(count),
-			expectedReturn,
-			"previous() should return " + expectedReturn
-		);
-		assert.equal(
-			cal.getDomainKeys()[0],
-			+expectedStartDate,
-			"Calendar should start on " + expectedStartDate.toDateString()
-		);
+		assert.equal((count === null ? cal.previous() : cal.previous(count)), expectedReturn, "previous() should return " + expectedReturn);
+		assert.equal(cal.getDomainKeys()[0], +expectedStartDate, "Calendar should start on " + expectedStartDate.toDateString());
 	});
 }
 
@@ -128,30 +114,20 @@ _testPrevious(
 	new Date(2000, 2)
 );
 
-QUnit.test(
-	"Calling previous when maxDate is reached remove the maxDomainReached state",
-	function (assert) {
-		assert.expect(2);
+QUnit.test("Calling previous when maxDate is reached remove the maxDomainReached state", function(assert) {
+	assert.expect(2);
 
-		var cal = createCalendar({
-			domain: "month",
-			start: new Date(2000, 0),
-			range: 4,
-			loadOnInit: true,
-			paintOnLoad: true,
-			maxDate: new Date(2000, 3)
-		});
+	var cal = createCalendar( {
+		domain: "month",
+		start: new Date(2000, 0),
+		range: 4,
+		loadOnInit: true,
+		paintOnLoad: true,
+		maxDate: new Date(2000, 3)
+	});
 
-		assert.equal(
-			true,
-			cal._maxDomainReached,
-			"Max domain is reached on calendar init"
-		);
-		cal.previous();
-		assert.equal(
-			false,
-			cal._maxDomainReached,
-			"Max domain is not reached after previous()"
-		);
-	}
-);
+	assert.equal(true, cal._maxDomainReached, "Max domain is reached on calendar init");
+	cal.previous();
+	assert.equal(false, cal._maxDomainReached, "Max domain is not reached after previous()");
+});
+
