@@ -7,34 +7,38 @@
 
 QUnit.module("API: init(domainLabelFormat)");
 
-QUnit.test("Passing an empty string", function(assert) {
-	assert.expect(1);
+QUnit.test("Passing an empty string", function (assert) {
+  assert.expect(1);
 
-	var cal = createCalendar({ domainLabelFormat: "" });
-	assert.strictEqual(cal.options.domainLabelFormat, "");
+  const cal = createCalendar({ domainLabelFormat: "" });
+  assert.strictEqual(cal.options.domainLabelFormat, "");
 });
 
-QUnit.test("Passing a non-empty string", function(assert) {
-	assert.expect(1);
+QUnit.test("Passing a non-empty string", function (assert) {
+  assert.expect(1);
 
-	var cal = createCalendar({ domainLabelFormat: "R" });
-	assert.strictEqual(cal.options.domainLabelFormat, "R");
+  const cal = createCalendar({ domainLabelFormat: "R" });
+  assert.strictEqual(cal.options.domainLabelFormat, "R");
 });
 
-QUnit.test("Passing a function", function(assert) {
-	assert.expect(1);
+QUnit.test("Passing a function", function (assert) {
+  assert.expect(1);
 
-	var cal = createCalendar({ domainLabelFormat: function() {} });
-	assert.ok(typeof cal.options.domainLabelFormat === "function");
+  const cal = createCalendar({ domainLabelFormat: function () {} });
+  assert.ok(typeof cal.options.domainLabelFormat === "function");
 });
 
 function _testdomainLabelFormatWithInvalidInput(title, input) {
-	QUnit.test("Passing a not-valid input (" + title + ")", function(assert) {
-		assert.expect(1);
+  QUnit.test("Passing a not-valid input (" + title + ")", function (assert) {
+    assert.expect(1);
 
-		var cal = createCalendar({ domainLabelFormat: input });
-		assert.strictEqual(cal.options.domainLabelFormat, cal._domainType.hour.format.legend, "Invalid input should fallback to the domain default legend format");
-	});
+    const cal = createCalendar({ domainLabelFormat: input });
+    assert.strictEqual(
+      cal.options.domainLabelFormat,
+      cal._domainType.hour.format.legend,
+      "Invalid input should fallback to the domain default legend format"
+    );
+  });
 }
 
 _testdomainLabelFormatWithInvalidInput("number", 10);

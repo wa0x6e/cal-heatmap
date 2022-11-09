@@ -11,85 +11,157 @@
  */
 
 // Whether to split each domain>subDomain test into their own module
-var SPLIT_TEST = false;
+const SPLIT_TEST = false;
 
 function _test(domain, subDomain, config_h, config_v, skipped) {
+  if (arguments.length < 5) {
+    skipped = false;
+  }
 
-	if (arguments.length < 5) {
-		skipped = false;
-	}
+  if (SPLIT_TEST) {
+    QUnit.module(
+      "Test painting " + domain + " > " + subDomain + " columns/rows"
+    );
+  }
 
-	if (SPLIT_TEST) {
-		QUnit.module("Test painting " + domain + " > " + subDomain + " columns/rows");
-	}
+  for (var i = 0, total = config_h.length; i < total; i++) {
+    testConfig(
+      domain,
+      subDomain,
+      config_h[i][0],
+      config_h[i][1],
+      config_h[i][2],
+      config_h[i][3],
+      skipped
+    );
+    testConfig(
+      domain,
+      "x_" + subDomain,
+      config_h[i][0],
+      config_h[i][1],
+      config_h[i][3],
+      config_h[i][2],
+      skipped
+    );
+  }
 
-	for(var i = 0, total = config_h.length; i < total; i++) {
-		testConfig(domain, subDomain, config_h[i][0], config_h[i][1], config_h[i][2], config_h[i][3], skipped);
-		testConfig(domain, "x_" + subDomain, config_h[i][0], config_h[i][1], config_h[i][3], config_h[i][2], skipped);
-	}
-
-	// Cutting along the reading direction
-	for(i = 0, total = config_v.length; i < total; i++) {
-		testConfig(domain, subDomain, config_v[i][0], config_v[i][1], config_v[i][2], config_v[i][3], skipped);
-		testConfig(domain, "x_" + subDomain, config_v[i][0], config_v[i][1], config_v[i][3], config_v[i][2], skipped);
-	}
+  // Cutting along the reading direction
+  for (i = 0, total = config_v.length; i < total; i++) {
+    testConfig(
+      domain,
+      subDomain,
+      config_v[i][0],
+      config_v[i][1],
+      config_v[i][2],
+      config_v[i][3],
+      skipped
+    );
+    testConfig(
+      domain,
+      "x_" + subDomain,
+      config_v[i][0],
+      config_v[i][1],
+      config_v[i][3],
+      config_v[i][2],
+      skipped
+    );
+  }
 }
 
 /**
  * Trigger the test for the columns and rows limit
  */
-function testConfig(domain, subDomain, col, row, expectedCol, expectedRow, skipped) {
-	testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow, skipped);
+function testConfig(
+  domain,
+  subDomain,
+  col,
+  row,
+  expectedCol,
+  expectedRow,
+  skipped
+) {
+  testColumnsAndRows(
+    domain,
+    subDomain,
+    col,
+    row,
+    expectedCol,
+    expectedRow,
+    skipped
+  );
 }
 
 /**
  * The test itself
  */
-function testColumnsAndRows(domain, subDomain, col, row, expectedCol, expectedRow, skipped) {
+function testColumnsAndRows(
+  domain,
+  subDomain,
+  col,
+  row,
+  expectedCol,
+  expectedRow,
+  skipped
+) {
+  testTitle = "Default splitting";
 
-	testTitle = "Default splitting";
+  if (col > 0) {
+    testTitle = "Split into [" + col + "] columns";
+  } else if (row > 0) {
+    testTitle = "Split into [" + row + "] rows";
+  }
 
-	if (col > 0) {
-		testTitle = "Split into [" + col + "] columns";
-	} else if (row > 0) {
-		testTitle = "Split into [" + row + "] rows";
-	}
+  if (subDomain[0] === "x") {
+    testTitle += " [vertical layout]";
+  }
 
-	if (subDomain[0] === "x") {
-		testTitle += " [vertical layout]";
-	}
+  testTitle =
+    domain.toUpperCase() + " » " + subDomain.toUpperCase() + " : " + testTitle;
 
-	testTitle = domain.toUpperCase() + " » " + subDomain.toUpperCase() + " : " + testTitle;
+  if (skipped) {
+    testSkip(testTitle, _t);
+  } else {
+    QUnit.test(testTitle, _t);
+  }
 
-	if (skipped) {
-		testSkip(testTitle, _t);
-	} else {
-		QUnit.test(testTitle, _t);
-	}
+  function _t(assert) {
+    assert.expect(2);
 
-	function _t(assert) {
-		assert.expect(2);
+    const cal = createCalendar({
+      domain,
+      subDomain,
+      colLimit: col,
+      rowLimit: row,
+      start: new Date(2000, 0, 1),
+      cellPadding: 0,
+      paintOnLoad: true,
+      range: 1,
+    });
 
-		var cal = createCalendar({domain: domain, subDomain: subDomain, colLimit: col, rowLimit: row,
-			start: new Date(2000, 0, 1), cellPadding: 0, paintOnLoad: true, range: 1});
+    const rect = $("#cal-heatmap").find(".graph-rect");
 
-		var rect = $("#cal-heatmap").find(".graph-rect");
+    const _count = {
+      column: new Map(),
+      row: new Map(),
+    };
 
-		var _count = {
-			column: new Map(),
-			row: new Map()
-		};
+    rect.each(function () {
+      _count.column.set($(this).attr("x"), 0);
+      _count.row.set($(this).attr("y"), 0);
+    });
 
-		rect.each(function() {
-			_count.column.set($(this).attr("x"), 0);
-			_count.row.set($(this).attr("y"), 0);
-		});
-
-		assert.equal(_count.column.size, expectedCol, "The domain was split into " + expectedCol + " columns");
-		assert.equal(_count.row.size, expectedRow, "The domain was split into " + expectedRow + " rows");
-	}
+    assert.equal(
+      _count.column.size,
+      expectedCol,
+      "The domain was split into " + expectedCol + " columns"
+    );
+    assert.equal(
+      _count.row.size,
+      expectedRow,
+      "The domain was split into " + expectedRow + " rows"
+    );
+  }
 }
-
 
 QUnit.module("Painting column and row count");
 /*
@@ -109,20 +181,25 @@ QUnit.module("Painting column and row count");
 	=================================================================
  */
 
-_test("hour", "min", [
-	[0, 0, 6, 10],
-	[2, 0, 2, 30],
-	[50, 0, 30, 2],
-	[7, 0, 7, 9],
-	[21, 0, 20, 3],
-	[75, 0, 60, 1]
-], [
-	[0, 2, 30, 2],
-	[0, 50, 2, 50],
-	[0, 7, 9, 7],
-	[0, 21, 3, 21],
-	[0, 75, 1, 60]
-]);
+_test(
+  "hour",
+  "min",
+  [
+    [0, 0, 6, 10],
+    [2, 0, 2, 30],
+    [50, 0, 30, 2],
+    [7, 0, 7, 9],
+    [21, 0, 20, 3],
+    [75, 0, 60, 1],
+  ],
+  [
+    [0, 2, 30, 2],
+    [0, 50, 2, 50],
+    [0, 7, 9, 7],
+    [0, 21, 3, 21],
+    [0, 75, 1, 60],
+  ]
+);
 
 /*
 	=================================================================
@@ -130,18 +207,23 @@ _test("hour", "min", [
 	=================================================================
  */
 
-_test("day", "hour", [
-	[0, 0, 4, 6],
-	[2, 0, 2, 12],
-	[10, 0, 8, 3],
-	[5, 0, 5, 5],
-	[29, 0, 24, 1]
-], [
-	[0, 2, 12, 2],
-	[0, 10, 3, 10],
-	[0, 5, 5, 5],
-	[0, 29, 1, 24]
-]);
+_test(
+  "day",
+  "hour",
+  [
+    [0, 0, 4, 6],
+    [2, 0, 2, 12],
+    [10, 0, 8, 3],
+    [5, 0, 5, 5],
+    [29, 0, 24, 1],
+  ],
+  [
+    [0, 2, 12, 2],
+    [0, 10, 3, 10],
+    [0, 5, 5, 5],
+    [0, 29, 1, 24],
+  ]
+);
 
 /*
 	=================================================================
@@ -151,20 +233,25 @@ _test("day", "hour", [
 
 // 1 week = 168 hours
 
-_test("week", "hour", [
-	[0, 0, 28, 6],
-	[12, 0, 12, 14],
-	[100, 0, 84, 2],
-	[27, 0, 24, 7],
-	[41, 0, 34, 5],
-	[170, 0, 168, 1]
-], [
-	[0, 12, 14, 12],
-	[0, 100, 2, 100],
-	[0, 27, 7, 27],
-	[0, 41, 5, 41],
-	[0, 170, 1, 168]
-]);
+_test(
+  "week",
+  "hour",
+  [
+    [0, 0, 28, 6],
+    [12, 0, 12, 14],
+    [100, 0, 84, 2],
+    [27, 0, 24, 7],
+    [41, 0, 34, 5],
+    [170, 0, 168, 1],
+  ],
+  [
+    [0, 12, 14, 12],
+    [0, 100, 2, 100],
+    [0, 27, 7, 27],
+    [0, 41, 5, 41],
+    [0, 170, 1, 168],
+  ]
+);
 
 /*
 	=================================================================
@@ -172,20 +259,25 @@ _test("week", "hour", [
 	=================================================================
  */
 
-_test("week", "day", [
-	[0, 0, 1, 7],
-	[2, 0, 2, 4],
-	[6, 0, 4, 2],
-	[3, 0, 3, 3],
-	[5, 0, 4, 2],
-	[10, 0, 7, 1]
-], [
-	[0, 2, 4, 2],
-	[0, 6, 2, 6],
-	[0, 3, 3, 3],
-	[0, 5, 2, 5],
-	[0, 10, 1, 7]
-]);
+_test(
+  "week",
+  "day",
+  [
+    [0, 0, 1, 7],
+    [2, 0, 2, 4],
+    [6, 0, 4, 2],
+    [3, 0, 3, 3],
+    [5, 0, 4, 2],
+    [10, 0, 7, 1],
+  ],
+  [
+    [0, 2, 4, 2],
+    [0, 6, 2, 6],
+    [0, 3, 3, 3],
+    [0, 5, 2, 5],
+    [0, 10, 1, 7],
+  ]
+);
 
 /*
 	=================================================================
@@ -195,21 +287,25 @@ _test("week", "day", [
 
 // Tested month contains : 31 * 24 = 744 hours
 
-_test("month", "hour", [
-	[0, 0, 124, 6],
-	[2, 0, 2, 372],
-	[100, 0, 93, 8],
-	[7, 0, 7, 107],
-	[551, 0, 372, 2],
-	[800, 0, 744, 1]
-], [
-	[0, 2, 372, 2],
-	[0, 100, 8, 100],
-	[0, 7, 107, 7],
-	[0, 551, 2, 551],
-	[0, 800, 1, 744]
-]);
-
+_test(
+  "month",
+  "hour",
+  [
+    [0, 0, 124, 6],
+    [2, 0, 2, 372],
+    [100, 0, 93, 8],
+    [7, 0, 7, 107],
+    [551, 0, 372, 2],
+    [800, 0, 744, 1],
+  ],
+  [
+    [0, 2, 372, 2],
+    [0, 100, 8, 100],
+    [0, 7, 107, 7],
+    [0, 551, 2, 551],
+    [0, 800, 1, 744],
+  ]
+);
 
 /*
 	=================================================================
@@ -219,20 +315,25 @@ _test("month", "hour", [
 
 // Tested month contains 31 days
 
-_test("month", "day", [
-	[0, 0, 6, 7],
-	[2, 0, 2, 16],
-	[10, 0, 8, 4],
-	[7, 0, 7, 5],
-	[19, 0, 16, 2],
-	[40, 0, 31, 1]
-], [
-	[0, 2, 16, 2],
-	[0, 10, 4, 10],
-	[0, 7, 5, 7],
-	[0, 19, 2, 19],
-	[0, 40, 1, 31]
-]);
+_test(
+  "month",
+  "day",
+  [
+    [0, 0, 6, 7],
+    [2, 0, 2, 16],
+    [10, 0, 8, 4],
+    [7, 0, 7, 5],
+    [19, 0, 16, 2],
+    [40, 0, 31, 1],
+  ],
+  [
+    [0, 2, 16, 2],
+    [0, 10, 4, 10],
+    [0, 7, 5, 7],
+    [0, 19, 2, 19],
+    [0, 40, 1, 31],
+  ]
+);
 
 /*
 	=================================================================
@@ -242,16 +343,22 @@ _test("month", "day", [
 
 // January 2000 contains 5 weeks
 
-_test("month", "week", [
-	[0, 0, 5, 1],
-	[2, 0, 2, 3],
-	[3, 0, 3, 2],
-	[8, 0, 5, 1]
-], [
-	[0, 2, 3, 2],
-	[0, 3, 2, 3],
-	[0, 8, 1, 8]
-], true);
+_test(
+  "month",
+  "week",
+  [
+    [0, 0, 5, 1],
+    [2, 0, 2, 3],
+    [3, 0, 3, 2],
+    [8, 0, 5, 1],
+  ],
+  [
+    [0, 2, 3, 2],
+    [0, 3, 2, 3],
+    [0, 8, 1, 8],
+  ],
+  true
+);
 
 /*
 	=================================================================
@@ -259,20 +366,25 @@ _test("month", "week", [
 	=================================================================
  */
 
-_test("year", "day", [
-	[0, 0, 53, 7],
-	[2, 0, 2, 183],
-	[50, 0, 46, 8],
-	[3, 0, 3, 122],
-	[60, 0, 53, 7],
-	[400, 0, 366, 1]
-], [
-	[0, 2, 183, 2],
-	[0, 50, 8, 50],
-	[0, 3, 122, 3],
-	[0, 60, 7, 60],
-	[0, 400, 1, 366]
-]);
+_test(
+  "year",
+  "day",
+  [
+    [0, 0, 53, 7],
+    [2, 0, 2, 183],
+    [50, 0, 46, 8],
+    [3, 0, 3, 122],
+    [60, 0, 53, 7],
+    [400, 0, 366, 1],
+  ],
+  [
+    [0, 2, 183, 2],
+    [0, 50, 8, 50],
+    [0, 3, 122, 3],
+    [0, 60, 7, 60],
+    [0, 400, 1, 366],
+  ]
+);
 
 /*
 	=================================================================
@@ -280,19 +392,24 @@ _test("year", "day", [
 	=================================================================
  */
 
-_test("year", "week", [
-	[0, 0, 52, 1],
-	[2, 0, 2, 26],
-	[30, 0, 26, 2],
-	[3, 0, 3, 18],
-	[49, 0, 2, 26]
-], [
-	[0, 2, 26, 2],
-	[0, 30, 2, 30],
-	[0, 3, 18, 3],
-	[0, 49, 1, 49]
-], true);
-
+_test(
+  "year",
+  "week",
+  [
+    [0, 0, 52, 1],
+    [2, 0, 2, 26],
+    [30, 0, 26, 2],
+    [3, 0, 3, 18],
+    [49, 0, 2, 26],
+  ],
+  [
+    [0, 2, 26, 2],
+    [0, 30, 2, 30],
+    [0, 3, 18, 3],
+    [0, 49, 1, 49],
+  ],
+  true
+);
 
 /*
 	=================================================================
@@ -300,17 +417,22 @@ _test("year", "week", [
 	=================================================================
  */
 
-_test("year", "month", [
-	[0, 0, 12, 1],
-	[2, 0, 2, 6],
-	[10, 0, 6, 2],
-	[5, 0, 4, 3],
-	[11, 0, 6, 2],
-	[15, 0, 12, 1]
-], [
-	[0, 2, 6, 2],
-	[0, 10, 2, 10],
-	[0, 5, 3, 5],
-	[0, 11, 2, 11],
-	[0, 15, 1, 12]
-]);
+_test(
+  "year",
+  "month",
+  [
+    [0, 0, 12, 1],
+    [2, 0, 2, 6],
+    [10, 0, 6, 2],
+    [5, 0, 4, 3],
+    [11, 0, 6, 2],
+    [15, 0, 12, 1],
+  ],
+  [
+    [0, 2, 6, 2],
+    [0, 10, 2, 10],
+    [0, 5, 3, 5],
+    [0, 11, 2, 11],
+    [0, 15, 1, 12],
+  ]
+);

@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "3.6.2",
+  "version": "4.0.0",
   "description": "Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data",
   "keywords": [
     "calendar",
@@ -13,29 +13,31 @@
     "test": "test"
   },
   "dependencies": {
-    "d3": "7.6.1"
+    "d3": "7.6.1",
+    "prettier": "^2.7.1"
   },
   "devDependencies": {
+    "eslint": "^8.27.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-html": "^7.1.0",
     "grunt": "1.5.3",
-    "grunt-contrib-uglify": "5.2.2",
-    "grunt-contrib-copy": "1.0.0",
-    "grunt-contrib-jshint": "3.2.0",
     "grunt-contrib-concat": "2.1.0",
-    "grunt-contrib-watch": "1.1.0",
-    "grunt-contrib-qunit": "6.2.0",
-
+    "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-csslint": "2.0.0",
+    "grunt-contrib-qunit": "6.2.0",
+    "grunt-contrib-uglify": "5.2.2",
+    "grunt-contrib-watch": "1.1.0",
+    "grunt-exec": "^3.0.0",
+    "grunt-karma": "4.0.2",
     "grunt-replace": "2.0.2",
-
+    "jquery": "3.6.1",
     "karma": "6.4.1",
+    "karma-chrome-launcher": "3.1.1",
     "karma-coverage": "2.2.0",
     "karma-qunit": "4.1.2",
-    "grunt-karma": "4.0.2",
-    "karma-chrome-launcher": "3.1.1",
     "puppeteer": "18.2.1",
-
     "qunit": "2.19.1",
-    "jquery": "3.6.1"
+    "standard": "^17.0.0"
   },
   "scripts": {
     "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless"

@@ -1,0 +1,11 @@
+{
+  "extends": "standard",
+  "rules": {
+    "no-undef": "off",
+    "no-unused-vars": "off",
+    "no-var": "off",
+    "space-before-function-paren": "error",
+    "quotes": ["single", { "avoidEscape": true }]
+  },
+  "plugins": ["html"]
+}

@@ -4,7 +4,7 @@
 	-----------------------------------------------------------------
  */
 
-QUnit.module( "Interpreting Data source template" );
+QUnit.module("Interpreting Data source template");
 
 /*
 QUnit.test("Data Source is a regex string, replace by timestamp", function(assert) {
@@ -110,4 +110,4 @@ QUnit.test("Filter out datas not relevant to calendar domain", function(assert) 
 	assert.equal(calDatas.hasOwnProperty(date2*1000), true, "Only datas for the second hours remains");
 	assert.equal(Object.keys(calDatas[date2*1000]).length, 2, "Hours contains datas for 2 minutes");
 
-});*/
+}); */

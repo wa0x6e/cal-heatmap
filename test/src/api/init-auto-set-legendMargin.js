@@ -9,15 +9,22 @@
 QUnit.module("API: init(legendMargin)");
 
 function __testAutoSetLegendMarginSetting(title, ver, hor, autoMarginIndex) {
-	QUnit.test("Automatically add margin to " + title, function(assert) {
-		assert.expect(1);
+  QUnit.test("Automatically add margin to " + title, function (assert) {
+    assert.expect(1);
 
-		var margin = [0, 0, 0, 0];
-		var cal = createCalendar({ legendVerticalPosition: ver, legendHorizontalPosition: hor });
-		margin[autoMarginIndex] = cal.DEFAULT_LEGEND_MARGIN;
+    const margin = [0, 0, 0, 0];
+    const cal = createCalendar({
+      legendVerticalPosition: ver,
+      legendHorizontalPosition: hor,
+    });
+    margin[autoMarginIndex] = cal.DEFAULT_LEGEND_MARGIN;
 
-		assert.deepEqual(cal.options.legendMargin, margin, "domainMargin is set to [" + margin.join(", ") + "]");
-	});
+    assert.deepEqual(
+      cal.options.legendMargin,
+      margin,
+      "domainMargin is set to [" + margin.join(", ") + "]"
+    );
+  });
 }
 
 __testAutoSetLegendMarginSetting("bottom", "top", "left", 2);
