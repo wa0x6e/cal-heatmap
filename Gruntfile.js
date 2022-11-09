@@ -1,5 +1,5 @@
 module.exports = function (grunt) {
-  'use strict'
+  'use strict';
 
   const headerComment =
     '/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n' +
@@ -8,30 +8,30 @@ module.exports = function (grunt) {
     ' *  <%= pkg.homepage %>\n' +
     ' *  Licensed under the <%= pkg.license %> license\n' +
     ' *  Copyright 2014 <%= pkg.author.name %>\n' +
-    ' */\n'
+    ' */\n';
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     csslint: {
       base: {
-        src: '<%= pkg.name %>.css',
+        src: 'src/<%= pkg.name %>.css',
         options: {
           'known-properties': false,
           'order-alphabetical': false,
-          'box-sizing': false
-        }
-      }
+          'box-sizing': false,
+        },
+      },
     },
     uglify: {
       options: {
-        banner: headerComment
+        banner: headerComment,
       },
       base: {
         files: {
-          '<%= pkg.name %>.min.js': ['<%= pkg.name %>.js']
-        }
-      }
+          'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
+        },
+      },
     },
     qunit: {
       options: {
@@ -41,62 +41,66 @@ module.exports = function (grunt) {
           args: [
             '--headless',
             '--disable-web-security',
-            '--allow-file-access-from-files'
-          ]
+            '--allow-file-access-from-files',
+          ],
         },
         coverage: {
           src: ['src/*.js'],
           instrumentedFiles: 'temp/',
           htmlReport: 'report/coverage',
-          coberturaReport: 'report/'
-        }
+          coberturaReport: 'report/',
+        },
       },
-      all: ['test/*.html']
+      all: ['test/*.html'],
     },
     concat: {
       options: {
-        banner: headerComment + '\n'
+        banner: headerComment + '\n',
       },
       js: {
         src: ['src/<%= pkg.name %>.js'],
-        dest: '<%= pkg.name %>.js'
+        dest: 'dist/<%= pkg.name %>.js',
+      },
+      css: {
+        src: ['src/<%= pkg.name %>.css'],
+        dest: 'dist/<%= pkg.name %>.css',
       },
       test: {
         src: ['test/src/function.js', 'test/src/**/*.js'],
-        dest: 'test/test.js'
-      }
+        dest: 'test/test.js',
+      },
     },
     karma: {
       unit: {
-        configFile: 'karma.conf.js'
-      }
+        configFile: 'karma.conf.js',
+      },
     },
     watch: {
       scripts: {
         files: 'test/src/**/*.js',
         tasks: ['concat:test'],
         options: {
-          interrupt: true
-        }
-      }
+          interrupt: true,
+        },
+      },
     },
     exec: {
       format:
-        'npx prettier -w "src/**/*.{html,js,json,md,mjs,yml}" && npx prettier -w "test/**/*.{html,js,json,md,mjs,yml}"'
-    }
-  })
+        'npx prettier -w "src/**/*.{html,js,json,md,mjs,yml}" && npx prettier -w "test/**/*.{html,js,json,md,mjs,yml}"',
+    },
+  });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify')
-  grunt.loadNpmTasks('grunt-contrib-csslint')
-  grunt.loadNpmTasks('grunt-contrib-qunit')
-  grunt.loadNpmTasks('grunt-contrib-concat')
-  grunt.loadNpmTasks('grunt-karma')
-  grunt.loadNpmTasks('grunt-exec')
-  grunt.loadNpmTasks('grunt-contrib-watch')
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-csslint');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-exec');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // TO RUN BEFORE COMMIT
   // ====================
-  grunt.registerTask('quick-build', ['csslint'])
+  grunt.registerTask('quick-build', ['csslint']);
 
   // Full build without version bump
   grunt.registerTask('build', [
@@ -104,10 +108,10 @@ module.exports = function (grunt) {
     'concat',
     'qunit',
     'csslint',
-    'uglify'
-  ])
+    'uglify',
+  ]);
 
   // FOR TRAVIS
   // ==========
-  grunt.registerTask('travis', ['csslint'])
-}
+  grunt.registerTask('travis', ['csslint']);
+};
