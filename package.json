@@ -53,16 +53,6 @@
   },
   "license": "MIT",
   "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1",
-  "volo": {
-    "dependencies": {
-      "d3": "d3"
-    }
-  },
-  "jam": {
-    "dependencies": {
-      "d3": "^7.4.0"
-    }
-  },
   "bugs": "https://github.com/wa0x6e/cal-heatmap/issues",
   "github": "https://github.com/wa0x6e/cal-heatmap",
   "categories": [
