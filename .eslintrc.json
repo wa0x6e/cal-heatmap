@@ -1,11 +1,10 @@
 {
-  "extends": "standard",
-  "rules": {
-    "no-undef": "off",
-    "no-unused-vars": "off",
-    "no-var": "off",
-    "space-before-function-paren": "error",
-    "quotes": ["single", { "avoidEscape": true }]
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 8
   },
-  "plugins": ["html"]
+  "rules": {
+    "prefer-arrow-callback": true
+  }
 }

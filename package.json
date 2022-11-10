@@ -8,15 +8,24 @@
     "d3js",
     "heat map"
   ],
+  "type": "module",
   "main": "cal-heatmap.min.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "d3": "7.6.1",
-    "prettier": "^2.7.1"
+    "d3-fetch": "^3.0.1",
+    "d3-format": "^3.1.0",
+    "d3-interpolate": "^3.0.1",
+    "d3-scale": "^4.0.2",
+    "d3-selection": "^3.0.0",
+    "d3-transition": "^3.0.1",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "d3-time": "^3.0.0",
+    "d3-time-format": "^4.1.0",
     "eslint": "^8.27.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-html": "^7.1.0",
@@ -25,7 +34,6 @@
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-csslint": "2.0.0",
     "grunt-contrib-qunit": "6.2.0",
-    "grunt-contrib-uglify": "5.2.2",
     "grunt-contrib-watch": "1.1.0",
     "grunt-exec": "^3.0.0",
     "grunt-karma": "4.0.2",
@@ -35,11 +43,15 @@
     "karma-chrome-launcher": "3.1.1",
     "karma-coverage": "2.2.0",
     "karma-qunit": "4.1.2",
+    "prettier": "^2.7.1",
     "puppeteer": "18.2.1",
     "qunit": "2.19.1",
+    "rollup": "^3.2.5",
     "standard": "^17.0.0"
   },
   "scripts": {
+    "build": "rollup --config",
+    "dev": "rollup --config -w",
     "test": "grunt travis --verbose; ./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless"
   },
   "repository": {

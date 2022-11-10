@@ -1,18 +1,35 @@
-const d3 = typeof require === "function" ? require("d3") : window.d3;
+import { mergeRecursive, arrayEquals } from './function';
+import Legend from './Legend';
+import DomainPosition from './DomainPosition';
+
+import { format } from 'd3-format';
+import { select, selectAll } from 'd3-selection';
+import {
+  timeYears,
+  timeMonths,
+  timeDays,
+  timeMondays,
+  timeSundays,
+  timeHours,
+  timeMinutes,
+} from 'd3-time';
+import { timeFormat } from 'd3-time-format';
+import { transition } from 'd3-transition';
+import { json, csv, dsv, text } from 'd3-fetch';
 
 const CalHeatMap = function () {
-  "use strict";
+  'use strict';
 
   const self = this;
 
-  this.allowedDataType = ["json", "csv", "tsv", "txt"];
+  this.allowedDataType = ['json', 'csv', 'tsv', 'txt'];
 
   // Default settings
   this.options = {
     // selector string of the container to append the graph to
     // Accept any string value accepted by document.querySelector or CSS3
     // or an Element object
-    itemSelector: "#cal-heatmap",
+    itemSelector: '#cal-heatmap',
 
     // Whether to paint the calendar on init()
     // Used by testsuite to reduce testing time
@@ -38,9 +55,9 @@ const CalHeatMap = function () {
 
     domainMargin: [0, 0, 0, 0],
 
-    domain: "hour",
+    domain: 'hour',
 
-    subDomain: "min",
+    subDomain: 'min',
 
     // Number of columns to split the subDomains to
     // If not null, will takes precedence over rowLimit
@@ -71,7 +88,7 @@ const CalHeatMap = function () {
 
     // Data source
     // URL, where to fetch the original datas
-    data: "",
+    data: '',
 
     // Data type
     // Default: json
@@ -107,11 +124,11 @@ const CalHeatMap = function () {
     // Domain Label properties
     label: {
       // valid: top, right, bottom, left
-      position: "bottom",
+      position: 'bottom',
 
       // Valid: left, center, right
       // Also valid are the direct svg values: start, middle, end
-      align: "center",
+      align: 'center',
 
       // By default, there is no margin/padding around the label
       offset: {
@@ -147,15 +164,15 @@ const CalHeatMap = function () {
     // Legend vertical position
     // top: place legend above calendar
     // bottom: place legend below the calendar
-    legendVerticalPosition: "bottom",
+    legendVerticalPosition: 'bottom',
 
     // Legend horizontal position
     // accepted values: left, center, right
-    legendHorizontalPosition: "left",
+    legendHorizontalPosition: 'left',
 
     // Legend rotation
     // accepted values: horizontal, vertical
-    legendOrientation: "horizontal",
+    legendOrientation: 'horizontal',
 
     // Objects holding all the heatmap different colors
     // null to disable, and use the default css styles
@@ -186,46 +203,46 @@ const CalHeatMap = function () {
     // ================================================
 
     // Name of the items to represent in the calendar
-    itemName: ["item", "items"],
+    itemName: ['item', 'items'],
 
     // Formatting of the domain label
     // @default: null, will use the formatting according to domain type
-    // Accept a string used as specifier by d3.timeFormat()
+    // Accept a string used as specifier by timeFormat()
     // or a function
     //
     // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-    // for accepted date formatting used by d3.timeFormat()
+    // for accepted date formatting used by timeFormat()
     domainLabelFormat: null,
 
     // Formatting of the title displayed when hovering a subDomain cell
     subDomainTitleFormat: {
-      empty: "{date}",
-      filled: "{count} {name} {connector} {date}",
+      empty: '{date}',
+      filled: '{count} {name} {connector} {date}',
     },
 
     // Formatting of the {date} used in subDomainTitleFormat
     // @default: null, will use the formatting according to subDomain type
-    // Accept a string used as specifier by d3.timeFormat()
+    // Accept a string used as specifier by timeFormat()
     // or a function
     //
     // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-    // for accepted date formatting used by d3.timeFormat()
+    // for accepted date formatting used by timeFormat()
     subDomainDateFormat: null,
 
     // Formatting of the text inside each subDomain cell
     // @default: null, no text
-    // Accept a string used as specifier by d3.timeFormat()
+    // Accept a string used as specifier by timeFormat()
     // or a function
     //
     // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-    // for accepted date formatting used by d3.timeFormat()
+    // for accepted date formatting used by timeFormat()
     subDomainTextFormat: null,
 
     // Formatting of the title displayed when hovering a legend cell
     legendTitleFormat: {
-      lower: "less than {min} {name}",
-      inner: "between {down} and {up} {name}",
-      upper: "more than {max} {name}",
+      lower: 'less than {min} {name}',
+      inner: 'between {down} and {up} {name}',
+      upper: 'more than {max} {name}',
     },
 
     // Animation duration, in ms
@@ -235,7 +252,7 @@ const CalHeatMap = function () {
 
     previousSelector: false,
 
-    itemNamespace: "cal-heatmap",
+    itemNamespace: 'cal-heatmap',
 
     tooltip: false,
 
@@ -302,7 +319,7 @@ const CalHeatMap = function () {
 
   this._domainType = {
     min: {
-      name: "minute",
+      name: 'minute',
       level: 10,
       maxItemNumber: 60,
       defaultRowNumber: 10,
@@ -322,9 +339,9 @@ const CalHeatMap = function () {
         },
       },
       format: {
-        date: "%H:%M, %A %B %-e, %Y",
-        legend: "",
-        connector: "at",
+        date: '%H:%M, %A %B %-e, %Y',
+        legend: '',
+        connector: 'at',
       },
       extractUnit: function (d) {
         return new Date(
@@ -337,15 +354,15 @@ const CalHeatMap = function () {
       },
     },
     hour: {
-      name: "hour",
+      name: 'hour',
       level: 20,
       maxItemNumber: function (d) {
         switch (self.options.domain) {
-          case "day":
+          case 'day':
             return 24;
-          case "week":
+          case 'week':
             return 24 * 7;
-          case "month":
+          case 'month':
             return (
               24 *
               (self.options.domainDynamicDimension
@@ -357,11 +374,11 @@ const CalHeatMap = function () {
       defaultRowNumber: 6,
       defaultColumnNumber: function (d) {
         switch (self.options.domain) {
-          case "day":
+          case 'day':
             return 4;
-          case "week":
+          case 'week':
             return 28;
-          case "month":
+          case 'month':
             return self.options.domainDynamicDimension
               ? self.getDayCountInMonth(d)
               : 31;
@@ -375,7 +392,7 @@ const CalHeatMap = function () {
       },
       position: {
         x: function (d) {
-          if (self.options.domain === "month") {
+          if (self.options.domain === 'month') {
             if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
               return Math.floor(
                 (d.getHours() + (d.getDate() - 1) * 24) /
@@ -386,7 +403,7 @@ const CalHeatMap = function () {
               Math.floor(d.getHours() / self._domainType.hour.row(d)) +
               (d.getDate() - 1) * 4
             );
-          } else if (self.options.domain === "week") {
+          } else if (self.options.domain === 'week') {
             if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
               return Math.floor(
                 (d.getHours() + self.getWeekDay(d) * 24) /
@@ -404,10 +421,10 @@ const CalHeatMap = function () {
           let p = d.getHours();
           if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
             switch (self.options.domain) {
-              case "month":
+              case 'month':
                 p += (d.getDate() - 1) * 24;
                 break;
-              case "week":
+              case 'week':
                 p += self.getWeekDay(d) * 24;
                 break;
             }
@@ -416,9 +433,9 @@ const CalHeatMap = function () {
         },
       },
       format: {
-        date: "%Hh, %A %B %-e, %Y",
-        legend: "%H:00",
-        connector: "at",
+        date: '%Hh, %A %B %-e, %Y',
+        legend: '%H:00',
+        connector: 'at',
       },
       extractUnit: function (d) {
         return new Date(
@@ -430,17 +447,17 @@ const CalHeatMap = function () {
       },
     },
     day: {
-      name: "day",
+      name: 'day',
       level: 30,
       maxItemNumber: function (d) {
         switch (self.options.domain) {
-          case "week":
+          case 'week':
             return 7;
-          case "month":
+          case 'month':
             return self.options.domainDynamicDimension
               ? self.getDayCountInMonth(d)
               : 31;
-          case "year":
+          case 'year':
             return self.options.domainDynamicDimension
               ? self.getDayCountInYear(d)
               : 366;
@@ -449,9 +466,9 @@ const CalHeatMap = function () {
       defaultColumnNumber: function (d) {
         d = new Date(d);
         switch (self.options.domain) {
-          case "week":
+          case 'week':
             return 1;
-          case "month":
+          case 'month':
             return self.options.domainDynamicDimension &&
               !self.options.verticalOrientation
               ? self.getWeekNumber(
@@ -460,7 +477,7 @@ const CalHeatMap = function () {
                   self.getWeekNumber(d) +
                   1
               : 6;
-          case "year":
+          case 'year':
             return self.options.domainDynamicDimension
               ? self.getWeekNumber(new Date(d.getFullYear(), 11, 31)) -
                   self.getWeekNumber(new Date(d.getFullYear(), 0)) +
@@ -478,11 +495,11 @@ const CalHeatMap = function () {
       position: {
         x: function (d) {
           switch (self.options.domain) {
-            case "week":
+            case 'week':
               return Math.floor(
                 self.getWeekDay(d) / self._domainType.day.row(d)
               );
-            case "month":
+            case 'month':
               if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
                 return Math.floor(
                   (d.getDate() - 1) / self._domainType.day.row(d)
@@ -492,7 +509,7 @@ const CalHeatMap = function () {
                 self.getWeekNumber(d) -
                 self.getWeekNumber(new Date(d.getFullYear(), d.getMonth()))
               );
-            case "year":
+            case 'year':
               if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
                 return Math.floor(
                   (self.getDayOfYear(d) - 1) / self._domainType.day.row(d)
@@ -505,13 +522,13 @@ const CalHeatMap = function () {
           let p = self.getWeekDay(d);
           if (self.options.colLimit > 0 || self.options.rowLimit > 0) {
             switch (self.options.domain) {
-              case "year":
+              case 'year':
                 p = self.getDayOfYear(d) - 1;
                 break;
-              case "week":
+              case 'week':
                 p = self.getWeekDay(d);
                 break;
-              case "month":
+              case 'month':
                 p = d.getDate() - 1;
                 break;
             }
@@ -520,24 +537,24 @@ const CalHeatMap = function () {
         },
       },
       format: {
-        date: "%A %B %-e, %Y",
-        legend: "%e %b",
-        connector: "on",
+        date: '%A %B %-e, %Y',
+        legend: '%e %b',
+        connector: 'on',
       },
       extractUnit: function (d) {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
       },
     },
     week: {
-      name: "week",
+      name: 'week',
       level: 40,
       maxItemNumber: 54,
       defaultColumnNumber: function (d) {
         d = new Date(d);
         switch (self.options.domain) {
-          case "year":
+          case 'year':
             return self._domainType.week.maxItemNumber;
-          case "month":
+          case 'month':
             return self.options.domainDynamicDimension
               ? self.getWeekNumber(
                   new Date(d.getFullYear(), d.getMonth() + 1, 0)
@@ -555,11 +572,11 @@ const CalHeatMap = function () {
       position: {
         x: function (d) {
           switch (self.options.domain) {
-            case "year":
+            case 'year':
               return Math.floor(
                 self.getWeekNumber(d) / self._domainType.week.row(d)
               );
-            case "month":
+            case 'month':
               return Math.floor(
                 self.getMonthWeekNumber(d) / self._domainType.week.row(d)
               );
@@ -570,9 +587,9 @@ const CalHeatMap = function () {
         },
       },
       format: {
-        date: "%B Week #%W",
-        legend: "%B Week #%W",
-        connector: "in",
+        date: '%B Week #%W',
+        legend: '%B Week #%W',
+        connector: 'in',
       },
       extractUnit: function (d) {
         const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -586,7 +603,7 @@ const CalHeatMap = function () {
       },
     },
     month: {
-      name: "month",
+      name: 'month',
       level: 50,
       maxItemNumber: 12,
       defaultColumnNumber: 12,
@@ -606,16 +623,16 @@ const CalHeatMap = function () {
         },
       },
       format: {
-        date: "%B %Y",
-        legend: "%B",
-        connector: "in",
+        date: '%B %Y',
+        legend: '%B',
+        connector: 'in',
       },
       extractUnit: function (d) {
         return new Date(d.getFullYear(), d.getMonth()).getTime();
       },
     },
     year: {
-      name: "year",
+      name: 'year',
       level: 60,
       row: function () {
         return self.options.rowLimit || 1;
@@ -632,9 +649,9 @@ const CalHeatMap = function () {
         },
       },
       format: {
-        date: "%Y",
-        legend: "%Y",
-        connector: "in",
+        date: '%Y',
+        legend: '%Y',
+        connector: 'in',
       },
       extractUnit: function (d) {
         return new Date(d.getFullYear()).getTime();
@@ -645,8 +662,8 @@ const CalHeatMap = function () {
   for (const type in this._domainType) {
     if (this._domainType.hasOwnProperty(type)) {
       const d = this._domainType[type];
-      this._domainType["x_" + type] = {
-        name: "x_" + type,
+      this._domainType['x_' + type] = {
+        name: 'x_' + type,
         level: d.type,
         maxItemNumber: d.maxItemNumber,
         defaultRowNumber: d.defaultRowNumber,
@@ -728,21 +745,19 @@ const CalHeatMap = function () {
         );
       });
 
-    self.root = d3
-      .select(self.options.itemSelector)
-      .append("svg")
-      .attr("class", "cal-heatmap-container");
+    self.root = select(self.options.itemSelector)
+      .append('svg')
+      .attr('class', 'cal-heatmap-container');
 
-    self.tooltip = d3
-      .select(self.options.itemSelector)
-      .attr("style", function () {
-        const current = d3.select(self.options.itemSelector).attr("style");
-        return (current !== null ? current : "") + "position:relative;";
+    self.tooltip = select(self.options.itemSelector)
+      .attr('style', function () {
+        const current = select(self.options.itemSelector).attr('style');
+        return (current !== null ? current : '') + 'position:relative;';
       })
-      .append("div")
-      .attr("class", "ch-tooltip");
+      .append('div')
+      .attr('class', 'ch-tooltip');
 
-    self.root.attr("x", 0).attr("y", 0).append("svg").attr("class", "graph");
+    self.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
 
     self.Legend = new Legend(self);
 
@@ -755,8 +770,8 @@ const CalHeatMap = function () {
 
   function _initCalendar() {
     self.verticalDomainLabel =
-      self.options.label.position === "top" ||
-      self.options.label.position === "bottom";
+      self.options.label.position === 'top' ||
+      self.options.label.position === 'bottom';
 
     self.domainVerticalLabelHeight =
       self.options.label.height === null
@@ -765,7 +780,7 @@ const CalHeatMap = function () {
     self.domainHorizontalLabelWidth = 0;
 
     if (
-      self.options.domainLabelFormat === "" &&
+      self.options.domainLabelFormat === '' &&
       self.options.label.height === null
     ) {
       self.domainVerticalLabelHeight = 0;
@@ -782,8 +797,8 @@ const CalHeatMap = function () {
     // ATTACHING DOMAIN NAVIGATION EVENT                    //
     // =========================================================================//
     if (self.options.nextSelector !== false) {
-      d3.select(self.options.nextSelector).on(
-        "click." + self.options.itemNamespace,
+      select(self.options.nextSelector).on(
+        'click.' + self.options.itemNamespace,
         function (ev) {
           ev.preventDefault();
           return self.loadNextDomain(1);
@@ -792,8 +807,8 @@ const CalHeatMap = function () {
     }
 
     if (self.options.previousSelector !== false) {
-      d3.select(self.options.previousSelector).on(
-        "click." + self.options.itemNamespace,
+      select(self.options.previousSelector).on(
+        'click.' + self.options.itemNamespace,
         function (ev) {
           ev.preventDefault();
           return self.loadPreviousDomain(1);
@@ -875,8 +890,8 @@ const CalHeatMap = function () {
 
     // Painting all the domains
     let domainSvg = self.root
-      .select(".graph")
-      .selectAll(".graph-domain")
+      .select('.graph')
+      .selectAll('.graph-domain')
       .data(
         function () {
           const data = self.getDomainKeys();
@@ -894,56 +909,56 @@ const CalHeatMap = function () {
     // =========================================================================//
     if (
       options.dayLabel &&
-      options.domain === "month" &&
-      options.subDomain === "day"
+      options.domain === 'month' &&
+      options.subDomain === 'day'
     ) {
       // Create a list of all day names starting with Sunday or Monday, depending on configuration
       const daysOfTheWeek = [
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
       ];
       if (options.weekStartOnMonday) {
-        daysOfTheWeek.push("sunday");
+        daysOfTheWeek.push('sunday');
       } else {
-        daysOfTheWeek.shif("sunday");
+        daysOfTheWeek.shif('sunday');
       }
       // Get the first character of the day name
       const daysOfTheWeekAbbr = daysOfTheWeek.map(function (day) {
-        return self.formatDate(d3.time[day](new Date()), "%a").charAt(0);
+        return self.formatDate(time[day](new Date()), '%a').charAt(0);
       });
       // Append "day-name" group to SVG
       const dayLabelSvgGroup = this.root
-        .append("svg")
-        .attr("class", "day-name")
-        .attr("x", 0)
-        .attr("y", 0);
+        .append('svg')
+        .attr('class', 'day-name')
+        .attr('x', 0)
+        .attr('y', 0);
 
       const dayLabelSvg = dayLabelSvgGroup
-        .selectAll("g")
+        .selectAll('g')
         .data(daysOfTheWeekAbbr)
         .enter()
-        .append("g");
+        .append('g');
       // Styling "day-name-rect" elements
       dayLabelSvg
-        .append("rect")
-        .attr("class", "day-name-rect")
-        .attr("width", options.cellSize)
-        .attr("height", options.cellSize)
-        .attr("x", 0)
-        .attr("y", function (data, index) {
+        .append('rect')
+        .attr('class', 'day-name-rect')
+        .attr('width', options.cellSize)
+        .attr('height', options.cellSize)
+        .attr('x', 0)
+        .attr('y', function (data, index) {
           return index * options.cellSize + index * options.cellPadding;
         });
       // Adding day names to SVG
       dayLabelSvg
-        .append("text")
-        .attr("class", "day-name-text")
-        .attr("dominant-baseline", "central")
-        .attr("x", 0)
-        .attr("y", function (data, index) {
+        .append('text')
+        .attr('class', 'day-name-text')
+        .attr('dominant-baseline', 'central')
+        .attr('x', 0)
+        .attr('y', function (data, index) {
           return (
             index * options.cellSize +
             index * options.cellPadding +
@@ -961,47 +976,47 @@ const CalHeatMap = function () {
 
     const svg = domainSvg
       .enter()
-      .append("svg")
-      .attr("width", function (d) {
+      .append('svg')
+      .attr('width', function (d) {
         return w(d, true);
       })
-      .attr("height", function (d) {
+      .attr('height', function (d) {
         return h(d, true);
       })
-      .attr("x", function (d) {
+      .attr('x', function (d) {
         if (options.verticalOrientation) {
           self.graphDim.width = Math.max(self.graphDim.width, w(d, true));
           return 0;
         } else {
-          return getDomainPosition(d, self.graphDim, "width", w(d, true));
+          return getDomainPosition(d, self.graphDim, 'width', w(d, true));
         }
       })
-      .attr("y", function (d) {
+      .attr('y', function (d) {
         if (options.verticalOrientation) {
-          return getDomainPosition(d, self.graphDim, "height", h(d, true));
+          return getDomainPosition(d, self.graphDim, 'height', h(d, true));
         } else {
           self.graphDim.height = Math.max(self.graphDim.height, h(d, true));
           return 0;
         }
       })
-      .attr("class", function (d) {
-        let classname = "graph-domain";
+      .attr('class', function (d) {
+        let classname = 'graph-domain';
         const date = new Date(d);
         switch (options.domain) {
-          case "hour":
-            classname += " h_" + date.getHours();
+          case 'hour':
+            classname += ' h_' + date.getHours();
           /* falls through */
-          case "day":
-            classname += " d_" + date.getDate() + " dy_" + date.getDay();
+          case 'day':
+            classname += ' d_' + date.getDate() + ' dy_' + date.getDay();
           /* falls through */
-          case "week":
-            classname += " w_" + self.getWeekNumber(date);
+          case 'week':
+            classname += ' w_' + self.getWeekNumber(date);
           /* falls through */
-          case "month":
-            classname += " m_" + (date.getMonth() + 1);
+          case 'month':
+            classname += ' m_' + (date.getMonth() + 1);
           /* falls through */
-          case "year":
-            classname += " y_" + date.getFullYear();
+          case 'year':
+            classname += ' y_' + date.getFullYear();
         }
         return classname;
       });
@@ -1039,70 +1054,70 @@ const CalHeatMap = function () {
     }
 
     svg
-      .append("rect")
-      .attr("width", function (d) {
+      .append('rect')
+      .attr('width', function (d) {
         return w(d, true) - options.domainGutter - options.cellPadding;
       })
-      .attr("height", function (d) {
+      .attr('height', function (d) {
         return h(d, true) - options.domainGutter - options.cellPadding;
       })
-      .attr("class", "domain-background");
+      .attr('class', 'domain-background');
 
     // =========================================================================//
     // PAINTING SUBDOMAINS                            //
     // =========================================================================//
     const subDomainSvgGroup = svg
-      .append("svg")
-      .attr("x", function () {
-        if (options.label.position === "left") {
+      .append('svg')
+      .attr('x', function () {
+        if (options.label.position === 'left') {
           return self.domainHorizontalLabelWidth + options.domainMargin[3];
         } else {
           return options.domainMargin[3];
         }
       })
-      .attr("y", function () {
-        if (options.label.position === "top") {
+      .attr('y', function () {
+        if (options.label.position === 'top') {
           return self.domainVerticalLabelHeight + options.domainMargin[0];
         } else {
           return options.domainMargin[0];
         }
       })
-      .attr("class", "graph-subdomain-group");
+      .attr('class', 'graph-subdomain-group');
     const rect = subDomainSvgGroup
-      .selectAll("g")
+      .selectAll('g')
       .data(function (d) {
         return self._domains.get(d);
       })
       .enter()
-      .append("g");
+      .append('g');
     rect
-      .append("rect")
-      .attr("class", function (d) {
+      .append('rect')
+      .attr('class', function (d) {
         return (
-          "graph-rect" +
+          'graph-rect' +
           self.getHighlightClassName(d.t) +
-          (options.onClick !== null ? " hover_cursor" : "")
+          (options.onClick !== null ? ' hover_cursor' : '')
         );
       })
-      .attr("width", options.cellSize)
-      .attr("height", options.cellSize)
-      .attr("x", function (d) {
+      .attr('width', options.cellSize)
+      .attr('height', options.cellSize)
+      .attr('x', function (d) {
         return self.positionSubDomainX(d.t);
       })
-      .attr("y", function (d) {
+      .attr('y', function (d) {
         return self.positionSubDomainY(d.t);
       })
-      .on("click", function (ev, d) {
+      .on('click', function (ev, d) {
         if (options.onClick !== null) {
           return self.onClick(new Date(d.t), d.v);
         }
       })
-      .on("mouseover", function (d) {
+      .on('mouseover', function (d) {
         if (options.onMouseOver !== null) {
           return self.onMouseOver(new Date(d.t), d.v);
         }
       })
-      .on("mouseout", function (d) {
+      .on('mouseout', function (d) {
         if (options.onMouseOut !== null) {
           return self.onMouseOut(new Date(d.t), d.v);
         }
@@ -1110,24 +1125,24 @@ const CalHeatMap = function () {
       .call(function (selection) {
         if (options.cellRadius > 0) {
           selection
-            .attr("rx", options.cellRadius)
-            .attr("ry", options.cellRadius);
+            .attr('rx', options.cellRadius)
+            .attr('ry', options.cellRadius);
         }
 
         if (
           self.legendScale !== null &&
           options.legendColors !== null &&
-          options.legendColors.hasOwnProperty("base")
+          options.legendColors.hasOwnProperty('base')
         ) {
-          selection.attr("fill", options.legendColors.base);
+          selection.attr('fill', options.legendColors.base);
         }
 
         if (options.tooltip) {
-          selection.on("mouseover", function (ev, d) {
+          selection.on('mouseover', function (ev, d) {
             const domainNode = this.parentNode.parentNode;
 
             const showTooltip = function (title) {
-              self.tooltip.html(title).attr("style", "display: block;");
+              self.tooltip.html(title).attr('style', 'display: block;');
 
               let tooltipPositionX =
                 self.positionSubDomainX(d.t) -
@@ -1139,38 +1154,38 @@ const CalHeatMap = function () {
                 options.cellSize / 2;
 
               // Offset by the domain position
-              tooltipPositionX += parseInt(domainNode.getAttribute("x"), 10);
-              tooltipPositionY += parseInt(domainNode.getAttribute("y"), 10);
+              tooltipPositionX += parseInt(domainNode.getAttribute('x'), 10);
+              tooltipPositionY += parseInt(domainNode.getAttribute('y'), 10);
 
               // Offset by the calendar position (when legend is left/top)
               tooltipPositionX += parseInt(
-                self.root.select(".graph").attr("x"),
+                self.root.select('.graph').attr('x'),
                 10
               );
               tooltipPositionY += parseInt(
-                self.root.select(".graph").attr("y"),
+                self.root.select('.graph').attr('y'),
                 10
               );
 
               // Offset by the inside domain position (when label is left/top)
               tooltipPositionX += parseInt(
-                domainNode.parentNode.getAttribute("x"),
+                domainNode.parentNode.getAttribute('x'),
                 10
               );
               tooltipPositionY += parseInt(
-                domainNode.parentNode.getAttribute("y"),
+                domainNode.parentNode.getAttribute('y'),
                 10
               );
 
               self.tooltip.attr(
-                "style",
-                "display: block; " +
-                  "left: " +
+                'style',
+                'display: block; ' +
+                  'left: ' +
                   tooltipPositionX +
-                  "px; " +
-                  "top: " +
+                  'px; ' +
+                  'top: ' +
                   tooltipPositionY +
-                  "px;"
+                  'px;'
               );
             };
 
@@ -1181,15 +1196,15 @@ const CalHeatMap = function () {
             }
           });
 
-          selection.on("mouseout", function () {
-            self.tooltip.attr("style", "display:none").html("");
+          selection.on('mouseout', function () {
+            self.tooltip.attr('style', 'display:none').html('');
           });
         }
       });
 
     // Appending a title to each subdomain
     if (!options.tooltip) {
-      rect.append("title").text(function (d) {
+      rect.append('title').text(function (d) {
         return self.formatDate(new Date(d.t), options.subDomainDateFormat);
       });
     }
@@ -1197,66 +1212,66 @@ const CalHeatMap = function () {
     // =========================================================================//
     // PAINTING LABEL                              //
     // =========================================================================//
-    if (options.domainLabelFormat !== "") {
+    if (options.domainLabelFormat !== '') {
       svg
-        .append("text")
-        .attr("class", "graph-label")
-        .attr("y", function (d) {
+        .append('text')
+        .attr('class', 'graph-label')
+        .attr('y', function (d) {
           let y = options.domainMargin[0];
           switch (options.label.position) {
-            case "top":
+            case 'top':
               y += self.domainVerticalLabelHeight / 2;
               break;
-            case "bottom":
+            case 'bottom':
               y += h(d) + self.domainVerticalLabelHeight / 2;
           }
 
           return (
             y +
             options.label.offset.y *
-              ((options.label.rotate === "right" &&
-                options.label.position === "right") ||
-              (options.label.rotate === "left" &&
-                options.label.position === "left")
+              ((options.label.rotate === 'right' &&
+                options.label.position === 'right') ||
+              (options.label.rotate === 'left' &&
+                options.label.position === 'left')
                 ? -1
                 : 1)
           );
         })
-        .attr("x", function (d) {
+        .attr('x', function (d) {
           let x = options.domainMargin[3];
           switch (options.label.position) {
-            case "right":
+            case 'right':
               x += w(d);
               break;
-            case "bottom":
-            case "top":
+            case 'bottom':
+            case 'top':
               x += w(d) / 2;
           }
 
-          if (options.label.align === "right") {
+          if (options.label.align === 'right') {
             return (
               x +
               self.domainHorizontalLabelWidth -
               options.label.offset.x *
-                (options.label.rotate === "right" ? -1 : 1)
+                (options.label.rotate === 'right' ? -1 : 1)
             );
           }
           return x + options.label.offset.x;
         })
-        .attr("text-anchor", function () {
+        .attr('text-anchor', function () {
           switch (options.label.align) {
-            case "start":
-            case "left":
-              return "start";
-            case "end":
-            case "right":
-              return "end";
+            case 'start':
+            case 'left':
+              return 'start';
+            case 'end':
+            case 'right':
+              return 'end';
             default:
-              return "middle";
+              return 'middle';
           }
         })
-        .attr("dominant-baseline", function () {
-          return self.verticalDomainLabel ? "middle" : "top";
+        .attr('dominant-baseline', function () {
+          return self.verticalDomainLabel ? 'middle' : 'top';
         })
         .text(function (d) {
           return self.formatDate(new Date(d), options.domainLabelFormat);
@@ -1266,40 +1281,40 @@ const CalHeatMap = function () {
 
     function domainRotate(selection) {
       switch (options.label.rotate) {
-        case "right":
-          selection.attr("transform", function (d) {
-            let s = "rotate(90), ";
+        case 'right':
+          selection.attr('transform', function (d) {
+            let s = 'rotate(90), ';
             switch (options.label.position) {
-              case "right":
-                s += "translate(-" + w(d) + " , -" + w(d) + ")";
+              case 'right':
+                s += 'translate(-' + w(d) + ' , -' + w(d) + ')';
                 break;
-              case "left":
-                s += "translate(0, -" + self.domainHorizontalLabelWidth + ")";
+              case 'left':
+                s += 'translate(0, -' + self.domainHorizontalLabelWidth + ')';
                 break;
             }
 
             return s;
           });
           break;
-        case "left":
-          selection.attr("transform", function (d) {
-            let s = "rotate(270), ";
+        case 'left':
+          selection.attr('transform', function (d) {
+            let s = 'rotate(270), ';
             switch (options.label.position) {
-              case "right":
+              case 'right':
                 s +=
-                  "translate(-" +
+                  'translate(-' +
                   (w(d) + self.domainHorizontalLabelWidth) +
-                  " , " +
+                  ' , ' +
                   w(d) +
-                  ")";
+                  ')';
                 break;
-              case "left":
+              case 'left':
                 s +=
-                  "translate(-" +
+                  'translate(-' +
                   self.domainHorizontalLabelWidth +
-                  " , " +
+                  ' , ' +
                   self.domainHorizontalLabelWidth +
-                  ")";
+                  ')';
                 break;
             }
 
@@ -1314,18 +1329,18 @@ const CalHeatMap = function () {
     // =========================================================================//
     if (options.subDomainTextFormat !== null) {
       rect
-        .append("text")
-        .attr("class", function (d) {
-          return "subdomain-text" + self.getHighlightClassName(d.t);
+        .append('text')
+        .attr('class', function (d) {
+          return 'subdomain-text' + self.getHighlightClassName(d.t);
         })
-        .attr("x", function (d) {
+        .attr('x', function (d) {
           return self.positionSubDomainX(d.t) + options.cellSize / 2;
         })
-        .attr("y", function (d) {
+        .attr('y', function (d) {
           return self.positionSubDomainY(d.t) + options.cellSize / 2;
         })
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "central")
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'central')
         .text(function (d) {
           return self.formatDate(new Date(d.t), options.subDomainTextFormat);
         });
@@ -1336,8 +1351,8 @@ const CalHeatMap = function () {
     // =========================================================================//
 
     domainSvg = self.root
-      .select(".graph")
-      .selectAll(".graph-domain")
+      .select('.graph')
+      .selectAll('.graph-domain')
       .data(
         function () {
           const data = self.getDomainKeys();
@@ -1351,12 +1366,12 @@ const CalHeatMap = function () {
       domainSvg
         .transition()
         .duration(options.animationDuration)
-        .attr("x", function (d) {
+        .attr('x', function (d) {
           return options.verticalOrientation
             ? 0
             : self.domainPosition.getPosition(d);
         })
-        .attr("y", function (d) {
+        .attr('y', function (d) {
           return options.verticalOrientation
             ? self.domainPosition.getPosition(d)
             : 0;
@@ -1377,7 +1392,7 @@ const CalHeatMap = function () {
       .exit()
       .transition()
       .duration(options.animationDuration)
-      .attr("x", function (d) {
+      .attr('x', function (d) {
         if (options.verticalOrientation) {
           return 0;
         } else {
@@ -1389,7 +1404,7 @@ const CalHeatMap = function () {
           }
         }
       })
-      .attr("y", function (d) {
+      .attr('y', function (d) {
         if (options.verticalOrientation) {
           switch (navigationDir) {
             case self.NAVIGATE_LEFT:
@@ -1417,7 +1432,7 @@ CalHeatMap.prototype = {
    */
   /* jshint maxstatements:false */
   init: function (settings) {
-    "use strict";
+    'use strict';
 
     const parent = this;
 
@@ -1426,7 +1441,7 @@ CalHeatMap.prototype = {
     // Fatal errors
     // Stop script execution on error
     validateDomainType();
-    validateSelector(options.itemSelector, false, "itemSelector");
+    validateSelector(options.itemSelector, false, 'itemSelector');
 
     if (parent.allowedDataType.indexOf(options.dataType) === -1) {
       throw new Error(
@@ -1434,7 +1449,7 @@ CalHeatMap.prototype = {
       );
     }
 
-    if (d3.select(options.itemSelector).empty()) {
+    if (select(options.itemSelector).empty()) {
       throw new Error(
         "The node '" +
           options.itemSelector +
@@ -1443,8 +1458,8 @@ CalHeatMap.prototype = {
     }
 
     try {
-      validateSelector(options.nextSelector, true, "nextSelector");
-      validateSelector(options.previousSelector, true, "previousSelector");
+      validateSelector(options.nextSelector, true, 'nextSelector');
+      validateSelector(options.previousSelector, true, 'previousSelector');
     } catch (error) {
       console.log(error.message);
       return false;
@@ -1452,34 +1467,34 @@ CalHeatMap.prototype = {
 
     // If other settings contains error, will fallback to default
 
-    if (!settings.hasOwnProperty("subDomain")) {
+    if (!settings.hasOwnProperty('subDomain')) {
       this.options.subDomain = getOptimalSubDomain(settings.domain);
     }
 
     if (
-      typeof options.itemNamespace !== "string" ||
-      options.itemNamespace === ""
+      typeof options.itemNamespace !== 'string' ||
+      options.itemNamespace === ''
     ) {
       console.log(
-        "itemNamespace can not be empty, falling back to cal-heatmap"
+        'itemNamespace can not be empty, falling back to cal-heatmap'
       );
-      options.itemNamespace = "cal-heatmap";
+      options.itemNamespace = 'cal-heatmap';
     }
 
     // Don't touch these settings
     const s = [
-      "data",
-      "onComplete",
-      "onClick",
-      "onResize",
-      "onMouseOver",
-      "onMouseOut",
-      "afterLoad",
-      "afterLoadData",
-      "afterLoadPreviousDomain",
-      "afterLoadNextDomain",
-      "afterUpdate",
-      "onTooltip",
+      'data',
+      'onComplete',
+      'onClick',
+      'onResize',
+      'onMouseOver',
+      'onMouseOut',
+      'afterLoad',
+      'afterLoadData',
+      'afterLoadPreviousDomain',
+      'afterLoadNextDomain',
+      'afterUpdate',
+      'onTooltip',
     ];
 
     for (const k in s) {
@@ -1489,19 +1504,19 @@ CalHeatMap.prototype = {
     }
 
     options.subDomainDateFormat =
-      typeof options.subDomainDateFormat === "string" ||
-      typeof options.subDomainDateFormat === "function"
+      typeof options.subDomainDateFormat === 'string' ||
+      typeof options.subDomainDateFormat === 'function'
         ? options.subDomainDateFormat
         : this._domainType[options.subDomain].format.date;
     options.domainLabelFormat =
-      typeof options.domainLabelFormat === "string" ||
-      typeof options.domainLabelFormat === "function"
+      typeof options.domainLabelFormat === 'string' ||
+      typeof options.domainLabelFormat === 'function'
         ? options.domainLabelFormat
         : this._domainType[options.domain].format.legend;
     options.subDomainTextFormat =
-      (typeof options.subDomainTextFormat === "string" &&
-        options.subDomainTextFormat !== "") ||
-      typeof options.subDomainTextFormat === "function"
+      (typeof options.subDomainTextFormat === 'string' &&
+        options.subDomainTextFormat !== '') ||
+      typeof options.subDomainTextFormat === 'function'
         ? options.subDomainTextFormat
         : null;
     options.domainMargin = expandMarginSetting(options.domainMargin);
@@ -1510,7 +1525,7 @@ CalHeatMap.prototype = {
     options.itemName = expandItemName(options.itemName);
     options.colLimit = parseColLimit(options.colLimit);
     options.rowLimit = parseRowLimit(options.rowLimit);
-    if (!settings.hasOwnProperty("legendMargin")) {
+    if (!settings.hasOwnProperty('legendMargin')) {
       autoAddLegendMargin();
     }
     autoAlignLabel();
@@ -1528,12 +1543,12 @@ CalHeatMap.prototype = {
       if (
         ((canBeFalse && selector === false) ||
           selector instanceof Element ||
-          typeof selector === "string") &&
-        selector !== ""
+          typeof selector === 'string') &&
+        selector !== ''
       ) {
         return true;
       }
-      throw new Error("The " + name + " is not valid");
+      throw new Error('The ' + name + ' is not valid');
     }
 
     /**
@@ -1544,16 +1559,16 @@ CalHeatMap.prototype = {
      */
     function getOptimalSubDomain(domain) {
       switch (domain) {
-        case "year":
-          return "month";
-        case "month":
-          return "day";
-        case "week":
-          return "day";
-        case "day":
-          return "hour";
+        case 'year':
+          return 'month';
+        case 'month':
+          return 'day';
+        case 'week':
+          return 'day';
+        case 'day':
+          return 'hour';
         default:
-          return "min";
+          return 'min';
       }
     }
 
@@ -1566,15 +1581,15 @@ CalHeatMap.prototype = {
     function validateDomainType() {
       if (
         !parent._domainType.hasOwnProperty(options.domain) ||
-        options.domain === "min" ||
-        options.domain.substring(0, 2) === "x_"
+        options.domain === 'min' ||
+        options.domain.substring(0, 2) === 'x_'
       ) {
         throw new Error("The domain '" + options.domain + "' is not valid");
       }
 
       if (
         !parent._domainType.hasOwnProperty(options.subDomain) ||
-        options.subDomain === "year"
+        options.subDomain === 'year'
       ) {
         throw new Error(
           "The subDomain '" + options.subDomain + "' is not valid"
@@ -1605,36 +1620,36 @@ CalHeatMap.prototype = {
     function autoAlignLabel() {
       // Auto-align label, depending on it's position
       if (
-        !settings.hasOwnProperty("label") ||
-        (settings.hasOwnProperty("label") &&
-          !settings.label.hasOwnProperty("align"))
+        !settings.hasOwnProperty('label') ||
+        (settings.hasOwnProperty('label') &&
+          !settings.label.hasOwnProperty('align'))
       ) {
         switch (options.label.position) {
-          case "left":
-            options.label.align = "right";
+          case 'left':
+            options.label.align = 'right';
             break;
-          case "right":
-            options.label.align = "left";
+          case 'right':
+            options.label.align = 'left';
             break;
           default:
-            options.label.align = "center";
+            options.label.align = 'center';
         }
 
-        if (options.label.rotate === "left") {
-          options.label.align = "right";
-        } else if (options.label.rotate === "right") {
-          options.label.align = "left";
+        if (options.label.rotate === 'left') {
+          options.label.align = 'right';
+        } else if (options.label.rotate === 'right') {
+          options.label.align = 'left';
         }
       }
 
       if (
-        !settings.hasOwnProperty("label") ||
-        (settings.hasOwnProperty("label") &&
-          !settings.label.hasOwnProperty("offset"))
+        !settings.hasOwnProperty('label') ||
+        (settings.hasOwnProperty('label') &&
+          !settings.label.hasOwnProperty('offset'))
       ) {
         if (
-          options.label.position === "left" ||
-          options.label.position === "right"
+          options.label.position === 'left' ||
+          options.label.position === 'right'
         ) {
           options.label.offset = {
             x: 10,
@@ -1651,16 +1666,16 @@ CalHeatMap.prototype = {
      */
     function autoAddLegendMargin() {
       switch (options.legendVerticalPosition) {
-        case "top":
+        case 'top':
           options.legendMargin[2] = parent.DEFAULT_LEGEND_MARGIN;
           break;
-        case "bottom":
+        case 'bottom':
           options.legendMargin[0] = parent.DEFAULT_LEGEND_MARGIN;
           break;
-        case "middle":
-        case "center":
+        case 'middle':
+        case 'center':
           options.legendMargin[
-            options.legendHorizontalPosition === "right" ? 3 : 1
+            options.legendHorizontalPosition === 'right' ? 3 : 1
           ] = parent.DEFAULT_LEGEND_MARGIN;
       }
     }
@@ -1672,12 +1687,12 @@ CalHeatMap.prototype = {
      * @return {array}        array
      */
     function expandMarginSetting(value) {
-      if (typeof value === "number") {
+      if (typeof value === 'number') {
         value = [value];
       }
 
       if (!Array.isArray(value)) {
-        console.log("Margin only takes an integer or an array of integers");
+        console.log('Margin only takes an integer or an array of integers');
         value = [0];
       }
 
@@ -1702,13 +1717,13 @@ CalHeatMap.prototype = {
      * @return {array}       An array like [singular-form, plural-form]
      */
     function expandItemName(value) {
-      if (typeof value === "string") {
-        return [value, value + (value !== "" ? "s" : "")];
+      if (typeof value === 'string') {
+        return [value, value + (value !== '' ? 's' : '')];
       }
 
       if (Array.isArray(value)) {
         if (value.length === 1) {
-          return [value[0], value[0] + "s"];
+          return [value[0], value[0] + 's'];
         } else if (value.length > 2) {
           return value.slice(0, 2);
         }
@@ -1716,7 +1731,7 @@ CalHeatMap.prototype = {
         return value;
       }
 
-      return ["item", "items"];
+      return ['item', 'items'];
     }
 
     function parseColLimit(value) {
@@ -1726,7 +1741,7 @@ CalHeatMap.prototype = {
     function parseRowLimit(value) {
       if (value > 0 && options.colLimit > 0) {
         console.log(
-          "colLimit and rowLimit are mutually exclusive, rowLimit will be ignored"
+          'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored'
         );
         return null;
       }
@@ -1743,7 +1758,7 @@ CalHeatMap.prototype = {
    * @return {array}       An array of Dates
    */
   expandDateSetting: function (value) {
-    "use strict";
+    'use strict';
 
     if (!Array.isArray(value)) {
       value = [value];
@@ -1751,7 +1766,7 @@ CalHeatMap.prototype = {
 
     return value
       .map(function (data) {
-        if (data === "now") {
+        if (data === 'now') {
           return new Date();
         }
         if (data instanceof Date) {
@@ -1772,18 +1787,18 @@ CalHeatMap.prototype = {
    * @return void
    */
   fill: function (svg) {
-    "use strict";
+    'use strict';
 
     const parent = this;
     const options = parent.options;
 
     if (arguments.length === 0) {
-      svg = parent.root.selectAll(".graph-domain");
+      svg = parent.root.selectAll('.graph-domain');
     }
 
     const rect = svg
-      .selectAll("svg")
-      .selectAll("g")
+      .selectAll('svg')
+      .selectAll('g')
       .data(function (d) {
         return parent._domains.get(d) || [];
       });
@@ -1795,23 +1810,23 @@ CalHeatMap.prototype = {
         return false;
       }
 
-      element.attr("fill", function (d) {
+      element.attr('fill', function (d) {
         if (
           d.v === null &&
-          options.hasOwnProperty("considerMissingDataAsZero") &&
+          options.hasOwnProperty('considerMissingDataAsZero') &&
           !options.considerMissingDataAsZero
         ) {
-          if (options.legendColors.hasOwnProperty("base")) {
+          if (options.legendColors.hasOwnProperty('base')) {
             return options.legendColors.base;
           }
         }
 
         if (
           options.legendColors !== null &&
-          options.legendColors.hasOwnProperty("empty") &&
+          options.legendColors.hasOwnProperty('empty') &&
           (d.v === 0 ||
             (d.v === null &&
-              options.hasOwnProperty("considerMissingDataAsZero") &&
+              options.hasOwnProperty('considerMissingDataAsZero') &&
               options.considerMissingDataAsZero))
         ) {
           return options.legendColors.empty;
@@ -1821,7 +1836,7 @@ CalHeatMap.prototype = {
           d.v < 0 &&
           options.legend[0] > 0 &&
           options.legendColors !== null &&
-          options.legendColors.hasOwnProperty("overflow")
+          options.legendColors.hasOwnProperty('overflow')
         ) {
           return options.legendColors.overflow;
         }
@@ -1835,19 +1850,19 @@ CalHeatMap.prototype = {
     rect
       .transition()
       .duration(options.animationDuration)
-      .select("rect")
-      .attr("class", function (d) {
-        const htmlClass = parent.getHighlightClassName(d.t).trim().split(" ");
+      .select('rect')
+      .attr('class', function (d) {
+        const htmlClass = parent.getHighlightClassName(d.t).trim().split(' ');
         const pastDate = parent.dateIsLessThan(d.t, new Date());
 
         if (
           parent.legendScale === null ||
           (d.v === null &&
-            options.hasOwnProperty("considerMissingDataAsZero") &&
+            options.hasOwnProperty('considerMissingDataAsZero') &&
             !options.considerMissingDataAsZero &&
-            !options.legendColors.hasOwnProperty("base"))
+            !options.legendColors.hasOwnProperty('base'))
         ) {
-          htmlClass.push("graph-rect");
+          htmlClass.push('graph-rect');
         }
 
         if (d.v !== null) {
@@ -1861,23 +1876,23 @@ CalHeatMap.prototype = {
         }
 
         if (options.onClick !== null) {
-          htmlClass.push("hover_cursor");
+          htmlClass.push('hover_cursor');
         }
 
-        return htmlClass.join(" ");
+        return htmlClass.join(' ');
       })
       .call(addStyle);
 
     rect
       .transition()
       .duration(options.animationDuration)
-      .select("title")
+      .select('title')
       .text(function (d) {
         return parent.getSubDomainTitle(d);
       });
 
     function formatSubDomainText(element) {
-      if (typeof options.subDomainTextFormat === "function") {
+      if (typeof options.subDomainTextFormat === 'function') {
         element.text(function (d) {
           return options.subDomainTextFormat(d.t, d.v);
         });
@@ -1892,9 +1907,9 @@ CalHeatMap.prototype = {
     rect
       .transition()
       .duration(options.animationDuration)
-      .select("text")
-      .attr("class", function (d) {
-        return "subdomain-text" + parent.getHighlightClassName(d.t);
+      .select('text')
+      .attr('class', function (d) {
+        return 'subdomain-text' + parent.getHighlightClassName(d.t);
       })
       .call(formatSubDomainText);
   },
@@ -1909,10 +1924,10 @@ CalHeatMap.prototype = {
    * @return String
    */
   formatStringWithObject: function (formatted, args) {
-    "use strict";
+    'use strict';
     for (const prop in args) {
       if (args.hasOwnProperty(prop)) {
-        const regexp = new RegExp("\\{" + prop + "\\}", "gi");
+        const regexp = new RegExp('\\{' + prop + '\\}', 'gi');
         formatted = formatted.replace(regexp, args[prop]);
       }
     }
@@ -1932,19 +1947,19 @@ CalHeatMap.prototype = {
    * @return mixed  True when the triggering was skipped, false on error, else the callback function
    */
   triggerEvent: function (eventName, successArgs, skip) {
-    "use strict";
+    'use strict';
 
     if ((arguments.length === 3 && skip) || this.options[eventName] === null) {
       return true;
     }
 
-    if (typeof this.options[eventName] === "function") {
-      if (typeof successArgs === "function") {
+    if (typeof this.options[eventName] === 'function') {
+      if (typeof successArgs === 'function') {
         successArgs = successArgs();
       }
       return this.options[eventName].apply(this, successArgs);
     } else {
-      console.log("Provided callback for " + eventName + " is not a function.");
+      console.log('Provided callback for ' + eventName + ' is not a function.');
       return false;
     }
   },
@@ -1956,9 +1971,9 @@ CalHeatMap.prototype = {
    * @param  int    itemNb  Number of items in that date
    */
   onClick: function (d, itemNb) {
-    "use strict";
+    'use strict';
 
-    return this.triggerEvent("onClick", [d, itemNb]);
+    return this.triggerEvent('onClick', [d, itemNb]);
   },
 
   /**
@@ -1968,9 +1983,9 @@ CalHeatMap.prototype = {
    * @param  int    itemNb  Number of items in that date
    */
   onMouseOver: function (d, itemNb) {
-    "use strict";
+    'use strict';
 
-    return this.triggerEvent("onMouseOver", [d, itemNb]);
+    return this.triggerEvent('onMouseOver', [d, itemNb]);
   },
 
   /**
@@ -1980,27 +1995,27 @@ CalHeatMap.prototype = {
    * @param  int    itemNb  Number of items in that date
    */
   onMouseOut: function (d, itemNb) {
-    "use strict";
+    'use strict';
 
-    return this.triggerEvent("onMouseOut", [d, itemNb]);
+    return this.triggerEvent('onMouseOut', [d, itemNb]);
   },
 
   /**
    * Event triggered after drawing the calendar, byt before filling it with data
    */
   afterLoad: function () {
-    "use strict";
+    'use strict';
 
-    return this.triggerEvent("afterLoad");
+    return this.triggerEvent('afterLoad');
   },
 
   /**
    * Event triggered after completing drawing and filling the calendar
    */
   onComplete: function () {
-    "use strict";
+    'use strict';
 
-    const response = this.triggerEvent("onComplete", [], this._completed);
+    const response = this.triggerEvent('onComplete', [], this._completed);
     this._completed = true;
     return response;
   },
@@ -2009,9 +2024,9 @@ CalHeatMap.prototype = {
    * Event triggered after resize event
    */
   onResize: function (h, w) {
-    "use strict";
+    'use strict';
 
-    return this.triggerEvent("onResize", [h, w]);
+    return this.triggerEvent('onResize', [h, w]);
   },
 
   /**
@@ -2021,10 +2036,10 @@ CalHeatMap.prototype = {
    * @param  Date    end    Domain end date
    */
   afterLoadPreviousDomain: function (start) {
-    "use strict";
+    'use strict';
 
     const parent = this;
-    return this.triggerEvent("afterLoadPreviousDomain", function () {
+    return this.triggerEvent('afterLoadPreviousDomain', function () {
       const subDomain = parent.getSubDomain(start);
       return [subDomain.shift(), subDomain.pop()];
     });
@@ -2037,10 +2052,10 @@ CalHeatMap.prototype = {
    * @param  Date    end    Domain end date
    */
   afterLoadNextDomain: function (start) {
-    "use strict";
+    'use strict';
 
     const parent = this;
-    return this.triggerEvent("afterLoadNextDomain", function () {
+    return this.triggerEvent('afterLoadNextDomain', function () {
       const subDomain = parent.getSubDomain(start);
       return [subDomain.shift(), subDomain.pop()];
     });
@@ -2052,10 +2067,10 @@ CalHeatMap.prototype = {
    * @param  boolean  reached True if the leftmost domain was reached
    */
   onMinDomainReached: function (reached) {
-    "use strict";
+    'use strict';
 
     this._minDomainReached = reached;
-    return this.triggerEvent("onMinDomainReached", [reached]);
+    return this.triggerEvent('onMinDomainReached', [reached]);
   },
 
   /**
@@ -2064,14 +2079,14 @@ CalHeatMap.prototype = {
    * @param  boolean  reached True if the rightmost domain was reached
    */
   onMaxDomainReached: function (reached) {
-    "use strict";
+    'use strict';
 
     this._maxDomainReached = reached;
-    return this.triggerEvent("onMaxDomainReached", [reached]);
+    return this.triggerEvent('onMaxDomainReached', [reached]);
   },
 
   checkIfMinDomainIsReached: function (date, upperBound) {
-    "use strict";
+    'use strict';
 
     if (this.minDomainIsReached(date)) {
       this.onMinDomainReached(true);
@@ -2085,7 +2100,7 @@ CalHeatMap.prototype = {
   },
 
   checkIfMaxDomainIsReached: function (date, lowerBound) {
-    "use strict";
+    'use strict';
 
     if (this.maxDomainIsReached(date)) {
       this.onMaxDomainReached(true);
@@ -2099,34 +2114,34 @@ CalHeatMap.prototype = {
   },
 
   afterUpdate: function () {
-    "use strict";
+    'use strict';
 
-    return this.triggerEvent("afterUpdate");
+    return this.triggerEvent('afterUpdate');
   },
 
   // =========================================================================//
   // FORMATTER                                //
   // =========================================================================//
 
-  formatNumber: d3.format(",d"),
+  formatNumber: format(',d'),
 
   formatDate: function (d, format) {
-    "use strict";
+    'use strict';
 
     if (arguments.length < 2) {
-      format = "title";
+      format = 'title';
     }
 
-    if (typeof format === "function") {
+    if (typeof format === 'function') {
       return format(d);
     } else {
-      const f = d3.timeFormat(format);
+      const f = timeFormat(format);
       return f(d);
     }
   },
 
   getSubDomainTitle: function (d) {
-    "use strict";
+    'use strict';
 
     if (d.v === null && !this.options.considerMissingDataAsZero) {
       return this.formatStringWithObject(
@@ -2173,7 +2188,7 @@ CalHeatMap.prototype = {
    * @return bool True if the next domain was loaded, else false
    */
   loadNextDomain: function (n) {
-    "use strict";
+    'use strict';
 
     if (this._maxDomainReached || n === 0) {
       return false;
@@ -2199,7 +2214,7 @@ CalHeatMap.prototype = {
    * @return bool True if the previous domain was loaded, else false
    */
   loadPreviousDomain: function (n) {
-    "use strict";
+    'use strict';
 
     if (this._minDomainReached || n === 0) {
       return false;
@@ -2217,7 +2232,7 @@ CalHeatMap.prototype = {
   },
 
   loadNewDomains: function (direction, newDomains) {
-    "use strict";
+    'use strict';
 
     const parent = this;
     const backward = direction === this.NAVIGATE_LEFT;
@@ -2285,7 +2300,7 @@ CalHeatMap.prototype = {
    * @return bool True if the specified date correspond to the calendar upper bound
    */
   maxDomainIsReached: function (datetimestamp) {
-    "use strict";
+    'use strict';
 
     return (
       this.options.maxDate !== null &&
@@ -2300,7 +2315,7 @@ CalHeatMap.prototype = {
    * @return bool True if the specified date correspond to the calendar lower bound
    */
   minDomainIsReached: function (datetimestamp) {
-    "use strict";
+    'use strict';
 
     return (
       this.options.minDate !== null &&
@@ -2314,7 +2329,7 @@ CalHeatMap.prototype = {
    * @return Array a sorted array of timestamp
    */
   getDomainKeys: function () {
-    "use strict";
+    'use strict';
 
     return Array.from(this._domains.keys())
       .map(function (d) {
@@ -2330,7 +2345,7 @@ CalHeatMap.prototype = {
   // =========================================================================//
 
   positionSubDomainX: function (d) {
-    "use strict";
+    'use strict';
 
     const index = this._domainType[this.options.subDomain].position.x(
       new Date(d)
@@ -2339,7 +2354,7 @@ CalHeatMap.prototype = {
   },
 
   positionSubDomainY: function (d) {
-    "use strict";
+    'use strict';
 
     const index = this._domainType[this.options.subDomain].position.y(
       new Date(d)
@@ -2348,36 +2363,36 @@ CalHeatMap.prototype = {
   },
 
   getSubDomainColumnNumber: function (d) {
-    "use strict";
+    'use strict';
 
     if (this.options.rowLimit > 0) {
       let i = this._domainType[this.options.subDomain].maxItemNumber;
-      if (typeof i === "function") {
+      if (typeof i === 'function') {
         i = i(d);
       }
       return Math.ceil(i / this.options.rowLimit);
     }
 
     let j = this._domainType[this.options.subDomain].defaultColumnNumber;
-    if (typeof j === "function") {
+    if (typeof j === 'function') {
       j = j(d);
     }
     return this.options.colLimit || j;
   },
 
   getSubDomainRowNumber: function (d) {
-    "use strict";
+    'use strict';
 
     if (this.options.colLimit > 0) {
       let i = this._domainType[this.options.subDomain].maxItemNumber;
-      if (typeof i === "function") {
+      if (typeof i === 'function') {
         i = i(d);
       }
       return Math.ceil(i / this.options.colLimit);
     }
 
     let j = this._domainType[this.options.subDomain].defaultRowNumber;
-    if (typeof j === "function") {
+    if (typeof j === 'function') {
       j = j(d);
     }
     return this.options.rowLimit || j;
@@ -2390,7 +2405,7 @@ CalHeatMap.prototype = {
    * @return String the highlight class
    */
   getHighlightClassName: function (d) {
-    "use strict";
+    'use strict';
 
     d = new Date(d);
 
@@ -2398,12 +2413,12 @@ CalHeatMap.prototype = {
       for (const i in this.options.highlight) {
         if (this.dateIsEqual(this.options.highlight[i], d)) {
           return this.isNow(this.options.highlight[i])
-            ? " highlight-now"
-            : " highlight";
+            ? ' highlight-now'
+            : ' highlight';
         }
       }
     }
-    return "";
+    return '';
   },
 
   /**
@@ -2414,7 +2429,7 @@ CalHeatMap.prototype = {
    * @return bool True if the date correspond to a subdomain cell
    */
   isNow: function (d) {
-    "use strict";
+    'use strict';
 
     return this.dateIsEqual(d, new Date());
   },
@@ -2430,7 +2445,7 @@ CalHeatMap.prototype = {
    */
   /* jshint maxcomplexity: false */
   dateIsEqual: function (dateA, dateB) {
-    "use strict";
+    'use strict';
 
     if (!(dateA instanceof Date)) {
       dateA = new Date(dateA);
@@ -2441,8 +2456,8 @@ CalHeatMap.prototype = {
     }
 
     switch (this.options.subDomain) {
-      case "x_min":
-      case "min":
+      case 'x_min':
+      case 'min':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
           dateA.getMonth() === dateB.getMonth() &&
@@ -2450,29 +2465,29 @@ CalHeatMap.prototype = {
           dateA.getHours() === dateB.getHours() &&
           dateA.getMinutes() === dateB.getMinutes()
         );
-      case "x_hour":
-      case "hour":
+      case 'x_hour':
+      case 'hour':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
           dateA.getMonth() === dateB.getMonth() &&
           dateA.getDate() === dateB.getDate() &&
           dateA.getHours() === dateB.getHours()
         );
-      case "x_day":
-      case "day":
+      case 'x_day':
+      case 'day':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
           dateA.getMonth() === dateB.getMonth() &&
           dateA.getDate() === dateB.getDate()
         );
-      case "x_week":
-      case "week":
+      case 'x_week':
+      case 'week':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
           this.getWeekNumber(dateA) === this.getWeekNumber(dateB)
         );
-      case "x_month":
-      case "month":
+      case 'x_month':
+      case 'month':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
           dateA.getMonth() === dateB.getMonth()
@@ -2490,7 +2505,7 @@ CalHeatMap.prototype = {
    * @returns {boolean}
    */
   dateIsLessThan: function (dateA, dateB) {
-    "use strict";
+    'use strict';
 
     if (!(dateA instanceof Date)) {
       dateA = new Date(dateA);
@@ -2502,8 +2517,8 @@ CalHeatMap.prototype = {
 
     function normalizedMillis(date, subdomain) {
       switch (subdomain) {
-        case "x_min":
-        case "min":
+        case 'x_min':
+        case 'min':
           return new Date(
             date.getFullYear(),
             date.getMonth(),
@@ -2511,25 +2526,25 @@ CalHeatMap.prototype = {
             date.getHours(),
             date.getMinutes()
           ).getTime();
-        case "x_hour":
-        case "hour":
+        case 'x_hour':
+        case 'hour':
           return new Date(
             date.getFullYear(),
             date.getMonth(),
             date.getDate(),
             date.getHours()
           ).getTime();
-        case "x_day":
-        case "day":
+        case 'x_day':
+        case 'day':
           return new Date(
             date.getFullYear(),
             date.getMonth(),
             date.getDate()
           ).getTime();
-        case "x_week":
-        case "week":
-        case "x_month":
-        case "month":
+        case 'x_week':
+        case 'week':
+        case 'x_month':
+        case 'month':
           return new Date(date.getFullYear(), date.getMonth()).getTime();
         default:
           return date.getTime();
@@ -2551,7 +2566,7 @@ CalHeatMap.prototype = {
    * @param  Date
    * @return  int Day of the year [1,366]
    */
-  getDayOfYear: d3.timeFormat("%j"),
+  getDayOfYear: timeFormat('%j'),
 
   /**
    * Return the week number of the year
@@ -2559,12 +2574,12 @@ CalHeatMap.prototype = {
    * @return int  Week number [0-53]
    */
   getWeekNumber: function (d) {
-    "use strict";
+    'use strict';
 
     const f =
       this.options.weekStartOnMonday === true
-        ? d3.timeFormat("%W")
-        : d3.timeFormat("%U");
+        ? timeFormat('%W')
+        : timeFormat('%U');
     return f(d);
   },
 
@@ -2575,9 +2590,9 @@ CalHeatMap.prototype = {
    * @return int Week number, relative to the month [0-5]
    */
   getMonthWeekNumber: function (d) {
-    "use strict";
+    'use strict';
 
-    if (typeof d === "number") {
+    if (typeof d === 'number') {
       d = new Date(d);
     }
 
@@ -2594,9 +2609,9 @@ CalHeatMap.prototype = {
    * @return int Number of weeks in the date's year
    */
   getWeekNumberInYear: function (d) {
-    "use strict";
+    'use strict';
 
-    if (typeof d === "number") {
+    if (typeof d === 'number') {
       d = new Date(d);
     }
   },
@@ -2608,7 +2623,7 @@ CalHeatMap.prototype = {
    * @return int Number of days in the date's month
    */
   getDayCountInMonth: function (d) {
-    "use strict";
+    'use strict';
 
     return this.getEndOfMonth(d).getDate();
   },
@@ -2620,9 +2635,9 @@ CalHeatMap.prototype = {
    * @return int Number of days in the date's year
    */
   getDayCountInYear: function (d) {
-    "use strict";
+    'use strict';
 
-    if (typeof d === "number") {
+    if (typeof d === 'number') {
       d = new Date(d);
     }
     return new Date(d.getFullYear(), 1, 29).getMonth() === 1 ? 366 : 365;
@@ -2638,7 +2653,7 @@ CalHeatMap.prototype = {
    * @return int The week day number (0-6)
    */
   getWeekDay: function (d) {
-    "use strict";
+    'use strict';
 
     if (this.options.weekStartOnMonday === false) {
       return d.getDay();
@@ -2652,9 +2667,9 @@ CalHeatMap.prototype = {
    * @return Date      Last day of the month
    */
   getEndOfMonth: function (d) {
-    "use strict";
+    'use strict';
 
-    if (typeof d === "number") {
+    if (typeof d === 'number') {
       d = new Date(d);
     }
     return new Date(d.getFullYear(), d.getMonth() + 1, 0);
@@ -2668,23 +2683,23 @@ CalHeatMap.prototype = {
    * @return Date
    */
   jumpDate: function (date, count, step) {
-    "use strict";
+    'use strict';
 
     const d = new Date(date);
     switch (step) {
-      case "hour":
+      case 'hour':
         d.setHours(d.getHours() + count);
         break;
-      case "day":
+      case 'day':
         d.setHours(d.getHours() + count * 24);
         break;
-      case "week":
+      case 'week':
         d.setHours(d.getHours() + count * 24 * 7);
         break;
-      case "month":
+      case 'month':
         d.setMonth(d.getMonth() + count);
         break;
-      case "year":
+      case 'year':
         d.setFullYear(d.getFullYear() + count);
     }
 
@@ -2703,7 +2718,7 @@ CalHeatMap.prototype = {
    * @return array  An array of minutes
    */
   getMinuteDomain: function (d, range) {
-    "use strict";
+    'use strict';
 
     const start = new Date(
       d.getFullYear(),
@@ -2722,7 +2737,7 @@ CalHeatMap.prototype = {
     } else {
       stop = new Date(+start + range * 1000 * 60);
     }
-    return d3.timeMinutes(Math.min(start, stop), Math.max(start, stop));
+    return timeMinutes(Math.min(start, stop), Math.max(start, stop));
   },
 
   /**
@@ -2733,7 +2748,7 @@ CalHeatMap.prototype = {
    * @return array  An array of hours
    */
   getHourDomain: function (d, range) {
-    "use strict";
+    'use strict';
 
     const start = new Date(
       d.getFullYear(),
@@ -2754,7 +2769,7 @@ CalHeatMap.prototype = {
       stop.setHours(stop.getHours() + range);
     }
 
-    const domains = d3.timeHours(Math.min(start, stop), Math.max(start, stop));
+    const domains = timeHours(Math.min(start, stop), Math.max(start, stop));
 
     // Passing from DST to standard time
     // If there are 25 hours, let's compress the duplicate hours
@@ -2768,10 +2783,10 @@ CalHeatMap.prototype = {
       }
     }
 
-    // d3.timeHours is returning more hours than needed when changing
+    // timeHours is returning more hours than needed when changing
     // from DST to standard time, because there is really 2 hours between
     // 1am and 2am!
-    if (typeof range === "number" && domains.length > Math.abs(range)) {
+    if (typeof range === 'number' && domains.length > Math.abs(range)) {
       domains.splice(domains.length - 1, 1);
     }
 
@@ -2786,7 +2801,7 @@ CalHeatMap.prototype = {
    * @return array  An array of weeks
    */
   getDayDomain: function (d, range) {
-    "use strict";
+    'use strict';
 
     const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     let stop = null;
@@ -2797,7 +2812,7 @@ CalHeatMap.prototype = {
       stop = new Date(stop.setDate(stop.getDate() + parseInt(range, 10)));
     }
 
-    return d3.timeDays(Math.min(start, stop), Math.max(start, stop));
+    return timeDays(Math.min(start, stop), Math.max(start, stop));
   },
 
   /**
@@ -2808,7 +2823,7 @@ CalHeatMap.prototype = {
    * @return array  An array of weeks
    */
   getWeekDomain: function (d, range) {
-    "use strict";
+    'use strict';
 
     let weekStart;
 
@@ -2836,13 +2851,13 @@ CalHeatMap.prototype = {
     const endDate = new Date(weekStart);
 
     let stop = range;
-    if (typeof range !== "object") {
+    if (typeof range !== 'object') {
       stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
     }
 
     return this.options.weekStartOnMonday === true
-      ? d3.timeMondays(Math.min(weekStart, stop), Math.max(weekStart, stop))
-      : d3.timeSundays(Math.min(weekStart, stop), Math.max(weekStart, stop));
+      ? timeMondays(Math.min(weekStart, stop), Math.max(weekStart, stop))
+      : timeSundays(Math.min(weekStart, stop), Math.max(weekStart, stop));
   },
 
   /**
@@ -2853,7 +2868,7 @@ CalHeatMap.prototype = {
    * @return array  An array of months
    */
   getMonthDomain: function (d, range) {
-    "use strict";
+    'use strict';
 
     const start = new Date(d.getFullYear(), d.getMonth());
     let stop = null;
@@ -2864,7 +2879,7 @@ CalHeatMap.prototype = {
       stop = stop.setMonth(stop.getMonth() + range);
     }
 
-    return d3.timeMonths(Math.min(start, stop), Math.max(start, stop));
+    return timeMonths(Math.min(start, stop), Math.max(start, stop));
   },
 
   /**
@@ -2875,7 +2890,7 @@ CalHeatMap.prototype = {
    * @return array  An array of hours
    */
   getYearDomain: function (d, range) {
-    "use strict";
+    'use strict';
 
     const start = new Date(d.getFullYear(), 0);
     let stop = null;
@@ -2885,7 +2900,7 @@ CalHeatMap.prototype = {
       stop = new Date(d.getFullYear() + range, 0);
     }
 
-    return d3.timeYears(Math.min(start, stop), Math.max(start, stop));
+    return timeYears(Math.min(start, stop), Math.max(start, stop));
   },
 
   /**
@@ -2896,9 +2911,9 @@ CalHeatMap.prototype = {
    * @return Array of dates
    */
   getDomain: function (date, range) {
-    "use strict";
+    'use strict';
 
-    if (typeof date === "number") {
+    if (typeof date === 'number') {
       date = new Date(date);
     }
 
@@ -2907,12 +2922,12 @@ CalHeatMap.prototype = {
     }
 
     switch (this.options.domain) {
-      case "hour":
+      case 'hour':
         var domains = this.getHourDomain(date, range);
 
         // Case where an hour is missing, when passing from standard time to DST
         // Missing hour is perfectly acceptabl in subDomain, but not in domains
-        if (typeof range === "number" && domains.length < range) {
+        if (typeof range === 'number' && domains.length < range) {
           if (range > 0) {
             domains.push(this.getHourDomain(domains[domains.length - 1], 2)[1]);
           } else {
@@ -2920,22 +2935,22 @@ CalHeatMap.prototype = {
           }
         }
         return domains;
-      case "day":
+      case 'day':
         return this.getDayDomain(date, range);
-      case "week":
+      case 'week':
         return this.getWeekDomain(date, range);
-      case "month":
+      case 'month':
         return this.getMonthDomain(date, range);
-      case "year":
+      case 'year':
         return this.getYearDomain(date, range);
     }
   },
 
   /* jshint maxcomplexity: false */
   getSubDomain: function (date) {
-    "use strict";
+    'use strict';
 
-    if (typeof date === "number") {
+    if (typeof date === 'number') {
       date = new Date(date);
     }
 
@@ -2946,11 +2961,11 @@ CalHeatMap.prototype = {
      */
     const computeDaySubDomainSize = function (date, domain) {
       switch (domain) {
-        case "year":
+        case 'year':
           return parent.getDayCountInYear(date);
-        case "month":
+        case 'month':
           return parent.getDayCountInMonth(date);
-        case "week":
+        case 'week':
           return 7;
       }
     };
@@ -2960,11 +2975,11 @@ CalHeatMap.prototype = {
      */
     const computeMinSubDomainSize = function (date, domain) {
       switch (domain) {
-        case "hour":
+        case 'hour':
           return 60;
-        case "day":
+        case 'day':
           return 60 * 24;
-        case "week":
+        case 'week':
           return 60 * 24 * 7;
       }
     };
@@ -2974,11 +2989,11 @@ CalHeatMap.prototype = {
      */
     const computeHourSubDomainSize = function (date, domain) {
       switch (domain) {
-        case "day":
+        case 'day':
           return 24;
-        case "week":
+        case 'week':
           return 168;
-        case "month":
+        case 'month':
           return parent.getDayCountInMonth(date) * 24;
       }
     };
@@ -2987,7 +3002,7 @@ CalHeatMap.prototype = {
      * @return int
      */
     const computeWeekSubDomainSize = function (date, domain) {
-      if (domain === "month") {
+      if (domain === 'month') {
         const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
         let endWeekNb = parent.getWeekNumber(endOfMonth);
         let startWeekNb = parent.getWeekNumber(
@@ -3000,38 +3015,38 @@ CalHeatMap.prototype = {
         }
 
         return endWeekNb - startWeekNb + 1;
-      } else if (domain === "year") {
+      } else if (domain === 'year') {
         return parent.getWeekNumber(new Date(date.getFullYear(), 11, 31));
       }
     };
 
     switch (this.options.subDomain) {
-      case "x_min":
-      case "min":
+      case 'x_min':
+      case 'min':
         return this.getMinuteDomain(
           date,
           computeMinSubDomainSize(date, this.options.domain)
         );
-      case "x_hour":
-      case "hour":
+      case 'x_hour':
+      case 'hour':
         return this.getHourDomain(
           date,
           computeHourSubDomainSize(date, this.options.domain)
         );
-      case "x_day":
-      case "day":
+      case 'x_day':
+      case 'day':
         return this.getDayDomain(
           date,
           computeDaySubDomainSize(date, this.options.domain)
         );
-      case "x_week":
-      case "week":
+      case 'x_week':
+      case 'week':
         return this.getWeekDomain(
           date,
           computeWeekSubDomainSize(date, this.options.domain)
         );
-      case "x_month":
-      case "month":
+      case 'x_month':
+      case 'month':
         return this.getMonthDomain(date, 12);
     }
   },
@@ -3042,7 +3057,7 @@ CalHeatMap.prototype = {
    * @return Date The start date of the wanted domain
    */
   getNextDomain: function (n) {
-    "use strict";
+    'use strict';
 
     if (arguments.length === 0) {
       n = 1;
@@ -3059,7 +3074,7 @@ CalHeatMap.prototype = {
    * @return Date The start date of the wanted domain
    */
   getPreviousDomain: function (n) {
-    "use strict";
+    'use strict';
 
     if (arguments.length === 0) {
       n = 1;
@@ -3096,7 +3111,7 @@ CalHeatMap.prototype = {
     afterLoad,
     updateMode
   ) {
-    "use strict";
+    'use strict';
 
     const self = this;
     if (arguments.length < 5) {
@@ -3107,36 +3122,36 @@ CalHeatMap.prototype = {
     }
     const _callback = function (data) {
       if (afterLoad !== false) {
-        if (typeof afterLoad === "function") {
+        if (typeof afterLoad === 'function') {
           data = afterLoad(data);
-        } else if (typeof self.options.afterLoadData === "function") {
+        } else if (typeof self.options.afterLoadData === 'function') {
           data = self.options.afterLoadData(data);
         } else {
-          console.log("Provided callback for afterLoadData is not a function.");
+          console.log('Provided callback for afterLoadData is not a function.');
         }
       } else if (
-        self.options.dataType === "csv" ||
-        self.options.dataType === "tsv"
+        self.options.dataType === 'csv' ||
+        self.options.dataType === 'tsv'
       ) {
         data = this.interpretCSV(data);
       }
       self.parseDatas(data, updateMode, startDate, endDate);
-      if (typeof callback === "function") {
+      if (typeof callback === 'function') {
         callback();
       }
     };
 
     switch (typeof source) {
-      case "string":
-        if (source === "") {
+      case 'string':
+        if (source === '') {
           _callback({});
           return true;
         } else {
           const url = this.parseURI(source, startDate, endDate);
 
-          const reqInit = { method: "GET" };
+          const reqInit = { method: 'GET' };
           if (self.options.dataPostPayload !== null) {
-            reqInit.method = "POST";
+            reqInit.method = 'POST';
           }
           if (self.options.dataPostPayload !== null) {
             reqInit.body = this.parseURI(
@@ -3159,25 +3174,25 @@ CalHeatMap.prototype = {
             reqInit.headers = myheaders;
           }
 
-          let xhr = null;
+          let request = null;
           switch (this.options.dataType) {
-            case "json":
-              xhr = d3.json(url, reqInit);
+            case 'json':
+              request = json(url, reqInit);
               break;
-            case "csv":
-              xhr = d3.csv(url, reqInit);
+            case 'csv':
+              request = csv(url, reqInit);
               break;
-            case "tsv":
-              xhr = d3.dsv("\t", url, reqInit);
+            case 'tsv':
+              request = dsv('\t', url, reqInit);
               break;
-            case "txt":
-              xhr = d3.text(url, reqInit);
+            case 'txt':
+              request = text(url, reqInit);
               break;
           }
-          xhr.then(_callback);
+          request.then(_callback);
         }
         return false;
-      case "object":
+      case 'object':
         if (source === Object(source)) {
           _callback(source);
           return false;
@@ -3200,7 +3215,7 @@ CalHeatMap.prototype = {
    * @return void
    */
   parseDatas: function (data, updateMode, startDate, endDate) {
-    "use strict";
+    'use strict';
 
     if (updateMode === this.RESET_ALL_ON_UPDATE) {
       this._domains.forEach(function (value) {
@@ -3264,7 +3279,7 @@ CalHeatMap.prototype = {
   },
 
   parseURI: function (str, startDate, endDate) {
-    "use strict";
+    'use strict';
 
     // Use a timestamp in seconds
     str = str.replace(/\{\{t:start\}\}/g, startDate.getTime() / 1000);
@@ -3278,7 +3293,7 @@ CalHeatMap.prototype = {
   },
 
   interpretCSV: function (data) {
-    "use strict";
+    'use strict';
 
     const d = {};
     const keys = Object.keys(data[0]);
@@ -3299,17 +3314,17 @@ CalHeatMap.prototype = {
    * @return void
    */
   resize: function () {
-    "use strict";
+    'use strict';
 
     const parent = this;
     const options = parent.options;
     const legendWidth = options.displayLegend
-      ? parent.Legend.getDim("width") +
+      ? parent.Legend.getDim('width') +
         options.legendMargin[1] +
         options.legendMargin[3]
       : 0;
     const legendHeight = options.displayLegend
-      ? parent.Legend.getDim("height") +
+      ? parent.Legend.getDim('height') +
         options.legendMargin[0] +
         options.legendMargin[2]
       : 0;
@@ -3321,8 +3336,8 @@ CalHeatMap.prototype = {
 
     const getHeight = function () {
       if (
-        options.legendVerticalPosition === "middle" ||
-        options.legendVerticalPosition === "center"
+        options.legendVerticalPosition === 'middle' ||
+        options.legendVerticalPosition === 'center'
       ) {
         return Math.max(graphHeight, legendHeight);
       }
@@ -3331,8 +3346,8 @@ CalHeatMap.prototype = {
 
     const getWidth = function () {
       if (
-        options.legendVerticalPosition === "middle" ||
-        options.legendVerticalPosition === "center"
+        options.legendVerticalPosition === 'middle' ||
+        options.legendVerticalPosition === 'center'
       ) {
         return graphWidth + legendWidth;
       }
@@ -3342,32 +3357,32 @@ CalHeatMap.prototype = {
     this.root
       .transition()
       .duration(options.animationDuration)
-      .attr("width", getWidth())
-      .attr("height", getHeight());
+      .attr('width', getWidth())
+      .attr('height', getHeight());
 
     this.root
-      .select(".graph")
+      .select('.graph')
       .transition()
       .duration(options.animationDuration)
-      .attr("y", function () {
-        if (options.legendVerticalPosition === "top") {
+      .attr('y', function () {
+        if (options.legendVerticalPosition === 'top') {
           return legendHeight;
         }
         return 0;
       })
-      .attr("x", function () {
+      .attr('x', function () {
         let xPosition = 0;
         if (
           options.dayLabel &&
-          options.domain === "month" &&
-          options.subDomain === "day"
+          options.domain === 'month' &&
+          options.subDomain === 'day'
         ) {
           xPosition = options.cellSize + options.cellPadding;
         }
         if (
-          (options.legendVerticalPosition === "middle" ||
-            options.legendVerticalPosition === "center") &&
-          options.legendHorizontalPosition === "left"
+          (options.legendVerticalPosition === 'middle' ||
+            options.legendVerticalPosition === 'center') &&
+          options.legendHorizontalPosition === 'left'
         ) {
           return legendWidth + xPosition;
         }
@@ -3384,7 +3399,7 @@ CalHeatMap.prototype = {
    * Shift the calendar forward
    */
   next: function (n) {
-    "use strict";
+    'use strict';
 
     if (arguments.length === 0) {
       n = 1;
@@ -3396,7 +3411,7 @@ CalHeatMap.prototype = {
    * Shift the calendar backward
    */
   previous: function (n) {
-    "use strict";
+    'use strict';
 
     if (arguments.length === 0) {
       n = 1;
@@ -3416,7 +3431,7 @@ CalHeatMap.prototype = {
    * @param bool True of the calendar was scrolled
    */
   jumpTo: function (date, reset) {
-    "use strict";
+    'use strict';
 
     if (arguments.length < 2) {
       reset = false;
@@ -3447,7 +3462,7 @@ CalHeatMap.prototype = {
    * @return void
    */
   rewind: function () {
-    "use strict";
+    'use strict';
 
     this.jumpTo(this.options.start, true);
   },
@@ -3460,7 +3475,7 @@ CalHeatMap.prototype = {
    * if you don't want to use the afterLoad() callback
    */
   update: function (dataSource, afterLoad, updateMode) {
-    "use strict";
+    'use strict';
 
     if (arguments.length === 0) {
       dataSource = this.options.data;
@@ -3494,7 +3509,7 @@ CalHeatMap.prototype = {
    * @param array colorRange an array of 2 hex colors, for the minimum and maximum colors
    */
   setLegend: function () {
-    "use strict";
+    'use strict';
 
     const oldLegend = this.options.legend.slice(0);
     if (arguments.length >= 1 && Array.isArray(arguments[0])) {
@@ -3527,7 +3542,7 @@ CalHeatMap.prototype = {
    * @return bool False if there is no legend to remove
    */
   removeLegend: function () {
-    "use strict";
+    'use strict';
 
     if (!this.options.displayLegend) {
       return false;
@@ -3543,7 +3558,7 @@ CalHeatMap.prototype = {
    * @return bool False if the legend was already displayed
    */
   showLegend: function () {
-    "use strict";
+    'use strict';
 
     if (this.options.displayLegend) {
       return false;
@@ -3565,7 +3580,7 @@ CalHeatMap.prototype = {
    * @return bool True if dates were highlighted
    */
   highlight: function (args) {
-    "use strict";
+    'use strict';
 
     if ((this.options.highlight = this.expandDateSetting(args)).length > 0) {
       this.fill();
@@ -3584,19 +3599,19 @@ CalHeatMap.prototype = {
    * @return null
    */
   destroy: function (callback) {
-    "use strict";
+    'use strict';
 
     this.root
       .transition()
       .duration(this.options.animationDuration)
-      .attr("width", 0)
-      .attr("height", 0)
+      .attr('width', 0)
+      .attr('height', 0)
       .remove()
       .each(function () {
-        if (typeof callback === "function") {
+        if (typeof callback === 'function') {
           callback();
-        } else if (typeof callback !== "undefined") {
-          console.log("Provided callback for destroy() is not a function.");
+        } else if (typeof callback !== 'undefined') {
+          console.log('Provided callback for destroy() is not a function.');
         }
       });
 
@@ -3604,62 +3619,62 @@ CalHeatMap.prototype = {
   },
 
   getSVG: function () {
-    "use strict";
+    'use strict';
 
     const styles = {
-      ".cal-heatmap-container": {},
-      ".graph": {},
-      ".graph-rect": {},
-      "rect.highlight": {},
-      "rect.now": {},
-      "rect.highlight-now": {},
-      "text.highlight": {},
-      "text.now": {},
-      "text.highlight-now": {},
-      ".domain-background": {},
-      ".graph-label": {},
-      ".subdomain-text": {},
-      ".q0": {},
-      ".qi": {},
+      '.cal-heatmap-container': {},
+      '.graph': {},
+      '.graph-rect': {},
+      'rect.highlight': {},
+      'rect.now': {},
+      'rect.highlight-now': {},
+      'text.highlight': {},
+      'text.now': {},
+      'text.highlight-now': {},
+      '.domain-background': {},
+      '.graph-label': {},
+      '.subdomain-text': {},
+      '.q0': {},
+      '.qi': {},
     };
 
     for (let j = 1, total = this.options.legend.length + 1; j <= total; j++) {
-      styles[".q" + j] = {};
+      styles['.q' + j] = {};
     }
 
     const root = this.root;
 
     const whitelistStyles = [
       // SVG specific properties
-      "stroke",
-      "stroke-width",
-      "stroke-opacity",
-      "stroke-dasharray",
-      "stroke-dashoffset",
-      "stroke-linecap",
-      "stroke-miterlimit",
-      "fill",
-      "fill-opacity",
-      "fill-rule",
-      "marker",
-      "marker-start",
-      "marker-mid",
-      "marker-end",
-      "alignement-baseline",
-      "baseline-shift",
-      "dominant-baseline",
-      "glyph-orientation-horizontal",
-      "glyph-orientation-vertical",
-      "kerning",
-      "text-anchor",
-      "shape-rendering",
+      'stroke',
+      'stroke-width',
+      'stroke-opacity',
+      'stroke-dasharray',
+      'stroke-dashoffset',
+      'stroke-linecap',
+      'stroke-miterlimit',
+      'fill',
+      'fill-opacity',
+      'fill-rule',
+      'marker',
+      'marker-start',
+      'marker-mid',
+      'marker-end',
+      'alignement-baseline',
+      'baseline-shift',
+      'dominant-baseline',
+      'glyph-orientation-horizontal',
+      'glyph-orientation-vertical',
+      'kerning',
+      'text-anchor',
+      'shape-rendering',
 
       // Text Specific properties
-      "text-transform",
-      "font-family",
-      "font",
-      "font-size",
-      "font-weight",
+      'text-transform',
+      'font-family',
+      'font',
+      'font-size',
+      'font-weight',
     ];
 
     const filterStyles = function (attribute, property, value) {
@@ -3686,7 +3701,7 @@ CalHeatMap.prototype = {
 
       // The DOM Level 2 CSS way
       /* jshint maxdepth: false */
-      if ("getComputedStyle" in window) {
+      if ('getComputedStyle' in window) {
         const cs = getComputedStyle(dom, null);
         if (cs.length !== 0) {
           for (let i = 0; i < cs.length; i++) {
@@ -3704,7 +3719,7 @@ CalHeatMap.prototype = {
         }
 
         // The IE way
-      } else if ("currentStyle" in dom) {
+      } else if ('currentStyle' in dom) {
         const css = dom.currentStyle;
         for (const p in css) {
           filterStyles(element, p, css[p]);
@@ -3717,489 +3732,19 @@ CalHeatMap.prototype = {
       'xmlns:xlink="http://www.w3.org/1999/xlink"><style type="text/css"><![CDATA[ ';
 
     for (const style in styles) {
-      string += style + " {\n";
+      string += style + ' {\n';
       for (const l in styles[style]) {
-        string += "\t" + l + ":" + styles[style][l] + ";\n";
+        string += '\t' + l + ':' + styles[style][l] + ';\n';
       }
-      string += "}\n";
+      string += '}\n';
     }
 
-    string += "]]></style>";
-    string += new XMLSerializer().serializeToString(this.root[0][0]);
-    string += "</svg>";
+    string += ']]></style>';
+    string += new XMLSerializer().serializeToString(this.root.node());
+    string += '</svg>';
 
     return string;
   },
 };
 
-// =========================================================================//
-// DOMAIN POSITION COMPUTATION                        //
-// =========================================================================//
-
-/**
- * Compute the position of a domain, relative to the calendar
- */
-var DomainPosition = function () {
-  "use strict";
-
-  this.positions = new Map();
-};
-
-DomainPosition.prototype.getPosition = function (d) {
-  "use strict";
-
-  return this.positions.get(d);
-};
-
-DomainPosition.prototype.getPositionFromIndex = function (i) {
-  "use strict";
-
-  const domains = this.getKeys();
-  return this.positions.get(domains[i]);
-};
-
-DomainPosition.prototype.getLast = function () {
-  "use strict";
-
-  const domains = this.getKeys();
-  return this.positions.get(domains[domains.length - 1]);
-};
-
-DomainPosition.prototype.setPosition = function (d, dim) {
-  "use strict";
-
-  this.positions.set(d, dim);
-};
-
-DomainPosition.prototype.shiftRightBy = function (exitingDomainDim) {
-  "use strict";
-
-  const mypos = this.positions;
-  const mythis = this;
-  mypos.forEach(function (value, key) {
-    mythis.positions.set(key, value - exitingDomainDim);
-  });
-
-  const domains = this.getKeys();
-  this.positions.delete(domains[0]);
-};
-
-DomainPosition.prototype.shiftLeftBy = function (enteringDomainDim) {
-  "use strict";
-
-  const mypos = this.positions;
-  const mythis = this;
-  mypos.forEach(function (value, key) {
-    mythis.positions.set(key, value + enteringDomainDim);
-  });
-
-  const domains = this.getKeys();
-  this.positions.delete(domains[domains.length - 1]);
-};
-
-DomainPosition.prototype.getKeys = function () {
-  "use strict";
-
-  return Array.from(this.positions.keys()).sort(function (a, b) {
-    return parseInt(a, 10) - parseInt(b, 10);
-  });
-};
-
-// =========================================================================//
-// LEGEND                                  //
-// =========================================================================//
-
-var Legend = function (calendar) {
-  "use strict";
-
-  this.calendar = calendar;
-  this.computeDim();
-
-  if (calendar.options.legendColors !== null) {
-    this.buildColors();
-  }
-};
-
-Legend.prototype.computeDim = function () {
-  "use strict";
-
-  const options = this.calendar.options; // Shorter accessor for variable name mangling when minifying
-  this.dim = {
-    width:
-      options.legendCellSize * (options.legend.length + 1) +
-      options.legendCellPadding * options.legend.length,
-    height: options.legendCellSize,
-  };
-};
-
-Legend.prototype.remove = function () {
-  "use strict";
-
-  this.calendar.root.select(".graph-legend").remove();
-  this.calendar.resize();
-};
-
-Legend.prototype.redraw = function (width) {
-  "use strict";
-
-  if (!this.calendar.options.displayLegend) {
-    return false;
-  }
-
-  const parent = this;
-  const calendar = this.calendar;
-  let legend = calendar.root;
-  let legendItem;
-  const options = calendar.options; // Shorter accessor for variable name mangling when minifying
-
-  this.computeDim();
-
-  const _legend = options.legend.slice(0);
-  _legend.push(_legend[_legend.length - 1] + 1);
-
-  const legendElement = calendar.root.select(".graph-legend");
-  if (!legendElement.empty()) {
-    legend = legendElement;
-    legendItem = legend.select("g").selectAll("rect").data(_legend);
-  } else {
-    // Creating the new legend DOM if it doesn't already exist
-    legend =
-      options.legendVerticalPosition === "top"
-        ? legend.insert("svg", ".graph")
-        : legend.append("svg");
-
-    legend.attr("x", getLegendXPosition()).attr("y", getLegendYPosition());
-
-    legendItem = legend
-      .attr("class", "graph-legend")
-      .attr("height", parent.getDim("height"))
-      .attr("width", parent.getDim("width"))
-      .append("g")
-      .selectAll()
-      .data(_legend);
-  }
-
-  legendItem
-    .enter()
-    .append("rect")
-    .call(legendCellLayout)
-    .attr("class", function (d) {
-      return calendar.Legend.getClass(d, calendar.legendScale === null);
-    })
-    .attr("fill-opacity", 0)
-    .call(function (selection) {
-      if (
-        calendar.legendScale !== null &&
-        options.legendColors !== null &&
-        options.legendColors.hasOwnProperty("base")
-      ) {
-        selection.attr("fill", options.legendColors.base);
-      }
-    })
-    .append("title");
-
-  legendItem
-    .exit()
-    .transition()
-    .duration(options.animationDuration)
-    .attr("fill-opacity", 0)
-    .remove();
-
-  legendItem
-    .transition()
-    .delay(function (d, i) {
-      return (options.animationDuration * i) / 10;
-    })
-    .call(legendCellLayout)
-    .attr("fill-opacity", 1)
-    .call(function (element) {
-      element.attr("fill", function (d, i) {
-        if (calendar.legendScale === null) {
-          return "";
-        }
-
-        if (i === 0) {
-          return calendar.legendScale(d - 1);
-        }
-        return calendar.legendScale(options.legend[i - 1]);
-      });
-
-      element.attr("class", function (d) {
-        return calendar.Legend.getClass(d, calendar.legendScale === null);
-      });
-    });
-
-  function legendCellLayout(selection) {
-    selection
-      .attr("width", options.legendCellSize)
-      .attr("height", options.legendCellSize)
-      .attr("x", function (d, i) {
-        return i * (options.legendCellSize + options.legendCellPadding);
-      });
-  }
-
-  legendItem.select("title").text(function (d, i) {
-    if (i === 0) {
-      return calendar.formatStringWithObject(options.legendTitleFormat.lower, {
-        min: options.legend[i],
-        name: options.itemName[1],
-      });
-    } else if (i === _legend.length - 1) {
-      return calendar.formatStringWithObject(options.legendTitleFormat.upper, {
-        max: options.legend[i - 1],
-        name: options.itemName[1],
-      });
-    } else {
-      return calendar.formatStringWithObject(options.legendTitleFormat.inner, {
-        down: options.legend[i - 1],
-        up: options.legend[i],
-        name: options.itemName[1],
-      });
-    }
-  });
-
-  legend
-    .transition()
-    .duration(options.animationDuration)
-    .attr("x", getLegendXPosition())
-    .attr("y", getLegendYPosition())
-    .attr("width", parent.getDim("width"))
-    .attr("height", parent.getDim("height"));
-
-  legend
-    .select("g")
-    .transition()
-    .duration(options.animationDuration)
-    .attr("transform", function () {
-      if (options.legendOrientation === "vertical") {
-        return (
-          "rotate(90 " +
-          options.legendCellSize / 2 +
-          " " +
-          options.legendCellSize / 2 +
-          ")"
-        );
-      }
-      return "";
-    });
-
-  function getLegendXPosition() {
-    switch (options.legendHorizontalPosition) {
-      case "right":
-        if (
-          options.legendVerticalPosition === "center" ||
-          options.legendVerticalPosition === "middle"
-        ) {
-          return width + options.legendMargin[3];
-        }
-        return width - parent.getDim("width") - options.legendMargin[1];
-      case "middle":
-      case "center":
-        return Math.round(width / 2 - parent.getDim("width") / 2);
-      default:
-        return options.legendMargin[3];
-    }
-  }
-
-  function getLegendYPosition() {
-    if (options.legendVerticalPosition === "bottom") {
-      return (
-        calendar.graphDim.height +
-        options.legendMargin[0] -
-        options.domainGutter -
-        options.cellPadding
-      );
-    }
-    return options.legendMargin[0];
-  }
-
-  calendar.resize();
-};
-
-/**
- * Return the dimension of the legend
- *
- * Takes into account rotation
- *
- * @param  string axis Width or height
- * @return int height or width in pixels
- */
-Legend.prototype.getDim = function (axis) {
-  "use strict";
-
-  const isHorizontal = this.calendar.options.legendOrientation === "horizontal";
-
-  switch (axis) {
-    case "width":
-      return this.dim[isHorizontal ? "width" : "height"];
-    case "height":
-      return this.dim[isHorizontal ? "height" : "width"];
-  }
-};
-
-Legend.prototype.buildColors = function () {
-  "use strict";
-
-  const options = this.calendar.options; // Shorter accessor for variable name mangling when minifying
-
-  if (options.legendColors === null) {
-    this.calendar.legendScale = null;
-    return false;
-  }
-
-  let _colorRange = [];
-
-  if (Array.isArray(options.legendColors)) {
-    _colorRange = options.legendColors;
-  } else if (
-    options.legendColors.hasOwnProperty("min") &&
-    options.legendColors.hasOwnProperty("max")
-  ) {
-    _colorRange = [options.legendColors.min, options.legendColors.max];
-  } else {
-    options.legendColors = null;
-    return false;
-  }
-
-  const _legend = options.legend.slice(0);
-
-  if (_legend[0] > 0) {
-    _legend.unshift(0);
-  } else if (_legend[0] <= 0) {
-    // Let's guess the leftmost value, it we have to add one
-    _legend.unshift(
-      _legend[0] - (_legend[_legend.length - 1] - _legend[0]) / _legend.length
-    );
-  }
-
-  const colorScale = d3
-    .scaleLinear()
-    .range(_colorRange)
-    .interpolate(d3.interpolateHcl)
-    .domain([d3.min(_legend), d3.max(_legend)]);
-  const legendColors = _legend.map(function (element) {
-    return colorScale(element);
-  });
-  this.calendar.legendScale = d3
-    .scaleThreshold()
-    .domain(options.legend)
-    .range(legendColors);
-
-  return true;
-};
-
-/**
- * Return the classname on the legend for the specified value
- *
- * @param integer n Value associated to a date
- * @param bool withCssClass Whether to display the css class used to style the cell.
- *                          Disabling will allow styling directly via html fill attribute
- *
- * @return string Classname according to the legend
- */
-Legend.prototype.getClass = function (n, withCssClass) {
-  "use strict";
-
-  if (n === null || isNaN(n)) {
-    return "";
-  }
-
-  let index = [this.calendar.options.legend.length + 1];
-
-  for (
-    let i = 0, total = this.calendar.options.legend.length - 1;
-    i <= total;
-    i++
-  ) {
-    if (this.calendar.options.legend[0] > 0 && n < 0) {
-      index = ["1", "i"];
-      break;
-    }
-
-    if (n <= this.calendar.options.legend[i]) {
-      index = [i + 1];
-      break;
-    }
-  }
-
-  if (n === 0) {
-    index.push(0);
-  }
-
-  index.unshift("");
-  return (index.join(" r") + (withCssClass ? index.join(" q") : "")).trim();
-};
-
-/**
- * #source http://stackoverflow.com/a/383245/805649
- */
-function mergeRecursive(obj1, obj2) {
-  "use strict";
-
-  /* jshint forin:false */
-  for (const p in obj2) {
-    try {
-      // Property in destination object set; update its value.
-      if (obj2[p].constructor === Object) {
-        obj1[p] = mergeRecursive(obj1[p], obj2[p]);
-      } else {
-        obj1[p] = obj2[p];
-      }
-    } catch (e) {
-      // Property in destination object not set; create it and set its value.
-      obj1[p] = obj2[p];
-    }
-  }
-
-  return obj1;
-}
-
-/**
- * Check if 2 arrays are equals
- *
- * @link http://stackoverflow.com/a/14853974/805649
- * @param  array array the array to compare to
- * @return bool true of the 2 arrays are equals
- */
-function arrayEquals(arrayA, arrayB) {
-  "use strict";
-
-  // if the other array is a falsy value, return
-  if (!arrayB || !arrayA) {
-    return false;
-  }
-
-  // compare lengths - can save a lot of time
-  if (arrayA.length !== arrayB.length) {
-    return false;
-  }
-
-  for (let i = 0; i < arrayA.length; i++) {
-    // Check if we have nested arrays
-    if (arrayA[i] instanceof Array && arrayB[i] instanceof Array) {
-      // recurse into the nested arrays
-      if (!arrayEquals(arrayA[i], arrayB[i])) {
-        return false;
-      }
-    } else if (arrayA[i] !== arrayB[i]) {
-      // Warning - two different object instances will never be equal: {x:20} != {x:20}
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * AMD Loader
- */
-if (typeof define === "function" && define.amd) {
-  define(["d3"], function () {
-    "use strict";
-
-    return CalHeatMap;
-  });
-} else if (typeof module === "object" && module.exports) {
-  module.exports = CalHeatMap;
-} else {
-  window.CalHeatMap = CalHeatMap;
-}
+export default CalHeatMap;

@@ -23,16 +23,6 @@ module.exports = function (grunt) {
         },
       },
     },
-    uglify: {
-      options: {
-        banner: headerComment,
-      },
-      base: {
-        files: {
-          'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
-        },
-      },
-    },
     qunit: {
       options: {
         '--web-security': 'no',
@@ -56,10 +46,6 @@ module.exports = function (grunt) {
     concat: {
       options: {
         banner: headerComment + '\n',
-      },
-      js: {
-        src: ['src/<%= pkg.name %>.js'],
-        dest: 'dist/<%= pkg.name %>.js',
       },
       css: {
         src: ['src/<%= pkg.name %>.css'],
@@ -90,7 +76,6 @@ module.exports = function (grunt) {
     },
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-csslint');
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -103,13 +88,7 @@ module.exports = function (grunt) {
   grunt.registerTask('quick-build', ['csslint']);
 
   // Full build without version bump
-  grunt.registerTask('build', [
-    'exec:format',
-    'concat',
-    'qunit',
-    'csslint',
-    'uglify',
-  ]);
+  grunt.registerTask('build', ['exec:format', 'concat', 'qunit', 'csslint']);
 
   // FOR TRAVIS
   // ==========
