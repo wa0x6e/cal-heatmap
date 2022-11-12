@@ -1,10 +1,10 @@
 {
-  "extends": "eslint:recommended",
+  "extends": "airbnb",
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 8
   },
   "rules": {
-    "prefer-arrow-callback": true
+    "arrow-parens": ["error", "as-needed"]
   }
 }
