@@ -1,4 +1,7 @@
 import { json, csv, dsv, text } from 'd3-fetch';
+
+import { generateDomain } from './domain/domainGenerator';
+
 import {
   RESET_ALL_ON_UPDATE,
   APPEND_ON_UPDATE,
@@ -18,14 +21,14 @@ function interpretCSV(data) {
 
 function parseURI(str, startDate, endDate) {
   // Use a timestamp in seconds
-  str = str.replace(/\{\{t:start\}\}/g, startDate.getTime() / 1000);
-  str = str.replace(/\{\{t:end\}\}/g, endDate.getTime() / 1000);
+  let newUri = str.replace(/\{\{t:start\}\}/g, startDate.getTime() / 1000);
+  newUri = newUri.replace(/\{\{t:end\}\}/g, endDate.getTime() / 1000);
 
   // Use a string date, following the ISO-8601
-  str = str.replace(/\{\{d:start\}\}/g, startDate.toISOString());
-  str = str.replace(/\{\{d:end\}\}/g, endDate.toISOString());
+  newUri = newUri.replace(/\{\{d:start\}\}/g, startDate.toISOString());
+  newUri = newUri.replace(/\{\{d:end\}\}/g, endDate.toISOString());
 
-  return str;
+  return newUri;
 }
 
 /**
@@ -40,61 +43,56 @@ function parseURI(str, startDate, endDate) {
  */
 function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
   if (updateMode === RESET_ALL_ON_UPDATE) {
-    calendar._domains.forEach(value => {
+    calendar.domainCollection.forEach(value => {
       value.forEach((element, index, array) => {
         array[index].v = null;
       });
     });
   }
 
-  const temp = {};
+  const newData = new Map();
 
-  const extractTime = function (d) {
-    return d.t;
-  };
+  const extractTime = d => d.t;
 
-  for (const d in data) {
-    const date = new Date(d * 1000);
-    let domainUnit = calendar.getDomain(date)[0].getTime();
-
-    // The current data belongs to a domain that was compressed
-    // Compress the data for the two duplicate hours into the same hour
-    if (calendar.DSTDomain.indexOf(domainUnit) >= 0) {
-      // Re-assign all data to the first or the second duplicate hours
-      // depending on which is visible
-      if (calendar._domains.has(domainUnit - 3600 * 1000)) {
-        domainUnit -= 3600 * 1000;
-      }
+  Object.keys(data).forEach(d => {
+    if (Number.isNaN(d)) {
+      return;
     }
+
+    const date = new Date(d * 1000);
+
+    const domainKey = generateDomain(
+      calendar.options.options.domain,
+      date,
+      calendar.options.options.weekStartOnMonday
+    )[0].getTime();
 
     // Skip if data is not relevant to current domain
     if (
-      isNaN(d) ||
-      !data.hasOwnProperty(d) ||
-      !calendar._domains.has(domainUnit) ||
-      !(domainUnit >= +startDate && domainUnit < +endDate)
+      !calendar.domainCollection.has(domainKey) ||
+      !(domainKey >= +startDate && domainKey < +endDate)
     ) {
-      continue;
+      return;
     }
 
-    const subDomainsData = calendar._domains.get(domainUnit);
+    const subDomainsData = calendar.domainCollection.get(domainKey);
 
-    if (!temp.hasOwnProperty(domainUnit)) {
-      temp[domainUnit] = subDomainsData.map(extractTime);
+    if (!newData.has(domainKey)) {
+      newData.set(domainKey, subDomainsData.map(extractTime));
     }
 
-    const index = temp[domainUnit].indexOf(
-      calendar.domainSkeleton.at(options.subDomain).extractUnit(date)
-    );
+    const subDomainIndex = newData
+      .get(domainKey)
+      .indexOf(calendar.domainSkeleton.at(options.subDomain).extractUnit(date));
 
     if (updateMode === RESET_SINGLE_ON_UPDATE) {
-      subDomainsData[index].v = data[d];
-    } else if (!isNaN(subDomainsData[index].v)) {
-      subDomainsData[index].v += data[d];
+      subDomainsData[subDomainIndex].v = data[d];
+    } else if (!Number.isNaN(subDomainsData[subDomainIndex].v)) {
+      subDomainsData[subDomainIndex].v += data[d];
     } else {
-      subDomainsData[index].v = data[d];
+      subDomainsData[subDomainIndex].v = data[d];
     }
-  }
+  });
 }
 
 /**
@@ -111,6 +109,7 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
  * - True if there are no data to load
  * - False if data are loaded asynchronously
  */
+// eslint-disable-next-line import/prefer-default-export
 export function getDatas(
   calendar,
   options,
@@ -118,15 +117,9 @@ export function getDatas(
   startDate,
   endDate,
   callback,
-  afterLoad,
-  updateMode
+  afterLoad = true,
+  updateMode = APPEND_ON_UPDATE
 ) {
-  if (arguments.length < 5) {
-    afterLoad = true;
-  }
-  if (arguments.length < 6) {
-    updateMode = APPEND_ON_UPDATE;
-  }
   const _callback = function (data) {
     if (afterLoad !== false) {
       if (typeof afterLoad === 'function') {
@@ -184,6 +177,7 @@ export function getDatas(
         case 'txt':
           request = text(url, reqInit);
           break;
+        default:
       }
       request.then(_callback);
 

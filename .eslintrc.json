@@ -2,7 +2,7 @@
   "extends": "airbnb",
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 8
+    "ecmaVersion": 13
   },
   "rules": {
     "arrow-parens": ["error", "as-needed"]

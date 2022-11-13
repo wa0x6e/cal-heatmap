@@ -91,6 +91,8 @@ export default class DomainPosition {
         this.setPosition(domainIndex, tmp);
         this.shiftLeftBy(enteringDomainDim);
         return tmp;
+      default:
+        return false;
     }
   }
 }

@@ -1,7 +1,8 @@
 import { NAVIGATE_RIGHT, NAVIGATE_LEFT } from '../constant';
 import { generateDomain } from '../domain/domainGenerator';
 import { getDatas } from '../data';
-import { getSubDomain } from '../subDomain';
+import { jumpDate } from '../date';
+import { generateSubDomain } from '../subDomain/subDomainGenerator';
 
 export default class Navigator {
   constructor(calendar) {
@@ -15,21 +16,20 @@ export default class Navigator {
       return false;
     }
 
+    const { options } = this.calendar.options;
+
     const bound = this.loadNewDomains(
-      NAVIGATE_RIGHT,
       generateDomain(
-        this.calendar.options.domain,
+        options.domain,
         this.calendar.getNextDomain(),
-        this.calendar.options.weekStartOnMonday,
+        options.weekStartOnMonday,
         n
-      )
+      ),
+      NAVIGATE_RIGHT
     );
 
     this.afterLoadNextDomain(bound.end);
-    this.checkIfMaxDomainIsReached(
-      this.calendar.getNextDomain().getTime(),
-      bound.start
-    );
+    this.checkIfMaxDomainIsReached(this.getNextDomain().getTime(), bound.start);
 
     return true;
   }
@@ -39,14 +39,16 @@ export default class Navigator {
       return false;
     }
 
+    const { options } = this.calendar.options;
+
     const bound = this.loadNewDomains(
-      NAVIGATE_LEFT,
       generateDomain(
-        this.calendar.options.options.domain,
+        options.domain,
         this.calendar.getDomainKeys()[0],
-        this.calendar.options.options.weekStartOnMonday,
+        options.weekStartOnMonday,
         -n
-      ).reverse()
+      ).reverse(),
+      NAVIGATE_LEFT
     );
 
     this.afterLoadPreviousDomain(bound.start);
@@ -59,13 +61,14 @@ export default class Navigator {
     const domains = this.calendar.getDomainKeys();
     const firstDomain = domains[0];
     const lastDomain = domains[domains.length - 1];
+    const { options } = this.calendar.options;
 
     if (date < firstDomain) {
       return this.loadPreviousDomain(
         generateDomain(
-          this.calendar.options.domain,
+          options.domain,
           firstDomain,
-          this.calendar.options.weekStartOnMonday,
+          options.weekStartOnMonday,
           date
         ).length
       );
@@ -73,9 +76,9 @@ export default class Navigator {
     if (reset) {
       return this.loadNextDomain(
         generateDomain(
-          this.calendar.options.domain,
+          options.domain,
           firstDomain,
-          this.calendar.options.weekStartOnMonday,
+          options.weekStartOnMonday,
           date
         ).length
       );
@@ -84,9 +87,9 @@ export default class Navigator {
     if (date > lastDomain) {
       return this.loadNextDomain(
         generateDomain(
-          this.calendar.options.domain,
+          options.domain,
           lastDomain,
-          this.calendar.options.weekStartOnMonday,
+          options.weekStartOnMonday,
           date
         ).length
       );
@@ -95,21 +98,17 @@ export default class Navigator {
     return false;
   }
 
-  loadNewDomains(direction, newDomains) {
+  loadNewDomains(newDomains, direction = NAVIGATE_RIGHT) {
     const backward = direction === NAVIGATE_LEFT;
     let i = -1;
     let total = newDomains.length;
     let domains = this.calendar.getDomainKeys();
     const { options } = this.calendar.options;
 
-    function buildSubDomain(d) {
-      return {
-        t: this.calendar.domainSkeleton
-          .at(this.calendar.options.subDomain)
-          .extractUnit(d),
-        v: null,
-      };
-    }
+    const buildSubDomain = d => ({
+      t: this.calendar.domainSkeleton.at(options.subDomain).extractUnit(d),
+      v: null,
+    });
 
     // Remove out of bound domains from list of new domains to prepend
     while (++i < total) {
@@ -126,12 +125,16 @@ export default class Navigator {
     newDomains = newDomains.slice(-options.range);
 
     for (i = 0, total = newDomains.length; i < total; i++) {
-      this.domainCollection.set(
+      this.calendar.domainCollection.set(
         newDomains[i].getTime(),
-        getSubDomain(newDomains[i], options, this.DTSDomain).map(buildSubDomain)
+        generateSubDomain(newDomains[i], options, this.DTSDomain).map(
+          buildSubDomain
+        )
       );
 
-      this.domainCollection.delete(backward ? domains.pop() : domains.shift());
+      this.calendar.domainCollection.delete(
+        backward ? domains.pop() : domains.shift()
+      );
     }
 
     domains = this.calendar.getDomainKeys();
@@ -142,25 +145,68 @@ export default class Navigator {
 
     this.calendar.calendarPainter.paint(direction);
 
-    getDatas(
-      this.calendar,
-      options,
-      options.data,
-      newDomains[0],
-      getSubDomain(
-        newDomains[newDomains.length - 1],
-        options,
-        this.calendar.DTSDomain
-      ).pop(),
-      () => {
-        this.calendar.fill(this.calendar.lastInsertedSvg);
-      }
-    );
+    // getDatas(
+    //   this.calendar,
+    //   options,
+    //   options.data,
+    //   newDomains[0],
+    //   generateSubDomain(
+    //     newDomains[newDomains.length - 1],
+    //     options,
+    //     this.calendar.DTSDomain
+    //   ).pop(),
+    //   () => {
+    //     this.calendar.fill(this.calendar.lastInsertedSvg);
+    //   }
+    // );
+
+    this.checkIfMinDomainIsReached(domains[0]);
+    this.checkIfMaxDomainIsReached(this.getNextDomain().getTime());
 
     return {
       start: newDomains[backward ? 0 : 1],
       end: domains[domains.length - 1],
     };
+  }
+
+  checkIfMinDomainIsReached(date, upperBound) {
+    if (this.minDomainIsReached(date)) {
+      this.onMinDomainReached(true);
+    }
+
+    if (arguments.length === 2) {
+      if (this.maxDomainReached && !this.maxDomainIsReached(upperBound)) {
+        this.onMaxDomainReached(false);
+      }
+    }
+  }
+
+  checkIfMaxDomainIsReached(date, lowerBound) {
+    if (this.maxDomainIsReached(date)) {
+      this.onMaxDomainReached(true);
+    }
+
+    if (arguments.length === 2) {
+      if (this.minDomainReached && !this.minDomainIsReached(lowerBound)) {
+        this.onMinDomainReached(false);
+      }
+    }
+  }
+
+  /**
+   * Get the n-th next domain after the calendar newest (rightmost) domain
+   * @param  int n
+   * @return Date The start date of the wanted domain
+   */
+  getNextDomain(n = 1) {
+    const { options } = this.calendar.options;
+
+    return generateDomain(
+      options.domain,
+      jumpDate(this.calendar.getDomainKeys().pop(), n, options.domain),
+      options.weekStartOnMonday,
+      n
+    )[0];
   }
 
   setMinDomainReached(status) {

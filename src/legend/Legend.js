@@ -12,7 +12,10 @@ export default class Legend {
     this.calendar = calendar;
     this.legendColor = new LegendColor(calendar);
 
-    this.dimensions = {};
+    this.dimensions = {
+      width: 0,
+      height: 0,
+    };
     this.shown = calendar.options.options.displayLegend;
   }
 
@@ -49,9 +52,9 @@ export default class Legend {
 
     if (options.legendVerticalPosition === 'bottom') {
       return (
-        this.calendar.calendarPainter.getHeight() -
-        options.legendMargin[0] -
-        options.domainGutter -
+        this.calendar.calendarPainter.domainPainter.getHeight() +
+        options.legendMargin[0] +
+        options.domainGutter +
         options.cellPadding
       );
     }
@@ -126,7 +129,7 @@ export default class Legend {
       .enter()
       .append('rect')
       .call(s => this.legendCellLayout(s))
-      .attr('class', d => this.getClass(d, this.legendColor.scale === null))
+      .attr('class', d => this.getClassName(d, this.legendColor.scale === null))
       .call(selection => {
         if (
           this.legendColor.scale !== null &&
@@ -157,7 +160,7 @@ export default class Legend {
         });
 
         element.attr('class', d =>
-          this.getClass(d, this.legendColor.scale === null)
+          this.getClassName(d, this.legendColor.scale === null)
         );
       });
 
@@ -215,13 +218,15 @@ export default class Legend {
    */
   getDimensions(axis) {
     const isHorizontal =
-      this.calendar.options.legendOrientation === 'horizontal';
+      this.calendar.options.options.legendOrientation === 'horizontal';
 
     switch (axis) {
       case 'height':
         return this.dimensions[isHorizontal ? 'height' : 'width'];
       case 'width':
         return this.dimensions[isHorizontal ? 'width' : 'height'];
+      default:
+        throw new Error('Invalid axis');
     }
   }
 
@@ -242,7 +247,7 @@ export default class Legend {
    *
    * @return string Classname according to the legend
    */
-  getClass(n, withCssClass) {
+  getClassName(n, withCssClass) {
     if (n === null || isNaN(n)) {
       return '';
     }

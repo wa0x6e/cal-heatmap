@@ -1,8 +1,8 @@
 import { select } from 'd3-selection';
-import { formatDate } from '../function';
 import DomainPainter from '../domain/DomainPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
 import LabelPainter from '../label/LabelPainter';
+import SubLabelPainter from '../label/SubLabelPainter';
 import Legend from '../legend/Legend';
 
 export default class CalendarPainter {
@@ -17,6 +17,7 @@ export default class CalendarPainter {
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.labelPainter = new LabelPainter(calendar);
+    this.subLabelPainter = new SubLabelPainter(calendar);
     this.legend = new Legend(calendar);
 
     // Record the address of the last inserted domain when browsing
@@ -67,82 +68,15 @@ export default class CalendarPainter {
   }
 
   paint(navigationDir = false) {
-    const { options } = this.calendar;
-
     const domainSvg = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(domainSvg);
+    this.subLabelPainter.paint(domainSvg);
     this.labelPainter.paint(domainSvg);
     this.legend.paint(this.root);
 
     this.resize();
 
     return true;
-
-    // =========================================================================//
-    // DAY LABEl                              //
-    // =========================================================================//
-    if (
-      options.dayLabel &&
-      options.domain === 'month' &&
-      options.subDomain === 'day'
-    ) {
-      // Create a list of all day names starting with Sunday or Monday, depending on configuration
-      const daysOfTheWeek = [
-        'monday',
-        'tuesday',
-        'wednesday',
-        'thursday',
-        'friday',
-        'saturday',
-      ];
-      if (options.weekStartOnMonday) {
-        daysOfTheWeek.push('sunday');
-      } else {
-        daysOfTheWeek.shif('sunday');
-      }
-      // Get the first character of the day name
-      const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-        formatDate(time[day](new Date()), '%a').charAt(0)
-      );
-      // Append "day-name" group to SVG
-      const dayLabelSvgGroup = this.root
-        .append('svg')
-        .attr('class', 'day-name')
-        .attr('x', 0)
-        .attr('y', 0);
-
-      const dayLabelSvg = dayLabelSvgGroup
-        .selectAll('g')
-        .data(daysOfTheWeekAbbr)
-        .enter()
-        .append('g');
-      // Styling "day-name-rect" elements
-      dayLabelSvg
-        .append('rect')
-        .attr('class', 'day-name-rect')
-        .attr('width', options.cellSize)
-        .attr('height', options.cellSize)
-        .attr('x', 0)
-        .attr(
-          'y',
-          (data, index) =>
-            index * options.cellSize + index * options.cellPadding
-        );
-      // Adding day names to SVG
-      dayLabelSvg
-        .append('text')
-        .attr('class', 'day-name-text')
-        .attr('dominant-baseline', 'central')
-        .attr('x', 0)
-        .attr(
-          'y',
-          (data, index) =>
-            index * options.cellSize +
-            index * options.cellPadding +
-            options.cellSize / 2
-        )
-        .text(data => data);
-    }
   }
 
   getHeight() {
@@ -158,9 +92,9 @@ export default class CalendarPainter {
       options.legendVerticalPosition === 'middle' ||
       options.legendVerticalPosition === 'center'
     ) {
-      return Math.max(this.graphDimensions.height, legendHeight);
+      return Math.max(this.domainPainter.dimensions.height, legendHeight);
     }
-    return this.graphDimensions.height + legendHeight;
+    return this.domainPainter.dimensions.height + legendHeight;
   }
 
   getWidth() {
@@ -176,9 +110,9 @@ export default class CalendarPainter {
       options.legendVerticalPosition === 'middle' ||
       options.legendVerticalPosition === 'center'
     ) {
-      return this.graphDimensions.width + legendWidth;
+      return this.domainPainter.dimensions.width + legendWidth;
     }
-    return Math.max(this.graphDimensions.width, legendWidth);
+    return Math.max(this.domainPainter.dimensions.width, legendWidth);
   }
 
   resize() {
@@ -189,6 +123,8 @@ export default class CalendarPainter {
       .duration(options.animationDuration)
       .attr('width', this.getWidth())
       .attr('height', this.getHeight());
+
+    this.calendar.onResize(this.getHeight(), this.getWidth());
 
     // this.root
     //   .select('.graph')
@@ -223,7 +159,7 @@ export default class CalendarPainter {
   destroy(callback) {
     this.root
       .transition()
-      .duration(this.calendar.options.animationDuration)
+      .duration(this.calendar.options.options.animationDuration)
       .attr('width', 0)
       .attr('height', 0)
       .remove()

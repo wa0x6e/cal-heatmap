@@ -1,6 +1,8 @@
 import { selectAll } from 'd3-selection';
 
 import { getSubDomainTitle, formatSubDomainText } from '../subDomain';
+import { getHighlightClassName } from '../function';
+import { dateIsLessThan } from '../date';
 
 export default class Populator {
   constructor(calendar) {
@@ -10,7 +12,9 @@ export default class Populator {
   /**
    * Colorize the cell via a style attribute if enabled
    */
-  addStyle(element) {
+  #addStyle(element) {
+    const { options } = this.calendar.options;
+
     if (this.calendar.calendarPainter.legend.legendColor.scale === null) {
       return false;
     }
@@ -52,14 +56,15 @@ export default class Populator {
     });
   }
 
-  getClass(d) {
-    const htmlClass = getHighlightClassName(d.t, parent.options)
-      .trim()
-      .split(' ');
-    const pastDate = dateIsLessThan(d.t, new Date(), parent.options);
+  #getClassName(d) {
+    const { calendar } = this;
+    const { options } = calendar.options;
+
+    const htmlClass = getHighlightClassName(d.t, options).trim().split(' ');
+    const pastDate = dateIsLessThan(d.t, new Date(), options);
 
     if (
-      this.calendar.calendarPainter.legend.legendColor.scale === null ||
+      calendar.calendarPainter.legend.legendColor.scale === null ||
       (d.v === null &&
         options.hasOwnProperty('considerMissingDataAsZero') &&
         !options.considerMissingDataAsZero &&
@@ -70,16 +75,16 @@ export default class Populator {
 
     if (d.v !== null) {
       htmlClass.push(
-        parent.Legend.getClass(
+        calendar.calendarPainter.legend.getClassName(
           d.v,
-          this.calendar.calendarPainter.legend.legendColor.scale === null
+          calendar.calendarPainter.legend.legendColor.scale === null
         )
       );
     } else if (options.considerMissingDataAsZero && pastDate) {
       htmlClass.push(
-        parent.Legend.getClass(
+        calendar.calendarPainter.legend.getClassName(
           0,
-          this.calendar.calendarPainter.legend.legendColor.scale === null
+          calendar.calendarPainter.legend.legendColor.scale === null
         )
       );
     }
@@ -92,21 +97,21 @@ export default class Populator {
   }
 
   populate() {
-    const parent = this;
-    const { options } = parent;
+    const { calendar } = this;
+    const { options } = calendar.options;
     const svg = this.calendar.calendarPainter.root.selectAll('.graph-domain');
 
     const rect = svg
       .selectAll('svg')
       .selectAll('g')
-      .data(d => parent.domainCollection.get(d) || []);
+      .data(d => calendar.domainCollection.get(d) || []);
 
     rect
       .transition()
       .duration(options.animationDuration)
       .select('rect')
-      .attr('class', d => this.getClass(d))
-      .call(this.addStyle);
+      .attr('class', d => this.#getClassName(d))
+      .call(d => this.#addStyle(d));
 
     rect
       .transition()
@@ -116,7 +121,7 @@ export default class Populator {
         getSubDomainTitle(
           d,
           options,
-          parent.domainSkeleton.at(options.subDomain).format.connector
+          calendar.domainSkeleton.at(options.subDomain).format.connector
         )
       );
 
@@ -131,7 +136,7 @@ export default class Populator {
       .select('text')
       .attr(
         'class',
-        d => `subdomain-text${getHighlightClassName(d.t, parent.options)}`
+        d => `subdomain-text${getHighlightClassName(d.t, options)}`
       )
       .call(() => formatSubDomainText(options.subDomainTextFormat));
   }

@@ -4,6 +4,7 @@ import { scaleLinear, scaleThreshold } from 'd3-scale';
 export default class LegendColor {
   constructor(calendar) {
     this.calendar = calendar;
+    this.scale = null;
   }
 
   build() {

@@ -8,73 +8,73 @@ export default class LabelPainter {
   paint(root) {
     const { options } = this.calendar.options;
 
-    if (options.domainLabelFormat !== '') {
-      root
-        .append('text')
-        .attr('class', 'graph-label')
-        .attr('y', d => {
-          let y = options.domainMargin[0];
-          switch (options.label.position) {
-            case 'top':
-              y += options.domainVerticalLabelHeight / 2;
-              break;
-            case 'bottom':
-              y +=
-                this.calendar.calendarPainter.domainPainter.domainHeight(d) +
-                options.domainVerticalLabelHeight / 2;
-          }
-
-          return (
-            y +
-            options.label.offset.y *
-              ((options.label.rotate === 'right' &&
-                options.label.position === 'right') ||
-              (options.label.rotate === 'left' &&
-                options.label.position === 'left')
-                ? -1
-                : 1)
-          );
-        })
-        .attr('x', d => {
-          let x = options.domainMargin[3];
-          switch (options.label.position) {
-            case 'right':
-              x += this.calendar.calendarPainter.domainPainter.domainWidth(d);
-              break;
-            case 'bottom':
-            case 'top':
-              x +=
-                this.calendar.calendarPainter.domainPainter.domainWidth(d) / 2;
-          }
-
-          if (options.label.align === 'right') {
-            return (
-              x +
-              options.domainHorizontalLabelWidth -
-              options.label.offset.x *
-                (options.label.rotate === 'right' ? -1 : 1)
-            );
-          }
-          return x + options.label.offset.x;
-        })
-        .attr('text-anchor', () => {
-          switch (options.label.align) {
-            case 'start':
-            case 'left':
-              return 'start';
-            case 'end':
-            case 'right':
-              return 'end';
-            default:
-              return 'middle';
-          }
-        })
-        .attr('dominant-baseline', () =>
-          options.verticalDomainLabel ? 'middle' : 'top'
-        )
-        .text(d => formatDate(new Date(d), options.domainLabelFormat))
-        .call(s => this.domainRotate(s));
+    if (options.domainLabelFormat === '') {
+      return false;
     }
+
+    root
+      .append('text')
+      .attr('class', 'graph-label')
+      .attr('y', d => {
+        let y = options.domainMargin[0];
+
+        if (options.label.position === 'top') {
+          y += options.domainVerticalLabelHeight / 2;
+        } else {
+          y +=
+            this.calendar.calendarPainter.domainPainter.getHeight(d) +
+            options.domainVerticalLabelHeight / 2;
+        }
+
+        return (
+          y +
+          options.label.offset.y *
+            ((options.label.rotate === 'right' &&
+              options.label.position === 'right') ||
+            (options.label.rotate === 'left' &&
+              options.label.position === 'left')
+              ? -1
+              : 1)
+        );
+      })
+      .attr('x', d => {
+        let x = options.domainMargin[3];
+
+        switch (options.label.position) {
+          case 'right':
+            x += this.calendar.calendarPainter.domainPainter.getWidth(d);
+            break;
+          case 'bottom':
+          case 'top':
+            x += this.calendar.calendarPainter.domainPainter.getWidth(d) / 2;
+        }
+
+        if (options.label.align === 'right') {
+          return (
+            x +
+            options.domainHorizontalLabelWidth -
+            options.label.offset.x * (options.label.rotate === 'right' ? -1 : 1)
+          );
+        }
+        return x + options.label.offset.x;
+      })
+      .attr('text-anchor', () => {
+        switch (options.label.align) {
+          case 'start':
+          case 'left':
+            return 'start';
+          case 'end':
+          case 'right':
+            return 'end';
+          default:
+            return 'middle';
+        }
+      })
+      .attr('dominant-baseline', () =>
+        options.verticalDomainLabel ? 'middle' : 'top'
+      )
+      .text(d => formatDate(new Date(d), options.domainLabelFormat))
+      .call(s => this.domainRotate(s));
   }
 
   domainRotate(selection) {
@@ -86,15 +86,16 @@ export default class LabelPainter {
           let s = 'rotate(90), ';
           switch (options.label.position) {
             case 'right':
-              s += `translate(-${this.calendar.calendarPainter.domainPainter.domainWidth(
+              s += `translate(-${this.calendar.calendarPainter.domainPainter.getWidth(
                 d
-              )} , -${this.calendar.calendarPainter.domainPainter.domainWidth(
+              )} , -${this.calendar.calendarPainter.domainPainter.getWidth(
                 d
               )})`;
               break;
             case 'left':
               s += `translate(0, -${options.domainHorizontalLabelWidth})`;
               break;
+            default:
           }
 
           return s;
@@ -106,20 +107,20 @@ export default class LabelPainter {
           switch (options.label.position) {
             case 'right':
               s += `translate(-${
-                this.calendar.calendarPainter.domainPainter.domainWidth(d) +
+                this.calendar.calendarPainter.domainPainter.getWidth(d) +
                 options.domainHorizontalLabelWidth
-              } , ${this.calendar.calendarPainter.domainPainter.domainWidth(
-                d
-              )})`;
+              } , ${this.calendar.calendarPainter.domainPainter.getWidth(d)})`;
               break;
             case 'left':
               s += `translate(-${options.domainHorizontalLabelWidth} , ${options.domainHorizontalLabelWidth})`;
               break;
+            default:
           }
 
           return s;
         });
         break;
+      default:
     }
   }
 }

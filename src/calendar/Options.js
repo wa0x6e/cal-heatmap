@@ -1,16 +1,33 @@
 import { select } from 'd3-selection';
+import { merge } from 'lodash-es';
 
-import {
-  mergeRecursive,
-  expandMarginSetting,
-  expandItemName,
-} from '../function';
+import { expandMarginSetting, expandItemName } from '../function';
 import { expandDateSetting } from '../date';
 import { validateSelector, validateDomainType } from '../utils/validator';
-import { getOptimalSubDomain } from '../subDomain';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 const DEFAULT_LEGEND_MARGIN = 10;
+
+/**
+ * Return the optimal subDomain for the specified domain
+ *
+ * @param  {string} domain a domain name
+ * @return {string}        the subDomain name
+ */
+function getOptimalSubDomain(domain) {
+  switch (domain) {
+    case 'year':
+      return 'month';
+    case 'month':
+      return 'day';
+    case 'week':
+      return 'day';
+    case 'day':
+      return 'hour';
+    default:
+      return 'min';
+  }
+}
 
 export default class Options {
   constructor(calendar) {
@@ -306,7 +323,7 @@ export default class Options {
   }
 
   merge(newOptions) {
-    this.options = mergeRecursive(this.options, newOptions);
+    this.options = merge(this.options, newOptions);
   }
 
   set(key, value) {
@@ -322,7 +339,7 @@ export default class Options {
   validate() {
     // Fatal errors
     // Stop script execution on error
-    validateDomainType(this.calendar, this.options);
+    validateDomainType(this.calendar.domainSkeleton, this.options);
     validateSelector(this.options.itemSelector, false, 'itemSelector');
 
     if (!ALLOWED_DATA_TYPES.includes(this.options.dataType)) {
@@ -423,6 +440,8 @@ export default class Options {
 
   init() {
     const { options } = this;
+
+    this.validate();
 
     options.subDomainDateFormat =
       typeof options.subDomainDateFormat === 'string' ||

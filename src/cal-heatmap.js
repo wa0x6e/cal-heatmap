@@ -4,24 +4,24 @@ import Populator from './calendar/Populator';
 import Options from './calendar/Options';
 import { arrayEquals } from './function';
 
-import extractSVG from './extractSVG';
+import extractSVG from './utils/extractSVG';
 
 import { generateDomain } from './domain/domainGenerator';
 import { getDatas } from './data';
-import { getSubDomain } from './subDomain';
-import { jumpDate } from './date';
+
 import DomainSkeleton from './calendar/DomainSkeleton';
+import CalendarEvent from './calendar/CalendarEvent';
 
 import { RESET_ALL_ON_UPDATE } from './constant';
 
-export default class CalHeatMap {
+export default class CalHeatMap extends CalendarEvent {
   constructor() {
+    super();
+
     // Default settings
     this.options = new Options(this);
 
     this.domainSkeleton = new DomainSkeleton(this);
-
-    this.statusComplete = false;
 
     // Record all the valid domains
     // Each domain value is a timestamp in milliseconds
@@ -37,238 +37,38 @@ export default class CalHeatMap {
   }
 
   init(settings) {
-    this.options.merge(settings);
-    this.domainSkeleton.compute();
-    this.options.validate();
-    this.options.init();
-
     const { options } = this.options;
 
-    // Init the DomainCollection
-    generateDomain(
-      options.domain,
-      options.start,
-      options.weekStartOnMonday,
-      options.range
-    )
-      .map(d => d.getTime())
-      .map(d => {
-        this.domainCollection.set(
-          d,
-          getSubDomain(d, options, this.DTSDomain).map(d => ({
-            t: this.domainSkeleton.at(options.subDomain).extractUnit(d),
-            v: null,
-          }))
-        );
-      });
+    this.options.merge(settings);
+    this.domainSkeleton.compute();
+    this.options.init();
 
     this.calendarPainter.setup();
+    this.initDomainCollection();
 
     if (options.paintOnLoad) {
       this.calendarPainter.paint();
       this.afterLoad();
-
-      const domains = this.getDomainKeys();
-
       // Fill the graph with some datas
-      if (this.options.loadOnInit) {
-        getDatas(
-          this,
-          options,
-          options.data,
-          new Date(domains[0]),
-          getSubDomain(
-            domains[domains.length - 1],
-            options,
-            this.DTSDomain
-          ).pop(),
-          () => {
-            this.populator.populate();
-            this.onComplete();
-          }
-        );
+      if (options.loadOnInit) {
+        this.update();
       } else {
         this.onComplete();
       }
-
-      this.checkIfMinDomainIsReached(domains[0]);
-      this.checkIfMaxDomainIsReached(this.getNextDomain().getTime());
     }
   }
 
-  // =========================================================================//
-  // EVENTS CALLBACK                              //
-  // =========================================================================//
+  initDomainCollection() {
+    const { options } = this.options;
 
-  /**
-   * Helper method for triggering event callback
-   *
-   * @param  string  eventName       Name of the event to trigger
-   * @param  array  successArgs     List of argument to pass to the callback
-   * @param  boolean  skip      Whether to skip the event triggering
-   * @return mixed  True when the triggering was skipped, false on error, else the callback function
-   */
-  triggerEvent(eventName, successArgs, skip) {
-    if (
-      (arguments.length === 3 && skip) ||
-      this.options.options[eventName] === null
-    ) {
-      return true;
-    }
-
-    if (typeof this.options.options[eventName] === 'function') {
-      if (typeof successArgs === 'function') {
-        successArgs = successArgs();
-      }
-      return this.options.options[eventName].apply(this, successArgs);
-    }
-    console.log(`Provided callback for ${eventName} is not a function.`);
-    return false;
-  }
-
-  /**
-   * Event triggered on a mouse click on a subDomain cell
-   *
-   * @param  Date    d    Date of the subdomain block
-   * @param  int    itemNb  Number of items in that date
-   */
-  onClick(d, itemNb) {
-    return this.triggerEvent('onClick', [d, itemNb]);
-  }
-
-  /**
-   * Event triggered when the mouse cursor enteres a subDomain cell
-   *
-   * @param  Date    d    Date of the subdomain block
-   * @param  int    itemNb  Number of items in that date
-   */
-  onMouseOver(d, itemNb) {
-    return this.triggerEvent('onMouseOver', [d, itemNb]);
-  }
-
-  /**
-   * Event triggered when the mouse cursor leaves a subDomain cell
-   *
-   * @param  Date    d    Date of the subdomain block
-   * @param  int    itemNb  Number of items in that date
-   */
-  onMouseOut(d, itemNb) {
-    return this.triggerEvent('onMouseOut', [d, itemNb]);
-  }
-
-  /**
-   * Event triggered after drawing the calendar, byt before filling it with data
-   */
-  afterLoad() {
-    return this.triggerEvent('afterLoad');
-  }
-
-  /**
-   * Event triggered after completing drawing and filling the calendar
-   */
-  onComplete() {
-    const response = this.triggerEvent('onComplete', [], this.statusComplete);
-    this.statusComplete = true;
-    return response;
-  }
-
-  /**
-   * Event triggered after resize event
-   */
-  onResize(h, w) {
-    return this.triggerEvent('onResize', [h, w]);
-  }
-
-  /**
-   * Event triggered after shifting the calendar one domain back
-   *
-   * @param  Date    start  Domain start date
-   * @param  Date    end    Domain end date
-   */
-  afterLoadPreviousDomain(start) {
-    return this.triggerEvent('afterLoadPreviousDomain', () => {
-      const subDomain = getSubDomain(
-        start,
-        this.options.options,
-        this.DTSDomain
-      );
-      return [subDomain.shift(), subDomain.pop()];
-    });
-  }
-
-  /**
-   * Event triggered after shifting the calendar one domain above
-   *
-   * @param  Date    start  Domain start date
-   * @param  Date    end    Domain end date
-   */
-  afterLoadNextDomain(start) {
-    return this.triggerEvent('afterLoadNextDomain', () => {
-      const subDomain = getSubDomain(
-        start,
-        this.options.options,
-        this.DTSDomain
-      );
-      return [subDomain.shift(), subDomain.pop()];
-    });
-  }
-
-  /**
-   * Event triggered after loading the leftmost domain allowed by minDate
-   *
-   * @param  boolean  reached True if the leftmost domain was reached
-   */
-  onMinDomainReached(reached) {
-    this.navigator.minDomainReached = reached;
-    return this.triggerEvent('onMinDomainReached', [reached]);
-  }
-
-  /**
-   * Event triggered after loading the rightmost domain allowed by maxDate
-   *
-   * @param  boolean  reached True if the rightmost domain was reached
-   */
-  onMaxDomainReached(reached) {
-    this.navigator.maxDomainReached = reached;
-    return this.triggerEvent('onMaxDomainReached', [reached]);
-  }
-
-  checkIfMinDomainIsReached(date, upperBound) {
-    const { navigator } = this;
-
-    if (navigator.minDomainIsReached(date)) {
-      this.onMinDomainReached(true);
-    }
-
-    if (arguments.length === 2) {
-      if (
-        navigator.maxDomainReached &&
-        !navigator.maxDomainIsReached(upperBound)
-      ) {
-        this.onMaxDomainReached(false);
-      }
-    }
-  }
-
-  checkIfMaxDomainIsReached(date, lowerBound) {
-    const { navigator } = this;
-
-    if (navigator.maxDomainIsReached(date)) {
-      this.onMaxDomainReached(true);
-    }
-
-    if (arguments.length === 2) {
-      if (
-        navigator.minDomainReached &&
-        !navigator.minDomainIsReached(lowerBound)
-      ) {
-        this.onMinDomainReached(false);
-      }
-    }
-  }
-
-  afterUpdate() {
-    return this.triggerEvent('afterUpdate');
+    this.navigator.loadNewDomains(
+      generateDomain(
+        options.domain,
+        options.start,
+        options.weekStartOnMonday,
+        options.range
+      )
+    );
   }
 
   /**
@@ -277,75 +77,29 @@ export default class CalHeatMap {
    * @return Array a sorted array of timestamp
    */
   getDomainKeys() {
-    return Array.from(this.domainCollection.keys())
-      .map(d => parseInt(d, 10))
-      .sort((a, b) => a - b);
+    return Array.from(this.domainCollection.keys()).sort();
   }
 
-  /**
-   * Get the n-th next domain after the calendar newest (rightmost) domain
-   * @param  int n
-   * @return Date The start date of the wanted domain
-   */
-  getNextDomain(n = 1) {
-    const { options } = this.options;
-
-    return generateDomain(
-      options.domain,
-      jumpDate(this.getDomainKeys().pop(), n, options.domain),
-      options.weekStartOnMonday,
-      n
-    )[0];
-  }
-
-  /**
-   * Get the n-th domain before the calendar oldest (leftmost) domain
-   * @param  int n
-   * @return Date The start date of the wanted domain
-   */
-  getPreviousDomain(n = 1) {
-    const { options } = this.options;
-
-    return generateDomain(
-      options.domain,
-      jumpDate(this.getDomainKeys().shift(), -n, options.domain),
-      options.weekStartOnMonday,
-      n
-    )[0];
-  }
-
-  /**
-   * Handle the calendar layout and dimension
-   *
-   * Expand and shrink the container depending on its children dimension
-   * Also rearrange the children position depending on their dimension,
-   * and the legend position
-   *
-   * @return void
-   */
-  resize() {
-    const painter = this.calendarPainter;
-
-    painter.resize();
-    this.onResize(painter.getHeight(), painter.getWidth());
-  }
-
-  // =========================================================================//
-  // PUBLIC API                                //
-  // =========================================================================//
+  // =========================================================================
+  // PUBLIC API
+  // =========================================================================
 
   /**
    * Shift the calendar forward
    */
   next(n = 1) {
-    return this.navigator.loadNextDomain(n);
+    if (this.navigator.loadNextDomain(n)) {
+      this.calendarPainter.paint();
+    }
   }
 
   /**
    * Shift the calendar backward
    */
   previous(n = 1) {
-    return this.navigator.loadPreviousDomain(n);
+    if (this.navigator.loadPreviousDomain(n)) {
+      this.calendarPainter.paint();
+    }
   }
 
   /**
@@ -377,31 +131,32 @@ export default class CalHeatMap {
    * Update the calendar with new data
    *
    * @param  object|string    dataSource    The calendar's datasource, same type as this.options.data
-   * @param  boolean|function    afterLoad    Whether to execute afterLoad() on the data. Pass directly a function
-   * if you don't want to use the afterLoad() callback
+   * @param  boolean|function    afterLoadData    Whether to execute afterLoadData() on the data. Pass directly a function
+   * if you don't want to use the afterLoadData() callback
    */
   update(
     dataSource = this.options.options.data,
-    afterLoad = true,
+    afterLoadData = true,
     updateMode = RESET_ALL_ON_UPDATE
   ) {
     const domains = this.getDomainKeys();
-    const self = this;
+    const { options } = this.options;
+    const lastSubDomain = this.domainCollection.get(
+      domains[domains.length - 1]
+    );
+
     getDatas(
-      self,
-      self.options.options,
+      this,
+      options,
       dataSource,
       new Date(domains[0]),
-      getSubDomain(
-        domains[domains.length - 1],
-        self.options.options,
-        self.DTSDomain
-      ).pop(),
+      new Date(lastSubDomain[lastSubDomain.length - 1].t),
       () => {
-        self.populator.populate();
-        self.afterUpdate();
+        this.populator.populate();
+        this.afterUpdate();
+        this.onComplete();
       },
-      afterLoad,
+      afterLoadData,
       updateMode
     );
   }

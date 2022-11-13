@@ -1,4 +1,5 @@
 import { getHighlightClassName, formatDate } from '../function';
+import { getSubDomainTitle } from '../subDomain';
 
 export default class subDomainPainter {
   constructor(calendar) {
@@ -42,135 +43,137 @@ export default class subDomainPainter {
       )
       .attr('width', options.cellSize)
       .attr('height', options.cellSize)
-      .attr('x', d => this.positionSubDomainX(d.t))
-      .attr('y', d => this.positionSubDomainY(d.t))
-      .on('click', (ev, d) => {
-        if (options.onClick !== null) {
-          return this.onClick(new Date(d.t), d.v);
+      .attr('x', d => this.#getX(d.t))
+      .attr('y', d => this.#getY(d.t))
+      .on('click', (ev, d) => this.calendar.onClick(new Date(d.t), d.v))
+      .on('mouseover', d => this.calendar.onMouseOver(new Date(d.t), d.v))
+      .on('mouseout', d => this.calendar.onMouseOut(new Date(d.t), d.v))
+      .call(selection => {
+        if (options.cellRadius > 0) {
+          selection
+            .attr('rx', options.cellRadius)
+            .attr('ry', options.cellRadius);
         }
-      })
-      .on('mouseover', d => {
-        if (options.onMouseOver !== null) {
-          return this.onMouseOver(new Date(d.t), d.v);
+
+        if (
+          this.calendar.legendScale !== null &&
+          options.legendColors !== null &&
+          options.legendColors.hasOwnProperty('base')
+        ) {
+          selection.attr('fill', options.legendColors.base);
         }
-      })
-      .on('mouseout', d => {
-        if (options.onMouseOut !== null) {
-          return this.onMouseOut(new Date(d.t), d.v);
+
+        if (options.tooltip) {
+          this.#appendTooltip(selection);
         }
       });
-    // .call(selection => {
-    //   if (options.cellRadius > 0) {
-    //     selection
-    //       .attr('rx', options.cellRadius)
-    //       .attr('ry', options.cellRadius);
-    //   }
-
-    //   if (
-    //     this.calendar.legendScale !== null &&
-    //     options.legendColors !== null &&
-    //     options.legendColors.hasOwnProperty('base')
-    //   ) {
-    //     selection.attr('fill', options.legendColors.base);
-    //   }
-
-    //   if (options.tooltip) {
-    //     selection.on('mouseover', function (ev, d) {
-    //       const domainNode = this.parentNode.parentNode;
-
-    //       const showTooltip = function (title) {
-    //         this.tooltip.html(title).attr('style', 'display: block;');
-
-    //         let tooltipPositionX =
-    //           this.positionSubDomainX(d.t) -
-    //           this.tooltip.node().offsetWidth / 2 +
-    //           options.cellSize / 2;
-    //         let tooltipPositionY =
-    //           this.positionSubDomainY(d.t) -
-    //           this.tooltip.node().offsetHeight -
-    //           options.cellSize / 2;
-
-    //         // Offset by the domain position
-    //         tooltipPositionX += parseInt(domainNode.getAttribute('x'), 10);
-    //         tooltipPositionY += parseInt(domainNode.getAttribute('y'), 10);
-
-    //         // Offset by the calendar position (when legend is left/top)
-    //         tooltipPositionX += parseInt(
-    //           this.root.select('.graph').attr('x'),
-    //           10
-    //         );
-    //         tooltipPositionY += parseInt(
-    //           this.root.select('.graph').attr('y'),
-    //           10
-    //         );
-
-    //         // Offset by the inside domain position (when label is left/top)
-    //         tooltipPositionX += parseInt(
-    //           domainNode.parentNode.getAttribute('x'),
-    //           10
-    //         );
-    //         tooltipPositionY += parseInt(
-    //           domainNode.parentNode.getAttribute('y'),
-    //           10
-    //         );
-
-    //         this.tooltip.attr(
-    //           'style',
-    //           'display: block; ' +
-    //             `left: ${tooltipPositionX}px; ` +
-    //             `top: ${tooltipPositionY}px;`
-    //         );
-    //       };
-
-    //       if (options.onTooltip) {
-    //         showTooltip(this.calendar.options.onTooltip(new Date(d.t), d.v));
-    //       } else {
-    //         showTooltip(getSubDomainTitle(d, this.calendar.options));
-    //       }
-    //     });
-
-    //     selection.on('mouseout', () => {
-    //       this.tooltip.attr('style', 'display:none').html('');
-    //     });
-    //   }
-    // });
 
     if (!options.tooltip) {
-      rect
-        .append('title')
-        .text(d => formatDate(new Date(d.t), options.subDomainDateFormat));
+      this.#appendTitle(rect);
     }
 
     if (options.subDomainTextFormat !== null) {
-      rect
-        .append('text')
-        .attr(
-          'class',
-          d => `subdomain-text${getHighlightClassName(d.t, options)}`
-        )
-        .attr('x', d => this.positionSubDomainX(d.t) + options.cellSize / 2)
-        .attr('y', d => this.positionSubDomainY(d.t) + options.cellSize / 2)
-        .attr('text-anchor', 'middle')
-        .attr('dominant-baseline', 'central')
-        .text(d => formatDate(new Date(d.t), options.subDomainTextFormat));
+      this.#appendText(rect);
     }
   }
 
-  positionSubDomainX(d) {
+  #appendTooltip(elem) {
+    const { options } = this.calendar.options;
+
+    elem.on('mouseover', (ev, d) => {
+      const domainNode = this.parentNode.parentNode;
+
+      const showTooltip = title => {
+        let tooltipPositionX =
+          this.#getX(d.t) -
+          this.calendar.tooltip.node().offsetWidth / 2 +
+          options.cellSize / 2;
+        let tooltipPositionY =
+          this.#getY(d.t) -
+          this.calendar.tooltip.node().offsetHeight -
+          options.cellSize / 2;
+
+        // Offset by the domain position
+        tooltipPositionX += parseInt(domainNode.getAttribute('x'), 10);
+        tooltipPositionY += parseInt(domainNode.getAttribute('y'), 10);
+
+        // Offset by the calendar position (when legend is left/top)
+        tooltipPositionX += parseInt(this.root.select('.graph').attr('x'), 10);
+        tooltipPositionY += parseInt(this.root.select('.graph').attr('y'), 10);
+
+        // Offset by the inside domain position (when label is left/top)
+        tooltipPositionX += parseInt(
+          domainNode.parentNode.getAttribute('x'),
+          10
+        );
+        tooltipPositionY += parseInt(
+          domainNode.parentNode.getAttribute('y'),
+          10
+        );
+
+        this.calendar.tooltip
+          .html(title)
+          .attr(
+            'style',
+            'display: block; ' +
+              `left: ${tooltipPositionX}px; ` +
+              `top: ${tooltipPositionY}px;`
+          );
+      };
+
+      if (options.onTooltip) {
+        showTooltip(this.calendar.options.onTooltip(new Date(d.t), d.v));
+      } else {
+        showTooltip(getSubDomainTitle(d, this.calendar.options));
+      }
+    });
+
+    elem.on('mouseout', () => {
+      this.calendar.tooltip.attr('style', 'display:none').html('');
+    });
+  }
+
+  #appendText(elem) {
+    const { options } = this.calendar.options;
+
+    elem
+      .append('text')
+      .attr(
+        'class',
+        d => `subdomain-text${getHighlightClassName(d.t, options)}`
+      )
+      .attr('x', d => this.#getX(d.t) + options.cellSize / 2)
+      .attr('y', d => this.#getY(d.t) + options.cellSize / 2)
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'central')
+      .text(d => formatDate(new Date(d.t), options.subDomainTextFormat));
+  }
+
+  #appendTitle(elem) {
+    const { options } = this.calendar.options;
+
+    elem
+      .append('title')
+      .text(d => formatDate(new Date(d.t), options.subDomainDateFormat));
+  }
+
+  #getX(d) {
     const { options } = this.calendar.options;
 
     const index = this.calendar.domainSkeleton
       .at(options.subDomain)
       .position.x(new Date(d));
-    return index * options.cellSize + index * options.cellPadding;
+
+    return index * (options.cellSize + options.cellPadding);
   }
 
-  positionSubDomainY(d) {
+  #getY(d) {
     const { options } = this.calendar.options;
 
     const index = this.calendar.domainSkeleton
       .at(options.subDomain)
       .position.y(new Date(d));
-    return index * options.cellSize + index * options.cellPadding;
+
+    return index * (options.cellSize + options.cellPadding);
   }
 }

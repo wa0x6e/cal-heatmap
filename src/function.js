@@ -1,12 +1,7 @@
-import { merge } from 'lodash-es';
 import { format } from 'd3-format';
 import { timeFormat } from 'd3-time-format';
 
-import { dateIsEqual, isNow } from './date';
-
-export function mergeRecursive(obj1, obj2) {
-  return merge(obj1, obj2);
-}
+import { dateIsEqual } from './date';
 
 /**
  * Check if 2 arrays are equals
@@ -139,7 +134,9 @@ export function getHighlightClassName(d, options) {
   if (options.highlight.length > 0) {
     for (const i in options.highlight) {
       if (dateIsEqual(options.highlight[i], d, options.subDomain)) {
-        return isNow(options.highlight[i]) ? ' highlight-now' : ' highlight';
+        return dateIsEqual(options.highlight[i])
+          ? ' highlight-now'
+          : ' highlight';
       }
     }
   }

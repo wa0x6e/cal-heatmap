@@ -207,17 +207,6 @@ export function dateIsEqual(dateA, dateB, subDomain) {
 }
 
 /**
- * Return whether the specified date is now,
- * according to the type of subdomain
- *
- * @param  Date d The date to compare
- * @return bool True if the date correspond to a subdomain cell
- */
-export function isNow(d) {
-  return dateIsEqual(d, new Date());
-}
-
-/**
  *
  * @param  Date date
  * @param  int count
@@ -241,6 +230,9 @@ export function jumpDate(date, count, step) {
       break;
     case 'year':
       d.setFullYear(d.getFullYear() + count);
+      break;
+    default:
+      throw new Error('Invalid step');
   }
 
   return new Date(d);

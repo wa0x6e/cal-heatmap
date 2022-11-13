@@ -127,6 +127,6 @@ export function generateDomain(domain, date, weekStartOnMonday, range = 1) {
     case 'year':
       return generateYearDomain(start, range);
     default:
-      return [];
+      throw new Error('Invalid domain');
   }
 }

@@ -10,6 +10,13 @@ export default class DomainPainter {
   constructor(calendar) {
     this.calendar = calendar;
     this.domainPosition = new DomainPosition();
+
+    // Dimensions of the internal area containing all the domains
+    // Excluding all surrounding margins
+    this.dimensions = {
+      width: 0,
+      height: 0,
+    };
   }
 
   paint(navigationDir, root) {
@@ -33,26 +40,32 @@ export default class DomainPainter {
       .enter()
       .append('svg')
       .attr('width', d => {
-        this.domainWidth(d, true);
+        const width = this.getWidth(d, true);
+        if (options.verticalOrientation) {
+          this.dimensions.width = width;
+        } else {
+          this.dimensions.width += width;
+        }
+        return width;
       })
-      .attr('height', d => this.domainHeight(d, true))
+      .attr('height', d => {
+        const height = this.getHeight(d, true);
+
+        if (options.verticalOrientation) {
+          this.dimensions.height += height;
+        } else {
+          this.dimensions.height = height;
+        }
+
+        return height;
+      })
       .attr('x', d => {
         if (options.verticalOrientation) {
-          this.calendar.calendarPainter.width = Math.max(
-            this.calendar.calendarPainter.width,
-            this.domainWidth(d, true)
-          );
           return 0;
         }
-        return this.domainPosition.getDomainPosition(
-          enteringDomainDim,
-          exitingDomainDim,
-          navigationDir,
-          d,
-          this.calendar.calendarPainter.graphDimensions,
-          'width',
-          this.domainWidth(d, true)
-        );
+
+        const domains = this.calendar.getDomainKeys();
+        return domains.indexOf(d) * this.getWidth(d, true);
       })
       .attr('y', d => {
         if (options.verticalOrientation) {
@@ -61,33 +74,27 @@ export default class DomainPainter {
             exitingDomainDim,
             navigationDir,
             d,
-            this.calendar.calendarPainter.graphDimensions,
+            this.dimensions,
             'height',
-            this.domainHeight(d, true)
+            this.getHeight(d, true)
           );
         }
-        this.calendar.calendarPainter.graphDimensions.height = Math.max(
-          this.calendar.calendarPainter.graphDimensions.height,
-          this.domainHeight(d, true)
-        );
+
         return 0;
       })
-      .attr('class', d => this.getClassName(d));
+      .attr('class', d => this.#getClassName(d));
     this.lastInsertedSvg = svg;
 
     svg
       .append('rect')
       .attr(
         'width',
-        d =>
-          this.domainWidth(d, true) - options.domainGutter - options.cellPadding
+        d => this.getWidth(d, true) - options.domainGutter - options.cellPadding
       )
       .attr(
         'height',
         d =>
-          this.domainHeight(d, true) -
-          options.domainGutter -
-          options.cellPadding
+          this.getHeight(d, true) - options.domainGutter - options.cellPadding
       )
       .attr('class', 'domain-background');
 
@@ -103,17 +110,6 @@ export default class DomainPainter {
         );
     }
 
-    const tempWidth = this.calendar.calendarPainter.graphDimensions.width;
-    const tempHeight = this.calendar.calendarPainter.graphDimensions.height;
-
-    if (options.verticalOrientation) {
-      this.calendar.calendarPainter.graphDimensions.height +=
-        enteringDomainDim - exitingDomainDim;
-    } else {
-      this.calendar.calendarPainter.graphDimensions.width +=
-        enteringDomainDim - exitingDomainDim;
-    }
-
     // At the time of exit, domainsWidth and domainsHeight already automatically shifted
     domainSvg
       .exit()
@@ -125,24 +121,18 @@ export default class DomainPainter {
         }
 
         if (navigationDir === NAVIGATE_LEFT) {
-          return Math.min(
-            this.calendar.calendarPainter.graphDimensions.width,
-            tempWidth
-          );
+          return this.dimensions.width;
         }
 
-        return -this.domainWidth(d, true);
+        return -this.getWidth(d, true);
       })
       .attr('y', d => {
         if (options.verticalOrientation) {
           if (navigationDir === NAVIGATE_LEFT) {
-            return Math.min(
-              this.calendar.calendarPainter.graphDimensions.height,
-              tempHeight
-            );
+            return this.dimensions.height;
           }
 
-          return -this.domainHeight(d, true);
+          return -this.getHeight(d, true);
         }
         return 0;
       })
@@ -151,38 +141,39 @@ export default class DomainPainter {
     return svg;
   }
 
-  getClassName(d) {
+  #getClassName(d) {
     let classname = 'graph-domain';
     const date = new Date(d);
     switch (this.calendar.options.options.domain) {
       case 'hour':
         classname += ` h_${date.getHours()}`;
-
+        break;
       case 'day':
         classname += ` d_${date.getDate()} dy_${date.getDay()}`;
-
+        break;
       case 'week':
         classname += ` w_${getWeekNumber(date)}`;
-
+        break;
       case 'month':
         classname += ` m_${date.getMonth() + 1}`;
-
+        break;
       case 'year':
         classname += ` y_${date.getFullYear()}`;
+        break;
+      default:
     }
     return classname;
   }
 
   // Return the width of the domain block, without the domain gutter
   // @param int d Domain start timestamp
-  domainWidth(d, outer = false) {
+  getWidth(d, outer = false) {
     const { options } = this.calendar.options;
+    const columnsCount = this.calendar.domainSkeleton
+      .at(options.subDomain)
+      .column(d);
 
-    let width =
-      options.cellSize *
-        this.calendar.domainSkeleton.at(options.subDomain).column(d) +
-      options.cellPadding *
-        this.calendar.domainSkeleton.at(options.subDomain).column(d);
+    let width = (options.cellSize + options.cellPadding) * columnsCount;
 
     if (outer) {
       width +=
@@ -196,14 +187,11 @@ export default class DomainPainter {
   }
 
   // Return the height of the domain block, without the domain gutter
-  domainHeight(d, outer = false) {
+  getHeight(d, outer = false) {
     const { options } = this.calendar.options;
+    const rowsCount = this.calendar.domainSkeleton.at(options.subDomain).row(d);
 
-    let height =
-      options.cellSize *
-        this.calendar.domainSkeleton.at(options.subDomain).row(d) +
-      options.cellPadding *
-        this.calendar.domainSkeleton.at(options.subDomain).row(d);
+    let height = (options.cellSize + options.cellPadding) * rowsCount;
 
     if (outer) {
       height +=
