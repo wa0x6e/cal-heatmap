@@ -4,6 +4,7 @@ import SubDomainPainter from '../subDomain/SubDomainPainter';
 import LabelPainter from '../label/LabelPainter';
 import SubLabelPainter from '../label/SubLabelPainter';
 import Legend from '../legend/Legend';
+import Tooltip from '../subDomain/Tooltip';
 
 export default class CalendarPainter {
   constructor(calendar) {
@@ -13,7 +14,7 @@ export default class CalendarPainter {
       height: 0,
     };
     this.root = null;
-    this.tooltip = null;
+    this.tooltip = new Tooltip(calendar);
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.labelPainter = new LabelPainter(calendar);
@@ -31,13 +32,7 @@ export default class CalendarPainter {
       .append('svg')
       .attr('class', 'cal-heatmap-container');
 
-    this.tooltip = select(itemSelector)
-      .attr('style', () => {
-        const current = select(itemSelector).attr('style');
-        return `${current !== null ? current : ''}position:relative;`;
-      })
-      .append('div')
-      .attr('class', 'ch-tooltip');
+    this.tooltip.init(this.root);
 
     this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
 

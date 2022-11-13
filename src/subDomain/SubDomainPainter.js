@@ -1,5 +1,4 @@
 import { getHighlightClassName, formatDate } from '../function';
-import { getSubDomainTitle } from '../subDomain';
 
 export default class subDomainPainter {
   constructor(calendar) {
@@ -64,7 +63,7 @@ export default class subDomainPainter {
         }
 
         if (options.tooltip) {
-          this.#appendTooltip(selection);
+          this.calendar.calendarPainter.tooltip.update(selection);
         }
       });
 
@@ -75,62 +74,6 @@ export default class subDomainPainter {
     if (options.subDomainTextFormat !== null) {
       this.#appendText(rect);
     }
-  }
-
-  #appendTooltip(elem) {
-    const { options } = this.calendar.options;
-
-    elem.on('mouseover', (ev, d) => {
-      const domainNode = this.parentNode.parentNode;
-
-      const showTooltip = title => {
-        let tooltipPositionX =
-          this.#getX(d.t) -
-          this.calendar.tooltip.node().offsetWidth / 2 +
-          options.cellSize / 2;
-        let tooltipPositionY =
-          this.#getY(d.t) -
-          this.calendar.tooltip.node().offsetHeight -
-          options.cellSize / 2;
-
-        // Offset by the domain position
-        tooltipPositionX += parseInt(domainNode.getAttribute('x'), 10);
-        tooltipPositionY += parseInt(domainNode.getAttribute('y'), 10);
-
-        // Offset by the calendar position (when legend is left/top)
-        tooltipPositionX += parseInt(this.root.select('.graph').attr('x'), 10);
-        tooltipPositionY += parseInt(this.root.select('.graph').attr('y'), 10);
-
-        // Offset by the inside domain position (when label is left/top)
-        tooltipPositionX += parseInt(
-          domainNode.parentNode.getAttribute('x'),
-          10
-        );
-        tooltipPositionY += parseInt(
-          domainNode.parentNode.getAttribute('y'),
-          10
-        );
-
-        this.calendar.tooltip
-          .html(title)
-          .attr(
-            'style',
-            'display: block; ' +
-              `left: ${tooltipPositionX}px; ` +
-              `top: ${tooltipPositionY}px;`
-          );
-      };
-
-      if (options.onTooltip) {
-        showTooltip(this.calendar.options.onTooltip(new Date(d.t), d.v));
-      } else {
-        showTooltip(getSubDomainTitle(d, this.calendar.options));
-      }
-    });
-
-    elem.on('mouseout', () => {
-      this.calendar.tooltip.attr('style', 'display:none').html('');
-    });
   }
 
   #appendText(elem) {

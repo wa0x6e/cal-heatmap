@@ -5822,32 +5822,6 @@
     return '';
   }
 
-  function formatSubDomainText(element, formatter) {
-    if (typeof formatter === 'function') {
-      element.text(d => formatter(d.t, d.v));
-    }
-  }
-
-  function getSubDomainTitle(d, options, connector) {
-    if (d.v === null && !options.considerMissingDataAsZero) {
-      return formatStringWithObject(options.subDomainTitleFormat.empty, {
-        date: formatDate(new Date(d.t), options.subDomainDateFormat),
-      });
-    }
-    let value = d.v;
-    // Consider null as 0
-    if (value === null && options.considerMissingDataAsZero) {
-      value = 0;
-    }
-
-    return formatStringWithObject(options.subDomainTitleFormat.filled, {
-      count: formatNumber(),
-      name: options.itemName[value !== 1 ? 1 : 0],
-      connector,
-      date: formatDate(new Date(d.t), options.subDomainDateFormat),
-    });
-  }
-
   class subDomainPainter {
     constructor(calendar) {
       this.calendar = calendar;
@@ -5911,7 +5885,7 @@
           }
 
           if (options.tooltip) {
-            this.#appendTooltip(selection);
+            this.calendar.calendarPainter.tooltip.update(selection);
           }
         });
 
@@ -5922,62 +5896,6 @@
       if (options.subDomainTextFormat !== null) {
         this.#appendText(rect);
       }
-    }
-
-    #appendTooltip(elem) {
-      const { options } = this.calendar.options;
-
-      elem.on('mouseover', (ev, d) => {
-        const domainNode = this.parentNode.parentNode;
-
-        const showTooltip = title => {
-          let tooltipPositionX =
-            this.#getX(d.t) -
-            this.calendar.tooltip.node().offsetWidth / 2 +
-            options.cellSize / 2;
-          let tooltipPositionY =
-            this.#getY(d.t) -
-            this.calendar.tooltip.node().offsetHeight -
-            options.cellSize / 2;
-
-          // Offset by the domain position
-          tooltipPositionX += parseInt(domainNode.getAttribute('x'), 10);
-          tooltipPositionY += parseInt(domainNode.getAttribute('y'), 10);
-
-          // Offset by the calendar position (when legend is left/top)
-          tooltipPositionX += parseInt(this.root.select('.graph').attr('x'), 10);
-          tooltipPositionY += parseInt(this.root.select('.graph').attr('y'), 10);
-
-          // Offset by the inside domain position (when label is left/top)
-          tooltipPositionX += parseInt(
-            domainNode.parentNode.getAttribute('x'),
-            10
-          );
-          tooltipPositionY += parseInt(
-            domainNode.parentNode.getAttribute('y'),
-            10
-          );
-
-          this.calendar.tooltip
-            .html(title)
-            .attr(
-              'style',
-              'display: block; ' +
-                `left: ${tooltipPositionX}px; ` +
-                `top: ${tooltipPositionY}px;`
-            );
-        };
-
-        if (options.onTooltip) {
-          showTooltip(this.calendar.options.onTooltip(new Date(d.t), d.v));
-        } else {
-          showTooltip(getSubDomainTitle(d, this.calendar.options));
-        }
-      });
-
-      elem.on('mouseout', () => {
-        this.calendar.tooltip.attr('style', 'display:none').html('');
-      });
     }
 
     #appendText(elem) {
@@ -6814,6 +6732,118 @@
     }
   }
 
+  function formatSubDomainText(element, formatter) {
+    if (typeof formatter === 'function') {
+      element.text(d => formatter(d.t, d.v));
+    }
+  }
+
+  function getSubDomainTitle(d, options, connector) {
+    if (d.v === null && !options.considerMissingDataAsZero) {
+      return formatStringWithObject(options.subDomainTitleFormat.empty, {
+        date: formatDate(new Date(d.t), options.subDomainDateFormat),
+      });
+    }
+    let value = d.v;
+    // Consider null as 0
+    if (value === null && options.considerMissingDataAsZero) {
+      value = 0;
+    }
+
+    return formatStringWithObject(options.subDomainTitleFormat.filled, {
+      count: formatNumber(),
+      name: options.itemName[value !== 1 ? 1 : 0],
+      connector,
+      date: formatDate(new Date(d.t), options.subDomainDateFormat),
+    });
+  }
+
+  class Tooltip {
+    constructor(calendar) {
+      this.calendar = calendar;
+      this.node = null;
+    }
+
+    init() {
+      const { itemSelector } = this.calendar.options.options;
+
+      this.node = select(itemSelector)
+        .attr('style', () => {
+          const current = select(itemSelector).attr('style');
+          return `${current !== null ? current : ''}position:relative;`;
+        })
+        .append('div')
+        .attr('class', 'ch-tooltip');
+    }
+
+    update(element) {
+      const { options } = this.calendar.options;
+
+      element.on('mouseover', (ev, d) => {
+        if (options.onTooltip) {
+          this.#setTitle(options.onTooltip(new Date(d.t), d.v));
+        } else {
+          this.#setTitle(getSubDomainTitle(d, options));
+        }
+
+        this.#show(ev.target);
+      });
+
+      element.on('mouseout', () => this.#hide());
+    }
+
+    #getCoordinates(axis, cell) {
+      const { options } = this.calendar.options;
+      const domainNode = cell.parentNode.parentNode;
+
+      let coordinate =
+        cell.getAttribute(axis) -
+        (axis === 'x'
+          ? this.node.node().offsetWidth / 2 - options.cellSize / 2
+          : this.node.node().offsetHeight + options.cellSize);
+      // Offset by the domain position
+      coordinate += parseInt(domainNode.getAttribute(axis), 10);
+
+      // Offset by the calendar position (when legend is left/top)
+      coordinate += parseInt(
+        this.calendar.calendarPainter.root.select('.graph').attr(axis) || 0,
+        10
+      );
+
+      // Offset by the inside domain position (when label is left/top)
+      coordinate += parseInt(domainNode.parentNode.getAttribute(axis), 10);
+
+      return coordinate;
+    }
+
+    #getX(cell) {
+      return this.#getCoordinates('x', cell);
+    }
+
+    #getY(cell) {
+      return this.#getCoordinates('y', cell);
+    }
+
+    #setTitle(title) {
+      this.node.html(title);
+    }
+
+    #show(cell) {
+      // Force display:block, because `offsetHeight` returns 0 on hidden element
+      this.node.attr('style', 'display: block;');
+      this.node.attr(
+        'style',
+        'display: block;' +
+          `left: ${this.#getX(cell)}px; ` +
+          `top: ${this.#getY(cell)}px;`
+      );
+    }
+
+    #hide() {
+      this.node.attr('style', 'display:none').html('');
+    }
+  }
+
   class CalendarPainter {
     constructor(calendar) {
       this.calendar = calendar;
@@ -6822,7 +6852,7 @@
         height: 0,
       };
       this.root = null;
-      this.tooltip = null;
+      this.tooltip = new Tooltip(calendar);
       this.domainPainter = new DomainPainter(calendar);
       this.subDomainPainter = new subDomainPainter(calendar);
       this.labelPainter = new LabelPainter(calendar);
@@ -6840,13 +6870,7 @@
         .append('svg')
         .attr('class', 'cal-heatmap-container');
 
-      this.tooltip = select(itemSelector)
-        .attr('style', () => {
-          const current = select(itemSelector).attr('style');
-          return `${current !== null ? current : ''}position:relative;`;
-        })
-        .append('div')
-        .attr('class', 'ch-tooltip');
+      this.tooltip.init(this.root);
 
       this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
 
