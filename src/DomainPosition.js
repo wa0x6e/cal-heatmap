@@ -1,10 +1,14 @@
 import { NAVIGATE_LEFT, NAVIGATE_RIGHT } from './constant';
 
 /**
- * Compute the position of a domain, relative to the calendar
+ * Compute the position of a domain on the scrolling axis,
+ * relative to the calendar
+ *
+ * Scrolling axis will depend on the calendar orientation
  */
 export default class DomainPosition {
   constructor() {
+    // { key: timestamp, value: scrollingAxis position }
     this.positions = new Map();
   }
 
@@ -13,8 +17,7 @@ export default class DomainPosition {
   }
 
   getPositionFromIndex(i) {
-    const domains = this.getKeys();
-    return this.positions.get(domains[i]);
+    return this.positions.get(this.getKeys()[i]);
   }
 
   getLast() {
@@ -22,26 +25,32 @@ export default class DomainPosition {
     return this.positions.get(domains[domains.length - 1]);
   }
 
-  setPosition(d, dim) {
-    this.positions.set(d, dim);
+  setPosition(d, position) {
+    this.positions.set(d, position);
   }
 
+  /**
+   * Shifiting all domains to the left, by the specified value
+   *
+   * @param  {[type]} exitingDomainDim [description]
+   * @return {[type]}                  [description]
+   */
   shiftRightBy(exitingDomainDim) {
-    const mypos = this.positions;
-    const mythis = this;
-    mypos.forEach((value, key) => {
-      mythis.positions.set(key, value - exitingDomainDim);
+    this.positions.forEach((value, key) => {
+      this.set(key, value - exitingDomainDim);
     });
 
-    const domains = this.getKeys();
-    this.positions.delete(domains[0]);
+    this.positions.delete(this.getKeys()[0]);
   }
 
+  /**
+   * Shifting all the domains to the right, by the specified value
+   * @param  {[type]} enteringDomainDim [description]
+   * @return {[type]}                   [description]
+   */
   shiftLeftBy(enteringDomainDim) {
-    const mypos = this.positions;
-    const mythis = this;
-    mypos.forEach((value, key) => {
-      mythis.positions.set(key, value + enteringDomainDim);
+    this.positions.forEach((value, key) => {
+      this.set(key, value + enteringDomainDim);
     });
 
     const domains = this.getKeys();
@@ -50,9 +59,7 @@ export default class DomainPosition {
   }
 
   getKeys() {
-    return Array.from(this.positions.keys()).sort(
-      (a, b) => parseInt(a, 10) - parseInt(b, 10)
-    );
+    return Array.from(this.positions.keys()).sort();
   }
 
   getDomainPosition(
@@ -62,7 +69,7 @@ export default class DomainPosition {
     domainIndex,
     graphDim,
     axis,
-    domainDim
+    domainDim,
   ) {
     let tmp = 0;
     switch (navigationDir) {

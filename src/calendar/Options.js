@@ -296,7 +296,7 @@ export default class Options {
       // Used mainly to convert the datas if they're not formatted like expected
       // Takes the fetched "data" object as argument, must return a json object
       // formatted like {timestamp:count, timestamp2:count2},
-      afterLoadData: data => data,
+      afterLoadData: (data) => data,
 
       // Callback triggered after calling and completing update().
       afterUpdate: null,
@@ -318,12 +318,8 @@ export default class Options {
       onMinDomainReached: null,
 
       // Callback when hovering over a time block
-      onTooltip: title => title,
+      onTooltip: (title) => title,
     };
-  }
-
-  merge(newOptions) {
-    this.options = merge(this.options, newOptions);
   }
 
   set(key, value) {
@@ -336,27 +332,29 @@ export default class Options {
     return true;
   }
 
-  validate() {
+  #validate() {
+    const { options } = this;
+
     // Fatal errors
     // Stop script execution on error
     validateDomainType(this.calendar.domainSkeleton, this.options);
-    validateSelector(this.options.itemSelector, false, 'itemSelector');
+    validateSelector(options.itemSelector, false, 'itemSelector');
 
-    if (!ALLOWED_DATA_TYPES.includes(this.options.dataType)) {
+    if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
       throw new Error(
-        `The data type '${this.options.dataType}' is not valid data type`
+        `The data type '${options.dataType}' is not valid data type`,
       );
     }
 
-    if (select(this.options.itemSelector).empty()) {
+    if (select(options.itemSelector).empty()) {
       throw new Error(
-        `The node '${this.options.itemSelector}' specified in itemSelector does not exist`
+        `The node '${options.itemSelector}' specified in itemSelector does not exist`,
       );
     }
 
     try {
-      validateSelector(this.options.nextSelector, true, 'nextSelector');
-      validateSelector(this.options.previousSelector, true, 'previousSelector');
+      validateSelector(options.nextSelector, true, 'nextSelector');
+      validateSelector(options.previousSelector, true, 'previousSelector');
     } catch (error) {
       console.log(error.message);
       return false;
@@ -364,27 +362,27 @@ export default class Options {
 
     // If other settings contains error, will fallback to default
 
-    if (!this.options.hasOwnProperty('subDomain')) {
-      this.options.subDomain = getOptimalSubDomain(this.options.domain);
+    if (!options.hasOwnProperty('subDomain')) {
+      options.subDomain = getOptimalSubDomain(options.domain);
     }
 
     if (
-      typeof this.options.itemNamespace !== 'string' ||
-      this.options.itemNamespace === ''
+      typeof options.itemNamespace !== 'string' ||
+      options.itemNamespace === ''
     ) {
       console.log(
-        'itemNamespace can not be empty, falling back to cal-heatmap'
+        'itemNamespace can not be empty, falling back to cal-heatmap',
       );
-      this.options.itemNamespace = 'cal-heatmap';
+      options.itemNamespace = 'cal-heatmap';
     }
 
     return true;
   }
 
-  parseRowLimit(value) {
+  #parseRowLimit(value) {
     if (value > 0 && this.options.colLimit > 0) {
       console.log(
-        'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored'
+        'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored',
       );
       return null;
     }
@@ -396,7 +394,7 @@ export default class Options {
    *
    * @return void
    */
-  autoAlignLabel() {
+  #autoAlignLabel() {
     // Auto-align label, depending on it's position
     if (
       !this.options.hasOwnProperty('label') ||
@@ -438,10 +436,13 @@ export default class Options {
     }
   }
 
-  init() {
+  init(settings) {
+    this.options = merge(this.options, settings);
+
     const { options } = this;
 
-    this.validate();
+    this.calendar.domainSkeleton.compute();
+    this.#validate();
 
     options.subDomainDateFormat =
       typeof options.subDomainDateFormat === 'string' ||
@@ -464,9 +465,9 @@ export default class Options {
     options.highlight = expandDateSetting(options.highlight);
     options.itemName = expandItemName(options.itemName);
     options.colLimit = options.colLimit > 0 ? options.colLimit : null;
-    options.rowLimit = this.parseRowLimit(options.rowLimit);
+    options.rowLimit = this.#parseRowLimit(options.rowLimit);
 
-    this.autoAlignLabel();
+    this.#autoAlignLabel();
 
     options.verticalDomainLabel =
       options.label.position === 'top' || options.label.position === 'bottom';
@@ -499,6 +500,8 @@ export default class Options {
           options.legendMargin[
             options.legendHorizontalPosition === 'right' ? 3 : 1
           ] = DEFAULT_LEGEND_MARGIN;
+          break;
+        default:
       }
     }
   }

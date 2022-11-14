@@ -6,7 +6,7 @@ import { arrayEquals } from './function';
 
 import extractSVG from './utils/extractSVG';
 
-import { generateDomain } from './domain/domainGenerator';
+import generateTimeInterval from './utils/timeInterval';
 import { getDatas } from './data';
 
 import DomainSkeleton from './calendar/DomainSkeleton';
@@ -30,44 +30,19 @@ export default class CalHeatMap extends CalendarEvent {
     this.navigator = new Navigator(this);
     this.populator = new Populator(this);
 
-    // List of domains that are skipped because of DST
-    // All times belonging to these domains should be re-assigned to the previous domain
-    this.DSTDomain = [];
     this.calendarPainter = new CalendarPainter(this);
   }
 
-  init(settings) {
-    const { options } = this.options;
-
-    this.options.merge(settings);
-    this.domainSkeleton.compute();
-    this.options.init();
-
-    this.calendarPainter.setup();
-    this.initDomainCollection();
-
-    if (options.paintOnLoad) {
-      this.calendarPainter.paint();
-      this.afterLoad();
-      // Fill the graph with some datas
-      if (options.loadOnInit) {
-        this.update();
-      } else {
-        this.onComplete();
-      }
-    }
-  }
-
-  initDomainCollection() {
+  #initDomainCollection() {
     const { options } = this.options;
 
     this.navigator.loadNewDomains(
-      generateDomain(
+      generateTimeInterval(
         options.domain,
         options.start,
+        options.range,
         options.weekStartOnMonday,
-        options.range
-      )
+      ),
     );
   }
 
@@ -84,8 +59,28 @@ export default class CalHeatMap extends CalendarEvent {
   // PUBLIC API
   // =========================================================================
 
+  init(settings) {
+    const { options } = this.options;
+
+    this.options.init(settings);
+
+    this.calendarPainter.setup();
+    this.#initDomainCollection();
+
+    if (options.paintOnLoad) {
+      this.calendarPainter.paint();
+      this.afterLoad();
+      // Fill the graph with some datas
+      if (options.loadOnInit) {
+        this.update();
+      } else {
+        this.onComplete();
+      }
+    }
+  }
+
   /**
-   * Shift the calendar forward
+   * Shift the calendar by n domains forward
    */
   next(n = 1) {
     if (this.navigator.loadNextDomain(n)) {
@@ -94,7 +89,7 @@ export default class CalHeatMap extends CalendarEvent {
   }
 
   /**
-   * Shift the calendar backward
+   * Shift the calendar by n domains backward
    */
   previous(n = 1) {
     if (this.navigator.loadPreviousDomain(n)) {
@@ -131,18 +126,18 @@ export default class CalHeatMap extends CalendarEvent {
    * Update the calendar with new data
    *
    * @param  object|string    dataSource    The calendar's datasource, same type as this.options.data
-   * @param  boolean|function    afterLoadData    Whether to execute afterLoadData() on the data. Pass directly a function
-   * if you don't want to use the afterLoadData() callback
+   * @param  boolean|function    afterLoadDataCallback    Whether to execute afterLoadDataCallback() on the data. Pass directly a function
+   * if you don't want to use the afterLoadDataCallback() callback
    */
   update(
     dataSource = this.options.options.data,
-    afterLoadData = true,
-    updateMode = RESET_ALL_ON_UPDATE
+    afterLoadDataCallback = this.options.options.afterLoadData,
+    updateMode = RESET_ALL_ON_UPDATE,
   ) {
-    const domains = this.getDomainKeys();
     const { options } = this.options;
+    const domains = this.getDomainKeys();
     const lastSubDomain = this.domainCollection.get(
-      domains[domains.length - 1]
+      domains[domains.length - 1],
     );
 
     getDatas(
@@ -156,8 +151,8 @@ export default class CalHeatMap extends CalendarEvent {
         this.afterUpdate();
         this.onComplete();
       },
-      afterLoadData,
-      updateMode
+      afterLoadDataCallback,
+      updateMode,
     );
   }
 
@@ -214,7 +209,7 @@ export default class CalHeatMap extends CalendarEvent {
       return false;
     }
 
-    return this.calendarPainter.legend.showLegend();
+    return this.calendarPainter.showLegend();
   }
 
   /**

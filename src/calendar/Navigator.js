@@ -1,5 +1,5 @@
 import { NAVIGATE_RIGHT, NAVIGATE_LEFT } from '../constant';
-import { generateDomain } from '../domain/domainGenerator';
+import generateTimeInterval from '../utils/timeInterval';
 import { getDatas } from '../data';
 import { jumpDate } from '../date';
 import { generateSubDomain } from '../subDomain/subDomainGenerator';
@@ -19,17 +19,20 @@ export default class Navigator {
     const { options } = this.calendar.options;
 
     const bound = this.loadNewDomains(
-      generateDomain(
+      generateTimeInterval(
         options.domain,
-        this.calendar.getNextDomain(),
+        this.#getNextDomain(),
+        n,
         options.weekStartOnMonday,
-        n
       ),
-      NAVIGATE_RIGHT
+      NAVIGATE_RIGHT,
     );
 
-    this.afterLoadNextDomain(bound.end);
-    this.checkIfMaxDomainIsReached(this.getNextDomain().getTime(), bound.start);
+    this.calendar.afterLoadNextDomain(bound.end);
+    this.#checkIfMaxDomainIsReached(
+      this.#getNextDomain().getTime(),
+      bound.start,
+    );
 
     return true;
   }
@@ -42,17 +45,17 @@ export default class Navigator {
     const { options } = this.calendar.options;
 
     const bound = this.loadNewDomains(
-      generateDomain(
+      generateTimeInterval(
         options.domain,
         this.calendar.getDomainKeys()[0],
+        -n,
         options.weekStartOnMonday,
-        -n
-      ).reverse(),
-      NAVIGATE_LEFT
+      ),
+      NAVIGATE_LEFT,
     );
 
-    this.afterLoadPreviousDomain(bound.start);
-    this.checkIfMinDomainIsReached(bound.start, bound.end);
+    this.calendar.afterLoadPreviousDomain(bound.start);
+    this.#checkIfMinDomainIsReached(bound.start, bound.end);
 
     return true;
   }
@@ -65,33 +68,33 @@ export default class Navigator {
 
     if (date < firstDomain) {
       return this.loadPreviousDomain(
-        generateDomain(
+        generateTimeInterval(
           options.domain,
           firstDomain,
+          date,
           options.weekStartOnMonday,
-          date
-        ).length
+        ).length,
       );
     }
     if (reset) {
       return this.loadNextDomain(
-        generateDomain(
+        generateTimeInterval(
           options.domain,
           firstDomain,
+          date,
           options.weekStartOnMonday,
-          date
-        ).length
+        ).length,
       );
     }
 
     if (date > lastDomain) {
       return this.loadNextDomain(
-        generateDomain(
+        generateTimeInterval(
           options.domain,
           lastDomain,
+          date,
           options.weekStartOnMonday,
-          date
-        ).length
+        ).length,
       );
     }
 
@@ -105,18 +108,18 @@ export default class Navigator {
     let domains = this.calendar.getDomainKeys();
     const { options } = this.calendar.options;
 
-    const buildSubDomain = d => ({
+    const buildSubDomain = (d) => ({
       t: this.calendar.domainSkeleton.at(options.subDomain).extractUnit(d),
       v: null,
     });
 
     // Remove out of bound domains from list of new domains to prepend
     while (++i < total) {
-      if (backward && this.minDomainIsReached(newDomains[i])) {
+      if (backward && this.#minDomainIsReached(newDomains[i])) {
         newDomains = newDomains.slice(0, i + 1);
         break;
       }
-      if (!backward && this.maxDomainIsReached(newDomains[i])) {
+      if (!backward && this.#maxDomainIsReached(newDomains[i])) {
         newDomains = newDomains.slice(0, i);
         break;
       }
@@ -128,12 +131,12 @@ export default class Navigator {
       this.calendar.domainCollection.set(
         newDomains[i].getTime(),
         generateSubDomain(newDomains[i], options, this.DTSDomain).map(
-          buildSubDomain
-        )
+          buildSubDomain,
+        ),
       );
 
       this.calendar.domainCollection.delete(
-        backward ? domains.pop() : domains.shift()
+        backward ? domains.pop() : domains.shift(),
       );
     }
 
@@ -160,8 +163,8 @@ export default class Navigator {
     //   }
     // );
 
-    this.checkIfMinDomainIsReached(domains[0]);
-    this.checkIfMaxDomainIsReached(this.getNextDomain().getTime());
+    this.#checkIfMinDomainIsReached(domains[0]);
+    this.#checkIfMaxDomainIsReached(this.#getNextDomain().getTime());
 
     return {
       start: newDomains[backward ? 0 : 1],
@@ -169,25 +172,25 @@ export default class Navigator {
     };
   }
 
-  checkIfMinDomainIsReached(date, upperBound) {
-    if (this.minDomainIsReached(date)) {
+  #checkIfMinDomainIsReached(date, upperBound) {
+    if (this.#minDomainIsReached(date)) {
       this.onMinDomainReached(true);
     }
 
     if (arguments.length === 2) {
-      if (this.maxDomainReached && !this.maxDomainIsReached(upperBound)) {
+      if (this.maxDomainReached && !this.#maxDomainIsReached(upperBound)) {
         this.onMaxDomainReached(false);
       }
     }
   }
 
-  checkIfMaxDomainIsReached(date, lowerBound) {
-    if (this.maxDomainIsReached(date)) {
+  #checkIfMaxDomainIsReached(date, lowerBound) {
+    if (this.#maxDomainIsReached(date)) {
       this.onMaxDomainReached(true);
     }
 
     if (arguments.length === 2) {
-      if (this.minDomainReached && !this.minDomainIsReached(lowerBound)) {
+      if (this.minDomainReached && !this.#minDomainIsReached(lowerBound)) {
         this.onMinDomainReached(false);
       }
     }
@@ -198,22 +201,22 @@ export default class Navigator {
    * @param  int n
    * @return Date The start date of the wanted domain
    */
-  getNextDomain(n = 1) {
+  #getNextDomain(n = 1) {
     const { options } = this.calendar.options;
 
-    return generateDomain(
+    return generateTimeInterval(
       options.domain,
       jumpDate(this.calendar.getDomainKeys().pop(), n, options.domain),
+      n,
       options.weekStartOnMonday,
-      n
     )[0];
   }
 
-  setMinDomainReached(status) {
+  #setMinDomainReached(status) {
     this.minDomainReached = status;
   }
 
-  setMaxDomainReached(status) {
+  #setMaxDomainReached(status) {
     this.maxDomainReached = status;
   }
 
@@ -223,7 +226,7 @@ export default class Navigator {
    * @param int datetimestamp The timestamp in ms to test
    * @return bool True if the specified date correspond to the calendar upper bound
    */
-  maxDomainIsReached(datetimestamp) {
+  #maxDomainIsReached(datetimestamp) {
     const { maxDate } = this.calendar.options.options;
     return maxDate !== null && maxDate.getTime() < datetimestamp;
   }
@@ -234,7 +237,7 @@ export default class Navigator {
    * @param int datetimestamp The timestamp in ms to test
    * @return bool True if the specified date correspond to the calendar lower bound
    */
-  minDomainIsReached(datetimestamp) {
+  #minDomainIsReached(datetimestamp) {
     const { minDate } = this.calendar.options.options;
 
     return minDate !== null && minDate.getTime() >= datetimestamp;

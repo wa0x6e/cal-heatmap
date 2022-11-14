@@ -15,7 +15,7 @@ export default class LabelPainter {
     root
       .append('text')
       .attr('class', 'graph-label')
-      .attr('y', d => {
+      .attr('y', (d) => {
         let y = options.domainMargin[0];
 
         if (options.label.position === 'top') {
@@ -37,7 +37,7 @@ export default class LabelPainter {
               : 1)
         );
       })
-      .attr('x', d => {
+      .attr('x', (d) => {
         let x = options.domainMargin[3];
 
         switch (options.label.position) {
@@ -71,25 +71,25 @@ export default class LabelPainter {
         }
       })
       .attr('dominant-baseline', () =>
-        options.verticalDomainLabel ? 'middle' : 'top'
+        options.verticalDomainLabel ? 'middle' : 'top',
       )
-      .text(d => formatDate(new Date(d), options.domainLabelFormat))
-      .call(s => this.domainRotate(s));
+      .text((d) => formatDate(new Date(d), options.domainLabelFormat))
+      .call((s) => this.#domainRotate(s));
   }
 
-  domainRotate(selection) {
+  #domainRotate(selection) {
     const { options } = this.calendar.options;
 
     switch (options.label.rotate) {
       case 'right':
-        selection.attr('transform', d => {
+        selection.attr('transform', (d) => {
           let s = 'rotate(90), ';
           switch (options.label.position) {
             case 'right':
               s += `translate(-${this.calendar.calendarPainter.domainPainter.getWidth(
-                d
+                d,
               )} , -${this.calendar.calendarPainter.domainPainter.getWidth(
-                d
+                d,
               )})`;
               break;
             case 'left':
@@ -102,7 +102,7 @@ export default class LabelPainter {
         });
         break;
       case 'left':
-        selection.attr('transform', d => {
+        selection.attr('transform', (d) => {
           let s = 'rotate(270), ';
           switch (options.label.position) {
             case 'right':

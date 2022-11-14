@@ -31,7 +31,7 @@ export default class DomainPainter {
           const data = this.calendar.getDomainKeys();
           return navigationDir === NAVIGATE_LEFT ? data.reverse() : data;
         },
-        d => d
+        (d) => d,
       );
     const enteringDomainDim = 0;
     const exitingDomainDim = 0;
@@ -39,7 +39,7 @@ export default class DomainPainter {
     const svg = domainSvg
       .enter()
       .append('svg')
-      .attr('width', d => {
+      .attr('width', (d) => {
         const width = this.getWidth(d, true);
         if (options.verticalOrientation) {
           this.dimensions.width = width;
@@ -48,7 +48,7 @@ export default class DomainPainter {
         }
         return width;
       })
-      .attr('height', d => {
+      .attr('height', (d) => {
         const height = this.getHeight(d, true);
 
         if (options.verticalOrientation) {
@@ -59,7 +59,7 @@ export default class DomainPainter {
 
         return height;
       })
-      .attr('x', d => {
+      .attr('x', (d) => {
         if (options.verticalOrientation) {
           return 0;
         }
@@ -67,7 +67,7 @@ export default class DomainPainter {
         const domains = this.calendar.getDomainKeys();
         return domains.indexOf(d) * this.getWidth(d, true);
       })
-      .attr('y', d => {
+      .attr('y', (d) => {
         if (options.verticalOrientation) {
           return this.domainPosition.getDomainPosition(
             enteringDomainDim,
@@ -76,25 +76,27 @@ export default class DomainPainter {
             d,
             this.dimensions,
             'height',
-            this.getHeight(d, true)
+            this.getHeight(d, true),
           );
         }
 
         return 0;
       })
-      .attr('class', d => this.#getClassName(d));
+      .attr('class', (d) => this.#getClassName(d));
+
     this.lastInsertedSvg = svg;
 
     svg
       .append('rect')
       .attr(
         'width',
-        d => this.getWidth(d, true) - options.domainGutter - options.cellPadding
+        (d) =>
+          this.getWidth(d, true) - options.domainGutter - options.cellPadding,
       )
       .attr(
         'height',
-        d =>
-          this.getHeight(d, true) - options.domainGutter - options.cellPadding
+        (d) =>
+          this.getHeight(d, true) - options.domainGutter - options.cellPadding,
       )
       .attr('class', 'domain-background');
 
@@ -102,11 +104,11 @@ export default class DomainPainter {
       domainSvg
         .transition()
         .duration(options.animationDuration)
-        .attr('x', d =>
-          options.verticalOrientation ? 0 : this.domainPosition.getPosition(d)
+        .attr('x', (d) =>
+          options.verticalOrientation ? 0 : this.domainPosition.getPosition(d),
         )
-        .attr('y', d =>
-          options.verticalOrientation ? this.domainPosition.getPosition(d) : 0
+        .attr('y', (d) =>
+          options.verticalOrientation ? this.domainPosition.getPosition(d) : 0,
         );
     }
 
@@ -115,7 +117,7 @@ export default class DomainPainter {
       .exit()
       .transition()
       .duration(options.animationDuration)
-      .attr('x', d => {
+      .attr('x', (d) => {
         if (options.verticalOrientation) {
           return 0;
         }
@@ -126,7 +128,7 @@ export default class DomainPainter {
 
         return -this.getWidth(d, true);
       })
-      .attr('y', d => {
+      .attr('y', (d) => {
         if (options.verticalOrientation) {
           if (navigationDir === NAVIGATE_LEFT) {
             return this.dimensions.height;
@@ -135,6 +137,21 @@ export default class DomainPainter {
           return -this.getHeight(d, true);
         }
         return 0;
+      })
+      .attr('width', (d) => {
+        const width = this.getWidth(d, true);
+        if (!options.verticalOrientation) {
+          this.dimensions.width -= width;
+        }
+        return width;
+      })
+      .attr('height', (d) => {
+        const height = this.getHeight(d, true);
+
+        if (options.verticalOrientation) {
+          this.dimensions.height -= height;
+        }
+        return height;
       })
       .remove();
 

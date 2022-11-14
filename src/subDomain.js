@@ -1,11 +1,5 @@
 import { formatNumber, formatDate, formatStringWithObject } from './function';
 
-export function formatSubDomainText(element, formatter) {
-  if (typeof formatter === 'function') {
-    element.text(d => formatter(d.t, d.v));
-  }
-}
-
 export function getSubDomainTitle(d, options, connector) {
   if (d.v === null && !options.considerMissingDataAsZero) {
     return formatStringWithObject(options.subDomainTitleFormat.empty, {

@@ -160,7 +160,9 @@
   }, function(date) {
     return date.getMonth();
   });
-  var months = month.range;
+
+  var timeMonth = month;
+  month.range;
 
   var year = newInterval(function(date) {
     date.setMonth(0, 1);
@@ -183,7 +185,9 @@
       date.setFullYear(date.getFullYear() + step * k);
     });
   };
-  var years = year.range;
+
+  var timeYear = year;
+  year.range;
 
   var utcDay = newInterval(function(date) {
     date.setUTCHours(0, 0, 0, 0);
@@ -380,98 +384,21 @@
     return stop < start ? -step1 : step1;
   }
 
-  function generateWeekDomain(d, range, weekStartOnMonday) {
-    let interval = sunday;
-    if (weekStartOnMonday) {
-      interval = monday;
+  function generate(interval, date, range) {
+    let start = date;
+    if (typeof date === 'number') {
+      start = new Date(date);
     }
 
     let stop = range;
     if (!(range instanceof Date)) {
-      stop = interval.offset(d, range);
+      stop = interval.offset(start, range);
     }
 
-    return interval.range(interval.floor(d), interval.ceil(stop));
-  }
-
-  /**
-   * Return all the minutes between 2 dates
-   *
-   * @param  Date  d  date  A date
-   * @param  int|date  range  Number of minutes in the range, or a stop date
-   * @return array  An array of minutes
-   */
-  function generateMinuteDomain(d, range) {
-    let stop = range;
-    if (!(range instanceof Date)) {
-      stop = timeMinute.offset(d, range);
-    }
-
-    return timeMinute.range(timeMinute.floor(d), timeMinute.ceil(stop));
-  }
-
-  /**
-   * Return all the hours between 2 dates
-   *
-   * @param  Date  d  A date
-   * @param  int|date  range  Number of hours in the range, or a stop date
-   * @return array  An array of hours
-   */
-  function generateHourDomain(d, range, DTSDomain) {
-    let stop = range;
-    if (!(range instanceof Date)) {
-      stop = timeHour.offset(d, range);
-    }
-
-    return timeHour.range(timeHour.floor(d), timeHour.ceil(stop));
-  }
-
-  /**
-   * Return all the days between 2 dates
-   *
-   * @param  Date    d    A date
-   * @param  int|date  range  Number of days in the range, or a stop date
-   * @return array  An array of weeks
-   */
-  function generateDayDomain(d, range) {
-    let stop = range;
-    if (!(range instanceof Date)) {
-      stop = timeDay.offset(d, range);
-    }
-
-    return timeDay.range(timeDay.floor(d), timeDay.ceil(stop));
-  }
-
-  /**
-   * Return all the months between 2 dates
-   *
-   * @param  Date    d    A date
-   * @param  int|date  range  Number of months in the range, or a stop date
-   * @return array  An array of months
-   */
-  function generateMonthDomain(d, range) {
-    let stop = range;
-    if (!(range instanceof Date)) {
-      stop = months.offset(d, range);
-    }
-
-    return months.range(months.floor(d), months.ceil(stop));
-  }
-
-  /**
-   * Return all the years between 2 dates
-   *
-   * @param  Date  d  date  A date
-   * @param  int|date  range  Number of minutes in the range, or a stop date
-   * @return array  An array of hours
-   */
-  function generateYearDomain(d, range) {
-    let stop = range;
-    if (!(range instanceof Date)) {
-      stop = years.offset(d, range);
-    }
-
-    return years.range(years.floor(d), years.ceil(stop));
+    return interval.range(
+      interval.floor(Math.min(start, stop)),
+      interval.ceil(Math.max(start, stop)),
+    );
   }
 
   /**
@@ -481,23 +408,25 @@
    * @param  int|Date range Number of dates to get, or a stop date
    * @return Array of dates
    */
-  function generateDomain(domain, date, weekStartOnMonday, range = 1) {
-    let start = date;
-    if (typeof date === 'number') {
-      start = new Date(date);
-    }
-
+  function generateTimeInterval(
+    domain,
+    date,
+    range,
+    weekStartOnMonday,
+  ) {
     switch (domain) {
+      case 'min':
+        return generate(timeMinute, date, range);
       case 'hour':
-        return generateHourDomain(start, range);
+        return generate(timeHour, date, range);
       case 'day':
-        return generateDayDomain(start, range);
+        return generate(timeDay, date, range);
       case 'week':
-        return generateWeekDomain(start, range, weekStartOnMonday);
+        return generate(weekStartOnMonday ? monday : sunday, date, range);
       case 'month':
-        return generateMonthDomain(start, range);
+        return generate(timeMonth, date, range);
       case 'year':
-        return generateYearDomain(start, range);
+        return generate(timeYear, date, range);
       default:
         throw new Error('Invalid domain');
     }
@@ -745,7 +674,7 @@
    */
   function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
     if (updateMode === RESET_ALL_ON_UPDATE) {
-      calendar.domainCollection.forEach(value => {
+      calendar.domainCollection.forEach((value) => {
         value.forEach((element, index, array) => {
           array[index].v = null;
         });
@@ -754,19 +683,20 @@
 
     const newData = new Map();
 
-    const extractTime = d => d.t;
+    const extractTime = (d) => d.t;
 
-    Object.keys(data).forEach(d => {
+    Object.keys(data).forEach((d) => {
       if (Number.isNaN(d)) {
         return;
       }
 
       const date = new Date(d * 1000);
 
-      const domainKey = generateDomain(
+      const domainKey = generateTimeInterval(
         calendar.options.options.domain,
         date,
-        calendar.options.options.weekStartOnMonday
+        1,
+        calendar.options.options.weekStartOnMonday,
       )[0].getTime();
 
       // Skip if data is not relevant to current domain
@@ -820,7 +750,7 @@
     endDate,
     callback,
     afterLoad = true,
-    updateMode = APPEND_ON_UPDATE
+    updateMode = APPEND_ON_UPDATE,
   ) {
     const _callback = function (data) {
       if (afterLoad !== false) {
@@ -1406,7 +1336,7 @@
   }
 
   function formatDayOfYear(d, p) {
-    return pad(1 + timeDay.count(year(d), d), p, 3);
+    return pad(1 + timeDay.count(timeYear(d), d), p, 3);
   }
 
   function formatMilliseconds(d, p) {
@@ -1435,7 +1365,7 @@
   }
 
   function formatWeekNumberSunday(d, p) {
-    return pad(sunday.count(year(d) - 1, d), p, 2);
+    return pad(sunday.count(timeYear(d) - 1, d), p, 2);
   }
 
   function dISO(d) {
@@ -1445,7 +1375,7 @@
 
   function formatWeekNumberISO(d, p) {
     d = dISO(d);
-    return pad(thursday.count(year(d), d) + (year(d).getDay() === 4), p, 2);
+    return pad(thursday.count(timeYear(d), d) + (timeYear(d).getDay() === 4), p, 2);
   }
 
   function formatWeekdayNumberSunday(d) {
@@ -1453,7 +1383,7 @@
   }
 
   function formatWeekNumberMonday(d, p) {
-    return pad(monday.count(year(d) - 1, d), p, 2);
+    return pad(monday.count(timeYear(d) - 1, d), p, 2);
   }
 
   function formatYear(d, p) {
@@ -1922,7 +1852,7 @@
       let endWeekNb = getWeekNumber(endOfMonth, weekStartOnMonday);
       let startWeekNb = getWeekNumber(
         new Date(date.getFullYear(), date.getMonth()),
-        weekStartOnMonday
+        weekStartOnMonday,
       );
 
       if (startWeekNb > endWeekNb) {
@@ -1935,13 +1865,13 @@
     if (domain === 'year') {
       return getWeekNumber(
         new Date(date.getFullYear(), 11, 31),
-        weekStartOnMonday
+        weekStartOnMonday,
       );
     }
   };
 
   // eslint-disable-next-line import/prefer-default-export
-  function generateSubDomain(startDate, options, DTSDomain) {
+  function generateSubDomain(startDate, options) {
     let date = startDate;
 
     if (typeof date === 'number') {
@@ -1951,35 +1881,40 @@
     switch (options.subDomain) {
       case 'x_min':
       case 'min':
-        return generateMinuteDomain(
+        return generateTimeInterval(
+          'min',
           date,
-          computeMinSubDomainSize(date, options.domain)
+          computeMinSubDomainSize(date, options.domain),
         );
       case 'x_hour':
       case 'hour':
-        return generateHourDomain(
+        return generateTimeInterval(
+          'hour',
           date,
-          computeHourSubDomainSize(date, options.domain));
+          computeHourSubDomainSize(date, options.domain),
+        );
       case 'x_day':
       case 'day':
-        return generateDayDomain(
+        return generateTimeInterval(
+          'day',
           date,
-          computeDaySubDomainSize(date, options.domain)
+          computeDaySubDomainSize(date, options.domain),
         );
       case 'x_week':
       case 'week':
-        return generateWeekDomain(
+        return generateTimeInterval(
+          'week',
           date,
           computeWeekSubDomainSize(
             date,
             options.domain,
-            options.weekStartOnMonday
+            options.weekStartOnMonday,
           ),
-          options.weekStartOnMonday
+          options.weekStartOnMonday,
         );
       case 'x_month':
       case 'month':
-        return generateMonthDomain(date, 12);
+        return generateTimeInterval('month', date, 12);
       default:
         throw new Error('Invalid subDomain');
     }
@@ -2000,17 +1935,20 @@
       const { options } = this.calendar.options;
 
       const bound = this.loadNewDomains(
-        generateDomain(
+        generateTimeInterval(
           options.domain,
-          this.calendar.getNextDomain(),
+          this.#getNextDomain(),
+          n,
           options.weekStartOnMonday,
-          n
         ),
-        NAVIGATE_RIGHT
+        NAVIGATE_RIGHT,
       );
 
-      this.afterLoadNextDomain(bound.end);
-      this.checkIfMaxDomainIsReached(this.getNextDomain().getTime(), bound.start);
+      this.calendar.afterLoadNextDomain(bound.end);
+      this.#checkIfMaxDomainIsReached(
+        this.#getNextDomain().getTime(),
+        bound.start,
+      );
 
       return true;
     }
@@ -2023,17 +1961,17 @@
       const { options } = this.calendar.options;
 
       const bound = this.loadNewDomains(
-        generateDomain(
+        generateTimeInterval(
           options.domain,
           this.calendar.getDomainKeys()[0],
+          -n,
           options.weekStartOnMonday,
-          -n
-        ).reverse(),
-        NAVIGATE_LEFT
+        ),
+        NAVIGATE_LEFT,
       );
 
-      this.afterLoadPreviousDomain(bound.start);
-      this.checkIfMinDomainIsReached(bound.start, bound.end);
+      this.calendar.afterLoadPreviousDomain(bound.start);
+      this.#checkIfMinDomainIsReached(bound.start, bound.end);
 
       return true;
     }
@@ -2046,33 +1984,33 @@
 
       if (date < firstDomain) {
         return this.loadPreviousDomain(
-          generateDomain(
+          generateTimeInterval(
             options.domain,
             firstDomain,
+            date,
             options.weekStartOnMonday,
-            date
-          ).length
+          ).length,
         );
       }
       if (reset) {
         return this.loadNextDomain(
-          generateDomain(
+          generateTimeInterval(
             options.domain,
             firstDomain,
+            date,
             options.weekStartOnMonday,
-            date
-          ).length
+          ).length,
         );
       }
 
       if (date > lastDomain) {
         return this.loadNextDomain(
-          generateDomain(
+          generateTimeInterval(
             options.domain,
             lastDomain,
+            date,
             options.weekStartOnMonday,
-            date
-          ).length
+          ).length,
         );
       }
 
@@ -2086,18 +2024,18 @@
       let domains = this.calendar.getDomainKeys();
       const { options } = this.calendar.options;
 
-      const buildSubDomain = d => ({
+      const buildSubDomain = (d) => ({
         t: this.calendar.domainSkeleton.at(options.subDomain).extractUnit(d),
         v: null,
       });
 
       // Remove out of bound domains from list of new domains to prepend
       while (++i < total) {
-        if (backward && this.minDomainIsReached(newDomains[i])) {
+        if (backward && this.#minDomainIsReached(newDomains[i])) {
           newDomains = newDomains.slice(0, i + 1);
           break;
         }
-        if (!backward && this.maxDomainIsReached(newDomains[i])) {
+        if (!backward && this.#maxDomainIsReached(newDomains[i])) {
           newDomains = newDomains.slice(0, i);
           break;
         }
@@ -2109,12 +2047,12 @@
         this.calendar.domainCollection.set(
           newDomains[i].getTime(),
           generateSubDomain(newDomains[i], options, this.DTSDomain).map(
-            buildSubDomain
-          )
+            buildSubDomain,
+          ),
         );
 
         this.calendar.domainCollection.delete(
-          backward ? domains.pop() : domains.shift()
+          backward ? domains.pop() : domains.shift(),
         );
       }
 
@@ -2141,8 +2079,8 @@
       //   }
       // );
 
-      this.checkIfMinDomainIsReached(domains[0]);
-      this.checkIfMaxDomainIsReached(this.getNextDomain().getTime());
+      this.#checkIfMinDomainIsReached(domains[0]);
+      this.#checkIfMaxDomainIsReached(this.#getNextDomain().getTime());
 
       return {
         start: newDomains[backward ? 0 : 1],
@@ -2150,25 +2088,25 @@
       };
     }
 
-    checkIfMinDomainIsReached(date, upperBound) {
-      if (this.minDomainIsReached(date)) {
+    #checkIfMinDomainIsReached(date, upperBound) {
+      if (this.#minDomainIsReached(date)) {
         this.onMinDomainReached(true);
       }
 
       if (arguments.length === 2) {
-        if (this.maxDomainReached && !this.maxDomainIsReached(upperBound)) {
+        if (this.maxDomainReached && !this.#maxDomainIsReached(upperBound)) {
           this.onMaxDomainReached(false);
         }
       }
     }
 
-    checkIfMaxDomainIsReached(date, lowerBound) {
-      if (this.maxDomainIsReached(date)) {
+    #checkIfMaxDomainIsReached(date, lowerBound) {
+      if (this.#maxDomainIsReached(date)) {
         this.onMaxDomainReached(true);
       }
 
       if (arguments.length === 2) {
-        if (this.minDomainReached && !this.minDomainIsReached(lowerBound)) {
+        if (this.minDomainReached && !this.#minDomainIsReached(lowerBound)) {
           this.onMinDomainReached(false);
         }
       }
@@ -2179,22 +2117,22 @@
      * @param  int n
      * @return Date The start date of the wanted domain
      */
-    getNextDomain(n = 1) {
+    #getNextDomain(n = 1) {
       const { options } = this.calendar.options;
 
-      return generateDomain(
+      return generateTimeInterval(
         options.domain,
         jumpDate(this.calendar.getDomainKeys().pop(), n, options.domain),
+        n,
         options.weekStartOnMonday,
-        n
       )[0];
     }
 
-    setMinDomainReached(status) {
+    #setMinDomainReached(status) {
       this.minDomainReached = status;
     }
 
-    setMaxDomainReached(status) {
+    #setMaxDomainReached(status) {
       this.maxDomainReached = status;
     }
 
@@ -2204,7 +2142,7 @@
      * @param int datetimestamp The timestamp in ms to test
      * @return bool True if the specified date correspond to the calendar upper bound
      */
-    maxDomainIsReached(datetimestamp) {
+    #maxDomainIsReached(datetimestamp) {
       const { maxDate } = this.calendar.options.options;
       return maxDate !== null && maxDate.getTime() < datetimestamp;
     }
@@ -2215,7 +2153,7 @@
      * @param int datetimestamp The timestamp in ms to test
      * @return bool True if the specified date correspond to the calendar lower bound
      */
-    minDomainIsReached(datetimestamp) {
+    #minDomainIsReached(datetimestamp) {
       const { minDate } = this.calendar.options.options;
 
       return minDate !== null && minDate.getTime() >= datetimestamp;
@@ -5062,10 +5000,14 @@
   selection.prototype.transition = selection_transition;
 
   /**
-   * Compute the position of a domain, relative to the calendar
+   * Compute the position of a domain on the scrolling axis,
+   * relative to the calendar
+   *
+   * Scrolling axis will depend on the calendar orientation
    */
   class DomainPosition {
     constructor() {
+      // { key: timestamp, value: scrollingAxis position }
       this.positions = new Map();
     }
 
@@ -5074,8 +5016,7 @@
     }
 
     getPositionFromIndex(i) {
-      const domains = this.getKeys();
-      return this.positions.get(domains[i]);
+      return this.positions.get(this.getKeys()[i]);
     }
 
     getLast() {
@@ -5083,26 +5024,32 @@
       return this.positions.get(domains[domains.length - 1]);
     }
 
-    setPosition(d, dim) {
-      this.positions.set(d, dim);
+    setPosition(d, position) {
+      this.positions.set(d, position);
     }
 
+    /**
+     * Shifiting all domains to the left, by the specified value
+     *
+     * @param  {[type]} exitingDomainDim [description]
+     * @return {[type]}                  [description]
+     */
     shiftRightBy(exitingDomainDim) {
-      const mypos = this.positions;
-      const mythis = this;
-      mypos.forEach((value, key) => {
-        mythis.positions.set(key, value - exitingDomainDim);
+      this.positions.forEach((value, key) => {
+        this.set(key, value - exitingDomainDim);
       });
 
-      const domains = this.getKeys();
-      this.positions.delete(domains[0]);
+      this.positions.delete(this.getKeys()[0]);
     }
 
+    /**
+     * Shifting all the domains to the right, by the specified value
+     * @param  {[type]} enteringDomainDim [description]
+     * @return {[type]}                   [description]
+     */
     shiftLeftBy(enteringDomainDim) {
-      const mypos = this.positions;
-      const mythis = this;
-      mypos.forEach((value, key) => {
-        mythis.positions.set(key, value + enteringDomainDim);
+      this.positions.forEach((value, key) => {
+        this.set(key, value + enteringDomainDim);
       });
 
       const domains = this.getKeys();
@@ -5111,9 +5058,7 @@
     }
 
     getKeys() {
-      return Array.from(this.positions.keys()).sort(
-        (a, b) => parseInt(a, 10) - parseInt(b, 10)
-      );
+      return Array.from(this.positions.keys()).sort();
     }
 
     getDomainPosition(
@@ -5123,7 +5068,7 @@
       domainIndex,
       graphDim,
       axis,
-      domainDim
+      domainDim,
     ) {
       let tmp = 0;
       switch (navigationDir) {
@@ -5183,7 +5128,7 @@
             const data = this.calendar.getDomainKeys();
             return navigationDir === NAVIGATE_LEFT ? data.reverse() : data;
           },
-          d => d
+          (d) => d,
         );
       const enteringDomainDim = 0;
       const exitingDomainDim = 0;
@@ -5191,7 +5136,7 @@
       const svg = domainSvg
         .enter()
         .append('svg')
-        .attr('width', d => {
+        .attr('width', (d) => {
           const width = this.getWidth(d, true);
           if (options.verticalOrientation) {
             this.dimensions.width = width;
@@ -5200,7 +5145,7 @@
           }
           return width;
         })
-        .attr('height', d => {
+        .attr('height', (d) => {
           const height = this.getHeight(d, true);
 
           if (options.verticalOrientation) {
@@ -5211,7 +5156,7 @@
 
           return height;
         })
-        .attr('x', d => {
+        .attr('x', (d) => {
           if (options.verticalOrientation) {
             return 0;
           }
@@ -5219,7 +5164,7 @@
           const domains = this.calendar.getDomainKeys();
           return domains.indexOf(d) * this.getWidth(d, true);
         })
-        .attr('y', d => {
+        .attr('y', (d) => {
           if (options.verticalOrientation) {
             return this.domainPosition.getDomainPosition(
               enteringDomainDim,
@@ -5228,25 +5173,27 @@
               d,
               this.dimensions,
               'height',
-              this.getHeight(d, true)
+              this.getHeight(d, true),
             );
           }
 
           return 0;
         })
-        .attr('class', d => this.#getClassName(d));
+        .attr('class', (d) => this.#getClassName(d));
+
       this.lastInsertedSvg = svg;
 
       svg
         .append('rect')
         .attr(
           'width',
-          d => this.getWidth(d, true) - options.domainGutter - options.cellPadding
+          (d) =>
+            this.getWidth(d, true) - options.domainGutter - options.cellPadding,
         )
         .attr(
           'height',
-          d =>
-            this.getHeight(d, true) - options.domainGutter - options.cellPadding
+          (d) =>
+            this.getHeight(d, true) - options.domainGutter - options.cellPadding,
         )
         .attr('class', 'domain-background');
 
@@ -5254,11 +5201,11 @@
         domainSvg
           .transition()
           .duration(options.animationDuration)
-          .attr('x', d =>
-            options.verticalOrientation ? 0 : this.domainPosition.getPosition(d)
+          .attr('x', (d) =>
+            options.verticalOrientation ? 0 : this.domainPosition.getPosition(d),
           )
-          .attr('y', d =>
-            options.verticalOrientation ? this.domainPosition.getPosition(d) : 0
+          .attr('y', (d) =>
+            options.verticalOrientation ? this.domainPosition.getPosition(d) : 0,
           );
       }
 
@@ -5267,7 +5214,7 @@
         .exit()
         .transition()
         .duration(options.animationDuration)
-        .attr('x', d => {
+        .attr('x', (d) => {
           if (options.verticalOrientation) {
             return 0;
           }
@@ -5278,7 +5225,7 @@
 
           return -this.getWidth(d, true);
         })
-        .attr('y', d => {
+        .attr('y', (d) => {
           if (options.verticalOrientation) {
             if (navigationDir === NAVIGATE_LEFT) {
               return this.dimensions.height;
@@ -5287,6 +5234,21 @@
             return -this.getHeight(d, true);
           }
           return 0;
+        })
+        .attr('width', (d) => {
+          const width = this.getWidth(d, true);
+          if (!options.verticalOrientation) {
+            this.dimensions.width -= width;
+          }
+          return width;
+        })
+        .attr('height', (d) => {
+          const height = this.getHeight(d, true);
+
+          if (options.verticalOrientation) {
+            this.dimensions.height -= height;
+          }
+          return height;
         })
         .remove();
 
@@ -5958,7 +5920,7 @@
       root
         .append('text')
         .attr('class', 'graph-label')
-        .attr('y', d => {
+        .attr('y', (d) => {
           let y = options.domainMargin[0];
 
           if (options.label.position === 'top') {
@@ -5980,7 +5942,7 @@
                 : 1)
           );
         })
-        .attr('x', d => {
+        .attr('x', (d) => {
           let x = options.domainMargin[3];
 
           switch (options.label.position) {
@@ -6014,25 +5976,25 @@
           }
         })
         .attr('dominant-baseline', () =>
-          options.verticalDomainLabel ? 'middle' : 'top'
+          options.verticalDomainLabel ? 'middle' : 'top',
         )
-        .text(d => formatDate(new Date(d), options.domainLabelFormat))
-        .call(s => this.domainRotate(s));
+        .text((d) => formatDate(new Date(d), options.domainLabelFormat))
+        .call((s) => this.#domainRotate(s));
     }
 
-    domainRotate(selection) {
+    #domainRotate(selection) {
       const { options } = this.calendar.options;
 
       switch (options.label.rotate) {
         case 'right':
-          selection.attr('transform', d => {
+          selection.attr('transform', (d) => {
             let s = 'rotate(90), ';
             switch (options.label.position) {
               case 'right':
                 s += `translate(-${this.calendar.calendarPainter.domainPainter.getWidth(
-                d
+                d,
               )} , -${this.calendar.calendarPainter.domainPainter.getWidth(
-                d
+                d,
               )})`;
                 break;
               case 'left':
@@ -6044,7 +6006,7 @@
           });
           break;
         case 'left':
-          selection.attr('transform', d => {
+          selection.attr('transform', (d) => {
             let s = 'rotate(270), ';
             switch (options.label.position) {
               case 'right':
@@ -6473,9 +6435,10 @@
         height: 0,
       };
       this.shown = calendar.options.options.displayLegend;
+      this.root = null;
     }
 
-    legendCellLayout(selection) {
+    #legendCellLayout(selection) {
       const { legendCellSize, legendCellPadding } = this.calendar.options.options;
       selection
         .attr('width', legendCellSize)
@@ -6483,7 +6446,7 @@
         .attr('x', (d, i) => i * (legendCellSize + legendCellPadding));
     }
 
-    getXPosition(width) {
+    #getXPosition(width) {
       const { options } = this.calendar.options;
 
       switch (options.legendHorizontalPosition) {
@@ -6503,7 +6466,7 @@
       }
     }
 
-    getYPosition() {
+    #getYPosition() {
       const { options } = this.calendar.options;
 
       if (options.legendVerticalPosition === 'bottom') {
@@ -6517,7 +6480,7 @@
       return options.legendMargin[0];
     }
 
-    computeDimensions() {
+    #computeDimensions() {
       const { options } = this.calendar.options;
 
       this.dimensions = {
@@ -6528,13 +6491,13 @@
       };
     }
 
-    destroy() {
+    destroy(root) {
       if (!this.shown) {
         return false;
       }
 
       this.shown = false;
-      this.calendar.root.select(DEFAULT_CLASSNAME).remove();
+      root.select(DEFAULT_CLASSNAME).remove();
 
       return true;
     }
@@ -6554,7 +6517,7 @@
       let legendItem;
       this.shown = true;
 
-      this.computeDimensions();
+      this.#computeDimensions();
 
       const legendItems = options.legend.slice(0);
       legendItems.push(legendItems[legendItems.length - 1] + 1);
@@ -6570,7 +6533,9 @@
             ? legend.insert('svg', '.graph')
             : legend.append('svg');
 
-        legend.attr('x', this.getXPosition(width)).attr('y', this.getYPosition());
+        legend
+          .attr('x', this.#getXPosition(width))
+          .attr('y', this.#getYPosition());
 
         legendItem = legend
           .attr('class', 'graph-legend')
@@ -6584,9 +6549,11 @@
       legendItem
         .enter()
         .append('rect')
-        .call(s => this.legendCellLayout(s))
-        .attr('class', d => this.getClassName(d, this.legendColor.scale === null))
-        .call(selection => {
+        .call((s) => this.#legendCellLayout(s))
+        .attr('class', (d) =>
+          this.getClassName(d, this.legendColor.scale === null),
+        )
+        .call((selection) => {
           if (
             this.legendColor.scale !== null &&
             options.legendColors !== null &&
@@ -6602,8 +6569,8 @@
       legendItem
         .transition()
         .delay((d, i) => (options.animationDuration * i) / 10)
-        .call(s => this.legendCellLayout(s))
-        .call(element => {
+        .call((s) => this.#legendCellLayout(s))
+        .call((element) => {
           element.attr('fill', (d, i) => {
             if (this.legendColor.scale === null) {
               return '';
@@ -6615,8 +6582,8 @@
             return this.legendColor.scale(options.legend[i - 1]);
           });
 
-          element.attr('class', d =>
-            this.getClassName(d, this.legendColor.scale === null)
+          element.attr('class', (d) =>
+            this.getClassName(d, this.legendColor.scale === null),
           );
         });
 
@@ -6643,8 +6610,8 @@
       legend
         .transition()
         .duration(options.animationDuration)
-        .attr('x', this.getXPosition(width))
-        .attr('y', this.getYPosition())
+        .attr('x', this.#getXPosition(width))
+        .attr('y', this.#getYPosition())
         .attr('width', this.getWidth())
         .attr('height', this.getHeight());
 
@@ -6672,7 +6639,7 @@
      * @param  string axis Width or height
      * @return int height or width in pixels
      */
-    getDimensions(axis) {
+    #getDimensions(axis) {
       const isHorizontal =
         this.calendar.options.options.legendOrientation === 'horizontal';
 
@@ -6687,11 +6654,11 @@
     }
 
     getWidth() {
-      return this.getDimensions('width');
+      return this.#getDimensions('width');
     }
 
     getHeight() {
-      return this.getDimensions('height');
+      return this.#getDimensions('height');
     }
 
     /**
@@ -6729,12 +6696,6 @@
 
       index.unshift('');
       return (index.join(' r') + (withCssClass ? index.join(' q') : '')).trim();
-    }
-  }
-
-  function formatSubDomainText(element, formatter) {
-    if (typeof formatter === 'function') {
-      element.text(d => formatter(d.t, d.v));
     }
   }
 
@@ -6874,28 +6835,31 @@
 
       this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
 
-      this.attachNavigationEvents();
+      this.#attachNavigationEvents();
 
       return true;
     }
 
-    attachNavigationEvents() {
+    #attachNavigationEvents() {
       const { options } = this.calendar;
 
       if (options.nextSelector !== false) {
-        select(options.nextSelector).on(`click.${options.itemNamespace}`, ev => {
-          ev.preventDefault();
-          return this.calendar.next(1);
-        });
+        select(options.nextSelector).on(
+          `click.${options.itemNamespace}`,
+          (ev) => {
+            ev.preventDefault();
+            return this.calendar.next(1);
+          },
+        );
       }
 
       if (options.previousSelector !== false) {
         select(options.previousSelector).on(
           `click.${options.itemNamespace}`,
-          ev => {
+          (ev) => {
             ev.preventDefault();
             return this.calendar.previous(1);
-          }
+          },
         );
       }
     }
@@ -7018,11 +6982,11 @@
     }
 
     removeLegend() {
-      return this.legend.destroy() && this.resize();
+      return this.legend.destroy(this.root) && this.resize();
     }
 
     showLegend() {
-      return this.legend.paint() && this.resize();
+      return this.legend.paint(this.root) && this.resize();
     }
   }
 
@@ -7118,6 +7082,13 @@
       return htmlClass.join(' ');
     }
 
+    #formatSubDomainText(element) {
+      const formatter = this.calendar.options.options.subDomainTextFormat;
+      if (typeof formatter === 'function') {
+        element.text(d => formatter(d.t, d.v));
+      }
+    }
+
     populate() {
       const { calendar } = this;
       const { options } = calendar.options;
@@ -7160,7 +7131,7 @@
           'class',
           d => `subdomain-text${getHighlightClassName(d.t, options)}`
         )
-        .call(() => formatSubDomainText(options.subDomainTextFormat));
+        .call(e => this.#formatSubDomainText(e));
     }
   }
 
@@ -9641,7 +9612,7 @@
         // Used mainly to convert the datas if they're not formatted like expected
         // Takes the fetched "data" object as argument, must return a json object
         // formatted like {timestamp:count, timestamp2:count2},
-        afterLoadData: data => data,
+        afterLoadData: (data) => data,
 
         // Callback triggered after calling and completing update().
         afterUpdate: null,
@@ -9663,12 +9634,8 @@
         onMinDomainReached: null,
 
         // Callback when hovering over a time block
-        onTooltip: title => title,
+        onTooltip: (title) => title,
       };
-    }
-
-    merge(newOptions) {
-      this.options = merge$1(this.options, newOptions);
     }
 
     set(key, value) {
@@ -9681,27 +9648,29 @@
       return true;
     }
 
-    validate() {
+    #validate() {
+      const { options } = this;
+
       // Fatal errors
       // Stop script execution on error
       validateDomainType(this.calendar.domainSkeleton, this.options);
-      validateSelector(this.options.itemSelector, false, 'itemSelector');
+      validateSelector(options.itemSelector, false, 'itemSelector');
 
-      if (!ALLOWED_DATA_TYPES.includes(this.options.dataType)) {
+      if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
         throw new Error(
-          `The data type '${this.options.dataType}' is not valid data type`
+          `The data type '${options.dataType}' is not valid data type`,
         );
       }
 
-      if (select(this.options.itemSelector).empty()) {
+      if (select(options.itemSelector).empty()) {
         throw new Error(
-          `The node '${this.options.itemSelector}' specified in itemSelector does not exist`
+          `The node '${options.itemSelector}' specified in itemSelector does not exist`,
         );
       }
 
       try {
-        validateSelector(this.options.nextSelector, true, 'nextSelector');
-        validateSelector(this.options.previousSelector, true, 'previousSelector');
+        validateSelector(options.nextSelector, true, 'nextSelector');
+        validateSelector(options.previousSelector, true, 'previousSelector');
       } catch (error) {
         console.log(error.message);
         return false;
@@ -9709,27 +9678,27 @@
 
       // If other settings contains error, will fallback to default
 
-      if (!this.options.hasOwnProperty('subDomain')) {
-        this.options.subDomain = getOptimalSubDomain(this.options.domain);
+      if (!options.hasOwnProperty('subDomain')) {
+        options.subDomain = getOptimalSubDomain(options.domain);
       }
 
       if (
-        typeof this.options.itemNamespace !== 'string' ||
-        this.options.itemNamespace === ''
+        typeof options.itemNamespace !== 'string' ||
+        options.itemNamespace === ''
       ) {
         console.log(
-          'itemNamespace can not be empty, falling back to cal-heatmap'
+          'itemNamespace can not be empty, falling back to cal-heatmap',
         );
-        this.options.itemNamespace = 'cal-heatmap';
+        options.itemNamespace = 'cal-heatmap';
       }
 
       return true;
     }
 
-    parseRowLimit(value) {
+    #parseRowLimit(value) {
       if (value > 0 && this.options.colLimit > 0) {
         console.log(
-          'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored'
+          'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored',
         );
         return null;
       }
@@ -9741,7 +9710,7 @@
      *
      * @return void
      */
-    autoAlignLabel() {
+    #autoAlignLabel() {
       // Auto-align label, depending on it's position
       if (
         !this.options.hasOwnProperty('label') ||
@@ -9783,10 +9752,13 @@
       }
     }
 
-    init() {
+    init(settings) {
+      this.options = merge$1(this.options, settings);
+
       const { options } = this;
 
-      this.validate();
+      this.calendar.domainSkeleton.compute();
+      this.#validate();
 
       options.subDomainDateFormat =
         typeof options.subDomainDateFormat === 'string' ||
@@ -9809,9 +9781,9 @@
       options.highlight = expandDateSetting$1(options.highlight);
       options.itemName = expandItemName(options.itemName);
       options.colLimit = options.colLimit > 0 ? options.colLimit : null;
-      options.rowLimit = this.parseRowLimit(options.rowLimit);
+      options.rowLimit = this.#parseRowLimit(options.rowLimit);
 
-      this.autoAlignLabel();
+      this.#autoAlignLabel();
 
       options.verticalDomainLabel =
         options.label.position === 'top' || options.label.position === 'bottom';
@@ -9844,6 +9816,7 @@
             options.legendMargin[
               options.legendHorizontalPosition === 'right' ? 3 : 1
             ] = DEFAULT_LEGEND_MARGIN;
+            break;
         }
       }
     }
@@ -9975,7 +9948,7 @@
       this.calendar = calendar;
     }
 
-    getSubDomainRowNumber(d) {
+    #getSubDomainRowNumber(d) {
       const { options } = this.calendar.options;
 
       if (options.colLimit > 0) {
@@ -9993,7 +9966,7 @@
       return options.rowLimit || j;
     }
 
-    getSubDomainColumnNumber(d) {
+    #getSubDomainColumnNumber(d) {
       const { options } = this.calendar.options;
 
       if (options.rowLimit > 0) {
@@ -10030,10 +10003,10 @@
           defaultRowNumber: 10,
           defaultColumnNumber: 6,
           row(d) {
-            return self.getSubDomainRowNumber(d);
+            return self.#getSubDomainRowNumber(d);
           },
           column(d) {
-            return self.getSubDomainColumnNumber(d);
+            return self.#getSubDomainColumnNumber(d);
           },
           position: {
             x(d) {
@@ -10054,7 +10027,7 @@
               d.getMonth(),
               d.getDate(),
               d.getHours(),
-              d.getMinutes()
+              d.getMinutes(),
             ).getTime();
           },
         },
@@ -10088,10 +10061,10 @@
             }
           },
           row(d) {
-            return self.getSubDomainRowNumber(d);
+            return self.#getSubDomainRowNumber(d);
           },
           column(d) {
-            return self.getSubDomainColumnNumber(d);
+            return self.#getSubDomainColumnNumber(d);
           },
           position: {
             x(d) {
@@ -10099,7 +10072,7 @@
                 if (options.colLimit > 0 || options.rowLimit > 0) {
                   return Math.floor(
                     (d.getHours() + (d.getDate() - 1) * 24) /
-                      self.settings.hour.row(d)
+                      self.settings.hour.row(d),
                   );
                 }
                 return (
@@ -10112,7 +10085,7 @@
                   return Math.floor(
                     (d.getHours() +
                       getWeekDay(d, options.weekStartOnMonday) * 24) /
-                      self.settings.hour.row(d)
+                      self.settings.hour.row(d),
                   );
                 }
                 return (
@@ -10147,7 +10120,7 @@
               d.getFullYear(),
               d.getMonth(),
               d.getDate(),
-              d.getHours()
+              d.getHours(),
             ).getTime();
           },
         },
@@ -10177,7 +10150,7 @@
                 return options.domainDynamicDimension &&
                   !options.verticalOrientation
                   ? getWeekNumber(
-                      new Date(d.getFullYear(), d.getMonth() + 1, 0)
+                      new Date(d.getFullYear(), d.getMonth() + 1, 0),
                     ) -
                       getWeekNumber(d) +
                       1
@@ -10192,10 +10165,10 @@
           },
           defaultRowNumber: 7,
           row(d) {
-            return self.getSubDomainRowNumber(d);
+            return self.#getSubDomainRowNumber(d);
           },
           column(d) {
-            return self.getSubDomainColumnNumber(d);
+            return self.#getSubDomainColumnNumber(d);
           },
           position: {
             x(d) {
@@ -10203,12 +10176,12 @@
                 case 'week':
                   return Math.floor(
                     getWeekDay(d, options.weekStartOnMonday) /
-                      self.settings.day.row(d)
+                      self.settings.day.row(d),
                   );
                 case 'month':
                   if (options.colLimit > 0 || options.rowLimit > 0) {
                     return Math.floor(
-                      (d.getDate() - 1) / self.settings.day.row(d)
+                      (d.getDate() - 1) / self.settings.day.row(d),
                     );
                   }
                   return (
@@ -10218,7 +10191,7 @@
                 case 'year':
                   if (options.colLimit > 0 || options.rowLimit > 0) {
                     return Math.floor(
-                      (getDayOfYear() - 1) / self.settings.day.row(d)
+                      (getDayOfYear() - 1) / self.settings.day.row(d),
                     );
                   }
                   return getWeekNumber(d);
@@ -10263,17 +10236,17 @@
               case 'month':
                 return options.domainDynamicDimension
                   ? getWeekNumber(
-                      new Date(d.getFullYear(), d.getMonth() + 1, 0)
+                      new Date(d.getFullYear(), d.getMonth() + 1, 0),
                     ) - getWeekNumber(d)
                   : 5;
             }
           },
           defaultRowNumber: 1,
           row(d) {
-            return self.getSubDomainRowNumber(d);
+            return self.#getSubDomainRowNumber(d);
           },
           column(d) {
-            return self.getSubDomainColumnNumber(d);
+            return self.#getSubDomainColumnNumber(d);
           },
           position: {
             x(d) {
@@ -10282,7 +10255,7 @@
                   return Math.floor(getWeekNumber(d) / self.settings.week.row(d));
                 case 'month':
                   return Math.floor(
-                    getMonthWeekNumber(d) / self.settings.week.row(d)
+                    getMonthWeekNumber(d) / self.settings.week.row(d),
                   );
               }
             },
@@ -10313,10 +10286,10 @@
           defaultColumnNumber: 12,
           defaultRowNumber: 1,
           row() {
-            return self.getSubDomainRowNumber();
+            return self.#getSubDomainRowNumber();
           },
           column() {
-            return self.getSubDomainColumnNumber();
+            return self.#getSubDomainColumnNumber();
           },
           position: {
             x(d) {
@@ -10542,44 +10515,19 @@
       this.navigator = new Navigator(this);
       this.populator = new Populator(this);
 
-      // List of domains that are skipped because of DST
-      // All times belonging to these domains should be re-assigned to the previous domain
-      this.DSTDomain = [];
       this.calendarPainter = new CalendarPainter(this);
     }
 
-    init(settings) {
-      const { options } = this.options;
-
-      this.options.merge(settings);
-      this.domainSkeleton.compute();
-      this.options.init();
-
-      this.calendarPainter.setup();
-      this.initDomainCollection();
-
-      if (options.paintOnLoad) {
-        this.calendarPainter.paint();
-        this.afterLoad();
-        // Fill the graph with some datas
-        if (options.loadOnInit) {
-          this.update();
-        } else {
-          this.onComplete();
-        }
-      }
-    }
-
-    initDomainCollection() {
+    #initDomainCollection() {
       const { options } = this.options;
 
       this.navigator.loadNewDomains(
-        generateDomain(
+        generateTimeInterval(
           options.domain,
           options.start,
+          options.range,
           options.weekStartOnMonday,
-          options.range
-        )
+        ),
       );
     }
 
@@ -10596,8 +10544,28 @@
     // PUBLIC API
     // =========================================================================
 
+    init(settings) {
+      const { options } = this.options;
+
+      this.options.init(settings);
+
+      this.calendarPainter.setup();
+      this.#initDomainCollection();
+
+      if (options.paintOnLoad) {
+        this.calendarPainter.paint();
+        this.afterLoad();
+        // Fill the graph with some datas
+        if (options.loadOnInit) {
+          this.update();
+        } else {
+          this.onComplete();
+        }
+      }
+    }
+
     /**
-     * Shift the calendar forward
+     * Shift the calendar by n domains forward
      */
     next(n = 1) {
       if (this.navigator.loadNextDomain(n)) {
@@ -10606,7 +10574,7 @@
     }
 
     /**
-     * Shift the calendar backward
+     * Shift the calendar by n domains backward
      */
     previous(n = 1) {
       if (this.navigator.loadPreviousDomain(n)) {
@@ -10643,18 +10611,18 @@
      * Update the calendar with new data
      *
      * @param  object|string    dataSource    The calendar's datasource, same type as this.options.data
-     * @param  boolean|function    afterLoadData    Whether to execute afterLoadData() on the data. Pass directly a function
-     * if you don't want to use the afterLoadData() callback
+     * @param  boolean|function    afterLoadDataCallback    Whether to execute afterLoadDataCallback() on the data. Pass directly a function
+     * if you don't want to use the afterLoadDataCallback() callback
      */
     update(
       dataSource = this.options.options.data,
-      afterLoadData = true,
-      updateMode = RESET_ALL_ON_UPDATE
+      afterLoadDataCallback = this.options.options.afterLoadData,
+      updateMode = RESET_ALL_ON_UPDATE,
     ) {
-      const domains = this.getDomainKeys();
       const { options } = this.options;
+      const domains = this.getDomainKeys();
       const lastSubDomain = this.domainCollection.get(
-        domains[domains.length - 1]
+        domains[domains.length - 1],
       );
 
       getDatas(
@@ -10668,8 +10636,8 @@
           this.afterUpdate();
           this.onComplete();
         },
-        afterLoadData,
-        updateMode
+        afterLoadDataCallback,
+        updateMode,
       );
     }
 
@@ -10726,7 +10694,7 @@
         return false;
       }
 
-      return this.calendarPainter.legend.showLegend();
+      return this.calendarPainter.showLegend();
     }
 
     /**

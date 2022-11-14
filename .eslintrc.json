@@ -1,10 +1,7 @@
 {
-  "extends": "airbnb",
+  "extends": "airbnb-base",
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 13
-  },
-  "rules": {
-    "arrow-parens": ["error", "as-needed"]
   }
 }

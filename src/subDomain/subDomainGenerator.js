@@ -1,11 +1,5 @@
 import { getDayCountInYear, getDayCountInMonth, getWeekNumber } from '../date';
-import {
-  generateMinuteDomain,
-  generateDayDomain,
-  generateHourDomain,
-  generateWeekDomain,
-  generateMonthDomain,
-} from '../domain/domainGenerator';
+import generateTimeInterval from '../utils/timeInterval';
 
 /**
  * @return int
@@ -64,7 +58,7 @@ const computeWeekSubDomainSize = (date, domain, weekStartOnMonday) => {
     let endWeekNb = getWeekNumber(endOfMonth, weekStartOnMonday);
     let startWeekNb = getWeekNumber(
       new Date(date.getFullYear(), date.getMonth()),
-      weekStartOnMonday
+      weekStartOnMonday,
     );
 
     if (startWeekNb > endWeekNb) {
@@ -77,13 +71,13 @@ const computeWeekSubDomainSize = (date, domain, weekStartOnMonday) => {
   if (domain === 'year') {
     return getWeekNumber(
       new Date(date.getFullYear(), 11, 31),
-      weekStartOnMonday
+      weekStartOnMonday,
     );
   }
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export function generateSubDomain(startDate, options, DTSDomain) {
+export function generateSubDomain(startDate, options) {
   let date = startDate;
 
   if (typeof date === 'number') {
@@ -93,37 +87,40 @@ export function generateSubDomain(startDate, options, DTSDomain) {
   switch (options.subDomain) {
     case 'x_min':
     case 'min':
-      return generateMinuteDomain(
+      return generateTimeInterval(
+        'min',
         date,
-        computeMinSubDomainSize(date, options.domain)
+        computeMinSubDomainSize(date, options.domain),
       );
     case 'x_hour':
     case 'hour':
-      return generateHourDomain(
+      return generateTimeInterval(
+        'hour',
         date,
         computeHourSubDomainSize(date, options.domain),
-        DTSDomain
       );
     case 'x_day':
     case 'day':
-      return generateDayDomain(
+      return generateTimeInterval(
+        'day',
         date,
-        computeDaySubDomainSize(date, options.domain)
+        computeDaySubDomainSize(date, options.domain),
       );
     case 'x_week':
     case 'week':
-      return generateWeekDomain(
+      return generateTimeInterval(
+        'week',
         date,
         computeWeekSubDomainSize(
           date,
           options.domain,
-          options.weekStartOnMonday
+          options.weekStartOnMonday,
         ),
-        options.weekStartOnMonday
+        options.weekStartOnMonday,
       );
     case 'x_month':
     case 'month':
-      return generateMonthDomain(date, 12);
+      return generateTimeInterval('month', date, 12);
     default:
       throw new Error('Invalid subDomain');
   }

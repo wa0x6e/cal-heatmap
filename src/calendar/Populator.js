@@ -1,6 +1,6 @@
 import { selectAll } from 'd3-selection';
 
-import { getSubDomainTitle, formatSubDomainText } from '../subDomain';
+import { getSubDomainTitle } from '../subDomain';
 import { getHighlightClassName } from '../function';
 import { dateIsLessThan } from '../date';
 
@@ -96,6 +96,13 @@ export default class Populator {
     return htmlClass.join(' ');
   }
 
+  #formatSubDomainText(element) {
+    const formatter = this.calendar.options.options.subDomainTextFormat;
+    if (typeof formatter === 'function') {
+      element.text(d => formatter(d.t, d.v));
+    }
+  }
+
   populate() {
     const { calendar } = this;
     const { options } = calendar.options;
@@ -138,6 +145,6 @@ export default class Populator {
         'class',
         d => `subdomain-text${getHighlightClassName(d.t, options)}`
       )
-      .call(() => formatSubDomainText(options.subDomainTextFormat));
+      .call(e => this.#formatSubDomainText(e));
   }
 }

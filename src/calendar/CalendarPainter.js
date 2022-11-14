@@ -1,4 +1,5 @@
 import { select } from 'd3-selection';
+
 import DomainPainter from '../domain/DomainPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
 import LabelPainter from '../label/LabelPainter';
@@ -36,28 +37,31 @@ export default class CalendarPainter {
 
     this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
 
-    this.attachNavigationEvents();
+    this.#attachNavigationEvents();
 
     return true;
   }
 
-  attachNavigationEvents() {
+  #attachNavigationEvents() {
     const { options } = this.calendar;
 
     if (options.nextSelector !== false) {
-      select(options.nextSelector).on(`click.${options.itemNamespace}`, ev => {
-        ev.preventDefault();
-        return this.calendar.next(1);
-      });
+      select(options.nextSelector).on(
+        `click.${options.itemNamespace}`,
+        (ev) => {
+          ev.preventDefault();
+          return this.calendar.next(1);
+        },
+      );
     }
 
     if (options.previousSelector !== false) {
       select(options.previousSelector).on(
         `click.${options.itemNamespace}`,
-        ev => {
+        (ev) => {
           ev.preventDefault();
           return this.calendar.previous(1);
-        }
+        },
       );
     }
   }
@@ -180,10 +184,10 @@ export default class CalendarPainter {
   }
 
   removeLegend() {
-    return this.legend.destroy() && this.resize();
+    return this.legend.destroy(this.root) && this.resize();
   }
 
   showLegend() {
-    return this.legend.paint() && this.resize();
+    return this.legend.paint(this.root) && this.resize();
   }
 }

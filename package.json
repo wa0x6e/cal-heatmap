@@ -27,7 +27,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
     "eslint": "^8.27.0",
-    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
     "grunt": "1.5.3",
     "grunt-contrib-concat": "2.1.0",
     "grunt-contrib-copy": "1.0.0",

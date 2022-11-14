@@ -1,6 +1,6 @@
 import { json, csv, dsv, text } from 'd3-fetch';
 
-import { generateDomain } from './domain/domainGenerator';
+import generateTimeInterval from './utils/timeInterval';
 
 import {
   RESET_ALL_ON_UPDATE,
@@ -43,7 +43,7 @@ function parseURI(str, startDate, endDate) {
  */
 function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
   if (updateMode === RESET_ALL_ON_UPDATE) {
-    calendar.domainCollection.forEach(value => {
+    calendar.domainCollection.forEach((value) => {
       value.forEach((element, index, array) => {
         array[index].v = null;
       });
@@ -52,19 +52,20 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
 
   const newData = new Map();
 
-  const extractTime = d => d.t;
+  const extractTime = (d) => d.t;
 
-  Object.keys(data).forEach(d => {
+  Object.keys(data).forEach((d) => {
     if (Number.isNaN(d)) {
       return;
     }
 
     const date = new Date(d * 1000);
 
-    const domainKey = generateDomain(
+    const domainKey = generateTimeInterval(
       calendar.options.options.domain,
       date,
-      calendar.options.options.weekStartOnMonday
+      1,
+      calendar.options.options.weekStartOnMonday,
     )[0].getTime();
 
     // Skip if data is not relevant to current domain
@@ -118,7 +119,7 @@ export function getDatas(
   endDate,
   callback,
   afterLoad = true,
-  updateMode = APPEND_ON_UPDATE
+  updateMode = APPEND_ON_UPDATE,
 ) {
   const _callback = function (data) {
     if (afterLoad !== false) {

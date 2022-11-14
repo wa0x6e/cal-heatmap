@@ -13,7 +13,7 @@ export default class DomainSkeleton {
     this.calendar = calendar;
   }
 
-  getSubDomainRowNumber(d) {
+  #getSubDomainRowNumber(d) {
     const { options } = this.calendar.options;
 
     if (options.colLimit > 0) {
@@ -31,7 +31,7 @@ export default class DomainSkeleton {
     return options.rowLimit || j;
   }
 
-  getSubDomainColumnNumber(d) {
+  #getSubDomainColumnNumber(d) {
     const { options } = this.calendar.options;
 
     if (options.rowLimit > 0) {
@@ -68,10 +68,10 @@ export default class DomainSkeleton {
         defaultRowNumber: 10,
         defaultColumnNumber: 6,
         row(d) {
-          return self.getSubDomainRowNumber(d);
+          return self.#getSubDomainRowNumber(d);
         },
         column(d) {
-          return self.getSubDomainColumnNumber(d);
+          return self.#getSubDomainColumnNumber(d);
         },
         position: {
           x(d) {
@@ -92,7 +92,7 @@ export default class DomainSkeleton {
             d.getMonth(),
             d.getDate(),
             d.getHours(),
-            d.getMinutes()
+            d.getMinutes(),
           ).getTime();
         },
       },
@@ -126,10 +126,10 @@ export default class DomainSkeleton {
           }
         },
         row(d) {
-          return self.getSubDomainRowNumber(d);
+          return self.#getSubDomainRowNumber(d);
         },
         column(d) {
-          return self.getSubDomainColumnNumber(d);
+          return self.#getSubDomainColumnNumber(d);
         },
         position: {
           x(d) {
@@ -137,7 +137,7 @@ export default class DomainSkeleton {
               if (options.colLimit > 0 || options.rowLimit > 0) {
                 return Math.floor(
                   (d.getHours() + (d.getDate() - 1) * 24) /
-                    self.settings.hour.row(d)
+                    self.settings.hour.row(d),
                 );
               }
               return (
@@ -150,7 +150,7 @@ export default class DomainSkeleton {
                 return Math.floor(
                   (d.getHours() +
                     getWeekDay(d, options.weekStartOnMonday) * 24) /
-                    self.settings.hour.row(d)
+                    self.settings.hour.row(d),
                 );
               }
               return (
@@ -185,7 +185,7 @@ export default class DomainSkeleton {
             d.getFullYear(),
             d.getMonth(),
             d.getDate(),
-            d.getHours()
+            d.getHours(),
           ).getTime();
         },
       },
@@ -215,7 +215,7 @@ export default class DomainSkeleton {
               return options.domainDynamicDimension &&
                 !options.verticalOrientation
                 ? getWeekNumber(
-                    new Date(d.getFullYear(), d.getMonth() + 1, 0)
+                    new Date(d.getFullYear(), d.getMonth() + 1, 0),
                   ) -
                     getWeekNumber(d) +
                     1
@@ -230,10 +230,10 @@ export default class DomainSkeleton {
         },
         defaultRowNumber: 7,
         row(d) {
-          return self.getSubDomainRowNumber(d);
+          return self.#getSubDomainRowNumber(d);
         },
         column(d) {
-          return self.getSubDomainColumnNumber(d);
+          return self.#getSubDomainColumnNumber(d);
         },
         position: {
           x(d) {
@@ -241,12 +241,12 @@ export default class DomainSkeleton {
               case 'week':
                 return Math.floor(
                   getWeekDay(d, options.weekStartOnMonday) /
-                    self.settings.day.row(d)
+                    self.settings.day.row(d),
                 );
               case 'month':
                 if (options.colLimit > 0 || options.rowLimit > 0) {
                   return Math.floor(
-                    (d.getDate() - 1) / self.settings.day.row(d)
+                    (d.getDate() - 1) / self.settings.day.row(d),
                   );
                 }
                 return (
@@ -256,7 +256,7 @@ export default class DomainSkeleton {
               case 'year':
                 if (options.colLimit > 0 || options.rowLimit > 0) {
                   return Math.floor(
-                    (getDayOfYear(d) - 1) / self.settings.day.row(d)
+                    (getDayOfYear(d) - 1) / self.settings.day.row(d),
                   );
                 }
                 return getWeekNumber(d);
@@ -301,17 +301,17 @@ export default class DomainSkeleton {
             case 'month':
               return options.domainDynamicDimension
                 ? getWeekNumber(
-                    new Date(d.getFullYear(), d.getMonth() + 1, 0)
+                    new Date(d.getFullYear(), d.getMonth() + 1, 0),
                   ) - getWeekNumber(d)
                 : 5;
           }
         },
         defaultRowNumber: 1,
         row(d) {
-          return self.getSubDomainRowNumber(d);
+          return self.#getSubDomainRowNumber(d);
         },
         column(d) {
-          return self.getSubDomainColumnNumber(d);
+          return self.#getSubDomainColumnNumber(d);
         },
         position: {
           x(d) {
@@ -320,7 +320,7 @@ export default class DomainSkeleton {
                 return Math.floor(getWeekNumber(d) / self.settings.week.row(d));
               case 'month':
                 return Math.floor(
-                  getMonthWeekNumber(d) / self.settings.week.row(d)
+                  getMonthWeekNumber(d) / self.settings.week.row(d),
                 );
             }
           },
@@ -351,10 +351,10 @@ export default class DomainSkeleton {
         defaultColumnNumber: 12,
         defaultRowNumber: 1,
         row() {
-          return self.getSubDomainRowNumber();
+          return self.#getSubDomainRowNumber();
         },
         column() {
-          return self.getSubDomainColumnNumber();
+          return self.#getSubDomainColumnNumber();
         },
         position: {
           x(d) {

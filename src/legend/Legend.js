@@ -17,9 +17,10 @@ export default class Legend {
       height: 0,
     };
     this.shown = calendar.options.options.displayLegend;
+    this.root = null;
   }
 
-  legendCellLayout(selection) {
+  #legendCellLayout(selection) {
     const { legendCellSize, legendCellPadding } = this.calendar.options.options;
     selection
       .attr('width', legendCellSize)
@@ -27,7 +28,7 @@ export default class Legend {
       .attr('x', (d, i) => i * (legendCellSize + legendCellPadding));
   }
 
-  getXPosition(width) {
+  #getXPosition(width) {
     const { options } = this.calendar.options;
 
     switch (options.legendHorizontalPosition) {
@@ -47,7 +48,7 @@ export default class Legend {
     }
   }
 
-  getYPosition() {
+  #getYPosition() {
     const { options } = this.calendar.options;
 
     if (options.legendVerticalPosition === 'bottom') {
@@ -61,7 +62,7 @@ export default class Legend {
     return options.legendMargin[0];
   }
 
-  computeDimensions() {
+  #computeDimensions() {
     const { options } = this.calendar.options;
 
     this.dimensions = {
@@ -72,13 +73,13 @@ export default class Legend {
     };
   }
 
-  destroy() {
+  destroy(root) {
     if (!this.shown) {
       return false;
     }
 
     this.shown = false;
-    this.calendar.root.select(DEFAULT_CLASSNAME).remove();
+    root.select(DEFAULT_CLASSNAME).remove();
 
     return true;
   }
@@ -98,7 +99,7 @@ export default class Legend {
     let legendItem;
     this.shown = true;
 
-    this.computeDimensions();
+    this.#computeDimensions();
 
     const legendItems = options.legend.slice(0);
     legendItems.push(legendItems[legendItems.length - 1] + 1);
@@ -114,7 +115,9 @@ export default class Legend {
           ? legend.insert('svg', '.graph')
           : legend.append('svg');
 
-      legend.attr('x', this.getXPosition(width)).attr('y', this.getYPosition());
+      legend
+        .attr('x', this.#getXPosition(width))
+        .attr('y', this.#getYPosition());
 
       legendItem = legend
         .attr('class', 'graph-legend')
@@ -128,9 +131,11 @@ export default class Legend {
     legendItem
       .enter()
       .append('rect')
-      .call(s => this.legendCellLayout(s))
-      .attr('class', d => this.getClassName(d, this.legendColor.scale === null))
-      .call(selection => {
+      .call((s) => this.#legendCellLayout(s))
+      .attr('class', (d) =>
+        this.getClassName(d, this.legendColor.scale === null),
+      )
+      .call((selection) => {
         if (
           this.legendColor.scale !== null &&
           options.legendColors !== null &&
@@ -146,8 +151,8 @@ export default class Legend {
     legendItem
       .transition()
       .delay((d, i) => (options.animationDuration * i) / 10)
-      .call(s => this.legendCellLayout(s))
-      .call(element => {
+      .call((s) => this.#legendCellLayout(s))
+      .call((element) => {
         element.attr('fill', (d, i) => {
           if (this.legendColor.scale === null) {
             return '';
@@ -159,8 +164,8 @@ export default class Legend {
           return this.legendColor.scale(options.legend[i - 1]);
         });
 
-        element.attr('class', d =>
-          this.getClassName(d, this.legendColor.scale === null)
+        element.attr('class', (d) =>
+          this.getClassName(d, this.legendColor.scale === null),
         );
       });
 
@@ -187,8 +192,8 @@ export default class Legend {
     legend
       .transition()
       .duration(options.animationDuration)
-      .attr('x', this.getXPosition(width))
-      .attr('y', this.getYPosition())
+      .attr('x', this.#getXPosition(width))
+      .attr('y', this.#getYPosition())
       .attr('width', this.getWidth())
       .attr('height', this.getHeight());
 
@@ -216,7 +221,7 @@ export default class Legend {
    * @param  string axis Width or height
    * @return int height or width in pixels
    */
-  getDimensions(axis) {
+  #getDimensions(axis) {
     const isHorizontal =
       this.calendar.options.options.legendOrientation === 'horizontal';
 
@@ -231,11 +236,11 @@ export default class Legend {
   }
 
   getWidth() {
-    return this.getDimensions('width');
+    return this.#getDimensions('width');
   }
 
   getHeight() {
-    return this.getDimensions('height');
+    return this.#getDimensions('height');
   }
 
   /**
