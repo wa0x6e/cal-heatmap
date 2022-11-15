@@ -15,7 +15,7 @@ export default class Populator {
   #addStyle(element) {
     const { options } = this.calendar.options;
 
-    if (this.calendar.colorizer.scale === null) {
+    if (!this.calendar.colorizer.scale) {
       return false;
     }
 
@@ -31,8 +31,7 @@ export default class Populator {
       }
 
       if (
-        options.legendColors !== null &&
-        options.legendColors.hasOwnProperty('empty') &&
+        options.legendColors?.hasOwnProperty('empty') &&
         (d.v === 0 ||
           (d.v === null &&
             options.hasOwnProperty('considerMissingDataAsZero') &&
@@ -44,8 +43,7 @@ export default class Populator {
       if (
         d.v < 0 &&
         options.legend[0] > 0 &&
-        options.legendColors !== null &&
-        options.legendColors.hasOwnProperty('overflow')
+        options.legendColors?.hasOwnProperty('overflow')
       ) {
         return options.legendColors.overflow;
       }

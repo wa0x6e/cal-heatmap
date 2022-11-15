@@ -54,13 +54,7 @@ export default class subDomainPainter {
             .attr('ry', options.cellRadius);
         }
 
-        if (
-          this.calendar.legendScale !== null &&
-          options.legendColors !== null &&
-          options.legendColors.hasOwnProperty('base')
-        ) {
-          selection.attr('fill', options.legendColors.base);
-        }
+        selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
 
         if (options.tooltip) {
           this.calendar.calendarPainter.tooltip.update(selection);

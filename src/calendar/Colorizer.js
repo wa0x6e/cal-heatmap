@@ -52,6 +52,16 @@ export default class Colorizer {
     return true;
   }
 
+  getCustomColor(colorKey) {
+    const { legendColors } = this.calendar.options.options;
+
+    if (this.scale !== null && legendColors?.hasOwnProperty(colorKey)) {
+      return legendColors[colorKey];
+    }
+
+    return null;
+  }
+
   /**
    * Return the classname of the cell for the specified value
    *

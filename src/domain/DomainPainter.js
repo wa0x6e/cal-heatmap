@@ -1,7 +1,7 @@
 import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
-import { NAVIGATE_LEFT } from '../constant';
+import { NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT } from '../constant';
 import { getWeekNumber } from '../date';
 
 export default class DomainPainter {
@@ -182,8 +182,8 @@ export default class DomainPainter {
       width +=
         options.domainHorizontalLabelWidth +
         options.domainGutter +
-        options.domainMargin[1] +
-        options.domainMargin[3];
+        options.domainMargin[RIGHT] +
+        options.domainMargin[LEFT];
     }
 
     return width;
@@ -200,8 +200,8 @@ export default class DomainPainter {
       height +=
         options.domainGutter +
         options.domainVerticalLabelHeight +
-        options.domainMargin[0] +
-        options.domainMargin[2];
+        options.domainMargin[TOP] +
+        options.domainMargin[BOTTOM];
     }
     return height;
   }

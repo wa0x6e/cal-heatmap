@@ -2,6 +2,7 @@ import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
 import { formatStringWithObject } from '../function';
+import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
 
 const DEFAULT_CLASSNAME = '.graph-legend';
 
@@ -14,7 +15,6 @@ export default class LegendPainter {
       height: 0,
     };
     this.shown = calendar.options.options.displayLegend;
-    this.root = null;
   }
 
   #legendCellLayout(selection) {
@@ -34,14 +34,14 @@ export default class LegendPainter {
           options.legendVerticalPosition === 'center' ||
           options.legendVerticalPosition === 'middle'
         ) {
-          return width + options.legendMargin[3];
+          return width + options.legendMargin[LEFT];
         }
-        return width - this.getWidth() - options.legendMargin[1];
+        return width - this.getWidth() - options.legendMargin[RIGHT];
       case 'middle':
       case 'center':
         return Math.round(width / 2 - this.getWidth() / 2);
       default:
-        return options.legendMargin[3];
+        return options.legendMargin[BOTTOM];
     }
   }
 
@@ -50,13 +50,11 @@ export default class LegendPainter {
 
     if (options.legendVerticalPosition === 'bottom') {
       return (
-        this.calendar.calendarPainter.domainPainter.getHeight() +
-        options.legendMargin[0] +
-        options.domainGutter +
-        options.cellPadding
+        this.calendar.calendarPainter.domainPainter.dimensions.height +
+        options.legendMargin[TOP]
       );
     }
-    return options.legendMargin[0];
+    return options.legendMargin[TOP];
   }
 
   #computeDimensions() {
@@ -125,13 +123,7 @@ export default class LegendPainter {
       .call((s) => this.#legendCellLayout(s))
       .attr('class', (d) => this.calendar.colorizer.getClassName(d))
       .call((selection) => {
-        if (
-          this.calendar.colorizer.scale !== null &&
-          options.legendColors !== null &&
-          options.legendColors.hasOwnProperty('base')
-        ) {
-          selection.attr('fill', options.legendColors.base);
-        }
+        selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
       })
       .append('title');
 
@@ -156,25 +148,9 @@ export default class LegendPainter {
         element.attr('class', (d) => this.calendar.colorizer.getClassName(d));
       });
 
-    legendItem.select('title').text((d, i) => {
-      if (i === 0) {
-        return formatStringWithObject(options.legendTitleFormat.lower, {
-          min: options.legend[i],
-          name: options.itemName[1],
-        });
-      }
-      if (i === legendItems.length - 1) {
-        return formatStringWithObject(options.legendTitleFormat.upper, {
-          max: options.legend[i - 1],
-          name: options.itemName[1],
-        });
-      }
-      return formatStringWithObject(options.legendTitleFormat.inner, {
-        down: options.legend[i - 1],
-        up: options.legend[i],
-        name: options.itemName[1],
-      });
-    });
+    legendItem
+      .select('title')
+      .text((d, i) => this.#getLegendTitle(d, i, legendItems));
 
     legend
       .transition()
@@ -198,6 +174,28 @@ export default class LegendPainter {
       });
 
     return true;
+  }
+
+  #getLegendTitle(d, i, legendItems) {
+    const { options } = this.calendar.options;
+
+    if (i === 0) {
+      return formatStringWithObject(options.legendTitleFormat.lower, {
+        min: options.legend[i],
+        name: options.itemName[1],
+      });
+    }
+    if (i === legendItems.length - 1) {
+      return formatStringWithObject(options.legendTitleFormat.upper, {
+        max: options.legend[i - 1],
+        name: options.itemName[1],
+      });
+    }
+    return formatStringWithObject(options.legendTitleFormat.inner, {
+      down: options.legend[i - 1],
+      up: options.legend[i],
+      name: options.itemName[1],
+    });
   }
 
   /**

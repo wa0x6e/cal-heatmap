@@ -224,7 +224,7 @@ export default class Navigator {
    */
   #maxDomainIsReached(datetimestamp) {
     const { maxDate } = this.calendar.options.options;
-    return maxDate !== null && maxDate.getTime() < datetimestamp;
+    return maxDate?.getTime() < datetimestamp;
   }
 
   /**
@@ -236,6 +236,6 @@ export default class Navigator {
   #minDomainIsReached(datetimestamp) {
     const { minDate } = this.calendar.options.options;
 
-    return minDate !== null && minDate.getTime() >= datetimestamp;
+    return minDate?.getTime() >= datetimestamp;
   }
 }

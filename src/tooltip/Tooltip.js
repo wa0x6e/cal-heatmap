@@ -14,7 +14,7 @@ export default class Tooltip {
     this.node = select(itemSelector)
       .attr('style', () => {
         const current = select(itemSelector).attr('style');
-        return `${current !== null ? current : ''}position:relative;`;
+        return `${current ?? ''}position:relative;`;
       })
       .append('div')
       .attr('class', 'ch-tooltip');
@@ -51,7 +51,7 @@ export default class Tooltip {
     // Offset by the calendar position (when legend is left/top)
     coordinate += parseInt(
       this.calendar.calendarPainter.root.select('.graph').attr(axis) || 0,
-      10
+      10,
     );
 
     // Offset by the inside domain position (when label is left/top)
@@ -79,7 +79,7 @@ export default class Tooltip {
       'style',
       'display: block;' +
         `left: ${this.#getX(cell)}px; ` +
-        `top: ${this.#getY(cell)}px;`
+        `top: ${this.#getY(cell)}px;`,
     );
   }
 

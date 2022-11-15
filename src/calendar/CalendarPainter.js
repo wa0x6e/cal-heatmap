@@ -1,5 +1,7 @@
 import { select } from 'd3-selection';
 
+import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+
 import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
 import DomainSecondaryLabelPainter from '../domain/DomainSecondaryLabelPainter';
@@ -85,8 +87,8 @@ export default class CalendarPainter {
 
     const legendHeight = options.displayLegend
       ? this.legendPainter.getHeight() +
-        options.legendMargin[0] +
-        options.legendMargin[2]
+        options.legendMargin[TOP] +
+        options.legendMargin[BOTTOM]
       : 0;
 
     if (
@@ -103,8 +105,8 @@ export default class CalendarPainter {
 
     const legendWidth = options.displayLegend
       ? this.legendPainter.getWidth() +
-        options.legendMargin[1] +
-        options.legendMargin[3]
+        options.legendMargin[RIGHT] +
+        options.legendMargin[LEFT]
       : 0;
 
     if (
@@ -175,10 +177,14 @@ export default class CalendarPainter {
     callback();
   }
 
-  highlight(args) {
-    if (
-      (this.calendar.options.highlight = expandDateSetting(args)).length > 0
-    ) {
+  /**
+   * Highlight a set of dates
+   *
+   * @param  {[type]} dates [description]
+   * @return {[type]}       [description]
+   */
+  highlight(dates) {
+    if (dates.length > 0) {
       this.fill();
       return true;
     }

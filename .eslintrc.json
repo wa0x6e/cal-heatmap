@@ -6,5 +6,9 @@
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 13
+  },
+  "rules": {
+    "no-prototype-builtins": "off",
+    "operator-linebreak": ["error", "after"]
   }
 }

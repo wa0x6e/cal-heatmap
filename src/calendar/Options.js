@@ -1,8 +1,8 @@
 import { select } from 'd3-selection';
 import { merge } from 'lodash-es';
 
-import { expandDateSetting } from '../date';
 import { validateSelector, validateDomainType } from '../utils/validator';
+import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 const DEFAULT_LEGEND_MARGIN = 10;
@@ -516,7 +516,6 @@ export default class Options {
         : null;
     options.domainMargin = expandMarginSetting(options.domainMargin);
     options.legendMargin = expandMarginSetting(options.legendMargin);
-    options.highlight = expandDateSetting(options.highlight);
     options.itemName = expandItemName(options.itemName);
     options.colLimit = options.colLimit > 0 ? options.colLimit : null;
     options.rowLimit = this.#parseRowLimit(options.rowLimit);
@@ -527,9 +526,7 @@ export default class Options {
       options.label.position === 'top' || options.label.position === 'bottom';
 
     options.domainVerticalLabelHeight =
-      options.label.height === null
-        ? Math.max(25, options.cellSize * 2)
-        : options.label.height;
+      options.label.height ?? Math.max(25, options.cellSize * 2);
     options.domainHorizontalLabelWidth = 0;
 
     if (options.domainLabelFormat === '' && options.label.height === null) {
@@ -544,15 +541,15 @@ export default class Options {
     if (!options.legendMargin !== [0, 0, 0, 0]) {
       switch (options.legendVerticalPosition) {
         case 'top':
-          options.legendMargin[2] = DEFAULT_LEGEND_MARGIN;
+          options.legendMargin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
           break;
         case 'bottom':
-          options.legendMargin[0] = DEFAULT_LEGEND_MARGIN;
+          options.legendMargin[TOP] = DEFAULT_LEGEND_MARGIN;
           break;
         case 'middle':
         case 'center':
           options.legendMargin[
-            options.legendHorizontalPosition === 'right' ? 3 : 1
+            options.legendHorizontalPosition === 'right' ? LEFT : RIGHT
           ] = DEFAULT_LEGEND_MARGIN;
           break;
         default:

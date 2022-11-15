@@ -47,6 +47,8 @@ export default class DomainLabelPainter {
           case 'bottom':
           case 'top':
             x += this.calendar.calendarPainter.domainPainter.getWidth(d) / 2;
+            break;
+          default:
         }
 
         if (options.label.align === 'right') {

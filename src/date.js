@@ -32,7 +32,7 @@ export function getMonthWeekNumber(d, weekStartOnMonday) {
 
   const monthFirstWeekNumber = getWeekNumber(
     new Date(d.getFullYear(), d.getMonth()),
-    weekStartOnMonday
+    weekStartOnMonday,
   );
   return getWeekNumber(d, weekStartOnMonday) - monthFirstWeekNumber - 1;
 }
@@ -113,7 +113,7 @@ export function dateIsLessThan(dateA, dateB, options) {
           date.getMonth(),
           date.getDate(),
           date.getHours(),
-          date.getMinutes()
+          date.getMinutes(),
         ).getTime();
       case 'x_hour':
       case 'hour':
@@ -121,14 +121,14 @@ export function dateIsLessThan(dateA, dateB, options) {
           date.getFullYear(),
           date.getMonth(),
           date.getDate(),
-          date.getHours()
+          date.getHours(),
         ).getTime();
       case 'x_day':
       case 'day':
         return new Date(
           date.getFullYear(),
           date.getMonth(),
-          date.getDate()
+          date.getDate(),
         ).getTime();
       case 'x_week':
       case 'week':
@@ -245,12 +245,13 @@ export function jumpDate(date, count, step) {
  * @return {array}       An array of Dates
  */
 export function expandDateSetting(value) {
-  if (!Array.isArray(value)) {
-    value = [value];
+  let settings = value;
+  if (!Array.isArray(settings)) {
+    settings = [settings];
   }
 
-  return value
-    .map(data => {
+  return settings
+    .map((data) => {
       if (data === 'now') {
         return new Date();
       }
@@ -259,5 +260,5 @@ export function expandDateSetting(value) {
       }
       return false;
     })
-    .filter(d => d !== false);
+    .filter((d) => d !== false);
 }

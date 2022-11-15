@@ -2922,6 +2922,10 @@
   const APPEND_ON_UPDATE = 2;
   const NAVIGATE_LEFT = 1;
   const NAVIGATE_RIGHT = 2;
+  const TOP = 0;
+  const RIGHT = 1;
+  const BOTTOM = 2;
+  const LEFT = 3;
 
   var t0$1 = new Date,
       t1$1 = new Date;
@@ -4478,7 +4482,7 @@
 
     const monthFirstWeekNumber = getWeekNumber(
       new Date(d.getFullYear(), d.getMonth()),
-      weekStartOnMonday
+      weekStartOnMonday,
     );
     return getWeekNumber(d, weekStartOnMonday) - monthFirstWeekNumber - 1;
   }
@@ -4559,7 +4563,7 @@
             date.getMonth(),
             date.getDate(),
             date.getHours(),
-            date.getMinutes()
+            date.getMinutes(),
           ).getTime();
         case 'x_hour':
         case 'hour':
@@ -4567,14 +4571,14 @@
             date.getFullYear(),
             date.getMonth(),
             date.getDate(),
-            date.getHours()
+            date.getHours(),
           ).getTime();
         case 'x_day':
         case 'day':
           return new Date(
             date.getFullYear(),
             date.getMonth(),
-            date.getDate()
+            date.getDate(),
           ).getTime();
         case 'x_week':
         case 'week':
@@ -4682,30 +4686,6 @@
     }
 
     return new Date(d);
-  }
-
-  /**
-   * Convert a keyword or an array of keyword/date to an array of date objects
-   *
-   * @param  {string|array|Date} value Data to convert
-   * @return {array}       An array of Dates
-   */
-  function expandDateSetting$1(value) {
-    if (!Array.isArray(value)) {
-      value = [value];
-    }
-
-    return value
-      .map(data => {
-        if (data === 'now') {
-          return new Date();
-        }
-        if (data instanceof Date) {
-          return data;
-        }
-        return false;
-      })
-      .filter(d => d !== false);
   }
 
   /**
@@ -5053,7 +5033,7 @@
      */
     #maxDomainIsReached(datetimestamp) {
       const { maxDate } = this.calendar.options.options;
-      return maxDate !== null && maxDate.getTime() < datetimestamp;
+      return maxDate?.getTime() < datetimestamp;
     }
 
     /**
@@ -5065,7 +5045,7 @@
     #minDomainIsReached(datetimestamp) {
       const { minDate } = this.calendar.options.options;
 
-      return minDate !== null && minDate.getTime() >= datetimestamp;
+      return minDate?.getTime() >= datetimestamp;
     }
   }
 
@@ -8085,8 +8065,8 @@
         width +=
           options.domainHorizontalLabelWidth +
           options.domainGutter +
-          options.domainMargin[1] +
-          options.domainMargin[3];
+          options.domainMargin[RIGHT] +
+          options.domainMargin[LEFT];
       }
 
       return width;
@@ -8103,8 +8083,8 @@
         height +=
           options.domainGutter +
           options.domainVerticalLabelHeight +
-          options.domainMargin[0] +
-          options.domainMargin[2];
+          options.domainMargin[TOP] +
+          options.domainMargin[BOTTOM];
       }
       return height;
     }
@@ -8206,6 +8186,7 @@
             case 'bottom':
             case 'top':
               x += this.calendar.calendarPainter.domainPainter.getWidth(d) / 2;
+              break;
           }
 
           if (options.label.align === 'right') {
@@ -8411,13 +8392,7 @@
               .attr('ry', options.cellRadius);
           }
 
-          if (
-            this.calendar.legendScale !== null &&
-            options.legendColors !== null &&
-            options.legendColors.hasOwnProperty('base')
-          ) {
-            selection.attr('fill', options.legendColors.base);
-          }
+          selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
 
           if (options.tooltip) {
             this.calendar.calendarPainter.tooltip.update(selection);
@@ -8835,7 +8810,7 @@
       this.node = select(itemSelector)
         .attr('style', () => {
           const current = select(itemSelector).attr('style');
-          return `${current !== null ? current : ''}position:relative;`;
+          return `${current ?? ''}position:relative;`;
         })
         .append('div')
         .attr('class', 'ch-tooltip');
@@ -8872,7 +8847,7 @@
       // Offset by the calendar position (when legend is left/top)
       coordinate += parseInt(
         this.calendar.calendarPainter.root.select('.graph').attr(axis) || 0,
-        10
+        10,
       );
 
       // Offset by the inside domain position (when label is left/top)
@@ -8900,7 +8875,7 @@
         'style',
         'display: block;' +
           `left: ${this.#getX(cell)}px; ` +
-          `top: ${this.#getY(cell)}px;`
+          `top: ${this.#getY(cell)}px;`,
       );
     }
 
@@ -8920,7 +8895,6 @@
         height: 0,
       };
       this.shown = calendar.options.options.displayLegend;
-      this.root = null;
     }
 
     #legendCellLayout(selection) {
@@ -8940,14 +8914,14 @@
             options.legendVerticalPosition === 'center' ||
             options.legendVerticalPosition === 'middle'
           ) {
-            return width + options.legendMargin[3];
+            return width + options.legendMargin[LEFT];
           }
-          return width - this.getWidth() - options.legendMargin[1];
+          return width - this.getWidth() - options.legendMargin[RIGHT];
         case 'middle':
         case 'center':
           return Math.round(width / 2 - this.getWidth() / 2);
         default:
-          return options.legendMargin[3];
+          return options.legendMargin[BOTTOM];
       }
     }
 
@@ -8956,13 +8930,11 @@
 
       if (options.legendVerticalPosition === 'bottom') {
         return (
-          this.calendar.calendarPainter.domainPainter.getHeight() +
-          options.legendMargin[0] +
-          options.domainGutter +
-          options.cellPadding
+          this.calendar.calendarPainter.domainPainter.dimensions.height +
+          options.legendMargin[TOP]
         );
       }
-      return options.legendMargin[0];
+      return options.legendMargin[TOP];
     }
 
     #computeDimensions() {
@@ -9031,13 +9003,7 @@
         .call((s) => this.#legendCellLayout(s))
         .attr('class', (d) => this.calendar.colorizer.getClassName(d))
         .call((selection) => {
-          if (
-            this.calendar.colorizer.scale !== null &&
-            options.legendColors !== null &&
-            options.legendColors.hasOwnProperty('base')
-          ) {
-            selection.attr('fill', options.legendColors.base);
-          }
+          selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
         })
         .append('title');
 
@@ -9062,25 +9028,9 @@
           element.attr('class', (d) => this.calendar.colorizer.getClassName(d));
         });
 
-      legendItem.select('title').text((d, i) => {
-        if (i === 0) {
-          return formatStringWithObject(options.legendTitleFormat.lower, {
-            min: options.legend[i],
-            name: options.itemName[1],
-          });
-        }
-        if (i === legendItems.length - 1) {
-          return formatStringWithObject(options.legendTitleFormat.upper, {
-            max: options.legend[i - 1],
-            name: options.itemName[1],
-          });
-        }
-        return formatStringWithObject(options.legendTitleFormat.inner, {
-          down: options.legend[i - 1],
-          up: options.legend[i],
-          name: options.itemName[1],
-        });
-      });
+      legendItem
+        .select('title')
+        .text((d, i) => this.#getLegendTitle(d, i, legendItems));
 
       legend
         .transition()
@@ -9104,6 +9054,28 @@
         });
 
       return true;
+    }
+
+    #getLegendTitle(d, i, legendItems) {
+      const { options } = this.calendar.options;
+
+      if (i === 0) {
+        return formatStringWithObject(options.legendTitleFormat.lower, {
+          min: options.legend[i],
+          name: options.itemName[1],
+        });
+      }
+      if (i === legendItems.length - 1) {
+        return formatStringWithObject(options.legendTitleFormat.upper, {
+          max: options.legend[i - 1],
+          name: options.itemName[1],
+        });
+      }
+      return formatStringWithObject(options.legendTitleFormat.inner, {
+        down: options.legend[i - 1],
+        up: options.legend[i],
+        name: options.itemName[1],
+      });
     }
 
     /**
@@ -9215,8 +9187,8 @@
 
       const legendHeight = options.displayLegend
         ? this.legendPainter.getHeight() +
-          options.legendMargin[0] +
-          options.legendMargin[2]
+          options.legendMargin[TOP] +
+          options.legendMargin[BOTTOM]
         : 0;
 
       if (
@@ -9233,8 +9205,8 @@
 
       const legendWidth = options.displayLegend
         ? this.legendPainter.getWidth() +
-          options.legendMargin[1] +
-          options.legendMargin[3]
+          options.legendMargin[RIGHT] +
+          options.legendMargin[LEFT]
         : 0;
 
       if (
@@ -9305,10 +9277,14 @@
       callback();
     }
 
-    highlight(args) {
-      if (
-        (this.calendar.options.highlight = expandDateSetting(args)).length > 0
-      ) {
+    /**
+     * Highlight a set of dates
+     *
+     * @param  {[type]} dates [description]
+     * @return {[type]}       [description]
+     */
+    highlight(dates) {
+      if (dates.length > 0) {
         this.fill();
         return true;
       }
@@ -9335,7 +9311,7 @@
     #addStyle(element) {
       const { options } = this.calendar.options;
 
-      if (this.calendar.colorizer.scale === null) {
+      if (!this.calendar.colorizer.scale) {
         return false;
       }
 
@@ -9351,8 +9327,7 @@
         }
 
         if (
-          options.legendColors !== null &&
-          options.legendColors.hasOwnProperty('empty') &&
+          options.legendColors?.hasOwnProperty('empty') &&
           (d.v === 0 ||
             (d.v === null &&
               options.hasOwnProperty('considerMissingDataAsZero') &&
@@ -9364,8 +9339,7 @@
         if (
           d.v < 0 &&
           options.legend[0] > 0 &&
-          options.legendColors !== null &&
-          options.legendColors.hasOwnProperty('overflow')
+          options.legendColors?.hasOwnProperty('overflow')
         ) {
           return options.legendColors.overflow;
         }
@@ -10018,7 +9992,6 @@
           : null;
       options.domainMargin = expandMarginSetting(options.domainMargin);
       options.legendMargin = expandMarginSetting(options.legendMargin);
-      options.highlight = expandDateSetting$1(options.highlight);
       options.itemName = expandItemName(options.itemName);
       options.colLimit = options.colLimit > 0 ? options.colLimit : null;
       options.rowLimit = this.#parseRowLimit(options.rowLimit);
@@ -10029,9 +10002,7 @@
         options.label.position === 'top' || options.label.position === 'bottom';
 
       options.domainVerticalLabelHeight =
-        options.label.height === null
-          ? Math.max(25, options.cellSize * 2)
-          : options.label.height;
+        options.label.height ?? Math.max(25, options.cellSize * 2);
       options.domainHorizontalLabelWidth = 0;
 
       if (options.domainLabelFormat === '' && options.label.height === null) {
@@ -10046,15 +10017,15 @@
       if (!options.legendMargin !== [0, 0, 0, 0]) {
         switch (options.legendVerticalPosition) {
           case 'top':
-            options.legendMargin[2] = DEFAULT_LEGEND_MARGIN;
+            options.legendMargin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
             break;
           case 'bottom':
-            options.legendMargin[0] = DEFAULT_LEGEND_MARGIN;
+            options.legendMargin[TOP] = DEFAULT_LEGEND_MARGIN;
             break;
           case 'middle':
           case 'center':
             options.legendMargin[
-              options.legendHorizontalPosition === 'right' ? 3 : 1
+              options.legendHorizontalPosition === 'right' ? LEFT : RIGHT
             ] = DEFAULT_LEGEND_MARGIN;
             break;
         }
@@ -10381,6 +10352,16 @@
         .range(colors);
 
       return true;
+    }
+
+    getCustomColor(colorKey) {
+      const { legendColors } = this.calendar.options.options;
+
+      if (this.scale !== null && legendColors?.hasOwnProperty(colorKey)) {
+        return legendColors[colorKey];
+      }
+
+      return null;
     }
 
     /**
