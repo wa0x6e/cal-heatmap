@@ -1,6 +1,4 @@
 module.exports = function (grunt) {
-  'use strict';
-
   const headerComment =
     '/*! <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today() %>)\n' +
     ' *  ---------------------------------------------\n' +
@@ -72,7 +70,7 @@ module.exports = function (grunt) {
     },
     exec: {
       format:
-        'npx prettier -w "src/**/*.{html,js,json,md,mjs,yml}" && npx prettier -w "test/**/*.{html,js,json,md,mjs,yml}"',
+        'npx prettier -w "*.js" && npx prettier -w "src/**/*.{html,js,json,md,mjs,yml}" && npx prettier -w "test/**/*.{html,js,json,md,mjs,yml}"',
     },
   });
 

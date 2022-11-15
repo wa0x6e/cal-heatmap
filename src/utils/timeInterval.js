@@ -26,7 +26,7 @@ function generate(interval, date, range) {
 }
 
 /**
- * Get an array of domain start dates
+ * Return an array of time interval
  *
  * @param  int|Date date A random date included in the wanted domain
  * @param  int|Date range Number of dates to get, or a stop date

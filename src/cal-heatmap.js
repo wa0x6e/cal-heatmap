@@ -1,8 +1,10 @@
+import { isEqual } from 'lodash-es';
+
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
 import Options from './calendar/Options';
-import { arrayEquals } from './function';
+import Colorizer from './calendar/Colorizer';
 
 import extractSVG from './utils/extractSVG';
 
@@ -31,6 +33,7 @@ export default class CalHeatMap extends CalendarEvent {
     this.populator = new Populator(this);
 
     this.calendarPainter = new CalendarPainter(this);
+    this.colorizer = new Colorizer(this);
   }
 
   #initDomainCollection() {
@@ -66,6 +69,8 @@ export default class CalHeatMap extends CalendarEvent {
 
     this.calendarPainter.setup();
     this.#initDomainCollection();
+
+    this.colorizer.build();
 
     if (options.paintOnLoad) {
       this.calendarPainter.paint();
@@ -163,21 +168,24 @@ export default class CalHeatMap extends CalendarEvent {
    * @param array colorRange an array of 2 hex colors, for the minimum and maximum colors
    */
   setLegend() {
-    const oldLegend = this.options.options.legend.slice(0);
+    const { options } = this.options;
+    const { legend, legendColors } = this.options.options;
+
+    const oldLegend = options.legend.slice(0);
     if (arguments.length >= 1 && Array.isArray(arguments[0])) {
-      this.options.options.legend = arguments[0];
+      legend = arguments[0];
     }
     if (arguments.length >= 2) {
       if (Array.isArray(arguments[1]) && arguments[1].length >= 2) {
-        this.options.options.legendColors = [arguments[1][0], arguments[1][1]];
+        legendColors = [arguments[1][0], arguments[1][1]];
       } else {
-        this.options.options.legendColors = arguments[1];
+        legendColors = arguments[1];
       }
     }
 
     if (
       (arguments.length > 0 &&
-        !arrayEquals(oldLegend, this.options.options.legend)) ||
+        !isEqual([...oldLegend].sort(), [...legend].sort())) ||
       arguments.length >= 2
     ) {
       this.calendarPainter.legend.buildColors();

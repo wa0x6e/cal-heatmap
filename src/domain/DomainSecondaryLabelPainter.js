@@ -1,6 +1,6 @@
 import { formatDate } from '../function';
 
-export default class SubLabelPainter {
+export default class DomainSecondaryLabel {
   constructor(calendar) {
     this.calendar = calendar;
   }

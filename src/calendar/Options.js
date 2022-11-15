@@ -1,12 +1,66 @@
 import { select } from 'd3-selection';
 import { merge } from 'lodash-es';
 
-import { expandMarginSetting, expandItemName } from '../function';
 import { expandDateSetting } from '../date';
 import { validateSelector, validateDomainType } from '../utils/validator';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 const DEFAULT_LEGEND_MARGIN = 10;
+
+/**
+ * Expand a number of an array of numbers to an usable 4 values array
+ *
+ * @param  {integer|array} value
+ * @return {array}        array
+ */
+function expandMarginSetting(value) {
+  if (typeof value === 'number') {
+    value = [value];
+  }
+
+  if (!Array.isArray(value)) {
+    console.log('Margin only takes an integer or an array of integers');
+    value = [0];
+  }
+
+  switch (value.length) {
+    case 1:
+      return [value[0], value[0], value[0], value[0]];
+    case 2:
+      return [value[0], value[1], value[0], value[1]];
+    case 3:
+      return [value[0], value[1], value[2], value[1]];
+    case 4:
+      return value;
+    default:
+      return value.slice(0, 4);
+  }
+}
+
+/**
+ * Convert a string to an array like [singular-form, plural-form]
+ *
+ * @param  {string|array} value Date to convert
+ * @return {array}       An array like [singular-form, plural-form]
+ */
+function expandItemName(value) {
+  if (typeof value === 'string') {
+    return [value, value + (value !== '' ? 's' : '')];
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 1) {
+      return [value[0], `${value[0]}s`];
+    }
+    if (value.length > 2) {
+      return value.slice(0, 2);
+    }
+
+    return value;
+  }
+
+  return ['item', 'items'];
+}
 
 /**
  * Return the optimal subDomain for the specified domain

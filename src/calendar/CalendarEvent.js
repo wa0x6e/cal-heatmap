@@ -14,7 +14,7 @@ export default class CalendarEvent {
    * @return mixed  True when the triggering was skipped, false on error, else the callback function
    */
   #triggerEvent(eventName, successArgs, skip = false) {
-    if (skip || this.options.options[eventName] === null) {
+    if (skip || !this.options.options[eventName]) {
       return true;
     }
 
@@ -92,7 +92,7 @@ export default class CalendarEvent {
       const subDomain = generateSubDomain(
         start,
         this.options.options,
-        this.DTSDomain
+        this.DTSDomain,
       );
       return [subDomain.shift(), subDomain.pop()];
     });
@@ -109,7 +109,7 @@ export default class CalendarEvent {
       const subDomain = generateSubDomain(
         start,
         this.options.options,
-        this.DTSDomain
+        this.DTSDomain,
       );
       return [subDomain.shift(), subDomain.pop()];
     });

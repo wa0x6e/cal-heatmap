@@ -1,16 +1,13 @@
 import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
-import LegendColor from './LegendColor';
-
 import { formatStringWithObject } from '../function';
 
 const DEFAULT_CLASSNAME = '.graph-legend';
 
-export default class Legend {
+export default class LegendPainter {
   constructor(calendar) {
     this.calendar = calendar;
-    this.legendColor = new LegendColor(calendar);
 
     this.dimensions = {
       width: 0,
@@ -28,7 +25,7 @@ export default class Legend {
       .attr('x', (d, i) => i * (legendCellSize + legendCellPadding));
   }
 
-  #getXPosition(width) {
+  #getX(width) {
     const { options } = this.calendar.options;
 
     switch (options.legendHorizontalPosition) {
@@ -48,7 +45,7 @@ export default class Legend {
     }
   }
 
-  #getYPosition() {
+  #getY() {
     const { options } = this.calendar.options;
 
     if (options.legendVerticalPosition === 'bottom') {
@@ -85,10 +82,6 @@ export default class Legend {
   }
 
   paint(root) {
-    if (this.calendar.options.options.legendColors !== null) {
-      this.legendColor.build();
-    }
-
     const { calendar } = this;
     const { options } = calendar.options;
     const width =
@@ -115,9 +108,7 @@ export default class Legend {
           ? legend.insert('svg', '.graph')
           : legend.append('svg');
 
-      legend
-        .attr('x', this.#getXPosition(width))
-        .attr('y', this.#getYPosition());
+      legend.attr('x', this.#getX(width)).attr('y', this.#getY());
 
       legendItem = legend
         .attr('class', 'graph-legend')
@@ -132,12 +123,10 @@ export default class Legend {
       .enter()
       .append('rect')
       .call((s) => this.#legendCellLayout(s))
-      .attr('class', (d) =>
-        this.getClassName(d, this.legendColor.scale === null),
-      )
+      .attr('class', (d) => this.calendar.colorizer.getClassName(d))
       .call((selection) => {
         if (
-          this.legendColor.scale !== null &&
+          this.calendar.colorizer.scale !== null &&
           options.legendColors !== null &&
           options.legendColors.hasOwnProperty('base')
         ) {
@@ -154,19 +143,17 @@ export default class Legend {
       .call((s) => this.#legendCellLayout(s))
       .call((element) => {
         element.attr('fill', (d, i) => {
-          if (this.legendColor.scale === null) {
+          if (this.calendar.colorizer.scale === null) {
             return '';
           }
 
           if (i === 0) {
-            return this.legendColor.scale(d - 1);
+            return this.calendar.colorizer.scale(d - 1);
           }
-          return this.legendColor.scale(options.legend[i - 1]);
+          return this.calendar.colorizer.scale(options.legend[i - 1]);
         });
 
-        element.attr('class', (d) =>
-          this.getClassName(d, this.legendColor.scale === null),
-        );
+        element.attr('class', (d) => this.calendar.colorizer.getClassName(d));
       });
 
     legendItem.select('title').text((d, i) => {
@@ -192,8 +179,8 @@ export default class Legend {
     legend
       .transition()
       .duration(options.animationDuration)
-      .attr('x', this.#getXPosition(width))
-      .attr('y', this.#getYPosition())
+      .attr('x', this.#getX(width))
+      .attr('y', this.#getY())
       .attr('width', this.getWidth())
       .attr('height', this.getHeight());
 
@@ -241,42 +228,5 @@ export default class Legend {
 
   getHeight() {
     return this.#getDimensions('height');
-  }
-
-  /**
-   * Return the classname on the legend for the specified value
-   *
-   * @param integer n Value associated to a date
-   * @param bool withCssClass Whether to display the css class used to style the cell.
-   *                          Disabling will allow styling directly via html fill attribute
-   *
-   * @return string Classname according to the legend
-   */
-  getClassName(n, withCssClass) {
-    if (n === null || isNaN(n)) {
-      return '';
-    }
-
-    const { legend } = this.calendar.options.options;
-    let index = [legend.length + 1];
-
-    for (let i = 0, total = legend.length - 1; i <= total; i++) {
-      if (legend[0] > 0 && n < 0) {
-        index = ['1', 'i'];
-        break;
-      }
-
-      if (n <= legend[i]) {
-        index = [i + 1];
-        break;
-      }
-    }
-
-    if (n === 0) {
-      index.push(0);
-    }
-
-    index.unshift('');
-    return (index.join(' r') + (withCssClass ? index.join(' q') : '')).trim();
   }
 }

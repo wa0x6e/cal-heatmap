@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Thu Sep 05 2013 14:14:49 GMT-0400 (EDT)
 
-process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 module.exports = function (config) {
   config.set({
@@ -19,8 +19,8 @@ module.exports = function (config) {
       'test/test.js',
       {
         pattern: 'test/data/data.*',
-        included: false
-      }
+        included: false,
+      },
     ],
 
     // list of files to exclude
@@ -47,12 +47,12 @@ module.exports = function (config) {
       // source files, that you wanna generate coverage for
       // do not include tests or libraries
       // (these files will be instrumented by Istanbul)
-      'src/*.js': ['coverage']
+      'src/*.js': ['coverage'],
     },
 
     coverageReporter: {
       type: 'lcov',
-      dir: 'coverage/'
+      dir: 'coverage/',
     },
 
     // Start these browsers, currently available:
@@ -70,6 +70,6 @@ module.exports = function (config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false
-  })
-}
+    singleRun: false,
+  });
+};

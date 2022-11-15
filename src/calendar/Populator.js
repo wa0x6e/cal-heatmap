@@ -15,11 +15,11 @@ export default class Populator {
   #addStyle(element) {
     const { options } = this.calendar.options;
 
-    if (this.calendar.calendarPainter.legend.legendColor.scale === null) {
+    if (this.calendar.colorizer.scale === null) {
       return false;
     }
 
-    element.attr('fill', d => {
+    element.attr('fill', (d) => {
       if (
         d.v === null &&
         options.hasOwnProperty('considerMissingDataAsZero') &&
@@ -50,8 +50,8 @@ export default class Populator {
         return options.legendColors.overflow;
       }
 
-      return this.calendar.calendarPainter.legend.legendColor.scale(
-        Math.min(d.v, options.legend[options.legend.length - 1])
+      return this.calendar.colorizer.scale(
+        Math.min(d.v, options.legend[options.legend.length - 1]),
       );
     });
   }
@@ -64,7 +64,7 @@ export default class Populator {
     const pastDate = dateIsLessThan(d.t, new Date(), options);
 
     if (
-      calendar.calendarPainter.legend.legendColor.scale === null ||
+      calendar.colorizer.scale === null ||
       (d.v === null &&
         options.hasOwnProperty('considerMissingDataAsZero') &&
         !options.considerMissingDataAsZero &&
@@ -74,19 +74,9 @@ export default class Populator {
     }
 
     if (d.v !== null) {
-      htmlClass.push(
-        calendar.calendarPainter.legend.getClassName(
-          d.v,
-          calendar.calendarPainter.legend.legendColor.scale === null
-        )
-      );
+      htmlClass.push(calendar.colorizer.getClassName(d.v));
     } else if (options.considerMissingDataAsZero && pastDate) {
-      htmlClass.push(
-        calendar.calendarPainter.legend.getClassName(
-          0,
-          calendar.calendarPainter.legend.legendColor.scale === null
-        )
-      );
+      htmlClass.push(calendar.colorizer.getClassName(0));
     }
 
     if (options.onClick !== null) {
@@ -99,7 +89,7 @@ export default class Populator {
   #formatSubDomainText(element) {
     const formatter = this.calendar.options.options.subDomainTextFormat;
     if (typeof formatter === 'function') {
-      element.text(d => formatter(d.t, d.v));
+      element.text((d) => formatter(d.t, d.v));
     }
   }
 
@@ -111,25 +101,25 @@ export default class Populator {
     const rect = svg
       .selectAll('svg')
       .selectAll('g')
-      .data(d => calendar.domainCollection.get(d) || []);
+      .data((d) => calendar.domainCollection.get(d) || []);
 
     rect
       .transition()
       .duration(options.animationDuration)
       .select('rect')
-      .attr('class', d => this.#getClassName(d))
-      .call(d => this.#addStyle(d));
+      .attr('class', (d) => this.#getClassName(d))
+      .call((d) => this.#addStyle(d));
 
     rect
       .transition()
       .duration(options.animationDuration)
       .select('title')
-      .text(d =>
+      .text((d) =>
         getSubDomainTitle(
           d,
           options,
-          calendar.domainSkeleton.at(options.subDomain).format.connector
-        )
+          calendar.domainSkeleton.at(options.subDomain).format.connector,
+        ),
       );
 
     /**
@@ -143,8 +133,8 @@ export default class Populator {
       .select('text')
       .attr(
         'class',
-        d => `subdomain-text${getHighlightClassName(d.t, options)}`
+        (d) => `subdomain-text${getHighlightClassName(d.t, options)}`,
       )
-      .call(e => this.#formatSubDomainText(e));
+      .call((e) => this.#formatSubDomainText(e));
   }
 }

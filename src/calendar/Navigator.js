@@ -108,11 +108,6 @@ export default class Navigator {
     let domains = this.calendar.getDomainKeys();
     const { options } = this.calendar.options;
 
-    const buildSubDomain = (d) => ({
-      t: this.calendar.domainSkeleton.at(options.subDomain).extractUnit(d),
-      v: null,
-    });
-
     // Remove out of bound domains from list of new domains to prepend
     while (++i < total) {
       if (backward && this.#minDomainIsReached(newDomains[i])) {
@@ -130,9 +125,10 @@ export default class Navigator {
     for (i = 0, total = newDomains.length; i < total; i++) {
       this.calendar.domainCollection.set(
         newDomains[i].getTime(),
-        generateSubDomain(newDomains[i], options, this.DTSDomain).map(
-          buildSubDomain,
-        ),
+        generateSubDomain(newDomains[i], options).map((d) => ({
+          t: this.calendar.domainSkeleton.at(options.subDomain).extractUnit(d),
+          v: null,
+        })),
       );
 
       this.calendar.domainCollection.delete(

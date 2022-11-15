@@ -1,11 +1,11 @@
 import { select } from 'd3-selection';
 
 import DomainPainter from '../domain/DomainPainter';
+import DomainLabelPainter from '../domain/DomainLabelPainter';
+import DomainSecondaryLabelPainter from '../domain/DomainSecondaryLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
-import LabelPainter from '../label/LabelPainter';
-import SubLabelPainter from '../label/SubLabelPainter';
-import Legend from '../legend/Legend';
-import Tooltip from '../subDomain/Tooltip';
+import Tooltip from '../tooltip/Tooltip';
+import LegendPainter from '../legend/LegendPainter';
 
 export default class CalendarPainter {
   constructor(calendar) {
@@ -18,9 +18,11 @@ export default class CalendarPainter {
     this.tooltip = new Tooltip(calendar);
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
-    this.labelPainter = new LabelPainter(calendar);
-    this.subLabelPainter = new SubLabelPainter(calendar);
-    this.legend = new Legend(calendar);
+    this.domainLabelPainter = new DomainLabelPainter(calendar);
+    this.domainSecondaryLabelPainter = new DomainSecondaryLabelPainter(
+      calendar,
+    );
+    this.legendPainter = new LegendPainter(calendar);
 
     // Record the address of the last inserted domain when browsing
     this.lastInsertedSvg = null;
@@ -69,9 +71,9 @@ export default class CalendarPainter {
   paint(navigationDir = false) {
     const domainSvg = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(domainSvg);
-    this.subLabelPainter.paint(domainSvg);
-    this.labelPainter.paint(domainSvg);
-    this.legend.paint(this.root);
+    this.domainLabelPainter.paint(domainSvg);
+    this.domainSecondaryLabelPainter.paint(domainSvg);
+    this.legendPainter.paint(this.root);
 
     this.resize();
 
@@ -82,7 +84,7 @@ export default class CalendarPainter {
     const { options } = this.calendar.options;
 
     const legendHeight = options.displayLegend
-      ? this.legend.getHeight() +
+      ? this.legendPainter.getHeight() +
         options.legendMargin[0] +
         options.legendMargin[2]
       : 0;
@@ -100,7 +102,7 @@ export default class CalendarPainter {
     const { options } = this.calendar.options;
 
     const legendWidth = options.displayLegend
-      ? this.legend.getWidth() +
+      ? this.legendPainter.getWidth() +
         options.legendMargin[1] +
         options.legendMargin[3]
       : 0;
@@ -184,10 +186,10 @@ export default class CalendarPainter {
   }
 
   removeLegend() {
-    return this.legend.destroy(this.root) && this.resize();
+    return this.legendPainter.destroy(this.root) && this.resize();
   }
 
   showLegend() {
-    return this.legend.paint(this.root) && this.resize();
+    return this.legendPainter.paint(this.root) && this.resize();
   }
 }

@@ -27,7 +27,7 @@ export default class subDomainPainter {
 
     const rect = subDomainSvgGroup
       .selectAll('g')
-      .data(d => this.calendar.domainCollection.get(d))
+      .data((d) => this.calendar.domainCollection.get(d))
       .enter()
       .append('g');
 
@@ -35,19 +35,19 @@ export default class subDomainPainter {
       .append('rect')
       .attr(
         'class',
-        d =>
+        (d) =>
           `graph-rect${getHighlightClassName(d.t, options)}${
             options.onClick !== null ? ' hover_cursor' : ''
-          }`
+          }`,
       )
       .attr('width', options.cellSize)
       .attr('height', options.cellSize)
-      .attr('x', d => this.#getX(d.t))
-      .attr('y', d => this.#getY(d.t))
+      .attr('x', (d) => this.#getX(d.t))
+      .attr('y', (d) => this.#getY(d.t))
       .on('click', (ev, d) => this.calendar.onClick(new Date(d.t), d.v))
-      .on('mouseover', d => this.calendar.onMouseOver(new Date(d.t), d.v))
-      .on('mouseout', d => this.calendar.onMouseOut(new Date(d.t), d.v))
-      .call(selection => {
+      .on('mouseover', (d) => this.calendar.onMouseOver(new Date(d.t), d.v))
+      .on('mouseout', (d) => this.calendar.onMouseOut(new Date(d.t), d.v))
+      .call((selection) => {
         if (options.cellRadius > 0) {
           selection
             .attr('rx', options.cellRadius)
@@ -83,13 +83,13 @@ export default class subDomainPainter {
       .append('text')
       .attr(
         'class',
-        d => `subdomain-text${getHighlightClassName(d.t, options)}`
+        (d) => `subdomain-text${getHighlightClassName(d.t, options)}`,
       )
-      .attr('x', d => this.#getX(d.t) + options.cellSize / 2)
-      .attr('y', d => this.#getY(d.t) + options.cellSize / 2)
+      .attr('x', (d) => this.#getX(d.t) + options.cellSize / 2)
+      .attr('y', (d) => this.#getY(d.t) + options.cellSize / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text(d => formatDate(new Date(d.t), options.subDomainTextFormat));
+      .text((d) => formatDate(new Date(d.t), options.subDomainTextFormat));
   }
 
   #appendTitle(elem) {
@@ -97,26 +97,24 @@ export default class subDomainPainter {
 
     elem
       .append('title')
-      .text(d => formatDate(new Date(d.t), options.subDomainDateFormat));
+      .text((d) => formatDate(new Date(d.t), options.subDomainDateFormat));
+  }
+
+  #getCoordinates(axis, d) {
+    const { options } = this.calendar.options;
+
+    const index = this.calendar.domainSkeleton
+      .at(options.subDomain)
+      .position[axis](new Date(d));
+
+    return index * (options.cellSize + options.cellPadding);
   }
 
   #getX(d) {
-    const { options } = this.calendar.options;
-
-    const index = this.calendar.domainSkeleton
-      .at(options.subDomain)
-      .position.x(new Date(d));
-
-    return index * (options.cellSize + options.cellPadding);
+    return this.#getCoordinates('x', d);
   }
 
   #getY(d) {
-    const { options } = this.calendar.options;
-
-    const index = this.calendar.domainSkeleton
-      .at(options.subDomain)
-      .position.y(new Date(d));
-
-    return index * (options.cellSize + options.cellPadding);
+    return this.#getCoordinates('y', d);
   }
 }

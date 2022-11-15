@@ -1,4 +1,6 @@
-import { formatNumber, formatDate, formatStringWithObject } from './function';
+import { format } from 'd3-format';
+
+import { formatDate, formatStringWithObject } from './function';
 
 export function getSubDomainTitle(d, options, connector) {
   if (d.v === null && !options.considerMissingDataAsZero) {
@@ -13,7 +15,7 @@ export function getSubDomainTitle(d, options, connector) {
   }
 
   return formatStringWithObject(options.subDomainTitleFormat.filled, {
-    count: formatNumber(value),
+    count: format(',d')(value),
     name: options.itemName[value !== 1 ? 1 : 0],
     connector,
     date: formatDate(new Date(d.t), options.subDomainDateFormat),
