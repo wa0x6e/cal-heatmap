@@ -85,6 +85,8 @@ export default class CalHeatMap extends CalendarEvent {
   next(n = 1) {
     if (this.navigator.loadNextDomain(n)) {
       this.calendarPainter.paint();
+      // @TODO: Update only newly inserted domains
+      this.update();
     }
   }
 
@@ -94,6 +96,8 @@ export default class CalHeatMap extends CalendarEvent {
   previous(n = 1) {
     if (this.navigator.loadPreviousDomain(n)) {
       this.calendarPainter.paint();
+      // @TODO: Update only newly inserted domains
+      this.update();
     }
   }
 

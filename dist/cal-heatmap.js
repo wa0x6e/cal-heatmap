@@ -18344,6 +18344,8 @@
     next(n = 1) {
       if (this.navigator.loadNextDomain(n)) {
         this.calendarPainter.paint();
+        // @TODO: Update only newly inserted domains
+        this.update();
       }
     }
 
@@ -18353,6 +18355,8 @@
     previous(n = 1) {
       if (this.navigator.loadPreviousDomain(n)) {
         this.calendarPainter.paint();
+        // @TODO: Update only newly inserted domains
+        this.update();
       }
     }
 
