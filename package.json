@@ -19,12 +19,15 @@
     "d3-interpolate": "^3.0.1",
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
-    "d3-time": "^3.0.0",
     "d3-time-format": "^4.1.0",
     "d3-transition": "^3.0.1",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "moment-range": "^4.0.2",
+    "moment-timezone": "^0.5.39"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-json": "^5.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "eslint": "^8.27.0",
     "eslint-config-airbnb-base": "^15.0.0",

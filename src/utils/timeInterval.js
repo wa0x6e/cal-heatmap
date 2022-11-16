@@ -1,34 +1,25 @@
-import {
-  timeYear,
-  timeMonth,
-  timeMonday,
-  timeSunday,
-  timeDay,
-  timeHour,
-  timeMinute,
-} from 'd3-time';
+import Moment from 'moment-timezone';
+import MomentRange from 'moment-range';
 
+// @TODO Handle week start day
+// see: https://github.com/rotaready/moment-range/pull/183
 function generate(interval, date, range) {
-  let start = date;
-  if (typeof date === 'number') {
-    start = new Date(date);
+  const moment = MomentRange.extendMoment(Moment);
+  const tz = moment.tz.defaultZone;
+  let dateRange;
+
+  let start = moment.tz(date, tz);
+  start = start.startOf(interval);
+
+  if (typeof range === 'number') {
+    dateRange = moment.rangeFromInterval(interval, range - 1, start);
+  } else {
+    dateRange = moment.range(start, moment.tz(range, tz).endOf(interval));
   }
-  start = interval.floor(date);
 
-  let stop = range;
-  if (!(range instanceof Date)) {
-    stop = interval.offset(start, range);
-  }
-  stop = interval.ceil(stop);
-
-  console.log(start);
-  console.log(stop);
-  console.log('*****');
-
-  return interval.range(
-    interval.floor(Math.min(start, stop)),
-    interval.ceil(Math.max(start, stop)),
-  );
+  return Array.from(dateRange.by(interval)).map((d) => {
+    return moment.tz(d, tz).valueOf();
+  });
 }
 
 /**
@@ -38,25 +29,20 @@ function generate(interval, date, range) {
  * @param  int|Date range Number of dates to get, or a stop date
  * @return Array of dates
  */
-export default function generateTimeInterval(
-  domain,
-  date,
-  range,
-  weekStartOnMonday,
-) {
+export default function generateTimeInterval(domain, date, range) {
   switch (domain) {
     case 'min':
-      return generate(timeMinute, date, range);
+      return generate('minute', date, range);
     case 'hour':
-      return generate(timeHour, date, range);
+      return generate(domain, date, range);
     case 'day':
-      return generate(timeDay, date, range);
+      return generate(domain, date, range);
     case 'week':
-      return generate(weekStartOnMonday ? timeMonday : timeSunday, date, range);
+      return generate(domain, date, range);
     case 'month':
-      return generate(timeMonth, date, range);
+      return generate(domain, date, range);
     case 'year':
-      return generate(timeYear, date, range);
+      return generate(domain, date, range);
     default:
       throw new Error('Invalid domain');
   }

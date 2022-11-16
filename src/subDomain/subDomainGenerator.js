@@ -52,13 +52,12 @@ const computeHourSubDomainSize = (date, domain) => {
 /**
  * @return int
  */
-const computeWeekSubDomainSize = (date, domain, weekStartOnMonday) => {
+const computeWeekSubDomainSize = (date, domain) => {
   if (domain === 'month') {
     const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    let endWeekNb = getWeekNumber(endOfMonth, weekStartOnMonday);
+    let endWeekNb = getWeekNumber(endOfMonth);
     let startWeekNb = getWeekNumber(
       new Date(date.getFullYear(), date.getMonth()),
-      weekStartOnMonday,
     );
 
     if (startWeekNb > endWeekNb) {
@@ -69,10 +68,7 @@ const computeWeekSubDomainSize = (date, domain, weekStartOnMonday) => {
     return endWeekNb - startWeekNb + 1;
   }
   if (domain === 'year') {
-    return getWeekNumber(
-      new Date(date.getFullYear(), 11, 31),
-      weekStartOnMonday,
-    );
+    return getWeekNumber(new Date(date.getFullYear(), 11, 31));
   }
 };
 
@@ -111,12 +107,7 @@ export function generateSubDomain(startDate, options) {
       return generateTimeInterval(
         'week',
         date,
-        computeWeekSubDomainSize(
-          date,
-          options.domain,
-          options.weekStartOnMonday,
-        ),
-        options.weekStartOnMonday,
+        computeWeekSubDomainSize(date, options.domain),
       );
     case 'x_month':
     case 'month':

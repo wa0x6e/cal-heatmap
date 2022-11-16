@@ -1,5 +1,6 @@
 import { select } from 'd3-selection';
 import { merge } from 'lodash-es';
+import moment from 'moment-timezone';
 
 import { validateSelector, validateDomainType } from '../utils/validator';
 import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
@@ -144,6 +145,10 @@ export default class Options {
       // Load remote data on calendar creation
       // When false, the calendar will be left empty
       loadOnInit: true,
+
+      // Timezone of the calendar
+      // When null, will default to browser local timezone
+      timezone: null,
 
       // Calendar orientation
       // false: display domains side by side
@@ -508,6 +513,9 @@ export default class Options {
       options.domainVerticalLabelHeight = 0;
       options.domainHorizontalLabelWidth = options.label.width;
     }
+
+    this.set('timezone', options.timezone ?? moment.tz.guess());
+    moment.tz.setDefault(options.timezone);
 
     if (options.legendMargin === [0, 0, 0, 0]) {
       switch (options.legendVerticalPosition) {

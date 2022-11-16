@@ -63,10 +63,9 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
 
     const domainKey = generateTimeInterval(
       calendar.options.options.domain,
-      date,
+      d * 1000,
       1,
-      calendar.options.options.weekStartOnMonday,
-    )[0].getTime();
+    )[0];
 
     // Skip if data is not relevant to current domain
     if (
@@ -84,7 +83,11 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
 
     const subDomainIndex = newData
       .get(domainKey)
-      .indexOf(calendar.domainSkeleton.at(options.subDomain).extractUnit(date));
+      .indexOf(
+        calendar.domainSkeleton
+          .at(options.subDomain)
+          .extractUnit(new Date(date)),
+      );
 
     if (updateMode === RESET_SINGLE_ON_UPDATE) {
       subDomainsData[subDomainIndex].v = data[d];

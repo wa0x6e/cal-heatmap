@@ -148,14 +148,13 @@ export default class DomainSkeleton {
             if (options.domain === 'week') {
               if (options.colLimit > 0 || options.rowLimit > 0) {
                 return Math.floor(
-                  (d.getHours() +
-                    getWeekDay(d, options.weekStartOnMonday) * 24) /
+                  (d.getHours() + getWeekDay(d) * 24) /
                     self.settings.hour.row(d),
                 );
               }
               return (
                 Math.floor(d.getHours() / self.settings.hour.row(d)) +
-                getWeekDay(d, options.weekStartOnMonday) * 4
+                getWeekDay(d) * 4
               );
             }
             return Math.floor(d.getHours() / self.settings.hour.row(d));
@@ -168,7 +167,7 @@ export default class DomainSkeleton {
                   p += (d.getDate() - 1) * 24;
                   break;
                 case 'week':
-                  p += getWeekDay(d, options.weekStartOnMonday) * 24;
+                  p += getWeekDay(d) * 24;
                   break;
               }
             }
@@ -239,10 +238,7 @@ export default class DomainSkeleton {
           x(d) {
             switch (options.domain) {
               case 'week':
-                return Math.floor(
-                  getWeekDay(d, options.weekStartOnMonday) /
-                    self.settings.day.row(d),
-                );
+                return Math.floor(getWeekDay(d) / self.settings.day.row(d));
               case 'month':
                 if (options.colLimit > 0 || options.rowLimit > 0) {
                   return Math.floor(
@@ -263,14 +259,14 @@ export default class DomainSkeleton {
             }
           },
           y(d) {
-            let p = getWeekDay(d, options.weekStartOnMonday);
+            let p = getWeekDay(d);
             if (options.colLimit > 0 || options.rowLimit > 0) {
               switch (options.domain) {
                 case 'year':
                   p = getDayOfYear(d) - 1;
                   break;
                 case 'week':
-                  p = getWeekDay(d, options.weekStartOnMonday);
+                  p = getWeekDay(d);
                   break;
                 case 'month':
                   p = d.getDate() - 1;
@@ -336,7 +332,7 @@ export default class DomainSkeleton {
         extractUnit(d) {
           const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
           // According to ISO-8601, week number computation are based on week starting on Monday
-          let weekDay = dt.getDay() - (options.weekStartOnMonday ? 1 : 0);
+          let weekDay = dt.getDay();
           if (weekDay < 0) {
             weekDay = 6;
           }

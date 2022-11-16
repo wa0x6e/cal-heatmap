@@ -40,12 +40,7 @@ export default class CalHeatMap extends CalendarEvent {
     const { options } = this.options;
 
     this.navigator.loadNewDomains(
-      generateTimeInterval(
-        options.domain,
-        options.start,
-        options.range,
-        options.weekStartOnMonday,
-      ),
+      generateTimeInterval(options.domain, options.start, options.range),
     );
   }
 

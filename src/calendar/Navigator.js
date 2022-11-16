@@ -23,7 +23,6 @@ export default class Navigator {
         options.domain,
         this.calendar.getDomainKeys().pop(),
         typeof n === 'number' ? n + 1 : n,
-        options.weekStartOnMonday,
       ).slice(1),
       NAVIGATE_RIGHT,
     );
@@ -41,7 +40,6 @@ export default class Navigator {
         options.domain,
         this.calendar.getDomainKeys()[0],
         typeof n === 'number' ? -n : n,
-        options.weekStartOnMonday,
       ),
       NAVIGATE_LEFT,
     );
@@ -55,33 +53,18 @@ export default class Navigator {
 
     if (date < firstDomain) {
       return this.loadPreviousDomain(
-        generateTimeInterval(
-          options.domain,
-          date,
-          firstDomain,
-          options.weekStartOnMonday,
-        ).length,
+        generateTimeInterval(options.domain, date, firstDomain).length,
       );
     }
     if (reset) {
       return this.loadNextDomain(
-        generateTimeInterval(
-          options.domain,
-          firstDomain,
-          date,
-          options.weekStartOnMonday,
-        ).length,
+        generateTimeInterval(options.domain, firstDomain, date).length,
       );
     }
 
     if (date > lastDomain) {
       return this.loadNextDomain(
-        generateTimeInterval(
-          options.domain,
-          lastDomain,
-          date,
-          options.weekStartOnMonday,
-        ).length,
+        generateTimeInterval(options.domain, lastDomain, date).length,
       );
     }
 
@@ -111,9 +94,11 @@ export default class Navigator {
 
     for (i = 0, total = newDomains.length; i < total; i++) {
       this.calendar.domainCollection.set(
-        newDomains[i].getTime(),
+        newDomains[i],
         generateSubDomain(newDomains[i], options).map((d) => ({
-          t: this.calendar.domainSkeleton.at(options.subDomain).extractUnit(d),
+          t: this.calendar.domainSkeleton
+            .at(options.subDomain)
+            .extractUnit(new Date(d)),
           v: null,
         })),
       );
@@ -147,7 +132,7 @@ export default class Navigator {
     // );
 
     this.#checkIfMinDomainIsReached(domains[0], domains[domains.length - 1]);
-    this.#checkIfMaxDomainIsReached(this.#getNextDomain().getTime());
+    this.#checkIfMaxDomainIsReached(this.#getNextDomain());
 
     if (direction === NAVIGATE_LEFT) {
       this.calendar.afterLoadPreviousDomain(newDomains[backward ? 0 : 1]);
@@ -197,7 +182,6 @@ export default class Navigator {
       options.domain,
       jumpDate(this.calendar.getDomainKeys().pop(), n, options.domain),
       n,
-      options.weekStartOnMonday,
     )[0];
   }
 

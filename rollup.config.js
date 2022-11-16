@@ -1,4 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 
 export default {
   input: 'src/cal-heatmap.js',
@@ -9,7 +11,6 @@ export default {
     external: [
       'd3-selection',
       'd3-format',
-      'd3-time',
       'd3-time-format',
       'd3-transition',
       'd3-interpolate',
@@ -17,5 +18,5 @@ export default {
       'd3-fetch',
     ],
   },
-  plugins: [resolve()],
+  plugins: [json(), commonjs(), resolve()],
 };

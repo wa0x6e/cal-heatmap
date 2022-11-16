@@ -14,8 +14,8 @@ export function getDayOfYear() {
  * Monday as the first day of the week
  * @return int  Week number [0-53]
  */
-export function getWeekNumber(d, weekStartOnMonday) {
-  const f = weekStartOnMonday === true ? timeFormat('%W') : timeFormat('%U');
+export function getWeekNumber(d) {
+  const f = timeFormat('%U');
   return f(d);
 }
 
@@ -25,16 +25,15 @@ export function getWeekNumber(d, weekStartOnMonday) {
  * @param  int|Date d Date or timestamp in milliseconds
  * @return int Week number, relative to the month [0-5]
  */
-export function getMonthWeekNumber(d, weekStartOnMonday) {
+export function getMonthWeekNumber(d) {
   if (typeof d === 'number') {
     d = new Date(d);
   }
 
   const monthFirstWeekNumber = getWeekNumber(
     new Date(d.getFullYear(), d.getMonth()),
-    weekStartOnMonday,
   );
-  return getWeekNumber(d, weekStartOnMonday) - monthFirstWeekNumber - 1;
+  return getWeekNumber(d) - monthFirstWeekNumber - 1;
 }
 
 /**
@@ -69,10 +68,7 @@ export function getDayCountInYear(d) {
  * @param  Date d
  * @return int The week day number (0-6)
  */
-export function getWeekDay(d, weekStartOnMonday) {
-  if (weekStartOnMonday === false) {
-    return d.getDay();
-  }
+export function getWeekDay(d) {
   return d.getDay() === 0 ? 6 : d.getDay() - 1;
 }
 
