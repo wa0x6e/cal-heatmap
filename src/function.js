@@ -50,3 +50,32 @@ export function getHighlightClassName(d, options) {
 
   return '';
 }
+
+/**
+ * Expand a number of an array of numbers to an usable 4 values array
+ *
+ * @param  {integer|array} value
+ * @return {array}        array
+ */
+export function expandMarginSetting(settings) {
+  let value = settings;
+  if (typeof value === 'number') {
+    value = [value];
+  }
+
+  if (!Array.isArray(value) || !value.every((d) => typeof d === 'number')) {
+    console.log('Margin only accepts an integer or an array of integers');
+    value = [0];
+  }
+
+  switch (value.length) {
+    case 1:
+      return [value[0], value[0], value[0], value[0]];
+    case 2:
+      return [value[0], value[1], value[0], value[1]];
+    case 3:
+      return [value[0], value[1], value[2], value[1]];
+    default:
+      return value.slice(0, 4);
+  }
+}

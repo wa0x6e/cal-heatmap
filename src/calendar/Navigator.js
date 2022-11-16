@@ -18,23 +18,15 @@ export default class Navigator {
 
     const { options } = this.calendar.options;
 
-    const bound = this.loadNewDomains(
+    return this.loadNewDomains(
       generateTimeInterval(
         options.domain,
-        this.#getNextDomain(),
-        n,
+        this.calendar.getDomainKeys().pop(),
+        typeof n === 'number' ? n + 1 : n,
         options.weekStartOnMonday,
-      ),
+      ).slice(1),
       NAVIGATE_RIGHT,
     );
-
-    this.calendar.afterLoadNextDomain(bound.end);
-    this.#checkIfMaxDomainIsReached(
-      this.#getNextDomain().getTime(),
-      bound.start,
-    );
-
-    return true;
   }
 
   loadPreviousDomain(n) {
@@ -44,20 +36,15 @@ export default class Navigator {
 
     const { options } = this.calendar.options;
 
-    const bound = this.loadNewDomains(
+    return this.loadNewDomains(
       generateTimeInterval(
         options.domain,
         this.calendar.getDomainKeys()[0],
-        -n,
+        typeof n === 'number' ? -n : n,
         options.weekStartOnMonday,
       ),
       NAVIGATE_LEFT,
     );
-
-    this.calendar.afterLoadPreviousDomain(bound.start);
-    this.#checkIfMinDomainIsReached(bound.start, bound.end);
-
-    return true;
   }
 
   jumpTo(date, reset) {
@@ -70,8 +57,8 @@ export default class Navigator {
       return this.loadPreviousDomain(
         generateTimeInterval(
           options.domain,
-          firstDomain,
           date,
+          firstDomain,
           options.weekStartOnMonday,
         ).length,
       );
@@ -159,8 +146,14 @@ export default class Navigator {
     //   }
     // );
 
-    this.#checkIfMinDomainIsReached(domains[0]);
+    this.#checkIfMinDomainIsReached(domains[0], domains[domains.length - 1]);
     this.#checkIfMaxDomainIsReached(this.#getNextDomain().getTime());
+
+    if (direction === NAVIGATE_LEFT) {
+      this.calendar.afterLoadPreviousDomain(newDomains[backward ? 0 : 1]);
+    } else if (direction === NAVIGATE_RIGHT) {
+      this.calendar.afterLoadNextDomain(domains[domains.length - 1]);
+    }
 
     return {
       start: newDomains[backward ? 0 : 1],

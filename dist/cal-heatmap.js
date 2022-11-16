@@ -3306,11 +3306,17 @@
     if (typeof date === 'number') {
       start = new Date(date);
     }
+    start = interval.floor(date);
 
     let stop = range;
     if (!(range instanceof Date)) {
       stop = interval.offset(start, range);
     }
+    stop = interval.ceil(stop);
+
+    console.log(start);
+    console.log(stop);
+    console.log('*****');
 
     return interval.range(
       interval.floor(Math.min(start, stop)),
@@ -4827,23 +4833,15 @@
 
       const { options } = this.calendar.options;
 
-      const bound = this.loadNewDomains(
+      return this.loadNewDomains(
         generateTimeInterval(
           options.domain,
-          this.#getNextDomain(),
-          n,
+          this.calendar.getDomainKeys().pop(),
+          typeof n === 'number' ? n + 1 : n,
           options.weekStartOnMonday,
-        ),
+        ).slice(1),
         NAVIGATE_RIGHT,
       );
-
-      this.calendar.afterLoadNextDomain(bound.end);
-      this.#checkIfMaxDomainIsReached(
-        this.#getNextDomain().getTime(),
-        bound.start,
-      );
-
-      return true;
     }
 
     loadPreviousDomain(n) {
@@ -4853,20 +4851,15 @@
 
       const { options } = this.calendar.options;
 
-      const bound = this.loadNewDomains(
+      return this.loadNewDomains(
         generateTimeInterval(
           options.domain,
           this.calendar.getDomainKeys()[0],
-          -n,
+          typeof n === 'number' ? -n : n,
           options.weekStartOnMonday,
         ),
         NAVIGATE_LEFT,
       );
-
-      this.calendar.afterLoadPreviousDomain(bound.start);
-      this.#checkIfMinDomainIsReached(bound.start, bound.end);
-
-      return true;
     }
 
     jumpTo(date, reset) {
@@ -4879,8 +4872,8 @@
         return this.loadPreviousDomain(
           generateTimeInterval(
             options.domain,
-            firstDomain,
             date,
+            firstDomain,
             options.weekStartOnMonday,
           ).length,
         );
@@ -4968,8 +4961,14 @@
       //   }
       // );
 
-      this.#checkIfMinDomainIsReached(domains[0]);
+      this.#checkIfMinDomainIsReached(domains[0], domains[domains.length - 1]);
       this.#checkIfMaxDomainIsReached(this.#getNextDomain().getTime());
+
+      if (direction === NAVIGATE_LEFT) {
+        this.calendar.afterLoadPreviousDomain(newDomains[backward ? 0 : 1]);
+      } else if (direction === NAVIGATE_RIGHT) {
+        this.calendar.afterLoadNextDomain(domains[domains.length - 1]);
+      }
 
       return {
         start: newDomains[backward ? 0 : 1],
@@ -8139,6 +8138,35 @@
     return '';
   }
 
+  /**
+   * Expand a number of an array of numbers to an usable 4 values array
+   *
+   * @param  {integer|array} value
+   * @return {array}        array
+   */
+  function expandMarginSetting(settings) {
+    let value = settings;
+    if (typeof value === 'number') {
+      value = [value];
+    }
+
+    if (!Array.isArray(value) || !value.every((d) => typeof d === 'number')) {
+      console.log('Margin only accepts an integer or an array of integers');
+      value = [0];
+    }
+
+    switch (value.length) {
+      case 1:
+        return [value[0], value[0], value[0], value[0]];
+      case 2:
+        return [value[0], value[1], value[0], value[1]];
+      case 3:
+        return [value[0], value[1], value[2], value[1]];
+      default:
+        return value.slice(0, 4);
+    }
+  }
+
   class DomainLabelPainter {
     constructor(calendar) {
       this.calendar = calendar;
@@ -9484,36 +9512,6 @@
   const DEFAULT_LEGEND_MARGIN = 10;
 
   /**
-   * Expand a number of an array of numbers to an usable 4 values array
-   *
-   * @param  {integer|array} value
-   * @return {array}        array
-   */
-  function expandMarginSetting(value) {
-    if (typeof value === 'number') {
-      value = [value];
-    }
-
-    if (!Array.isArray(value)) {
-      console.log('Margin only takes an integer or an array of integers');
-      value = [0];
-    }
-
-    switch (value.length) {
-      case 1:
-        return [value[0], value[0], value[0], value[0]];
-      case 2:
-        return [value[0], value[1], value[0], value[1]];
-      case 3:
-        return [value[0], value[1], value[2], value[1]];
-      case 4:
-        return value;
-      default:
-        return value.slice(0, 4);
-    }
-  }
-
-  /**
    * Convert a string to an array like [singular-form, plural-form]
    *
    * @param  {string|array} value Date to convert
@@ -9853,7 +9851,7 @@
     }
 
     set(key, value) {
-      if (this.options[key] === value) {
+      if (!this.options.hasOwnProperty(key) || this.options[key] === value) {
         return false;
       }
 
@@ -10014,7 +10012,7 @@
         options.domainHorizontalLabelWidth = options.label.width;
       }
 
-      if (!options.legendMargin !== [0, 0, 0, 0]) {
+      if (options.legendMargin === [0, 0, 0, 0]) {
         switch (options.legendVerticalPosition) {
           case 'top':
             options.legendMargin[BOTTOM] = DEFAULT_LEGEND_MARGIN;

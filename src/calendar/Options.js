@@ -3,39 +3,10 @@ import { merge } from 'lodash-es';
 
 import { validateSelector, validateDomainType } from '../utils/validator';
 import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+import { expandMarginSetting } from '../function';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 const DEFAULT_LEGEND_MARGIN = 10;
-
-/**
- * Expand a number of an array of numbers to an usable 4 values array
- *
- * @param  {integer|array} value
- * @return {array}        array
- */
-function expandMarginSetting(value) {
-  if (typeof value === 'number') {
-    value = [value];
-  }
-
-  if (!Array.isArray(value)) {
-    console.log('Margin only takes an integer or an array of integers');
-    value = [0];
-  }
-
-  switch (value.length) {
-    case 1:
-      return [value[0], value[0], value[0], value[0]];
-    case 2:
-      return [value[0], value[1], value[0], value[1]];
-    case 3:
-      return [value[0], value[1], value[2], value[1]];
-    case 4:
-      return value;
-    default:
-      return value.slice(0, 4);
-  }
-}
 
 /**
  * Convert a string to an array like [singular-form, plural-form]
@@ -377,7 +348,7 @@ export default class Options {
   }
 
   set(key, value) {
-    if (this.options[key] === value) {
+    if (!this.options.hasOwnProperty(key) || this.options[key] === value) {
       return false;
     }
 
@@ -538,7 +509,7 @@ export default class Options {
       options.domainHorizontalLabelWidth = options.label.width;
     }
 
-    if (!options.legendMargin !== [0, 0, 0, 0]) {
+    if (options.legendMargin === [0, 0, 0, 0]) {
       switch (options.legendVerticalPosition) {
         case 'top':
           options.legendMargin[BOTTOM] = DEFAULT_LEGEND_MARGIN;

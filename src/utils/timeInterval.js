@@ -13,11 +13,17 @@ function generate(interval, date, range) {
   if (typeof date === 'number') {
     start = new Date(date);
   }
+  start = interval.floor(date);
 
   let stop = range;
   if (!(range instanceof Date)) {
     stop = interval.offset(start, range);
   }
+  stop = interval.ceil(stop);
+
+  console.log(start);
+  console.log(stop);
+  console.log('*****');
 
   return interval.range(
     interval.floor(Math.min(start, stop)),

@@ -1,7 +1,8 @@
 {
   "extends": "airbnb-base",
   "env": {
-    "browser": true
+    "browser": true,
+    "jest/globals": true
   },
   "parserOptions": {
     "sourceType": "module",
@@ -10,5 +11,6 @@
   "rules": {
     "no-prototype-builtins": "off",
     "operator-linebreak": ["error", "after"]
-  }
+  },
+  "plugins": ["jest"]
 }
