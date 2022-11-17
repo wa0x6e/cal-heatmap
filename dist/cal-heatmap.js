@@ -14368,9 +14368,13 @@
         .attr('height', options.cellSize)
         .attr('x', (d) => this.#getX(d.t))
         .attr('y', (d) => this.#getY(d.t))
-        .on('click', (ev, d) => this.calendar.onClick(new Date(d.t), d.v))
-        .on('mouseover', (d) => this.calendar.onMouseOver(new Date(d.t), d.v))
-        .on('mouseout', (d) => this.calendar.onMouseOut(new Date(d.t), d.v))
+        .on('click', (ev, d) => this.calendar.onClick(ev, new Date(d.t), d.v))
+        .on('mouseover', (ev, d) =>
+          this.calendar.onMouseOver(ev, new Date(d.t), d.v),
+        )
+        .on('mouseout', (ev, d) =>
+          this.calendar.onMouseOut(ev, new Date(d.t), d.v),
+        )
         .call((selection) => {
           if (options.cellRadius > 0) {
             selection
