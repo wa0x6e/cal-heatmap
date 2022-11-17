@@ -1,11 +1,11 @@
-const yearTemplate = (domainTemplate, dateHelper, options) => ({
+const yearTemplate = (dateHelper) => ({
   name: 'year',
   level: 60,
   row() {
-    return options.rowLimit || 1;
+    return 1;
   },
   column() {
-    return options.colLimit || 1;
+    return 1;
   },
   position: {
     x() {

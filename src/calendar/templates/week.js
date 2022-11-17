@@ -1,12 +1,5 @@
-const weekTemplate = (
-  domainTemplate,
-  dateHelper,
-  { domain, domainDynamicDimension },
-) => ({
-  name: 'week',
-  level: 40,
-  maxItemNumber: 52,
-  defaultColumnNumber(d) {
+const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
+  function getColNumber(d) {
     switch (domain) {
       case 'year':
         return 52;
@@ -17,44 +10,45 @@ const weekTemplate = (
           : 5;
       default:
     }
-  },
-  defaultRowNumber: 1,
-  row(d) {
-    return domainTemplate.getSubDomainRowNumber(d);
-  },
-  column(d) {
-    return domainTemplate.getSubDomainColumnNumber(d);
-  },
-  position: {
-    x(d) {
-      switch (domain) {
-        case 'year':
-          return Math.floor(
-            dateHelper.moment(d).isoWeek() /
-              domainTemplate.getSubDomainRowNumber(d),
-          );
-        case 'month':
-          return Math.floor(
-            dateHelper.getMonthWeekNumber(d) /
-              domainTemplate.getSubDomainRowNumber(d),
-          );
-        default:
-      }
+  }
+
+  return {
+    name: 'week',
+    level: 40,
+    maxItemNumber: 52,
+    defaultColumnNumber(d) {
+      getColNumber(d);
     },
-    y(d) {
-      return (
-        dateHelper.moment(d).isoWeek() % domainTemplate.getSubDomainRowNumber(d)
-      );
+    defaultRowNumber: 1,
+    row(d) {
+      return 1;
     },
-  },
-  format: {
-    date: '%B Week #%W',
-    legend: '%B Week #%W',
-    connector: 'in',
-  },
-  extractUnit(d) {
-    return dateHelper.moment(d).startOf('isoWeek').valueOf();
-  },
-});
+    column(d) {
+      return getColNumber(d);
+    },
+    position: {
+      x(d) {
+        switch (domain) {
+          case 'year':
+            return Math.floor(dateHelper.moment(d).isoWeek() / 1);
+          case 'month':
+            return Math.floor(dateHelper.getMonthWeekNumber(d) / 1);
+          default:
+        }
+      },
+      y(d) {
+        return dateHelper.moment(d).isoWeek() % 1;
+      },
+    },
+    format: {
+      date: '%B Week #%W',
+      legend: '%B Week #%W',
+      connector: 'in',
+    },
+    extractUnit(d) {
+      return dateHelper.moment(d).startOf('isoWeek').valueOf();
+    },
+  };
+};
 
 export default weekTemplate;

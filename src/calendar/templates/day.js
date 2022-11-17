@@ -1,22 +1,8 @@
 const dayTemplate = (
-  domainTemplate,
   dateHelper,
-  { domain, rowLimit, colLimit, domainDynamicDimension, verticalOrientation },
-) => ({
-  name: 'day',
-  level: 30,
-  maxItemNumber(d) {
-    switch (domain) {
-      case 'month':
-        return domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31;
-      case 'year':
-        return domainDynamicDimension ? dateHelper.moment(d).daysInYear() : 366;
-      case 'week':
-      default:
-        return 7;
-    }
-  },
-  defaultColumnNumber(d) {
+  { domain, domainDynamicDimension, verticalOrientation },
+) => {
+  function getColNumber(d) {
     switch (domain) {
       case 'month':
         return domainDynamicDimension && !verticalOrientation
@@ -36,71 +22,66 @@ const dayTemplate = (
       default:
         return 1;
     }
-  },
-  defaultRowNumber: 7,
-  row(d) {
-    return domainTemplate.getSubDomainRowNumber(d);
-  },
-  column(d) {
-    return domainTemplate.getSubDomainColumnNumber(d);
-  },
-  position: {
-    x(d) {
+  }
+
+  return {
+    name: 'day',
+    level: 30,
+    maxItemNumber(d) {
       switch (domain) {
-        case 'week':
-          return Math.floor(
-            dateHelper.moment(d).isoWeekday() /
-              domainTemplate.getSubDomainRowNumber(d),
-          );
         case 'month':
-          if (colLimit > 0 || rowLimit > 0) {
-            return Math.floor(
-              (dateHelper.moment(d).date() - 1) /
-                domainTemplate.getSubDomainRowNumber(d),
-            );
-          }
-          return (
-            dateHelper.moment(d).isoWeek() -
-            dateHelper.moment(dateHelper.moment(d).startOf('month')).isoWeek()
-          );
+          return domainDynamicDimension
+            ? dateHelper.moment(d).daysInMonth()
+            : 31;
         case 'year':
-          if (colLimit > 0 || rowLimit > 0) {
-            return Math.floor(
-              (dateHelper.moment(d).dayOfYear() - 1) /
-                domainTemplate.getSubDomainRowNumber(d),
-            );
-          }
-          return dateHelper.moment(d).isoWeek();
+          return domainDynamicDimension
+            ? dateHelper.moment(d).endOf('year').dayOfYear()
+            : 366;
+        case 'week':
         default:
+          return 7;
       }
     },
-    y(d) {
-      let p = dateHelper.moment(d).isoWeekday();
-      if (colLimit > 0 || rowLimit > 0) {
+    defaultColumnNumber(d) {
+      return getColNumber(d);
+    },
+    defaultRowNumber: 7,
+    row(d) {
+      return 7;
+    },
+    column(d) {
+      return getColNumber(d);
+    },
+    position: {
+      x(d) {
         switch (domain) {
-          case 'year':
-            p = dateHelper.moment(d).dayOfYear() - 1;
-            break;
           case 'week':
-            p = dateHelper.moment(d).isoWeekday();
-            break;
+            return Math.floor(dateHelper.moment(d).isoWeekday() / 7);
           case 'month':
-            p = dateHelper.moment(d).date() - 1;
-            break;
+            return (
+              dateHelper.moment(d).isoWeek() -
+              dateHelper.moment(dateHelper.moment(d).startOf('month')).isoWeek()
+            );
+          case 'year':
+            return dateHelper.moment(d).isoWeek();
           default:
         }
-      }
-      return Math.floor(p % domainTemplate.getSubDomainRowNumber(d));
+      },
+      y(d) {
+        let p = dateHelper.moment(d).isoWeekday();
+
+        return Math.floor(p % 7);
+      },
     },
-  },
-  format: {
-    date: '%A %B %-e, %Y',
-    legend: '%e %b',
-    connector: 'on',
-  },
-  extractUnit(d) {
-    return dateHelper.moment(d).startOf('day').valueOf();
-  },
-});
+    format: {
+      date: '%A %B %-e, %Y',
+      legend: '%e %b',
+      connector: 'on',
+    },
+    extractUnit(d) {
+      return dateHelper.moment(d).startOf('day').valueOf();
+    },
+  };
+};
 
 export default dayTemplate;

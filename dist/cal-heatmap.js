@@ -10675,7 +10675,7 @@
   const computeDaySubDomainSize = (d, domain) => {
     switch (domain) {
       case 'year':
-        return DateHelper.moment(d).daysInYear();
+        return DateHelper.moment(d).endOf('year').dayOfYear();
       case 'month':
         return DateHelper.moment(d).daysInMonth();
       case 'week':
@@ -15563,14 +15563,6 @@
 
         domainTemplates: null,
 
-        // Number of columns to split the subDomains to
-        // If not null, will takes precedence over rowLimit
-        colLimit: null,
-
-        // Number of rows to split the subDomains to
-        // Will be ignored if colLimit is not null
-        rowLimit: null,
-
         // First day of the week is Monday
         // 0 to start the week on Sunday
         weekStartOnMonday: true,
@@ -15688,6 +15680,7 @@
         // Examples:
         // legendColors: {
         //    min: "green",
+        //    middle: "blue",
         //    max: "red",
         //    empty: "#ffffff",
         //    base: "grey",
@@ -15879,16 +15872,6 @@
       return true;
     }
 
-    #parseRowLimit(value) {
-      if (value > 0 && this.options.colLimit > 0) {
-        console.log(
-          'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored',
-        );
-        return null;
-      }
-      return value > 0 ? value : null;
-    }
-
     /**
      * Fine-tune the label alignement depending on its position
      *
@@ -15963,8 +15946,6 @@
       options.domainMargin = expandMarginSetting(options.domainMargin);
       options.legendMargin = expandMarginSetting(options.legendMargin);
       options.itemName = expandItemName(options.itemName);
-      options.colLimit = options.colLimit > 0 ? options.colLimit : null;
-      options.rowLimit = this.#parseRowLimit(options.rowLimit);
 
       this.#autoAlignLabel();
 
@@ -16624,28 +16605,24 @@
     return string;
   }
 
-  const minuteTemplate = (domainTemplate, dateHelper) => ({
+  const minuteTemplate = (dateHelper) => ({
     name: 'minute',
     level: 10,
     maxItemNumber: 60,
     defaultRowNumber: 10,
     defaultColumnNumber: 6,
     row(d) {
-      return domainTemplate.getSubDomainRowNumber(d);
+      return 10;
     },
     column(d) {
-      return domainTemplate.getSubDomainColumnNumber(d);
+      return 6;
     },
     position: {
       x(d) {
-        return Math.floor(
-          dateHelper.moment(d).minute() / domainTemplate.getSubDomainRowNumber(d),
-        );
+        return Math.floor(dateHelper.moment(d).minute() / 10);
       },
       y(d) {
-        return (
-          dateHelper.moment(d).minute() % domainTemplate.getSubDomainRowNumber(d)
-        );
+        return dateHelper.moment(d).minute() % 10;
       },
     },
     format: {
@@ -16658,29 +16635,8 @@
     },
   });
 
-  const hourTemplate = (
-    domainTemplate,
-    dateHelper,
-    { domain, rowLimit, colLimit, domainDynamicDimension },
-  ) => ({
-    name: 'hour',
-    level: 20,
-    maxItemNumber(d) {
-      switch (domain) {
-        case 'week':
-          return 24 * 7;
-        case 'month':
-          return (
-            24 *
-            (domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31)
-          );
-        case 'day':
-        default:
-          return 24;
-      }
-    },
-    defaultRowNumber: 6,
-    defaultColumnNumber(d) {
+  const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
+    function getColNumber(d) {
       switch (domain) {
         case 'week':
           return 28;
@@ -16690,87 +16646,70 @@
         default:
           return 4;
       }
-    },
-    row(d) {
-      return domainTemplate.getSubDomainRowNumber(d);
-    },
-    column(d) {
-      return domainTemplate.getSubDomainColumnNumber(d);
-    },
-    position: {
-      x(d) {
-        const hour = dateHelper.moment(d).hour();
-        const date = dateHelper.moment(d).date();
+    }
 
-        if (domain === 'month') {
-          if (colLimit > 0 || rowLimit > 0) {
-            return Math.floor(
-              (hour + (date - 1) * 24) / domainTemplate.getSubDomainRowNumber(d),
+    return {
+      name: 'hour',
+      level: 20,
+      maxItemNumber(d) {
+        switch (domain) {
+          case 'week':
+            return 24 * 7;
+          case 'month':
+            return (
+              24 *
+              (domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31)
             );
-          }
-          return (
-            Math.floor(hour / domainTemplate.getSubDomainRowNumber(d)) +
-            (date - 1) * 4
-          );
+          case 'day':
+          default:
+            return 24;
         }
-        if (domain === 'week') {
-          if (colLimit > 0 || rowLimit > 0) {
-            return Math.floor(
-              (hour + dateHelper.moment(d).isoWeekday() * 24) /
-                domainTemplate.getSubDomainRowNumber(d),
-            );
-          }
-          return (
-            Math.floor(hour / domainTemplate.getSubDomainRowNumber(d)) +
-            dateHelper.moment(d).isoWeekday() * 4
-          );
-        }
-        return Math.floor(hour / domainTemplate.getSubDomainRowNumber(d));
       },
-      y(d) {
-        let p = dateHelper.moment(d).hour();
-        if (colLimit > 0 || rowLimit > 0) {
-          switch (domain) {
-            case 'month':
-              p += (dateHelper.moment(d).date() - 1) * 24;
-              break;
-            case 'week':
-              p += dateHelper.moment(d).isoWeekday() * 24;
-              break;
-          }
-        }
-        return Math.floor(p % domainTemplate.getSubDomainRowNumber(d));
+      defaultRowNumber: 6,
+      defaultColumnNumber(d) {
+        return getColNumber(d);
       },
-    },
-    format: {
-      date: '%Hh, %A %B %-e, %Y',
-      legend: '%H:00',
-      connector: 'at',
-    },
-    extractUnit(d) {
-      return dateHelper.moment(d).startOf('hour').valueOf();
-    },
-  });
+      row(d) {
+        return 6;
+      },
+      column(d) {
+        return getColNumber(d);
+      },
+      position: {
+        x(d) {
+          const hour = dateHelper.moment(d).hour();
+          const date = dateHelper.moment(d).date();
+
+          if (domain === 'month') {
+            return Math.floor(hour / 6) + (date - 1) * 4;
+          }
+          if (domain === 'week') {
+            return Math.floor(hour / 6) + dateHelper.moment(d).isoWeekday() * 4;
+          }
+          return Math.floor(hour / 6);
+        },
+        y(d) {
+          let p = dateHelper.moment(d).hour();
+
+          return Math.floor(p % 6);
+        },
+      },
+      format: {
+        date: '%Hh, %A %B %-e, %Y',
+        legend: '%H:00',
+        connector: 'at',
+      },
+      extractUnit(d) {
+        return dateHelper.moment(d).startOf('hour').valueOf();
+      },
+    };
+  };
 
   const dayTemplate = (
-    domainTemplate,
     dateHelper,
-    { domain, rowLimit, colLimit, domainDynamicDimension, verticalOrientation },
-  ) => ({
-    name: 'day',
-    level: 30,
-    maxItemNumber(d) {
-      switch (domain) {
-        case 'month':
-          return domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31;
-        case 'year':
-          return domainDynamicDimension ? dateHelper.moment(d).daysInYear() : 366;
-        case 'week':
-        default:
-          return 7;
-      }
-    },
-    defaultColumnNumber(d) {
+    { domain, domainDynamicDimension, verticalOrientation },
+  ) => {
+    function getColNumber(d) {
       switch (domain) {
         case 'month':
           return domainDynamicDimension && !verticalOrientation
@@ -16790,80 +16729,69 @@
         default:
           return 1;
       }
-    },
-    defaultRowNumber: 7,
-    row(d) {
-      return domainTemplate.getSubDomainRowNumber(d);
-    },
-    column(d) {
-      return domainTemplate.getSubDomainColumnNumber(d);
-    },
-    position: {
-      x(d) {
-        switch (domain) {
-          case 'week':
-            return Math.floor(
-              dateHelper.moment(d).isoWeekday() /
-                domainTemplate.getSubDomainRowNumber(d),
-            );
-          case 'month':
-            if (colLimit > 0 || rowLimit > 0) {
-              return Math.floor(
-                (dateHelper.moment(d).date() - 1) /
-                  domainTemplate.getSubDomainRowNumber(d),
-              );
-            }
-            return (
-              dateHelper.moment(d).isoWeek() -
-              dateHelper.moment(dateHelper.moment(d).startOf('month')).isoWeek()
-            );
-          case 'year':
-            if (colLimit > 0 || rowLimit > 0) {
-              return Math.floor(
-                (dateHelper.moment(d).dayOfYear() - 1) /
-                  domainTemplate.getSubDomainRowNumber(d),
-              );
-            }
-            return dateHelper.moment(d).isoWeek();
-        }
-      },
-      y(d) {
-        let p = dateHelper.moment(d).isoWeekday();
-        if (colLimit > 0 || rowLimit > 0) {
-          switch (domain) {
-            case 'year':
-              p = dateHelper.moment(d).dayOfYear() - 1;
-              break;
-            case 'week':
-              p = dateHelper.moment(d).isoWeekday();
-              break;
-            case 'month':
-              p = dateHelper.moment(d).date() - 1;
-              break;
-          }
-        }
-        return Math.floor(p % domainTemplate.getSubDomainRowNumber(d));
-      },
-    },
-    format: {
-      date: '%A %B %-e, %Y',
-      legend: '%e %b',
-      connector: 'on',
-    },
-    extractUnit(d) {
-      return dateHelper.moment(d).startOf('day').valueOf();
-    },
-  });
+    }
 
-  const weekTemplate = (
-    domainTemplate,
-    dateHelper,
-    { domain, domainDynamicDimension },
-  ) => ({
-    name: 'week',
-    level: 40,
-    maxItemNumber: 52,
-    defaultColumnNumber(d) {
+    return {
+      name: 'day',
+      level: 30,
+      maxItemNumber(d) {
+        switch (domain) {
+          case 'month':
+            return domainDynamicDimension
+              ? dateHelper.moment(d).daysInMonth()
+              : 31;
+          case 'year':
+            return domainDynamicDimension
+              ? dateHelper.moment(d).endOf('year').dayOfYear()
+              : 366;
+          case 'week':
+          default:
+            return 7;
+        }
+      },
+      defaultColumnNumber(d) {
+        return getColNumber(d);
+      },
+      defaultRowNumber: 7,
+      row(d) {
+        return 7;
+      },
+      column(d) {
+        return getColNumber(d);
+      },
+      position: {
+        x(d) {
+          switch (domain) {
+            case 'week':
+              return Math.floor(dateHelper.moment(d).isoWeekday() / 7);
+            case 'month':
+              return (
+                dateHelper.moment(d).isoWeek() -
+                dateHelper.moment(dateHelper.moment(d).startOf('month')).isoWeek()
+              );
+            case 'year':
+              return dateHelper.moment(d).isoWeek();
+          }
+        },
+        y(d) {
+          let p = dateHelper.moment(d).isoWeekday();
+
+          return Math.floor(p % 7);
+        },
+      },
+      format: {
+        date: '%A %B %-e, %Y',
+        legend: '%e %b',
+        connector: 'on',
+      },
+      extractUnit(d) {
+        return dateHelper.moment(d).startOf('day').valueOf();
+      },
+    };
+  };
+
+  const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
+    function getColNumber(d) {
       switch (domain) {
         case 'year':
           return 52;
@@ -16873,67 +16801,64 @@
                 dateHelper.moment(d).isoWeek()
             : 5;
       }
-    },
-    defaultRowNumber: 1,
-    row(d) {
-      return domainTemplate.getSubDomainRowNumber(d);
-    },
-    column(d) {
-      return domainTemplate.getSubDomainColumnNumber(d);
-    },
-    position: {
-      x(d) {
-        switch (domain) {
-          case 'year':
-            return Math.floor(
-              dateHelper.moment(d).isoWeek() /
-                domainTemplate.getSubDomainRowNumber(d),
-            );
-          case 'month':
-            return Math.floor(
-              dateHelper.getMonthWeekNumber(d) /
-                domainTemplate.getSubDomainRowNumber(d),
-            );
-        }
-      },
-      y(d) {
-        return (
-          dateHelper.moment(d).isoWeek() % domainTemplate.getSubDomainRowNumber(d)
-        );
-      },
-    },
-    format: {
-      date: '%B Week #%W',
-      legend: '%B Week #%W',
-      connector: 'in',
-    },
-    extractUnit(d) {
-      return dateHelper.moment(d).startOf('isoWeek').valueOf();
-    },
-  });
+    }
 
-  const monthTemplate = (domainTemplate, dateHelper) => ({
+    return {
+      name: 'week',
+      level: 40,
+      maxItemNumber: 52,
+      defaultColumnNumber(d) {
+        getColNumber(d);
+      },
+      defaultRowNumber: 1,
+      row(d) {
+        return 1;
+      },
+      column(d) {
+        return getColNumber(d);
+      },
+      position: {
+        x(d) {
+          switch (domain) {
+            case 'year':
+              return Math.floor(dateHelper.moment(d).isoWeek() / 1);
+            case 'month':
+              return Math.floor(dateHelper.getMonthWeekNumber(d) / 1);
+          }
+        },
+        y(d) {
+          return dateHelper.moment(d).isoWeek() % 1;
+        },
+      },
+      format: {
+        date: '%B Week #%W',
+        legend: '%B Week #%W',
+        connector: 'in',
+      },
+      extractUnit(d) {
+        return dateHelper.moment(d).startOf('isoWeek').valueOf();
+      },
+    };
+  };
+
+  const monthTemplate = (dateHelper) => ({
     name: 'month',
     level: 50,
     maxItemNumber: 12,
     defaultColumnNumber: 12,
     defaultRowNumber: 1,
     row() {
-      return domainTemplate.getSubDomainRowNumber();
+      return 1;
     },
     column() {
-      return domainTemplate.getSubDomainColumnNumber();
+      return 12;
     },
     position: {
       x(d) {
-        return Math.floor(
-          dateHelper.moment(d).month() / domainTemplate.getSubDomainRowNumber(d),
-        );
+        return dateHelper.moment(d).month();
       },
-      y(d) {
-        return (
-          dateHelper.moment(d).month() % domainTemplate.getSubDomainRowNumber(d)
-        );
+      y() {
+        return 0;
       },
     },
     format: {
@@ -16946,14 +16871,14 @@
     },
   });
 
-  const yearTemplate = (domainTemplate, dateHelper, options) => ({
+  const yearTemplate = (dateHelper) => ({
     name: 'year',
     level: 60,
     row() {
-      return options.rowLimit || 1;
+      return 1;
     },
     column() {
-      return options.colLimit || 1;
+      return 1;
     },
     position: {
       x() {
@@ -16988,42 +16913,6 @@
       this.calendar = calendar;
     }
 
-    getSubDomainRowNumber(d) {
-      const { options } = this.calendar.options;
-
-      if (options.colLimit > 0) {
-        let i = this.settings[options.subDomain].maxItemNumber;
-        if (typeof i === 'function') {
-          i = i(d);
-        }
-        return Math.ceil(i / options.colLimit);
-      }
-
-      let j = this.settings[options.subDomain].defaultRowNumber;
-      if (typeof j === 'function') {
-        j = j(d);
-      }
-      return options.rowLimit || j;
-    }
-
-    getSubDomainColumnNumber(d) {
-      const { options } = this.calendar.options;
-
-      if (options.rowLimit > 0) {
-        let i = this.settings[options.subDomain].maxItemNumber;
-        if (typeof i === 'function') {
-          i = i(d);
-        }
-        return Math.ceil(i / options.rowLimit);
-      }
-
-      let j = this.settings[options.subDomain].defaultColumnNumber;
-      if (typeof j === 'function') {
-        j = j(d);
-      }
-      return options.colLimit || j;
-    }
-
     at(domain) {
       return this.settings[domain];
     }
@@ -17044,7 +16933,7 @@
       }
 
       [...DefaultTemplates, ...userTemplates].forEach((f) => {
-        const template = f(this, DateHelper, options);
+        const template = f(DateHelper, options);
         this.settings[template.name] = template;
       });
 

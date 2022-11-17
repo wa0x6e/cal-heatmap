@@ -7,42 +7,6 @@ export default class DomainTemplate {
     this.calendar = calendar;
   }
 
-  getSubDomainRowNumber(d) {
-    const { options } = this.calendar.options;
-
-    if (options.colLimit > 0) {
-      let i = this.settings[options.subDomain].maxItemNumber;
-      if (typeof i === 'function') {
-        i = i(d);
-      }
-      return Math.ceil(i / options.colLimit);
-    }
-
-    let j = this.settings[options.subDomain].defaultRowNumber;
-    if (typeof j === 'function') {
-      j = j(d);
-    }
-    return options.rowLimit || j;
-  }
-
-  getSubDomainColumnNumber(d) {
-    const { options } = this.calendar.options;
-
-    if (options.rowLimit > 0) {
-      let i = this.settings[options.subDomain].maxItemNumber;
-      if (typeof i === 'function') {
-        i = i(d);
-      }
-      return Math.ceil(i / options.rowLimit);
-    }
-
-    let j = this.settings[options.subDomain].defaultColumnNumber;
-    if (typeof j === 'function') {
-      j = j(d);
-    }
-    return options.colLimit || j;
-  }
-
   at(domain) {
     return this.settings[domain];
   }
@@ -63,7 +27,7 @@ export default class DomainTemplate {
     }
 
     [...DefaultTemplates, ...userTemplates].forEach((f) => {
-      const template = f(this, DateHelper, options);
+      const template = f(DateHelper, options);
       this.settings[template.name] = template;
     });
 

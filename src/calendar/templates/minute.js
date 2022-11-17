@@ -1,25 +1,21 @@
-const minuteTemplate = (domainTemplate, dateHelper) => ({
+const minuteTemplate = (dateHelper) => ({
   name: 'minute',
   level: 10,
   maxItemNumber: 60,
   defaultRowNumber: 10,
   defaultColumnNumber: 6,
   row(d) {
-    return domainTemplate.getSubDomainRowNumber(d);
+    return 10;
   },
   column(d) {
-    return domainTemplate.getSubDomainColumnNumber(d);
+    return 6;
   },
   position: {
     x(d) {
-      return Math.floor(
-        dateHelper.moment(d).minute() / domainTemplate.getSubDomainRowNumber(d),
-      );
+      return Math.floor(dateHelper.moment(d).minute() / 10);
     },
     y(d) {
-      return (
-        dateHelper.moment(d).minute() % domainTemplate.getSubDomainRowNumber(d)
-      );
+      return dateHelper.moment(d).minute() % 10;
     },
   },
   format: {

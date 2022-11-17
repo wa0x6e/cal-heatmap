@@ -7,7 +7,7 @@ import generateTimeInterval from '../utils/timeInterval';
 const computeDaySubDomainSize = (d, domain) => {
   switch (domain) {
     case 'year':
-      return DateHelper.moment(d).daysInYear();
+      return DateHelper.moment(d).endOf('year').dayOfYear();
     case 'month':
       return DateHelper.moment(d).daysInMonth();
     case 'week':

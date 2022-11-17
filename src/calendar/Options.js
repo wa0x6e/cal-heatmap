@@ -95,14 +95,6 @@ export default class Options {
 
       domainTemplates: null,
 
-      // Number of columns to split the subDomains to
-      // If not null, will takes precedence over rowLimit
-      colLimit: null,
-
-      // Number of rows to split the subDomains to
-      // Will be ignored if colLimit is not null
-      rowLimit: null,
-
       // First day of the week is Monday
       // 0 to start the week on Sunday
       weekStartOnMonday: true,
@@ -220,6 +212,7 @@ export default class Options {
       // Examples:
       // legendColors: {
       //    min: "green",
+      //    middle: "blue",
       //    max: "red",
       //    empty: "#ffffff",
       //    base: "grey",
@@ -411,16 +404,6 @@ export default class Options {
     return true;
   }
 
-  #parseRowLimit(value) {
-    if (value > 0 && this.options.colLimit > 0) {
-      console.log(
-        'colLimit and rowLimit are mutually exclusive, rowLimit will be ignored',
-      );
-      return null;
-    }
-    return value > 0 ? value : null;
-  }
-
   /**
    * Fine-tune the label alignement depending on its position
    *
@@ -495,8 +478,6 @@ export default class Options {
     options.domainMargin = expandMarginSetting(options.domainMargin);
     options.legendMargin = expandMarginSetting(options.legendMargin);
     options.itemName = expandItemName(options.itemName);
-    options.colLimit = options.colLimit > 0 ? options.colLimit : null;
-    options.rowLimit = this.#parseRowLimit(options.rowLimit);
 
     this.#autoAlignLabel();
 

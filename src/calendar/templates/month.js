@@ -1,25 +1,21 @@
-const monthTemplate = (domainTemplate, dateHelper) => ({
+const monthTemplate = (dateHelper) => ({
   name: 'month',
   level: 50,
   maxItemNumber: 12,
   defaultColumnNumber: 12,
   defaultRowNumber: 1,
   row() {
-    return domainTemplate.getSubDomainRowNumber();
+    return 1;
   },
   column() {
-    return domainTemplate.getSubDomainColumnNumber();
+    return 12;
   },
   position: {
     x(d) {
-      return Math.floor(
-        dateHelper.moment(d).month() / domainTemplate.getSubDomainRowNumber(d),
-      );
+      return dateHelper.moment(d).month();
     },
-    y(d) {
-      return (
-        dateHelper.moment(d).month() % domainTemplate.getSubDomainRowNumber(d)
-      );
+    y() {
+      return 0;
     },
   },
   format: {
