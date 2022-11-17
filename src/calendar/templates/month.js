@@ -1,13 +1,10 @@
 const monthTemplate = (dateHelper) => ({
   name: 'month',
   level: 50,
-  maxItemNumber: 12,
-  defaultColumnNumber: 12,
-  defaultRowNumber: 1,
-  row() {
+  rowsCount() {
     return 1;
   },
-  column() {
+  columnsCount() {
     return 12;
   },
   position: {

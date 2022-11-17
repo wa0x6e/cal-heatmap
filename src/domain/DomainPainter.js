@@ -175,7 +175,7 @@ export default class DomainPainter {
     const { options } = this.calendar.options;
     const columnsCount = this.calendar.subDomainTemplate
       .at(options.subDomain)
-      .column(d);
+      .columnsCount(d);
 
     let width = (options.cellSize + options.cellPadding) * columnsCount;
 
@@ -195,7 +195,7 @@ export default class DomainPainter {
     const { options } = this.calendar.options;
     const rowsCount = this.calendar.subDomainTemplate
       .at(options.subDomain)
-      .row(d);
+      .rowsCount(d);
 
     let height = (options.cellSize + options.cellPadding) * rowsCount;
 

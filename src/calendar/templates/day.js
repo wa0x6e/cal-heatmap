@@ -2,22 +2,22 @@ const dayTemplate = (
   dateHelper,
   { domain, domainDynamicDimension, verticalOrientation },
 ) => {
-  function getColNumber(d) {
+  const ROWS_COUNT = 7;
+
+  function getTotalColNumber(d) {
     switch (domain) {
       case 'month':
-        return domainDynamicDimension && !verticalOrientation
-          ? dateHelper.moment(dateHelper.moment(d).startOf('month')).isoWeek() -
-              dateHelper.moment(d).isoWeek() +
-              1
-          : 6;
+        return Math.ceil(
+          domainDynamicDimension && !verticalOrientation
+            ? dateHelper.moment(d).daysInMonth() / ROWS_COUNT
+            : 31 / ROWS_COUNT,
+        );
       case 'year':
-        return domainDynamicDimension
-          ? dateHelper.moment(dateHelper.moment(d).endOf('month')).isoWeek() -
-              dateHelper
-                .moment(dateHelper.moment(d).startOf('year'))
-                .isoWeek() +
-              1
-          : 52;
+        return Math.ceil(
+          domainDynamicDimension
+            ? dateHelper.moment(d).endOf('year').dayOfYear() / ROWS_COUNT
+            : 366 / ROWS_COUNT,
+        );
       case 'week':
       default:
         return 1;
@@ -27,50 +27,28 @@ const dayTemplate = (
   return {
     name: 'day',
     level: 30,
-    maxItemNumber(d) {
-      switch (domain) {
-        case 'month':
-          return domainDynamicDimension
-            ? dateHelper.moment(d).daysInMonth()
-            : 31;
-        case 'year':
-          return domainDynamicDimension
-            ? dateHelper.moment(d).endOf('year').dayOfYear()
-            : 366;
-        case 'week':
-        default:
-          return 7;
-      }
+    rowsCount() {
+      return ROWS_COUNT;
     },
-    defaultColumnNumber(d) {
-      return getColNumber(d);
-    },
-    defaultRowNumber: 7,
-    row(d) {
-      return 7;
-    },
-    column(d) {
-      return getColNumber(d);
+    columnsCount(d) {
+      return getTotalColNumber(d);
     },
     position: {
       x(d) {
+        const weekDay = dateHelper.moment(d).isoWeekday() - 1;
+
         switch (domain) {
           case 'week':
-            return Math.floor(dateHelper.moment(d).isoWeekday() / 7);
+            return Math.floor(weekDay / ROWS_COUNT);
           case 'month':
-            return (
-              dateHelper.moment(d).isoWeek() -
-              dateHelper.moment(dateHelper.moment(d).startOf('month')).isoWeek()
-            );
+            return dateHelper.getMonthWeekNumber(d);
           case 'year':
-            return dateHelper.moment(d).isoWeek();
+            return dateHelper.moment(d).isoWeek() - 1;
           default:
         }
       },
       y(d) {
-        let p = dateHelper.moment(d).isoWeekday();
-
-        return Math.floor(p % 7);
+        return Math.floor(dateHelper.moment(d).isoWeekday() % ROWS_COUNT);
       },
     },
     format: {

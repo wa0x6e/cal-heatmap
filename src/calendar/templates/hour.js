@@ -1,60 +1,47 @@
 const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
-  function getColNumber(d) {
+  const TOTAL_ITEMS = 24;
+  const ROWS_COUNT = 6;
+
+  function getTotalColNumber(d) {
     switch (domain) {
       case 'week':
-        return 28;
+        return (TOTAL_ITEMS / ROWS_COUNT) * 7;
       case 'month':
-        return domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31;
+        return (TOTAL_ITEMS / ROWS_COUNT) * domainDynamicDimension
+          ? dateHelper.moment(d).daysInMonth()
+          : 31;
       case 'day':
       default:
-        return 4;
+        return TOTAL_ITEMS / ROWS_COUNT;
     }
   }
 
   return {
     name: 'hour',
     level: 20,
-    maxItemNumber(d) {
-      switch (domain) {
-        case 'week':
-          return 24 * 7;
-        case 'month':
-          return (
-            24 *
-            (domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31)
-          );
-        case 'day':
-        default:
-          return 24;
-      }
+    rowsCount() {
+      return ROWS_COUNT;
     },
-    defaultRowNumber: 6,
-    defaultColumnNumber(d) {
-      return getColNumber(d);
-    },
-    row(d) {
-      return 6;
-    },
-    column(d) {
-      return getColNumber(d);
+    columnsCount(d) {
+      return getTotalColNumber(d);
     },
     position: {
       x(d) {
         const hour = dateHelper.moment(d).hour();
         const date = dateHelper.moment(d).date();
+        const baseX = Math.floor(hour / ROWS_COUNT);
+        const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
         if (domain === 'month') {
-          return Math.floor(hour / 6) + (date - 1) * 4;
+          return baseX + (date - 1) * columnOffset;
         }
         if (domain === 'week') {
-          return Math.floor(hour / 6) + dateHelper.moment(d).isoWeekday() * 4;
+          return baseX + (dateHelper.moment(d).isoWeekday() - 1) * columnOffset;
         }
-        return Math.floor(hour / 6);
+        return baseX;
       },
       y(d) {
-        let p = dateHelper.moment(d).hour();
-
-        return Math.floor(p % 6);
+        return Math.floor(dateHelper.moment(d).hour() % ROWS_COUNT);
       },
     },
     format: {

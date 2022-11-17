@@ -38,8 +38,6 @@ export default class SubDomainTemplate {
         name: `x_${type}`,
         level: template.type,
         maxItemNumber: template.maxItemNumber,
-        defaultRowNumber: template.defaultRowNumber,
-        defaultColumnNumber: template.defaultColumnNumber,
         row: template.column,
         column: template.row,
         position: {

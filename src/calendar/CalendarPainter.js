@@ -108,14 +108,18 @@ export default class CalendarPainter {
         options.legendMargin[RIGHT] +
         options.legendMargin[LEFT]
       : 0;
+    const domainsWidth =
+      this.domainPainter.dimensions.width -
+      options.domainMargin[RIGHT] -
+      options.domainGutter * 2;
 
     if (
       options.legendVerticalPosition === 'middle' ||
       options.legendVerticalPosition === 'center'
     ) {
-      return this.domainPainter.dimensions.width + legendWidth;
+      return domainsWidth + legendWidth;
     }
-    return Math.max(this.domainPainter.dimensions.width, legendWidth);
+    return Math.max(domainsWidth, legendWidth);
   }
 
   resize() {

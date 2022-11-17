@@ -1,11 +1,11 @@
 const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
-  function getColNumber(d) {
+  function getTotalColNumber(d) {
     switch (domain) {
       case 'year':
         return 52;
       case 'month':
         return domainDynamicDimension
-          ? dateHelper.moment(dateHelper.moment(d).startOf('year')).isoWeek() -
+          ? dateHelper.moment(dateHelper.moment(d).endOf('year')).isoWeek() -
               dateHelper.moment(d).isoWeek()
           : 5;
       default:
@@ -15,24 +15,19 @@ const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
   return {
     name: 'week',
     level: 40,
-    maxItemNumber: 52,
-    defaultColumnNumber(d) {
-      getColNumber(d);
-    },
-    defaultRowNumber: 1,
-    row(d) {
+    rowsCount(d) {
       return 1;
     },
-    column(d) {
-      return getColNumber(d);
+    columnsCount(d) {
+      return getTotalColNumber(d);
     },
     position: {
       x(d) {
         switch (domain) {
           case 'year':
-            return Math.floor(dateHelper.moment(d).isoWeek() / 1);
+            return Math.floor(dateHelper.moment(d).isoWeek());
           case 'month':
-            return Math.floor(dateHelper.getMonthWeekNumber(d) / 1);
+            return Math.floor(dateHelper.getMonthWeekNumber(d));
           default:
         }
       },

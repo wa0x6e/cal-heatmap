@@ -13,10 +13,10 @@ export default class DateHelper {
    */
   static getMonthWeekNumber(d) {
     const monthFirstWeekNumber = this.moment(
-      moment.tz(d.tz).startOf('month'),
+      this.moment(d).startOf('month'),
     ).isoWeek();
 
-    return this.moment(d).isoWeek() - monthFirstWeekNumber - 1;
+    return this.moment(d).isoWeek() - monthFirstWeekNumber;
   }
 
   static moment(d = new Date()) {
