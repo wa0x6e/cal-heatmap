@@ -146,22 +146,23 @@ export default class DomainPainter {
 
   #getClassName(d) {
     let classname = 'graph-domain';
-    const date = new Date(d);
+    const moment = DateHelper.moment(d);
+
     switch (this.calendar.options.options.domain) {
       case 'hour':
-        classname += ` h_${date.getHours()}`;
+        classname += ` h_${moment.hour()}`;
         break;
       case 'day':
-        classname += ` d_${date.getDate()} dy_${date.getDay()}`;
+        classname += ` d_${moment.date()} dy_${moment.isoWeekday()}`;
         break;
       case 'week':
-        classname += ` w_${DateHelper.getWeekNumber(date)}`;
+        classname += ` w_${moment.isoWeek()}`;
         break;
       case 'month':
-        classname += ` m_${date.getMonth() + 1}`;
+        classname += ` m_${moment.month() + 1}`;
         break;
       case 'year':
-        classname += ` y_${date.getFullYear()}`;
+        classname += ` y_${moment.year()}`;
         break;
       default:
     }

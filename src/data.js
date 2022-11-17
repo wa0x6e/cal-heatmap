@@ -1,6 +1,7 @@
 import { json, csv, dsv, text } from 'd3-fetch';
 
 import generateTimeInterval from './utils/timeInterval';
+import DateHelper from './utils/DateHelper';
 
 import {
   RESET_ALL_ON_UPDATE,
@@ -19,14 +20,20 @@ function interpretCSV(data) {
   return d;
 }
 
-function parseURI(str, startDate, endDate) {
+function parseURI(str, startTimestamp, endTimestamp) {
   // Use a timestamp in seconds
-  let newUri = str.replace(/\{\{t:start\}\}/g, startDate.getTime() / 1000);
-  newUri = newUri.replace(/\{\{t:end\}\}/g, endDate.getTime() / 1000);
+  let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
+  newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
 
   // Use a string date, following the ISO-8601
-  newUri = newUri.replace(/\{\{d:start\}\}/g, startDate.toISOString());
-  newUri = newUri.replace(/\{\{d:end\}\}/g, endDate.toISOString());
+  newUri = newUri.replace(
+    /\{\{d:start\}\}/g,
+    DateHelper.moment(startTimestamp).toISOString(),
+  );
+  newUri = newUri.replace(
+    /\{\{d:end\}\}/g,
+    DateHelper.moment(endTimestamp).toISOString(),
+  );
 
   return newUri;
 }
@@ -36,12 +43,19 @@ function parseURI(str, startDate, endDate) {
  *
  * @param object data
  * @param constant updateMode
- * @param Date startDate
- * @param Date endDate
+ * @param Date startTimestamp
+ * @param Date endTimestamp
  *
  * @return void
  */
-function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
+function parseDatas(
+  calendar,
+  data,
+  updateMode,
+  startTimestamp,
+  endTimestamp,
+  options,
+) {
   if (updateMode === RESET_ALL_ON_UPDATE) {
     calendar.domainCollection.forEach((value) => {
       value.forEach((element, index, array) => {
@@ -59,18 +73,18 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
       return;
     }
 
-    const date = new Date(d * 1000);
+    const timestamp = d * 1000;
 
     const domainKey = generateTimeInterval(
       calendar.options.options.domain,
-      d * 1000,
+      timestamp,
       1,
     )[0];
 
     // Skip if data is not relevant to current domain
     if (
       !calendar.domainCollection.has(domainKey) ||
-      !(domainKey >= +startDate && domainKey < +endDate)
+      !(domainKey >= startTimestamp && domainKey < endTimestamp)
     ) {
       return;
     }
@@ -84,9 +98,7 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
     const subDomainIndex = newData
       .get(domainKey)
       .indexOf(
-        calendar.domainTemplate
-          .at(options.subDomain)
-          .extractUnit(new Date(date)),
+        calendar.domainTemplate.at(options.subDomain).extractUnit(timestamp),
       );
 
     if (updateMode === RESET_SINGLE_ON_UPDATE) {
@@ -103,8 +115,8 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
  * Fetch and interpret data from the datasource
  *
  * @param string|object source
- * @param Date startDate
- * @param Date endDate
+ * @param int startTimestamp
+ * @param int endTimestamp
  * @param function callback
  * @param function|boolean afterLoad function used to convert the data into a json object. Use true to use the afterLoad callback
  * @param updateMode
@@ -118,8 +130,8 @@ export function getDatas(
   calendar,
   options,
   source,
-  startDate,
-  endDate,
+  startTimestamp,
+  endTimestamp,
   callback,
   afterLoad = true,
   updateMode = APPEND_ON_UPDATE,
@@ -136,7 +148,14 @@ export function getDatas(
     } else if (options.dataType === 'csv' || options.dataType === 'tsv') {
       data = interpretCSV(data);
     }
-    parseDatas(calendar, data, updateMode, startDate, endDate, options);
+    parseDatas(
+      calendar,
+      data,
+      updateMode,
+      startTimestamp,
+      endTimestamp,
+      options,
+    );
     if (typeof callback === 'function') {
       callback();
     }
@@ -148,14 +167,18 @@ export function getDatas(
         _callback({});
         return true;
       }
-      const url = parseURI(source, startDate, endDate);
+      const url = parseURI(source, startTimestamp, endTimestamp);
 
       const reqInit = { method: 'GET' };
       if (options.dataPostPayload !== null) {
         reqInit.method = 'POST';
       }
       if (options.dataPostPayload !== null) {
-        reqInit.body = parseURI(options.dataPostPayload, startDate, endDate);
+        reqInit.body = parseURI(
+          options.dataPostPayload,
+          startTimestamp,
+          endTimestamp,
+        );
       }
       if (options.dataRequestHeaders !== null) {
         const myheaders = new Headers();

@@ -1,13 +1,12 @@
-import { timeFormat } from 'd3-time-format';
-
-import { dateIsEqual } from './utils/date';
+import { datesFromSameInterval } from './utils/date';
+import DateHelper from './utils/DateHelper';
 
 export function formatDate(d, formatter = 'title') {
   if (typeof formatter === 'function') {
-    return formatter(d);
+    return formatter(new Date(d));
   }
-  const f = timeFormat(formatter);
-  return f(d);
+
+  return DateHelper.moment(d).format(formatter);
 }
 
 /**
@@ -36,12 +35,10 @@ export function formatStringWithObject(formatted, args) {
  * @return String the highlight class
  */
 export function getHighlightClassName(d, options) {
-  const date = new Date(d);
-
   if (options.highlight.length > 0) {
     options.highlight.forEach((i) => {
-      if (dateIsEqual(options.highlight[i], date, options.subDomain)) {
-        return dateIsEqual(options.highlight[i])
+      if (datesFromSameInterval(options.highlight[i], d, options.subDomain)) {
+        return datesFromSameInterval(options.highlight[i])
           ? ' highlight-now'
           : ' highlight';
       }

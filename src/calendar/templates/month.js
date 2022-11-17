@@ -1,4 +1,4 @@
-const monthTemplate = (domainTemplate) => ({
+const monthTemplate = (domainTemplate, dateHelper) => ({
   name: 'month',
   level: 50,
   maxItemNumber: 12,
@@ -12,10 +12,14 @@ const monthTemplate = (domainTemplate) => ({
   },
   position: {
     x(d) {
-      return Math.floor(d.getMonth() / domainTemplate.getSubDomainRowNumber(d));
+      return Math.floor(
+        dateHelper.moment(d).month() / domainTemplate.getSubDomainRowNumber(d),
+      );
     },
     y(d) {
-      return d.getMonth() % domainTemplate.getSubDomainRowNumber(d);
+      return (
+        dateHelper.moment(d).month() % domainTemplate.getSubDomainRowNumber(d)
+      );
     },
   },
   format: {
@@ -24,7 +28,7 @@ const monthTemplate = (domainTemplate) => ({
     connector: 'in',
   },
   extractUnit(d) {
-    return new Date(d.getFullYear(), d.getMonth()).getTime();
+    return dateHelper.moment(d).startOf('month').valueOf();
   },
 });
 

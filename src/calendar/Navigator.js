@@ -1,7 +1,6 @@
 import { NAVIGATE_RIGHT, NAVIGATE_LEFT } from '../constant';
 import generateTimeInterval from '../utils/timeInterval';
 import { getDatas } from '../data';
-import { jumpDate } from '../utils/date';
 import { generateSubDomain } from '../subDomain/subDomainGenerator';
 
 export default class Navigator {
@@ -96,9 +95,7 @@ export default class Navigator {
       this.calendar.domainCollection.set(
         newDomains[i],
         generateSubDomain(newDomains[i], options).map((d) => ({
-          t: this.calendar.domainTemplate
-            .at(options.subDomain)
-            .extractUnit(new Date(d)),
+          t: this.calendar.domainTemplate.at(options.subDomain).extractUnit(d),
           v: null,
         })),
       );
@@ -172,17 +169,16 @@ export default class Navigator {
 
   /**
    * Get the n-th next domain after the calendar newest (rightmost) domain
-   * @param  int n
    * @return Date The start date of the wanted domain
    */
-  #getNextDomain(n = 1) {
+  #getNextDomain() {
     const { options } = this.calendar.options;
 
     return generateTimeInterval(
       options.domain,
-      jumpDate(this.calendar.getDomainKeys().pop(), n, options.domain),
-      n,
-    )[0];
+      this.calendar.getDomainKeys().pop(),
+      1,
+    ).slice(1);
   }
 
   #setMinDomainReached(status) {

@@ -1,4 +1,4 @@
-const minuteTemplate = (domainTemplate) => ({
+const minuteTemplate = (domainTemplate, dateHelper) => ({
   name: 'minute',
   level: 10,
   maxItemNumber: 60,
@@ -13,11 +13,13 @@ const minuteTemplate = (domainTemplate) => ({
   position: {
     x(d) {
       return Math.floor(
-        d.getMinutes() / domainTemplate.getSubDomainRowNumber(d),
+        dateHelper.moment(d).minute() / domainTemplate.getSubDomainRowNumber(d),
       );
     },
     y(d) {
-      return d.getMinutes() % domainTemplate.getSubDomainRowNumber(d);
+      return (
+        dateHelper.moment(d).minute() % domainTemplate.getSubDomainRowNumber(d)
+      );
     },
   },
   format: {
@@ -26,13 +28,7 @@ const minuteTemplate = (domainTemplate) => ({
     connector: 'at',
   },
   extractUnit(d) {
-    return new Date(
-      d.getFullYear(),
-      d.getMonth(),
-      d.getDate(),
-      d.getHours(),
-      d.getMinutes(),
-    ).getTime();
+    return dateHelper.moment(d).startOf('minute').valueOf();
   },
 });
 

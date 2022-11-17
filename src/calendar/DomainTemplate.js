@@ -5,7 +5,6 @@ export default class DomainTemplate {
   constructor(calendar) {
     this.settings = {};
     this.calendar = calendar;
-    this.dateHelper = new DateHelper();
   }
 
   getSubDomainRowNumber(d) {
@@ -64,7 +63,7 @@ export default class DomainTemplate {
     }
 
     [...DefaultTemplates, ...userTemplates].forEach((f) => {
-      const template = f(this, this.dateHelper, options);
+      const template = f(this, DateHelper, options);
       this.settings[template.name] = template;
     });
 

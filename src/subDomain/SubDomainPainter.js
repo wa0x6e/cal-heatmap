@@ -83,7 +83,7 @@ export default class subDomainPainter {
       .attr('y', (d) => this.#getY(d.t) + options.cellSize / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d) => formatDate(new Date(d.t), options.subDomainTextFormat));
+      .text((d) => formatDate(d.t, options.subDomainTextFormat));
   }
 
   #appendTitle(elem) {
@@ -91,7 +91,7 @@ export default class subDomainPainter {
 
     elem
       .append('title')
-      .text((d) => formatDate(new Date(d.t), options.subDomainDateFormat));
+      .text((d) => formatDate(d.t, options.subDomainDateFormat));
   }
 
   #getCoordinates(axis, d) {
@@ -99,7 +99,7 @@ export default class subDomainPainter {
 
     const index = this.calendar.domainTemplate
       .at(options.subDomain)
-      .position[axis](new Date(d));
+      .position[axis](d);
 
     return index * (options.cellSize + options.cellPadding);
   }

@@ -11,7 +11,8 @@ const hourTemplate = (
         return 24 * 7;
       case 'month':
         return (
-          24 * (domainDynamicDimension ? dateHelper.getDayCountInMonth(d) : 31)
+          24 *
+          (domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31)
         );
       case 'day':
       default:
@@ -24,7 +25,7 @@ const hourTemplate = (
       case 'week':
         return 28;
       case 'month':
-        return domainDynamicDimension ? dateHelper.getDayCountInMonth(d) : 31;
+        return domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31;
       case 'day':
       default:
         return 4;
@@ -38,41 +39,43 @@ const hourTemplate = (
   },
   position: {
     x(d) {
+      const hour = dateHelper.moment(d).hour();
+      const date = dateHelper.moment(d).date();
+
       if (domain === 'month') {
         if (colLimit > 0 || rowLimit > 0) {
           return Math.floor(
-            (d.getHours() + (d.getDate() - 1) * 24) /
-              domainTemplate.settings.hour.row(d),
+            (hour + (date - 1) * 24) / domainTemplate.getSubDomainRowNumber(d),
           );
         }
         return (
-          Math.floor(d.getHours() / domainTemplate.getSubDomainRowNumber(d)) +
-          (d.getDate() - 1) * 4
+          Math.floor(hour / domainTemplate.getSubDomainRowNumber(d)) +
+          (date - 1) * 4
         );
       }
       if (domain === 'week') {
         if (colLimit > 0 || rowLimit > 0) {
           return Math.floor(
-            (d.getHours() + dateHelper.getWeekDay(d) * 24) /
+            (hour + dateHelper.moment(d).isoWeekday() * 24) /
               domainTemplate.getSubDomainRowNumber(d),
           );
         }
         return (
-          Math.floor(d.getHours() / domainTemplate.getSubDomainRowNumber(d)) +
-          dateHelper.getWeekDay(d) * 4
+          Math.floor(hour / domainTemplate.getSubDomainRowNumber(d)) +
+          dateHelper.moment(d).isoWeekday() * 4
         );
       }
-      return Math.floor(d.getHours() / domainTemplate.getSubDomainRowNumber(d));
+      return Math.floor(hour / domainTemplate.getSubDomainRowNumber(d));
     },
     y(d) {
-      let p = d.getHours();
+      let p = dateHelper.moment(d).hour();
       if (colLimit > 0 || rowLimit > 0) {
         switch (domain) {
           case 'month':
-            p += (d.getDate() - 1) * 24;
+            p += (dateHelper.moment(d).date() - 1) * 24;
             break;
           case 'week':
-            p += dateHelper.getWeekDay(d) * 24;
+            p += dateHelper.moment(d).isoWeekday() * 24;
             break;
           default:
         }
@@ -86,12 +89,7 @@ const hourTemplate = (
     connector: 'at',
   },
   extractUnit(d) {
-    return new Date(
-      d.getFullYear(),
-      d.getMonth(),
-      d.getDate(),
-      d.getHours(),
-    ).getTime();
+    return dateHelper.moment(d).startOf('hour').valueOf();
   },
 });
 

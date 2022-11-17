@@ -4,12 +4,12 @@ import generateTimeInterval from '../utils/timeInterval';
 /**
  * @return int
  */
-const computeDaySubDomainSize = (date, domain) => {
+const computeDaySubDomainSize = (d, domain) => {
   switch (domain) {
     case 'year':
-      return DateHelper.getDayCountInYear(date);
+      return DateHelper.moment(d).daysInYear();
     case 'month':
-      return DateHelper.getDayCountInMonth(date);
+      return DateHelper.moment(d).daysInMonth();
     case 'week':
       return 7;
     default:
@@ -20,7 +20,7 @@ const computeDaySubDomainSize = (date, domain) => {
 /**
  * @return int
  */
-const computeMinSubDomainSize = (date, domain) => {
+const computeMinuteSubDomainSize = (date, domain) => {
   switch (domain) {
     case 'hour':
       return 60;
@@ -43,7 +43,7 @@ const computeHourSubDomainSize = (date, domain) => {
     case 'week':
       return 168;
     case 'month':
-      return DateHelper.getDayCountInMonth(date) * 24;
+      return DateHelper.moment(date).daysInMonth() * 24;
     default:
       throw new Error('Invalid domain');
   }
@@ -54,39 +54,29 @@ const computeHourSubDomainSize = (date, domain) => {
  */
 const computeWeekSubDomainSize = (date, domain) => {
   if (domain === 'month') {
-    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    let endWeekNb = DateHelper.getWeekNumber(endOfMonth);
-    let startWeekNb = gDateHelper.etWeekNumber(
-      new Date(date.getFullYear(), date.getMonth()),
-    );
+    const endWeekNb = DateHelper.moment(
+      DateHelper.moment(date).endOf('month'),
+    ).isoWeek();
+    const startWeekNb = DateHelper.moment(
+      DateHelper.moment(date).startOf('month'),
+    ).isoWeek();
 
-    if (startWeekNb > endWeekNb) {
-      startWeekNb = 0;
-      endWeekNb++;
-    }
-
-    return endWeekNb - startWeekNb + 1;
+    return endWeekNb - startWeekNb;
   }
   if (domain === 'year') {
-    return DateHelper.getWeekNumber(new Date(date.getFullYear(), 11, 31));
+    return DateHelper.moment(DateHelper.moment(date).endOf('year')).isoWeek();
   }
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export function generateSubDomain(startDate, options) {
-  let date = startDate;
-
-  if (typeof date === 'number') {
-    date = new Date(date);
-  }
-
+export function generateSubDomain(date, options) {
   switch (options.subDomain) {
     case 'x_minute':
     case 'minute':
       return generateTimeInterval(
-        'min',
+        'minute',
         date,
-        computeMinSubDomainSize(date, options.domain),
+        computeMinuteSubDomainSize(date, options.domain),
       );
     case 'x_hour':
     case 'hour':

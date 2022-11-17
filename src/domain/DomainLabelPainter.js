@@ -75,7 +75,7 @@ export default class DomainLabelPainter {
       .attr('dominant-baseline', () =>
         options.verticalDomainLabel ? 'middle' : 'top',
       )
-      .text((d) => formatDate(new Date(d), options.domainLabelFormat))
+      .text((d) => formatDate(d, options.domainLabelFormat))
       .call((s) => this.#domainRotate(s));
   }
 

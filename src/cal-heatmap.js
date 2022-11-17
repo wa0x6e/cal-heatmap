@@ -148,8 +148,8 @@ export default class CalHeatMap extends CalendarEvent {
       this,
       options,
       dataSource,
-      new Date(domains[0]),
-      new Date(lastSubDomain[lastSubDomain.length - 1].t),
+      domains[0],
+      lastSubDomain[lastSubDomain.length - 1].t,
       () => {
         this.populator.populate();
         this.afterUpdate();

@@ -2,7 +2,7 @@ import { selectAll } from 'd3-selection';
 
 import { getSubDomainTitle } from '../subDomain';
 import { getHighlightClassName } from '../function';
-import { dateIsLessThan } from '../utils/date';
+import { dateFromPreviousInterval } from '../utils/date';
 
 export default class Populator {
   constructor(calendar) {
@@ -59,7 +59,11 @@ export default class Populator {
     const { options } = calendar.options;
 
     const htmlClass = getHighlightClassName(d.t, options).trim().split(' ');
-    const pastDate = dateIsLessThan(d.t, new Date(), options);
+    const pastDate = dateFromPreviousInterval(
+      d.t,
+      new Date(),
+      options.subDomain,
+    );
 
     if (
       calendar.colorizer.scale === null ||
