@@ -30,20 +30,5 @@ function generate(interval, date, range) {
  * @return Array of dates
  */
 export default function generateTimeInterval(domain, date, range) {
-  switch (domain) {
-    case 'min':
-      return generate('minute', date, range);
-    case 'hour':
-      return generate(domain, date, range);
-    case 'day':
-      return generate(domain, date, range);
-    case 'week':
-      return generate(domain, date, range);
-    case 'month':
-      return generate(domain, date, range);
-    case 'year':
-      return generate(domain, date, range);
-    default:
-      throw new Error('Invalid domain');
-  }
+  return generate(domain, date, range);
 }

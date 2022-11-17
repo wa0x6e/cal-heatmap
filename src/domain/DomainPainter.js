@@ -2,7 +2,7 @@ import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
 import { NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT } from '../constant';
-import { getWeekNumber } from '../date';
+import DateHelper from '../utils/DateHelper';
 
 export default class DomainPainter {
   constructor(calendar) {
@@ -155,7 +155,7 @@ export default class DomainPainter {
         classname += ` d_${date.getDate()} dy_${date.getDay()}`;
         break;
       case 'week':
-        classname += ` w_${getWeekNumber(date)}`;
+        classname += ` w_${DateHelper.getWeekNumber(date)}`;
         break;
       case 'month':
         classname += ` m_${date.getMonth() + 1}`;
@@ -172,7 +172,7 @@ export default class DomainPainter {
   // @param int d Domain start timestamp
   getWidth(d, outer = false) {
     const { options } = this.calendar.options;
-    const columnsCount = this.calendar.domainSkeleton
+    const columnsCount = this.calendar.domainTemplate
       .at(options.subDomain)
       .column(d);
 
@@ -192,7 +192,7 @@ export default class DomainPainter {
   // Return the height of the domain block, without the domain gutter
   getHeight(d, outer = false) {
     const { options } = this.calendar.options;
-    const rowsCount = this.calendar.domainSkeleton.at(options.subDomain).row(d);
+    const rowsCount = this.calendar.domainTemplate.at(options.subDomain).row(d);
 
     let height = (options.cellSize + options.cellPadding) * rowsCount;
 

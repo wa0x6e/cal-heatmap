@@ -25,20 +25,20 @@ export function validateSelector(selector, canBeFalse, name) {
  * @throw {Error} when domain or subdomain are not valid
  * @return {bool} True if domain and subdomain are valid and compatible
  */
-export function validateDomainType(domainSkeleton, { domain, subDomain }) {
+export function validateDomainType(domainTemplate, { domain, subDomain }) {
   if (
-    !domainSkeleton.has(domain) ||
+    !domainTemplate.has(domain) ||
     domain === 'min' ||
     domain.substring(0, 2) === 'x_'
   ) {
     throw new Error(`The domain '${domain}' is not valid`);
   }
 
-  if (!domainSkeleton.has(subDomain) || subDomain === 'year') {
+  if (!domainTemplate.has(subDomain) || subDomain === 'year') {
     throw new Error(`The subDomain '${subDomain}' is not valid`);
   }
 
-  if (domainSkeleton.at(domain).level <= domainSkeleton.at(subDomain).level) {
+  if (domainTemplate.at(domain).level <= domainTemplate.at(subDomain).level) {
     throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
   }
 

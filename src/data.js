@@ -84,7 +84,7 @@ function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
     const subDomainIndex = newData
       .get(domainKey)
       .indexOf(
-        calendar.domainSkeleton
+        calendar.domainTemplate
           .at(options.subDomain)
           .extractUnit(new Date(date)),
       );

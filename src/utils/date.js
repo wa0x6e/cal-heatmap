@@ -1,88 +1,4 @@
-import { timeFormat } from 'd3-time-format';
-
-/**
- * Return the day of the year for the date
- * @param  Date
- * @return  int Day of the year [1,366]
- */
-export function getDayOfYear() {
-  return timeFormat('%j');
-}
-
-/**
- * Return the week number of the year
- * Monday as the first day of the week
- * @return int  Week number [0-53]
- */
-export function getWeekNumber(d) {
-  const f = timeFormat('%U');
-  return f(d);
-}
-
-/**
- * Return the week number, relative to its month
- *
- * @param  int|Date d Date or timestamp in milliseconds
- * @return int Week number, relative to the month [0-5]
- */
-export function getMonthWeekNumber(d) {
-  if (typeof d === 'number') {
-    d = new Date(d);
-  }
-
-  const monthFirstWeekNumber = getWeekNumber(
-    new Date(d.getFullYear(), d.getMonth()),
-  );
-  return getWeekNumber(d) - monthFirstWeekNumber - 1;
-}
-
-/**
- * Return the number of days in the date's month
- *
- * @param  int|Date d Date or timestamp in milliseconds
- * @return int Number of days in the date's month
- */
-export function getDayCountInMonth(d) {
-  return getEndOfMonth(d).getDate();
-}
-
-/**
- * Return the number of days in the date's year
- *
- * @param  int|Date d Date or timestamp in milliseconds
- * @return int Number of days in the date's year
- */
-export function getDayCountInYear(d) {
-  if (typeof d === 'number') {
-    d = new Date(d);
-  }
-  return new Date(d.getFullYear(), 1, 29).getMonth() === 1 ? 366 : 365;
-}
-
-/**
- * Get the weekday from a date
- *
- * Return the week day number (0-6) of a date,
- * depending on whether the week start on monday or sunday
- *
- * @param  Date d
- * @return int The week day number (0-6)
- */
-export function getWeekDay(d) {
-  return d.getDay() === 0 ? 6 : d.getDay() - 1;
-}
-
-/**
- * Get the last day of the month
- * @param  Date|int  d  Date or timestamp in milliseconds
- * @return Date      Last day of the month
- */
-function getEndOfMonth(d) {
-  if (typeof d === 'number') {
-    d = new Date(d);
-  }
-  return new Date(d.getFullYear(), d.getMonth() + 1, 0);
-}
+import DateHelper from './DateHelper';
 
 /**
  * Returns wether or not dateA is less than or equal to dateB. This function is subdomain aware.
@@ -161,8 +77,8 @@ export function dateIsEqual(dateA, dateB, subDomain) {
   }
 
   switch (subDomain) {
-    case 'x_min':
-    case 'min':
+    case 'x_minute':
+    case 'minute':
       return (
         dateA.getFullYear() === dateB.getFullYear() &&
         dateA.getMonth() === dateB.getMonth() &&
@@ -189,7 +105,7 @@ export function dateIsEqual(dateA, dateB, subDomain) {
     case 'week':
       return (
         dateA.getFullYear() === dateB.getFullYear() &&
-        getWeekNumber(dateA) === getWeekNumber(dateB)
+        dateHelper.getWeekNumber(dateA) === dateHelper.getWeekNumber(dateB)
       );
     case 'x_month':
     case 'month':

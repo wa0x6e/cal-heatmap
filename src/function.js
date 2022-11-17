@@ -1,6 +1,6 @@
 import { timeFormat } from 'd3-time-format';
 
-import { dateIsEqual } from './date';
+import { dateIsEqual } from './utils/date';
 
 export function formatDate(d, formatter = 'title') {
   if (typeof formatter === 'function') {

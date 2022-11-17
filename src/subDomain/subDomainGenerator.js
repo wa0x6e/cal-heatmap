@@ -1,4 +1,4 @@
-import { getDayCountInYear, getDayCountInMonth, getWeekNumber } from '../date';
+import DateHelper from '../utils/DateHelper';
 import generateTimeInterval from '../utils/timeInterval';
 
 /**
@@ -7,9 +7,9 @@ import generateTimeInterval from '../utils/timeInterval';
 const computeDaySubDomainSize = (date, domain) => {
   switch (domain) {
     case 'year':
-      return getDayCountInYear(date);
+      return DateHelper.getDayCountInYear(date);
     case 'month':
-      return getDayCountInMonth(date);
+      return DateHelper.getDayCountInMonth(date);
     case 'week':
       return 7;
     default:
@@ -43,7 +43,7 @@ const computeHourSubDomainSize = (date, domain) => {
     case 'week':
       return 168;
     case 'month':
-      return getDayCountInMonth(date) * 24;
+      return DateHelper.getDayCountInMonth(date) * 24;
     default:
       throw new Error('Invalid domain');
   }
@@ -55,8 +55,8 @@ const computeHourSubDomainSize = (date, domain) => {
 const computeWeekSubDomainSize = (date, domain) => {
   if (domain === 'month') {
     const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    let endWeekNb = getWeekNumber(endOfMonth);
-    let startWeekNb = getWeekNumber(
+    let endWeekNb = DateHelper.getWeekNumber(endOfMonth);
+    let startWeekNb = gDateHelper.etWeekNumber(
       new Date(date.getFullYear(), date.getMonth()),
     );
 
@@ -68,7 +68,7 @@ const computeWeekSubDomainSize = (date, domain) => {
     return endWeekNb - startWeekNb + 1;
   }
   if (domain === 'year') {
-    return getWeekNumber(new Date(date.getFullYear(), 11, 31));
+    return DateHelper.getWeekNumber(new Date(date.getFullYear(), 11, 31));
   }
 };
 
@@ -81,8 +81,8 @@ export function generateSubDomain(startDate, options) {
   }
 
   switch (options.subDomain) {
-    case 'x_min':
-    case 'min':
+    case 'x_minute':
+    case 'minute':
       return generateTimeInterval(
         'min',
         date,

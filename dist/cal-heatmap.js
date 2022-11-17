@@ -2941,12 +2941,12 @@
   	throw new Error('Could not dynamically require "' + path + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
   }
 
-  var moment$1 = {exports: {}};
+  var moment$2 = {exports: {}};
 
   var hasRequiredMoment;
 
   function requireMoment () {
-  	if (hasRequiredMoment) return moment$1.exports;
+  	if (hasRequiredMoment) return moment$2.exports;
   	hasRequiredMoment = 1;
   	(function (module, exports) {
   (function (global, factory) {
@@ -8625,8 +8625,8 @@
   		    return hooks;
 
   		})));
-  } (moment$1));
-  	return moment$1.exports;
+  } (moment$2));
+  	return moment$2.exports;
   }
 
   (function (module) {
@@ -10185,7 +10185,7 @@
   	moment.tz.load(require$$1);
   } (momentTimezone$1));
 
-  var moment = /*@__PURE__*/getDefaultExportFromCjs(momentTimezone$1.exports);
+  var moment$1 = /*@__PURE__*/getDefaultExportFromCjs(momentTimezone$1.exports);
 
   var momentRange = {exports: {}};
 
@@ -10199,21 +10199,21 @@
   // @TODO Handle week start day
   // see: https://github.com/rotaready/moment-range/pull/183
   function generate(interval, date, range) {
-    const moment$1 = MomentRange.extendMoment(moment);
-    const tz = moment$1.tz.defaultZone;
+    const moment = MomentRange.extendMoment(moment$1);
+    const tz = moment.tz.defaultZone;
     let dateRange;
 
-    let start = moment$1.tz(date, tz);
+    let start = moment.tz(date, tz);
     start = start.startOf(interval);
 
     if (typeof range === 'number') {
-      dateRange = moment$1.rangeFromInterval(interval, range - 1, start);
+      dateRange = moment.rangeFromInterval(interval, range - 1, start);
     } else {
-      dateRange = moment$1.range(start, moment$1.tz(range, tz).endOf(interval));
+      dateRange = moment.range(start, moment.tz(range, tz).endOf(interval));
     }
 
     return Array.from(dateRange.by(interval)).map((d) => {
-      return moment$1.tz(d, tz).valueOf();
+      return moment.tz(d, tz).valueOf();
     });
   }
 
@@ -10225,22 +10225,7 @@
    * @return Array of dates
    */
   function generateTimeInterval(domain, date, range) {
-    switch (domain) {
-      case 'min':
-        return generate('minute', date, range);
-      case 'hour':
-        return generate(domain, date, range);
-      case 'day':
-        return generate(domain, date, range);
-      case 'week':
-        return generate(domain, date, range);
-      case 'month':
-        return generate(domain, date, range);
-      case 'year':
-        return generate(domain, date, range);
-      default:
-        throw new Error('Invalid domain');
-    }
+    return generate(domain, date, range);
   }
 
   var EOL = {},
@@ -10526,7 +10511,7 @@
       const subDomainIndex = newData
         .get(domainKey)
         .indexOf(
-          calendar.domainSkeleton
+          calendar.domainTemplate
             .at(options.subDomain)
             .extractUnit(new Date(date)),
         );
@@ -10639,1130 +10624,74 @@
     }
   }
 
-  var t0$1 = new Date,
-      t1$1 = new Date;
+  const moment = MomentRange.extendMoment(moment$1);
+  const tz = moment.tz.defaultZone;
 
-  function newInterval(floori, offseti, count, field) {
-
-    function interval(date) {
-      return floori(date = arguments.length === 0 ? new Date : new Date(+date)), date;
+  class DateHelper {
+    /**
+     * Return the day of the year for the date
+     * @param  Date
+     * @return  int Day of the year [1,366]
+     */
+    static getDayOfYear(d) {
+      return moment.tz(d, tz).dayOfYear();
     }
 
-    interval.floor = function(date) {
-      return floori(date = new Date(+date)), date;
-    };
-
-    interval.ceil = function(date) {
-      return floori(date = new Date(date - 1)), offseti(date, 1), floori(date), date;
-    };
-
-    interval.round = function(date) {
-      var d0 = interval(date),
-          d1 = interval.ceil(date);
-      return date - d0 < d1 - date ? d0 : d1;
-    };
-
-    interval.offset = function(date, step) {
-      return offseti(date = new Date(+date), step == null ? 1 : Math.floor(step)), date;
-    };
-
-    interval.range = function(start, stop, step) {
-      var range = [], previous;
-      start = interval.ceil(start);
-      step = step == null ? 1 : Math.floor(step);
-      if (!(start < stop) || !(step > 0)) return range; // also handles Invalid Date
-      do range.push(previous = new Date(+start)), offseti(start, step), floori(start);
-      while (previous < start && start < stop);
-      return range;
-    };
-
-    interval.filter = function(test) {
-      return newInterval(function(date) {
-        if (date >= date) while (floori(date), !test(date)) date.setTime(date - 1);
-      }, function(date, step) {
-        if (date >= date) {
-          if (step < 0) while (++step <= 0) {
-            while (offseti(date, -1), !test(date)) {} // eslint-disable-line no-empty
-          } else while (--step >= 0) {
-            while (offseti(date, +1), !test(date)) {} // eslint-disable-line no-empty
-          }
-        }
-      });
-    };
-
-    if (count) {
-      interval.count = function(start, end) {
-        t0$1.setTime(+start), t1$1.setTime(+end);
-        floori(t0$1), floori(t1$1);
-        return Math.floor(count(t0$1, t1$1));
-      };
-
-      interval.every = function(step) {
-        step = Math.floor(step);
-        return !isFinite(step) || !(step > 0) ? null
-            : !(step > 1) ? interval
-            : interval.filter(field
-                ? function(d) { return field(d) % step === 0; }
-                : function(d) { return interval.count(0, d) % step === 0; });
-      };
+    /**
+     * Return the week number of the year
+     * Monday as the first day of the week
+     * @return int  Week number [0-53]
+     */
+    static getWeekNumber(d) {
+      return moment.tz(d, tz).isoWeek();
     }
 
-    return interval;
-  }
+    /**
+     * Return the week number, relative to its month
+     *
+     * @param  int|Date d Date or timestamp in milliseconds
+     * @return int Week number, relative to the month [0-5]
+     */
+    static getMonthWeekNumber(d) {
+      const monthFirstWeekNumber = this.getWeekNumber(
+        moment.tz(d.tz).startOf('month'),
+      );
 
-  const durationSecond = 1000;
-  const durationMinute = durationSecond * 60;
-  const durationHour = durationMinute * 60;
-  const durationDay = durationHour * 24;
-  const durationWeek = durationDay * 7;
-
-  var day = newInterval(
-    date => date.setHours(0, 0, 0, 0),
-    (date, step) => date.setDate(date.getDate() + step),
-    (start, end) => (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationDay,
-    date => date.getDate() - 1
-  );
-
-  var timeDay = day;
-  day.range;
-
-  function weekday(i) {
-    return newInterval(function(date) {
-      date.setDate(date.getDate() - (date.getDay() + 7 - i) % 7);
-      date.setHours(0, 0, 0, 0);
-    }, function(date, step) {
-      date.setDate(date.getDate() + step * 7);
-    }, function(start, end) {
-      return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationWeek;
-    });
-  }
-
-  var sunday = weekday(0);
-  var monday = weekday(1);
-  var tuesday = weekday(2);
-  var wednesday = weekday(3);
-  var thursday = weekday(4);
-  var friday = weekday(5);
-  var saturday = weekday(6);
-
-  sunday.range;
-  monday.range;
-  tuesday.range;
-  wednesday.range;
-  thursday.range;
-  friday.range;
-  saturday.range;
-
-  var year = newInterval(function(date) {
-    date.setMonth(0, 1);
-    date.setHours(0, 0, 0, 0);
-  }, function(date, step) {
-    date.setFullYear(date.getFullYear() + step);
-  }, function(start, end) {
-    return end.getFullYear() - start.getFullYear();
-  }, function(date) {
-    return date.getFullYear();
-  });
-
-  // An optimized implementation for this simple case.
-  year.every = function(k) {
-    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval(function(date) {
-      date.setFullYear(Math.floor(date.getFullYear() / k) * k);
-      date.setMonth(0, 1);
-      date.setHours(0, 0, 0, 0);
-    }, function(date, step) {
-      date.setFullYear(date.getFullYear() + step * k);
-    });
-  };
-
-  var timeYear = year;
-  year.range;
-
-  var utcDay = newInterval(function(date) {
-    date.setUTCHours(0, 0, 0, 0);
-  }, function(date, step) {
-    date.setUTCDate(date.getUTCDate() + step);
-  }, function(start, end) {
-    return (end - start) / durationDay;
-  }, function(date) {
-    return date.getUTCDate() - 1;
-  });
-
-  var utcDay$1 = utcDay;
-  utcDay.range;
-
-  function utcWeekday(i) {
-    return newInterval(function(date) {
-      date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 7 - i) % 7);
-      date.setUTCHours(0, 0, 0, 0);
-    }, function(date, step) {
-      date.setUTCDate(date.getUTCDate() + step * 7);
-    }, function(start, end) {
-      return (end - start) / durationWeek;
-    });
-  }
-
-  var utcSunday = utcWeekday(0);
-  var utcMonday = utcWeekday(1);
-  var utcTuesday = utcWeekday(2);
-  var utcWednesday = utcWeekday(3);
-  var utcThursday = utcWeekday(4);
-  var utcFriday = utcWeekday(5);
-  var utcSaturday = utcWeekday(6);
-
-  utcSunday.range;
-  utcMonday.range;
-  utcTuesday.range;
-  utcWednesday.range;
-  utcThursday.range;
-  utcFriday.range;
-  utcSaturday.range;
-
-  var utcYear = newInterval(function(date) {
-    date.setUTCMonth(0, 1);
-    date.setUTCHours(0, 0, 0, 0);
-  }, function(date, step) {
-    date.setUTCFullYear(date.getUTCFullYear() + step);
-  }, function(start, end) {
-    return end.getUTCFullYear() - start.getUTCFullYear();
-  }, function(date) {
-    return date.getUTCFullYear();
-  });
-
-  // An optimized implementation for this simple case.
-  utcYear.every = function(k) {
-    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval(function(date) {
-      date.setUTCFullYear(Math.floor(date.getUTCFullYear() / k) * k);
-      date.setUTCMonth(0, 1);
-      date.setUTCHours(0, 0, 0, 0);
-    }, function(date, step) {
-      date.setUTCFullYear(date.getUTCFullYear() + step * k);
-    });
-  };
-
-  var utcYear$1 = utcYear;
-  utcYear.range;
-
-  function ascending$1(a, b) {
-    return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-  }
-
-  function descending(a, b) {
-    return a == null || b == null ? NaN
-      : b < a ? -1
-      : b > a ? 1
-      : b >= a ? 0
-      : NaN;
-  }
-
-  function bisector(f) {
-    let compare1, compare2, delta;
-
-    // If an accessor is specified, promote it to a comparator. In this case we
-    // can test whether the search value is (self-) comparable. We can’t do this
-    // for a comparator (except for specific, known comparators) because we can’t
-    // tell if the comparator is symmetric, and an asymmetric comparator can’t be
-    // used to test whether a single value is comparable.
-    if (f.length !== 2) {
-      compare1 = ascending$1;
-      compare2 = (d, x) => ascending$1(f(d), x);
-      delta = (d, x) => f(d) - x;
-    } else {
-      compare1 = f === ascending$1 || f === descending ? f : zero$1;
-      compare2 = f;
-      delta = f;
+      return this.getWeekNumber(d) - monthFirstWeekNumber - 1;
     }
 
-    function left(a, x, lo = 0, hi = a.length) {
-      if (lo < hi) {
-        if (compare1(x, x) !== 0) return hi;
-        do {
-          const mid = (lo + hi) >>> 1;
-          if (compare2(a[mid], x) < 0) lo = mid + 1;
-          else hi = mid;
-        } while (lo < hi);
-      }
-      return lo;
+    /**
+     * Return the number of days in the specified date's month
+     *
+     * @param  int|Date d Date or timestamp in milliseconds
+     * @return int Number of days in the date's month
+     */
+    static getDayCountInMonth(d) {
+      return moment.tz(d, tz).daysInMonth();
     }
 
-    function right(a, x, lo = 0, hi = a.length) {
-      if (lo < hi) {
-        if (compare1(x, x) !== 0) return hi;
-        do {
-          const mid = (lo + hi) >>> 1;
-          if (compare2(a[mid], x) <= 0) lo = mid + 1;
-          else hi = mid;
-        } while (lo < hi);
-      }
-      return lo;
+    /**
+     * Return the number of days in the date's year
+     *
+     * @param  int|Date d Date or timestamp in milliseconds
+     * @return int Number of days in the date's year
+     */
+    static getDayCountInYear(d) {
+      return moment.tz(d, tz).endOf('year').dayOfYear();
     }
 
-    function center(a, x, lo = 0, hi = a.length) {
-      const i = left(a, x, lo, hi - 1);
-      return i > lo && delta(a[i - 1], x) > -delta(a[i], x) ? i - 1 : i;
+    /**
+     * Get the weekday from a date
+     *
+     * Return the week day number (0-6) of a date,
+     * depending on whether the week start on monday or sunday
+     *
+     * @param  Date d
+     * @return int The week day number (0-6)
+     */
+    static getWeekDay(d) {
+      return moment.tz(d, tz).isoWeekday();
     }
-
-    return {left, center, right};
-  }
-
-  function zero$1() {
-    return 0;
-  }
-
-  function number$1(x) {
-    return x === null ? NaN : +x;
-  }
-
-  const ascendingBisect = bisector(ascending$1);
-  const bisectRight = ascendingBisect.right;
-  bisector(number$1).center;
-  var bisect = bisectRight;
-
-  var e10 = Math.sqrt(50),
-      e5 = Math.sqrt(10),
-      e2 = Math.sqrt(2);
-
-  function ticks(start, stop, count) {
-    var reverse,
-        i = -1,
-        n,
-        ticks,
-        step;
-
-    stop = +stop, start = +start, count = +count;
-    if (start === stop && count > 0) return [start];
-    if (reverse = stop < start) n = start, start = stop, stop = n;
-    if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
-
-    if (step > 0) {
-      let r0 = Math.round(start / step), r1 = Math.round(stop / step);
-      if (r0 * step < start) ++r0;
-      if (r1 * step > stop) --r1;
-      ticks = new Array(n = r1 - r0 + 1);
-      while (++i < n) ticks[i] = (r0 + i) * step;
-    } else {
-      step = -step;
-      let r0 = Math.round(start * step), r1 = Math.round(stop * step);
-      if (r0 / step < start) ++r0;
-      if (r1 / step > stop) --r1;
-      ticks = new Array(n = r1 - r0 + 1);
-      while (++i < n) ticks[i] = (r0 + i) / step;
-    }
-
-    if (reverse) ticks.reverse();
-
-    return ticks;
-  }
-
-  function tickIncrement(start, stop, count) {
-    var step = (stop - start) / Math.max(0, count),
-        power = Math.floor(Math.log(step) / Math.LN10),
-        error = step / Math.pow(10, power);
-    return power >= 0
-        ? (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1) * Math.pow(10, power)
-        : -Math.pow(10, -power) / (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1);
-  }
-
-  function tickStep(start, stop, count) {
-    var step0 = Math.abs(stop - start) / Math.max(0, count),
-        step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10)),
-        error = step0 / step1;
-    if (error >= e10) step1 *= 10;
-    else if (error >= e5) step1 *= 5;
-    else if (error >= e2) step1 *= 2;
-    return stop < start ? -step1 : step1;
-  }
-
-  function localDate(d) {
-    if (0 <= d.y && d.y < 100) {
-      var date = new Date(-1, d.m, d.d, d.H, d.M, d.S, d.L);
-      date.setFullYear(d.y);
-      return date;
-    }
-    return new Date(d.y, d.m, d.d, d.H, d.M, d.S, d.L);
-  }
-
-  function utcDate(d) {
-    if (0 <= d.y && d.y < 100) {
-      var date = new Date(Date.UTC(-1, d.m, d.d, d.H, d.M, d.S, d.L));
-      date.setUTCFullYear(d.y);
-      return date;
-    }
-    return new Date(Date.UTC(d.y, d.m, d.d, d.H, d.M, d.S, d.L));
-  }
-
-  function newDate(y, m, d) {
-    return {y: y, m: m, d: d, H: 0, M: 0, S: 0, L: 0};
-  }
-
-  function formatLocale$1(locale) {
-    var locale_dateTime = locale.dateTime,
-        locale_date = locale.date,
-        locale_time = locale.time,
-        locale_periods = locale.periods,
-        locale_weekdays = locale.days,
-        locale_shortWeekdays = locale.shortDays,
-        locale_months = locale.months,
-        locale_shortMonths = locale.shortMonths;
-
-    var periodRe = formatRe(locale_periods),
-        periodLookup = formatLookup(locale_periods),
-        weekdayRe = formatRe(locale_weekdays),
-        weekdayLookup = formatLookup(locale_weekdays),
-        shortWeekdayRe = formatRe(locale_shortWeekdays),
-        shortWeekdayLookup = formatLookup(locale_shortWeekdays),
-        monthRe = formatRe(locale_months),
-        monthLookup = formatLookup(locale_months),
-        shortMonthRe = formatRe(locale_shortMonths),
-        shortMonthLookup = formatLookup(locale_shortMonths);
-
-    var formats = {
-      "a": formatShortWeekday,
-      "A": formatWeekday,
-      "b": formatShortMonth,
-      "B": formatMonth,
-      "c": null,
-      "d": formatDayOfMonth,
-      "e": formatDayOfMonth,
-      "f": formatMicroseconds,
-      "g": formatYearISO,
-      "G": formatFullYearISO,
-      "H": formatHour24,
-      "I": formatHour12,
-      "j": formatDayOfYear,
-      "L": formatMilliseconds,
-      "m": formatMonthNumber,
-      "M": formatMinutes,
-      "p": formatPeriod,
-      "q": formatQuarter,
-      "Q": formatUnixTimestamp,
-      "s": formatUnixTimestampSeconds,
-      "S": formatSeconds,
-      "u": formatWeekdayNumberMonday,
-      "U": formatWeekNumberSunday,
-      "V": formatWeekNumberISO,
-      "w": formatWeekdayNumberSunday,
-      "W": formatWeekNumberMonday,
-      "x": null,
-      "X": null,
-      "y": formatYear,
-      "Y": formatFullYear,
-      "Z": formatZone,
-      "%": formatLiteralPercent
-    };
-
-    var utcFormats = {
-      "a": formatUTCShortWeekday,
-      "A": formatUTCWeekday,
-      "b": formatUTCShortMonth,
-      "B": formatUTCMonth,
-      "c": null,
-      "d": formatUTCDayOfMonth,
-      "e": formatUTCDayOfMonth,
-      "f": formatUTCMicroseconds,
-      "g": formatUTCYearISO,
-      "G": formatUTCFullYearISO,
-      "H": formatUTCHour24,
-      "I": formatUTCHour12,
-      "j": formatUTCDayOfYear,
-      "L": formatUTCMilliseconds,
-      "m": formatUTCMonthNumber,
-      "M": formatUTCMinutes,
-      "p": formatUTCPeriod,
-      "q": formatUTCQuarter,
-      "Q": formatUnixTimestamp,
-      "s": formatUnixTimestampSeconds,
-      "S": formatUTCSeconds,
-      "u": formatUTCWeekdayNumberMonday,
-      "U": formatUTCWeekNumberSunday,
-      "V": formatUTCWeekNumberISO,
-      "w": formatUTCWeekdayNumberSunday,
-      "W": formatUTCWeekNumberMonday,
-      "x": null,
-      "X": null,
-      "y": formatUTCYear,
-      "Y": formatUTCFullYear,
-      "Z": formatUTCZone,
-      "%": formatLiteralPercent
-    };
-
-    var parses = {
-      "a": parseShortWeekday,
-      "A": parseWeekday,
-      "b": parseShortMonth,
-      "B": parseMonth,
-      "c": parseLocaleDateTime,
-      "d": parseDayOfMonth,
-      "e": parseDayOfMonth,
-      "f": parseMicroseconds,
-      "g": parseYear,
-      "G": parseFullYear,
-      "H": parseHour24,
-      "I": parseHour24,
-      "j": parseDayOfYear,
-      "L": parseMilliseconds,
-      "m": parseMonthNumber,
-      "M": parseMinutes,
-      "p": parsePeriod,
-      "q": parseQuarter,
-      "Q": parseUnixTimestamp,
-      "s": parseUnixTimestampSeconds,
-      "S": parseSeconds,
-      "u": parseWeekdayNumberMonday,
-      "U": parseWeekNumberSunday,
-      "V": parseWeekNumberISO,
-      "w": parseWeekdayNumberSunday,
-      "W": parseWeekNumberMonday,
-      "x": parseLocaleDate,
-      "X": parseLocaleTime,
-      "y": parseYear,
-      "Y": parseFullYear,
-      "Z": parseZone,
-      "%": parseLiteralPercent
-    };
-
-    // These recursive directive definitions must be deferred.
-    formats.x = newFormat(locale_date, formats);
-    formats.X = newFormat(locale_time, formats);
-    formats.c = newFormat(locale_dateTime, formats);
-    utcFormats.x = newFormat(locale_date, utcFormats);
-    utcFormats.X = newFormat(locale_time, utcFormats);
-    utcFormats.c = newFormat(locale_dateTime, utcFormats);
-
-    function newFormat(specifier, formats) {
-      return function(date) {
-        var string = [],
-            i = -1,
-            j = 0,
-            n = specifier.length,
-            c,
-            pad,
-            format;
-
-        if (!(date instanceof Date)) date = new Date(+date);
-
-        while (++i < n) {
-          if (specifier.charCodeAt(i) === 37) {
-            string.push(specifier.slice(j, i));
-            if ((pad = pads[c = specifier.charAt(++i)]) != null) c = specifier.charAt(++i);
-            else pad = c === "e" ? " " : "0";
-            if (format = formats[c]) c = format(date, pad);
-            string.push(c);
-            j = i + 1;
-          }
-        }
-
-        string.push(specifier.slice(j, i));
-        return string.join("");
-      };
-    }
-
-    function newParse(specifier, Z) {
-      return function(string) {
-        var d = newDate(1900, undefined, 1),
-            i = parseSpecifier(d, specifier, string += "", 0),
-            week, day;
-        if (i != string.length) return null;
-
-        // If a UNIX timestamp is specified, return it.
-        if ("Q" in d) return new Date(d.Q);
-        if ("s" in d) return new Date(d.s * 1000 + ("L" in d ? d.L : 0));
-
-        // If this is utcParse, never use the local timezone.
-        if (Z && !("Z" in d)) d.Z = 0;
-
-        // The am-pm flag is 0 for AM, and 1 for PM.
-        if ("p" in d) d.H = d.H % 12 + d.p * 12;
-
-        // If the month was not specified, inherit from the quarter.
-        if (d.m === undefined) d.m = "q" in d ? d.q : 0;
-
-        // Convert day-of-week and week-of-year to day-of-year.
-        if ("V" in d) {
-          if (d.V < 1 || d.V > 53) return null;
-          if (!("w" in d)) d.w = 1;
-          if ("Z" in d) {
-            week = utcDate(newDate(d.y, 0, 1)), day = week.getUTCDay();
-            week = day > 4 || day === 0 ? utcMonday.ceil(week) : utcMonday(week);
-            week = utcDay$1.offset(week, (d.V - 1) * 7);
-            d.y = week.getUTCFullYear();
-            d.m = week.getUTCMonth();
-            d.d = week.getUTCDate() + (d.w + 6) % 7;
-          } else {
-            week = localDate(newDate(d.y, 0, 1)), day = week.getDay();
-            week = day > 4 || day === 0 ? monday.ceil(week) : monday(week);
-            week = timeDay.offset(week, (d.V - 1) * 7);
-            d.y = week.getFullYear();
-            d.m = week.getMonth();
-            d.d = week.getDate() + (d.w + 6) % 7;
-          }
-        } else if ("W" in d || "U" in d) {
-          if (!("w" in d)) d.w = "u" in d ? d.u % 7 : "W" in d ? 1 : 0;
-          day = "Z" in d ? utcDate(newDate(d.y, 0, 1)).getUTCDay() : localDate(newDate(d.y, 0, 1)).getDay();
-          d.m = 0;
-          d.d = "W" in d ? (d.w + 6) % 7 + d.W * 7 - (day + 5) % 7 : d.w + d.U * 7 - (day + 6) % 7;
-        }
-
-        // If a time zone is specified, all fields are interpreted as UTC and then
-        // offset according to the specified time zone.
-        if ("Z" in d) {
-          d.H += d.Z / 100 | 0;
-          d.M += d.Z % 100;
-          return utcDate(d);
-        }
-
-        // Otherwise, all fields are in local time.
-        return localDate(d);
-      };
-    }
-
-    function parseSpecifier(d, specifier, string, j) {
-      var i = 0,
-          n = specifier.length,
-          m = string.length,
-          c,
-          parse;
-
-      while (i < n) {
-        if (j >= m) return -1;
-        c = specifier.charCodeAt(i++);
-        if (c === 37) {
-          c = specifier.charAt(i++);
-          parse = parses[c in pads ? specifier.charAt(i++) : c];
-          if (!parse || ((j = parse(d, string, j)) < 0)) return -1;
-        } else if (c != string.charCodeAt(j++)) {
-          return -1;
-        }
-      }
-
-      return j;
-    }
-
-    function parsePeriod(d, string, i) {
-      var n = periodRe.exec(string.slice(i));
-      return n ? (d.p = periodLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
-    }
-
-    function parseShortWeekday(d, string, i) {
-      var n = shortWeekdayRe.exec(string.slice(i));
-      return n ? (d.w = shortWeekdayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
-    }
-
-    function parseWeekday(d, string, i) {
-      var n = weekdayRe.exec(string.slice(i));
-      return n ? (d.w = weekdayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
-    }
-
-    function parseShortMonth(d, string, i) {
-      var n = shortMonthRe.exec(string.slice(i));
-      return n ? (d.m = shortMonthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
-    }
-
-    function parseMonth(d, string, i) {
-      var n = monthRe.exec(string.slice(i));
-      return n ? (d.m = monthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
-    }
-
-    function parseLocaleDateTime(d, string, i) {
-      return parseSpecifier(d, locale_dateTime, string, i);
-    }
-
-    function parseLocaleDate(d, string, i) {
-      return parseSpecifier(d, locale_date, string, i);
-    }
-
-    function parseLocaleTime(d, string, i) {
-      return parseSpecifier(d, locale_time, string, i);
-    }
-
-    function formatShortWeekday(d) {
-      return locale_shortWeekdays[d.getDay()];
-    }
-
-    function formatWeekday(d) {
-      return locale_weekdays[d.getDay()];
-    }
-
-    function formatShortMonth(d) {
-      return locale_shortMonths[d.getMonth()];
-    }
-
-    function formatMonth(d) {
-      return locale_months[d.getMonth()];
-    }
-
-    function formatPeriod(d) {
-      return locale_periods[+(d.getHours() >= 12)];
-    }
-
-    function formatQuarter(d) {
-      return 1 + ~~(d.getMonth() / 3);
-    }
-
-    function formatUTCShortWeekday(d) {
-      return locale_shortWeekdays[d.getUTCDay()];
-    }
-
-    function formatUTCWeekday(d) {
-      return locale_weekdays[d.getUTCDay()];
-    }
-
-    function formatUTCShortMonth(d) {
-      return locale_shortMonths[d.getUTCMonth()];
-    }
-
-    function formatUTCMonth(d) {
-      return locale_months[d.getUTCMonth()];
-    }
-
-    function formatUTCPeriod(d) {
-      return locale_periods[+(d.getUTCHours() >= 12)];
-    }
-
-    function formatUTCQuarter(d) {
-      return 1 + ~~(d.getUTCMonth() / 3);
-    }
-
-    return {
-      format: function(specifier) {
-        var f = newFormat(specifier += "", formats);
-        f.toString = function() { return specifier; };
-        return f;
-      },
-      parse: function(specifier) {
-        var p = newParse(specifier += "", false);
-        p.toString = function() { return specifier; };
-        return p;
-      },
-      utcFormat: function(specifier) {
-        var f = newFormat(specifier += "", utcFormats);
-        f.toString = function() { return specifier; };
-        return f;
-      },
-      utcParse: function(specifier) {
-        var p = newParse(specifier += "", true);
-        p.toString = function() { return specifier; };
-        return p;
-      }
-    };
-  }
-
-  var pads = {"-": "", "_": " ", "0": "0"},
-      numberRe = /^\s*\d+/, // note: ignores next directive
-      percentRe = /^%/,
-      requoteRe = /[\\^$*+?|[\]().{}]/g;
-
-  function pad(value, fill, width) {
-    var sign = value < 0 ? "-" : "",
-        string = (sign ? -value : value) + "",
-        length = string.length;
-    return sign + (length < width ? new Array(width - length + 1).join(fill) + string : string);
-  }
-
-  function requote(s) {
-    return s.replace(requoteRe, "\\$&");
-  }
-
-  function formatRe(names) {
-    return new RegExp("^(?:" + names.map(requote).join("|") + ")", "i");
-  }
-
-  function formatLookup(names) {
-    return new Map(names.map((name, i) => [name.toLowerCase(), i]));
-  }
-
-  function parseWeekdayNumberSunday(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 1));
-    return n ? (d.w = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseWeekdayNumberMonday(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 1));
-    return n ? (d.u = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseWeekNumberSunday(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.U = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseWeekNumberISO(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.V = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseWeekNumberMonday(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.W = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseFullYear(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 4));
-    return n ? (d.y = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseYear(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.y = +n[0] + (+n[0] > 68 ? 1900 : 2000), i + n[0].length) : -1;
-  }
-
-  function parseZone(d, string, i) {
-    var n = /^(Z)|([+-]\d\d)(?::?(\d\d))?/.exec(string.slice(i, i + 6));
-    return n ? (d.Z = n[1] ? 0 : -(n[2] + (n[3] || "00")), i + n[0].length) : -1;
-  }
-
-  function parseQuarter(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 1));
-    return n ? (d.q = n[0] * 3 - 3, i + n[0].length) : -1;
-  }
-
-  function parseMonthNumber(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.m = n[0] - 1, i + n[0].length) : -1;
-  }
-
-  function parseDayOfMonth(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.d = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseDayOfYear(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 3));
-    return n ? (d.m = 0, d.d = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseHour24(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.H = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseMinutes(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.M = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseSeconds(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 2));
-    return n ? (d.S = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseMilliseconds(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 3));
-    return n ? (d.L = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseMicroseconds(d, string, i) {
-    var n = numberRe.exec(string.slice(i, i + 6));
-    return n ? (d.L = Math.floor(n[0] / 1000), i + n[0].length) : -1;
-  }
-
-  function parseLiteralPercent(d, string, i) {
-    var n = percentRe.exec(string.slice(i, i + 1));
-    return n ? i + n[0].length : -1;
-  }
-
-  function parseUnixTimestamp(d, string, i) {
-    var n = numberRe.exec(string.slice(i));
-    return n ? (d.Q = +n[0], i + n[0].length) : -1;
-  }
-
-  function parseUnixTimestampSeconds(d, string, i) {
-    var n = numberRe.exec(string.slice(i));
-    return n ? (d.s = +n[0], i + n[0].length) : -1;
-  }
-
-  function formatDayOfMonth(d, p) {
-    return pad(d.getDate(), p, 2);
-  }
-
-  function formatHour24(d, p) {
-    return pad(d.getHours(), p, 2);
-  }
-
-  function formatHour12(d, p) {
-    return pad(d.getHours() % 12 || 12, p, 2);
-  }
-
-  function formatDayOfYear(d, p) {
-    return pad(1 + timeDay.count(timeYear(d), d), p, 3);
-  }
-
-  function formatMilliseconds(d, p) {
-    return pad(d.getMilliseconds(), p, 3);
-  }
-
-  function formatMicroseconds(d, p) {
-    return formatMilliseconds(d, p) + "000";
-  }
-
-  function formatMonthNumber(d, p) {
-    return pad(d.getMonth() + 1, p, 2);
-  }
-
-  function formatMinutes(d, p) {
-    return pad(d.getMinutes(), p, 2);
-  }
-
-  function formatSeconds(d, p) {
-    return pad(d.getSeconds(), p, 2);
-  }
-
-  function formatWeekdayNumberMonday(d) {
-    var day = d.getDay();
-    return day === 0 ? 7 : day;
-  }
-
-  function formatWeekNumberSunday(d, p) {
-    return pad(sunday.count(timeYear(d) - 1, d), p, 2);
-  }
-
-  function dISO(d) {
-    var day = d.getDay();
-    return (day >= 4 || day === 0) ? thursday(d) : thursday.ceil(d);
-  }
-
-  function formatWeekNumberISO(d, p) {
-    d = dISO(d);
-    return pad(thursday.count(timeYear(d), d) + (timeYear(d).getDay() === 4), p, 2);
-  }
-
-  function formatWeekdayNumberSunday(d) {
-    return d.getDay();
-  }
-
-  function formatWeekNumberMonday(d, p) {
-    return pad(monday.count(timeYear(d) - 1, d), p, 2);
-  }
-
-  function formatYear(d, p) {
-    return pad(d.getFullYear() % 100, p, 2);
-  }
-
-  function formatYearISO(d, p) {
-    d = dISO(d);
-    return pad(d.getFullYear() % 100, p, 2);
-  }
-
-  function formatFullYear(d, p) {
-    return pad(d.getFullYear() % 10000, p, 4);
-  }
-
-  function formatFullYearISO(d, p) {
-    var day = d.getDay();
-    d = (day >= 4 || day === 0) ? thursday(d) : thursday.ceil(d);
-    return pad(d.getFullYear() % 10000, p, 4);
-  }
-
-  function formatZone(d) {
-    var z = d.getTimezoneOffset();
-    return (z > 0 ? "-" : (z *= -1, "+"))
-        + pad(z / 60 | 0, "0", 2)
-        + pad(z % 60, "0", 2);
-  }
-
-  function formatUTCDayOfMonth(d, p) {
-    return pad(d.getUTCDate(), p, 2);
-  }
-
-  function formatUTCHour24(d, p) {
-    return pad(d.getUTCHours(), p, 2);
-  }
-
-  function formatUTCHour12(d, p) {
-    return pad(d.getUTCHours() % 12 || 12, p, 2);
-  }
-
-  function formatUTCDayOfYear(d, p) {
-    return pad(1 + utcDay$1.count(utcYear$1(d), d), p, 3);
-  }
-
-  function formatUTCMilliseconds(d, p) {
-    return pad(d.getUTCMilliseconds(), p, 3);
-  }
-
-  function formatUTCMicroseconds(d, p) {
-    return formatUTCMilliseconds(d, p) + "000";
-  }
-
-  function formatUTCMonthNumber(d, p) {
-    return pad(d.getUTCMonth() + 1, p, 2);
-  }
-
-  function formatUTCMinutes(d, p) {
-    return pad(d.getUTCMinutes(), p, 2);
-  }
-
-  function formatUTCSeconds(d, p) {
-    return pad(d.getUTCSeconds(), p, 2);
-  }
-
-  function formatUTCWeekdayNumberMonday(d) {
-    var dow = d.getUTCDay();
-    return dow === 0 ? 7 : dow;
-  }
-
-  function formatUTCWeekNumberSunday(d, p) {
-    return pad(utcSunday.count(utcYear$1(d) - 1, d), p, 2);
-  }
-
-  function UTCdISO(d) {
-    var day = d.getUTCDay();
-    return (day >= 4 || day === 0) ? utcThursday(d) : utcThursday.ceil(d);
-  }
-
-  function formatUTCWeekNumberISO(d, p) {
-    d = UTCdISO(d);
-    return pad(utcThursday.count(utcYear$1(d), d) + (utcYear$1(d).getUTCDay() === 4), p, 2);
-  }
-
-  function formatUTCWeekdayNumberSunday(d) {
-    return d.getUTCDay();
-  }
-
-  function formatUTCWeekNumberMonday(d, p) {
-    return pad(utcMonday.count(utcYear$1(d) - 1, d), p, 2);
-  }
-
-  function formatUTCYear(d, p) {
-    return pad(d.getUTCFullYear() % 100, p, 2);
-  }
-
-  function formatUTCYearISO(d, p) {
-    d = UTCdISO(d);
-    return pad(d.getUTCFullYear() % 100, p, 2);
-  }
-
-  function formatUTCFullYear(d, p) {
-    return pad(d.getUTCFullYear() % 10000, p, 4);
-  }
-
-  function formatUTCFullYearISO(d, p) {
-    var day = d.getUTCDay();
-    d = (day >= 4 || day === 0) ? utcThursday(d) : utcThursday.ceil(d);
-    return pad(d.getUTCFullYear() % 10000, p, 4);
-  }
-
-  function formatUTCZone() {
-    return "+0000";
-  }
-
-  function formatLiteralPercent() {
-    return "%";
-  }
-
-  function formatUnixTimestamp(d) {
-    return +d;
-  }
-
-  function formatUnixTimestampSeconds(d) {
-    return Math.floor(+d / 1000);
-  }
-
-  var locale$1;
-  var timeFormat;
-
-  defaultLocale$1({
-    dateTime: "%x, %X",
-    date: "%-m/%-d/%Y",
-    time: "%-I:%M:%S %p",
-    periods: ["AM", "PM"],
-    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    shortDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    shortMonths: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-  });
-
-  function defaultLocale$1(definition) {
-    locale$1 = formatLocale$1(definition);
-    timeFormat = locale$1.format;
-    locale$1.parse;
-    locale$1.utcFormat;
-    locale$1.utcParse;
-    return locale$1;
-  }
-
-  /**
-   * Return the day of the year for the date
-   * @param  Date
-   * @return  int Day of the year [1,366]
-   */
-  function getDayOfYear() {
-    return timeFormat('%j');
-  }
-
-  /**
-   * Return the week number of the year
-   * Monday as the first day of the week
-   * @return int  Week number [0-53]
-   */
-  function getWeekNumber(d) {
-    const f = timeFormat('%U');
-    return f(d);
-  }
-
-  /**
-   * Return the week number, relative to its month
-   *
-   * @param  int|Date d Date or timestamp in milliseconds
-   * @return int Week number, relative to the month [0-5]
-   */
-  function getMonthWeekNumber(d) {
-    if (typeof d === 'number') {
-      d = new Date(d);
-    }
-
-    const monthFirstWeekNumber = getWeekNumber(
-      new Date(d.getFullYear(), d.getMonth()),
-    );
-    return getWeekNumber(d) - monthFirstWeekNumber - 1;
-  }
-
-  /**
-   * Return the number of days in the date's month
-   *
-   * @param  int|Date d Date or timestamp in milliseconds
-   * @return int Number of days in the date's month
-   */
-  function getDayCountInMonth(d) {
-    return getEndOfMonth(d).getDate();
-  }
-
-  /**
-   * Return the number of days in the date's year
-   *
-   * @param  int|Date d Date or timestamp in milliseconds
-   * @return int Number of days in the date's year
-   */
-  function getDayCountInYear(d) {
-    if (typeof d === 'number') {
-      d = new Date(d);
-    }
-    return new Date(d.getFullYear(), 1, 29).getMonth() === 1 ? 366 : 365;
-  }
-
-  /**
-   * Get the weekday from a date
-   *
-   * Return the week day number (0-6) of a date,
-   * depending on whether the week start on monday or sunday
-   *
-   * @param  Date d
-   * @return int The week day number (0-6)
-   */
-  function getWeekDay(d) {
-    return d.getDay() === 0 ? 6 : d.getDay() - 1;
-  }
-
-  /**
-   * Get the last day of the month
-   * @param  Date|int  d  Date or timestamp in milliseconds
-   * @return Date      Last day of the month
-   */
-  function getEndOfMonth(d) {
-    if (typeof d === 'number') {
-      d = new Date(d);
-    }
-    return new Date(d.getFullYear(), d.getMonth() + 1, 0);
   }
 
   /**
@@ -11842,8 +10771,8 @@
     }
 
     switch (subDomain) {
-      case 'x_min':
-      case 'min':
+      case 'x_minute':
+      case 'minute':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
           dateA.getMonth() === dateB.getMonth() &&
@@ -11870,7 +10799,7 @@
       case 'week':
         return (
           dateA.getFullYear() === dateB.getFullYear() &&
-          getWeekNumber(dateA) === getWeekNumber(dateB)
+          dateHelper.getWeekNumber(dateA) === dateHelper.getWeekNumber(dateB)
         );
       case 'x_month':
       case 'month':
@@ -11921,9 +10850,9 @@
   const computeDaySubDomainSize = (date, domain) => {
     switch (domain) {
       case 'year':
-        return getDayCountInYear(date);
+        return DateHelper.getDayCountInYear(date);
       case 'month':
-        return getDayCountInMonth(date);
+        return DateHelper.getDayCountInMonth(date);
       case 'week':
         return 7;
       default:
@@ -11957,7 +10886,7 @@
       case 'week':
         return 168;
       case 'month':
-        return getDayCountInMonth(date) * 24;
+        return DateHelper.getDayCountInMonth(date) * 24;
       default:
         throw new Error('Invalid domain');
     }
@@ -11969,8 +10898,8 @@
   const computeWeekSubDomainSize = (date, domain) => {
     if (domain === 'month') {
       const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-      let endWeekNb = getWeekNumber(endOfMonth);
-      let startWeekNb = getWeekNumber(
+      let endWeekNb = DateHelper.getWeekNumber(endOfMonth);
+      let startWeekNb = gDateHelper.etWeekNumber(
         new Date(date.getFullYear(), date.getMonth()),
       );
 
@@ -11982,7 +10911,7 @@
       return endWeekNb - startWeekNb + 1;
     }
     if (domain === 'year') {
-      return getWeekNumber(new Date(date.getFullYear(), 11, 31));
+      return DateHelper.getWeekNumber(new Date(date.getFullYear(), 11, 31));
     }
   };
 
@@ -11995,8 +10924,8 @@
     }
 
     switch (options.subDomain) {
-      case 'x_min':
-      case 'min':
+      case 'x_minute':
+      case 'minute':
         return generateTimeInterval(
           'min',
           date,
@@ -12123,7 +11052,7 @@
         this.calendar.domainCollection.set(
           newDomains[i],
           generateSubDomain(newDomains[i], options).map((d) => ({
-            t: this.calendar.domainSkeleton
+            t: this.calendar.domainTemplate
               .at(options.subDomain)
               .extractUnit(new Date(d)),
             v: null,
@@ -12616,7 +11545,7 @@
   }
 
   function selection_sort(compare) {
-    if (!compare) compare = ascending;
+    if (!compare) compare = ascending$1;
 
     function compareNode(a, b) {
       return a && b ? compare(a.__data__, b.__data__) : !a - !b;
@@ -12634,7 +11563,7 @@
     return new Selection$1(sortgroups, this._parents).order();
   }
 
-  function ascending(a, b) {
+  function ascending$1(a, b) {
     return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
   }
 
@@ -13966,10 +12895,10 @@
       Xn = 0.96422,
       Yn = 1,
       Zn = 0.82521,
-      t0 = 4 / 29,
-      t1 = 6 / 29,
-      t2 = 3 * t1 * t1,
-      t3 = t1 * t1 * t1;
+      t0$1 = 4 / 29,
+      t1$1 = 6 / 29,
+      t2 = 3 * t1$1 * t1$1,
+      t3 = t1$1 * t1$1 * t1$1;
 
   function labConvert(o) {
     if (o instanceof Lab) return new Lab(o.l, o.a, o.b, o.opacity);
@@ -14021,11 +12950,11 @@
   }));
 
   function xyz2lab(t) {
-    return t > t3 ? Math.pow(t, 1 / 3) : t / t2 + t0;
+    return t > t3 ? Math.pow(t, 1 / 3) : t / t2 + t0$1;
   }
 
   function lab2xyz(t) {
-    return t > t1 ? t * t * t : t2 * (t - t0);
+    return t > t1$1 ? t * t * t : t2 * (t - t0$1);
   }
 
   function lrgb2rgb(x) {
@@ -14194,7 +13123,7 @@
   var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g,
       reB = new RegExp(reA.source, "g");
 
-  function zero(b) {
+  function zero$1(b) {
     return function() {
       return b;
     };
@@ -14247,7 +13176,7 @@
     // Otherwise, interpolate each of the numbers and rejoin the string.
     return s.length < 2 ? (q[0]
         ? one(q[0].x)
-        : zero(b))
+        : zero$1(b))
         : (b = q.length, function(t) {
             for (var i = 0, o; i < b; ++i) s[(o = q[i]).i] = o.x(t);
             return s.join("");
@@ -15234,7 +14163,7 @@
           classname += ` d_${date.getDate()} dy_${date.getDay()}`;
           break;
         case 'week':
-          classname += ` w_${getWeekNumber(date)}`;
+          classname += ` w_${DateHelper.getWeekNumber(date)}`;
           break;
         case 'month':
           classname += ` m_${date.getMonth() + 1}`;
@@ -15250,7 +14179,7 @@
     // @param int d Domain start timestamp
     getWidth(d, outer = false) {
       const { options } = this.calendar.options;
-      const columnsCount = this.calendar.domainSkeleton
+      const columnsCount = this.calendar.domainTemplate
         .at(options.subDomain)
         .column(d);
 
@@ -15270,7 +14199,7 @@
     // Return the height of the domain block, without the domain gutter
     getHeight(d, outer = false) {
       const { options } = this.calendar.options;
-      const rowsCount = this.calendar.domainSkeleton.at(options.subDomain).row(d);
+      const rowsCount = this.calendar.domainTemplate.at(options.subDomain).row(d);
 
       let height = (options.cellSize + options.cellPadding) * rowsCount;
 
@@ -15283,6 +14212,1048 @@
       }
       return height;
     }
+  }
+
+  var t0 = new Date,
+      t1 = new Date;
+
+  function newInterval(floori, offseti, count, field) {
+
+    function interval(date) {
+      return floori(date = arguments.length === 0 ? new Date : new Date(+date)), date;
+    }
+
+    interval.floor = function(date) {
+      return floori(date = new Date(+date)), date;
+    };
+
+    interval.ceil = function(date) {
+      return floori(date = new Date(date - 1)), offseti(date, 1), floori(date), date;
+    };
+
+    interval.round = function(date) {
+      var d0 = interval(date),
+          d1 = interval.ceil(date);
+      return date - d0 < d1 - date ? d0 : d1;
+    };
+
+    interval.offset = function(date, step) {
+      return offseti(date = new Date(+date), step == null ? 1 : Math.floor(step)), date;
+    };
+
+    interval.range = function(start, stop, step) {
+      var range = [], previous;
+      start = interval.ceil(start);
+      step = step == null ? 1 : Math.floor(step);
+      if (!(start < stop) || !(step > 0)) return range; // also handles Invalid Date
+      do range.push(previous = new Date(+start)), offseti(start, step), floori(start);
+      while (previous < start && start < stop);
+      return range;
+    };
+
+    interval.filter = function(test) {
+      return newInterval(function(date) {
+        if (date >= date) while (floori(date), !test(date)) date.setTime(date - 1);
+      }, function(date, step) {
+        if (date >= date) {
+          if (step < 0) while (++step <= 0) {
+            while (offseti(date, -1), !test(date)) {} // eslint-disable-line no-empty
+          } else while (--step >= 0) {
+            while (offseti(date, +1), !test(date)) {} // eslint-disable-line no-empty
+          }
+        }
+      });
+    };
+
+    if (count) {
+      interval.count = function(start, end) {
+        t0.setTime(+start), t1.setTime(+end);
+        floori(t0), floori(t1);
+        return Math.floor(count(t0, t1));
+      };
+
+      interval.every = function(step) {
+        step = Math.floor(step);
+        return !isFinite(step) || !(step > 0) ? null
+            : !(step > 1) ? interval
+            : interval.filter(field
+                ? function(d) { return field(d) % step === 0; }
+                : function(d) { return interval.count(0, d) % step === 0; });
+      };
+    }
+
+    return interval;
+  }
+
+  const durationSecond = 1000;
+  const durationMinute = durationSecond * 60;
+  const durationHour = durationMinute * 60;
+  const durationDay = durationHour * 24;
+  const durationWeek = durationDay * 7;
+
+  var day = newInterval(
+    date => date.setHours(0, 0, 0, 0),
+    (date, step) => date.setDate(date.getDate() + step),
+    (start, end) => (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationDay,
+    date => date.getDate() - 1
+  );
+
+  var timeDay = day;
+  day.range;
+
+  function weekday(i) {
+    return newInterval(function(date) {
+      date.setDate(date.getDate() - (date.getDay() + 7 - i) % 7);
+      date.setHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setDate(date.getDate() + step * 7);
+    }, function(start, end) {
+      return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationWeek;
+    });
+  }
+
+  var sunday = weekday(0);
+  var monday = weekday(1);
+  var tuesday = weekday(2);
+  var wednesday = weekday(3);
+  var thursday = weekday(4);
+  var friday = weekday(5);
+  var saturday = weekday(6);
+
+  sunday.range;
+  monday.range;
+  tuesday.range;
+  wednesday.range;
+  thursday.range;
+  friday.range;
+  saturday.range;
+
+  var year = newInterval(function(date) {
+    date.setMonth(0, 1);
+    date.setHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setFullYear(date.getFullYear() + step);
+  }, function(start, end) {
+    return end.getFullYear() - start.getFullYear();
+  }, function(date) {
+    return date.getFullYear();
+  });
+
+  // An optimized implementation for this simple case.
+  year.every = function(k) {
+    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval(function(date) {
+      date.setFullYear(Math.floor(date.getFullYear() / k) * k);
+      date.setMonth(0, 1);
+      date.setHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setFullYear(date.getFullYear() + step * k);
+    });
+  };
+
+  var timeYear = year;
+  year.range;
+
+  var utcDay = newInterval(function(date) {
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCDate(date.getUTCDate() + step);
+  }, function(start, end) {
+    return (end - start) / durationDay;
+  }, function(date) {
+    return date.getUTCDate() - 1;
+  });
+
+  var utcDay$1 = utcDay;
+  utcDay.range;
+
+  function utcWeekday(i) {
+    return newInterval(function(date) {
+      date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 7 - i) % 7);
+      date.setUTCHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setUTCDate(date.getUTCDate() + step * 7);
+    }, function(start, end) {
+      return (end - start) / durationWeek;
+    });
+  }
+
+  var utcSunday = utcWeekday(0);
+  var utcMonday = utcWeekday(1);
+  var utcTuesday = utcWeekday(2);
+  var utcWednesday = utcWeekday(3);
+  var utcThursday = utcWeekday(4);
+  var utcFriday = utcWeekday(5);
+  var utcSaturday = utcWeekday(6);
+
+  utcSunday.range;
+  utcMonday.range;
+  utcTuesday.range;
+  utcWednesday.range;
+  utcThursday.range;
+  utcFriday.range;
+  utcSaturday.range;
+
+  var utcYear = newInterval(function(date) {
+    date.setUTCMonth(0, 1);
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCFullYear(date.getUTCFullYear() + step);
+  }, function(start, end) {
+    return end.getUTCFullYear() - start.getUTCFullYear();
+  }, function(date) {
+    return date.getUTCFullYear();
+  });
+
+  // An optimized implementation for this simple case.
+  utcYear.every = function(k) {
+    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval(function(date) {
+      date.setUTCFullYear(Math.floor(date.getUTCFullYear() / k) * k);
+      date.setUTCMonth(0, 1);
+      date.setUTCHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setUTCFullYear(date.getUTCFullYear() + step * k);
+    });
+  };
+
+  var utcYear$1 = utcYear;
+  utcYear.range;
+
+  function ascending(a, b) {
+    return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+  }
+
+  function descending(a, b) {
+    return a == null || b == null ? NaN
+      : b < a ? -1
+      : b > a ? 1
+      : b >= a ? 0
+      : NaN;
+  }
+
+  function bisector(f) {
+    let compare1, compare2, delta;
+
+    // If an accessor is specified, promote it to a comparator. In this case we
+    // can test whether the search value is (self-) comparable. We can’t do this
+    // for a comparator (except for specific, known comparators) because we can’t
+    // tell if the comparator is symmetric, and an asymmetric comparator can’t be
+    // used to test whether a single value is comparable.
+    if (f.length !== 2) {
+      compare1 = ascending;
+      compare2 = (d, x) => ascending(f(d), x);
+      delta = (d, x) => f(d) - x;
+    } else {
+      compare1 = f === ascending || f === descending ? f : zero;
+      compare2 = f;
+      delta = f;
+    }
+
+    function left(a, x, lo = 0, hi = a.length) {
+      if (lo < hi) {
+        if (compare1(x, x) !== 0) return hi;
+        do {
+          const mid = (lo + hi) >>> 1;
+          if (compare2(a[mid], x) < 0) lo = mid + 1;
+          else hi = mid;
+        } while (lo < hi);
+      }
+      return lo;
+    }
+
+    function right(a, x, lo = 0, hi = a.length) {
+      if (lo < hi) {
+        if (compare1(x, x) !== 0) return hi;
+        do {
+          const mid = (lo + hi) >>> 1;
+          if (compare2(a[mid], x) <= 0) lo = mid + 1;
+          else hi = mid;
+        } while (lo < hi);
+      }
+      return lo;
+    }
+
+    function center(a, x, lo = 0, hi = a.length) {
+      const i = left(a, x, lo, hi - 1);
+      return i > lo && delta(a[i - 1], x) > -delta(a[i], x) ? i - 1 : i;
+    }
+
+    return {left, center, right};
+  }
+
+  function zero() {
+    return 0;
+  }
+
+  function number$1(x) {
+    return x === null ? NaN : +x;
+  }
+
+  const ascendingBisect = bisector(ascending);
+  const bisectRight = ascendingBisect.right;
+  bisector(number$1).center;
+  var bisect = bisectRight;
+
+  var e10 = Math.sqrt(50),
+      e5 = Math.sqrt(10),
+      e2 = Math.sqrt(2);
+
+  function ticks(start, stop, count) {
+    var reverse,
+        i = -1,
+        n,
+        ticks,
+        step;
+
+    stop = +stop, start = +start, count = +count;
+    if (start === stop && count > 0) return [start];
+    if (reverse = stop < start) n = start, start = stop, stop = n;
+    if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
+
+    if (step > 0) {
+      let r0 = Math.round(start / step), r1 = Math.round(stop / step);
+      if (r0 * step < start) ++r0;
+      if (r1 * step > stop) --r1;
+      ticks = new Array(n = r1 - r0 + 1);
+      while (++i < n) ticks[i] = (r0 + i) * step;
+    } else {
+      step = -step;
+      let r0 = Math.round(start * step), r1 = Math.round(stop * step);
+      if (r0 / step < start) ++r0;
+      if (r1 / step > stop) --r1;
+      ticks = new Array(n = r1 - r0 + 1);
+      while (++i < n) ticks[i] = (r0 + i) / step;
+    }
+
+    if (reverse) ticks.reverse();
+
+    return ticks;
+  }
+
+  function tickIncrement(start, stop, count) {
+    var step = (stop - start) / Math.max(0, count),
+        power = Math.floor(Math.log(step) / Math.LN10),
+        error = step / Math.pow(10, power);
+    return power >= 0
+        ? (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1) * Math.pow(10, power)
+        : -Math.pow(10, -power) / (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1);
+  }
+
+  function tickStep(start, stop, count) {
+    var step0 = Math.abs(stop - start) / Math.max(0, count),
+        step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10)),
+        error = step0 / step1;
+    if (error >= e10) step1 *= 10;
+    else if (error >= e5) step1 *= 5;
+    else if (error >= e2) step1 *= 2;
+    return stop < start ? -step1 : step1;
+  }
+
+  function localDate(d) {
+    if (0 <= d.y && d.y < 100) {
+      var date = new Date(-1, d.m, d.d, d.H, d.M, d.S, d.L);
+      date.setFullYear(d.y);
+      return date;
+    }
+    return new Date(d.y, d.m, d.d, d.H, d.M, d.S, d.L);
+  }
+
+  function utcDate(d) {
+    if (0 <= d.y && d.y < 100) {
+      var date = new Date(Date.UTC(-1, d.m, d.d, d.H, d.M, d.S, d.L));
+      date.setUTCFullYear(d.y);
+      return date;
+    }
+    return new Date(Date.UTC(d.y, d.m, d.d, d.H, d.M, d.S, d.L));
+  }
+
+  function newDate(y, m, d) {
+    return {y: y, m: m, d: d, H: 0, M: 0, S: 0, L: 0};
+  }
+
+  function formatLocale$1(locale) {
+    var locale_dateTime = locale.dateTime,
+        locale_date = locale.date,
+        locale_time = locale.time,
+        locale_periods = locale.periods,
+        locale_weekdays = locale.days,
+        locale_shortWeekdays = locale.shortDays,
+        locale_months = locale.months,
+        locale_shortMonths = locale.shortMonths;
+
+    var periodRe = formatRe(locale_periods),
+        periodLookup = formatLookup(locale_periods),
+        weekdayRe = formatRe(locale_weekdays),
+        weekdayLookup = formatLookup(locale_weekdays),
+        shortWeekdayRe = formatRe(locale_shortWeekdays),
+        shortWeekdayLookup = formatLookup(locale_shortWeekdays),
+        monthRe = formatRe(locale_months),
+        monthLookup = formatLookup(locale_months),
+        shortMonthRe = formatRe(locale_shortMonths),
+        shortMonthLookup = formatLookup(locale_shortMonths);
+
+    var formats = {
+      "a": formatShortWeekday,
+      "A": formatWeekday,
+      "b": formatShortMonth,
+      "B": formatMonth,
+      "c": null,
+      "d": formatDayOfMonth,
+      "e": formatDayOfMonth,
+      "f": formatMicroseconds,
+      "g": formatYearISO,
+      "G": formatFullYearISO,
+      "H": formatHour24,
+      "I": formatHour12,
+      "j": formatDayOfYear,
+      "L": formatMilliseconds,
+      "m": formatMonthNumber,
+      "M": formatMinutes,
+      "p": formatPeriod,
+      "q": formatQuarter,
+      "Q": formatUnixTimestamp,
+      "s": formatUnixTimestampSeconds,
+      "S": formatSeconds,
+      "u": formatWeekdayNumberMonday,
+      "U": formatWeekNumberSunday,
+      "V": formatWeekNumberISO,
+      "w": formatWeekdayNumberSunday,
+      "W": formatWeekNumberMonday,
+      "x": null,
+      "X": null,
+      "y": formatYear,
+      "Y": formatFullYear,
+      "Z": formatZone,
+      "%": formatLiteralPercent
+    };
+
+    var utcFormats = {
+      "a": formatUTCShortWeekday,
+      "A": formatUTCWeekday,
+      "b": formatUTCShortMonth,
+      "B": formatUTCMonth,
+      "c": null,
+      "d": formatUTCDayOfMonth,
+      "e": formatUTCDayOfMonth,
+      "f": formatUTCMicroseconds,
+      "g": formatUTCYearISO,
+      "G": formatUTCFullYearISO,
+      "H": formatUTCHour24,
+      "I": formatUTCHour12,
+      "j": formatUTCDayOfYear,
+      "L": formatUTCMilliseconds,
+      "m": formatUTCMonthNumber,
+      "M": formatUTCMinutes,
+      "p": formatUTCPeriod,
+      "q": formatUTCQuarter,
+      "Q": formatUnixTimestamp,
+      "s": formatUnixTimestampSeconds,
+      "S": formatUTCSeconds,
+      "u": formatUTCWeekdayNumberMonday,
+      "U": formatUTCWeekNumberSunday,
+      "V": formatUTCWeekNumberISO,
+      "w": formatUTCWeekdayNumberSunday,
+      "W": formatUTCWeekNumberMonday,
+      "x": null,
+      "X": null,
+      "y": formatUTCYear,
+      "Y": formatUTCFullYear,
+      "Z": formatUTCZone,
+      "%": formatLiteralPercent
+    };
+
+    var parses = {
+      "a": parseShortWeekday,
+      "A": parseWeekday,
+      "b": parseShortMonth,
+      "B": parseMonth,
+      "c": parseLocaleDateTime,
+      "d": parseDayOfMonth,
+      "e": parseDayOfMonth,
+      "f": parseMicroseconds,
+      "g": parseYear,
+      "G": parseFullYear,
+      "H": parseHour24,
+      "I": parseHour24,
+      "j": parseDayOfYear,
+      "L": parseMilliseconds,
+      "m": parseMonthNumber,
+      "M": parseMinutes,
+      "p": parsePeriod,
+      "q": parseQuarter,
+      "Q": parseUnixTimestamp,
+      "s": parseUnixTimestampSeconds,
+      "S": parseSeconds,
+      "u": parseWeekdayNumberMonday,
+      "U": parseWeekNumberSunday,
+      "V": parseWeekNumberISO,
+      "w": parseWeekdayNumberSunday,
+      "W": parseWeekNumberMonday,
+      "x": parseLocaleDate,
+      "X": parseLocaleTime,
+      "y": parseYear,
+      "Y": parseFullYear,
+      "Z": parseZone,
+      "%": parseLiteralPercent
+    };
+
+    // These recursive directive definitions must be deferred.
+    formats.x = newFormat(locale_date, formats);
+    formats.X = newFormat(locale_time, formats);
+    formats.c = newFormat(locale_dateTime, formats);
+    utcFormats.x = newFormat(locale_date, utcFormats);
+    utcFormats.X = newFormat(locale_time, utcFormats);
+    utcFormats.c = newFormat(locale_dateTime, utcFormats);
+
+    function newFormat(specifier, formats) {
+      return function(date) {
+        var string = [],
+            i = -1,
+            j = 0,
+            n = specifier.length,
+            c,
+            pad,
+            format;
+
+        if (!(date instanceof Date)) date = new Date(+date);
+
+        while (++i < n) {
+          if (specifier.charCodeAt(i) === 37) {
+            string.push(specifier.slice(j, i));
+            if ((pad = pads[c = specifier.charAt(++i)]) != null) c = specifier.charAt(++i);
+            else pad = c === "e" ? " " : "0";
+            if (format = formats[c]) c = format(date, pad);
+            string.push(c);
+            j = i + 1;
+          }
+        }
+
+        string.push(specifier.slice(j, i));
+        return string.join("");
+      };
+    }
+
+    function newParse(specifier, Z) {
+      return function(string) {
+        var d = newDate(1900, undefined, 1),
+            i = parseSpecifier(d, specifier, string += "", 0),
+            week, day;
+        if (i != string.length) return null;
+
+        // If a UNIX timestamp is specified, return it.
+        if ("Q" in d) return new Date(d.Q);
+        if ("s" in d) return new Date(d.s * 1000 + ("L" in d ? d.L : 0));
+
+        // If this is utcParse, never use the local timezone.
+        if (Z && !("Z" in d)) d.Z = 0;
+
+        // The am-pm flag is 0 for AM, and 1 for PM.
+        if ("p" in d) d.H = d.H % 12 + d.p * 12;
+
+        // If the month was not specified, inherit from the quarter.
+        if (d.m === undefined) d.m = "q" in d ? d.q : 0;
+
+        // Convert day-of-week and week-of-year to day-of-year.
+        if ("V" in d) {
+          if (d.V < 1 || d.V > 53) return null;
+          if (!("w" in d)) d.w = 1;
+          if ("Z" in d) {
+            week = utcDate(newDate(d.y, 0, 1)), day = week.getUTCDay();
+            week = day > 4 || day === 0 ? utcMonday.ceil(week) : utcMonday(week);
+            week = utcDay$1.offset(week, (d.V - 1) * 7);
+            d.y = week.getUTCFullYear();
+            d.m = week.getUTCMonth();
+            d.d = week.getUTCDate() + (d.w + 6) % 7;
+          } else {
+            week = localDate(newDate(d.y, 0, 1)), day = week.getDay();
+            week = day > 4 || day === 0 ? monday.ceil(week) : monday(week);
+            week = timeDay.offset(week, (d.V - 1) * 7);
+            d.y = week.getFullYear();
+            d.m = week.getMonth();
+            d.d = week.getDate() + (d.w + 6) % 7;
+          }
+        } else if ("W" in d || "U" in d) {
+          if (!("w" in d)) d.w = "u" in d ? d.u % 7 : "W" in d ? 1 : 0;
+          day = "Z" in d ? utcDate(newDate(d.y, 0, 1)).getUTCDay() : localDate(newDate(d.y, 0, 1)).getDay();
+          d.m = 0;
+          d.d = "W" in d ? (d.w + 6) % 7 + d.W * 7 - (day + 5) % 7 : d.w + d.U * 7 - (day + 6) % 7;
+        }
+
+        // If a time zone is specified, all fields are interpreted as UTC and then
+        // offset according to the specified time zone.
+        if ("Z" in d) {
+          d.H += d.Z / 100 | 0;
+          d.M += d.Z % 100;
+          return utcDate(d);
+        }
+
+        // Otherwise, all fields are in local time.
+        return localDate(d);
+      };
+    }
+
+    function parseSpecifier(d, specifier, string, j) {
+      var i = 0,
+          n = specifier.length,
+          m = string.length,
+          c,
+          parse;
+
+      while (i < n) {
+        if (j >= m) return -1;
+        c = specifier.charCodeAt(i++);
+        if (c === 37) {
+          c = specifier.charAt(i++);
+          parse = parses[c in pads ? specifier.charAt(i++) : c];
+          if (!parse || ((j = parse(d, string, j)) < 0)) return -1;
+        } else if (c != string.charCodeAt(j++)) {
+          return -1;
+        }
+      }
+
+      return j;
+    }
+
+    function parsePeriod(d, string, i) {
+      var n = periodRe.exec(string.slice(i));
+      return n ? (d.p = periodLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+    }
+
+    function parseShortWeekday(d, string, i) {
+      var n = shortWeekdayRe.exec(string.slice(i));
+      return n ? (d.w = shortWeekdayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+    }
+
+    function parseWeekday(d, string, i) {
+      var n = weekdayRe.exec(string.slice(i));
+      return n ? (d.w = weekdayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+    }
+
+    function parseShortMonth(d, string, i) {
+      var n = shortMonthRe.exec(string.slice(i));
+      return n ? (d.m = shortMonthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+    }
+
+    function parseMonth(d, string, i) {
+      var n = monthRe.exec(string.slice(i));
+      return n ? (d.m = monthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+    }
+
+    function parseLocaleDateTime(d, string, i) {
+      return parseSpecifier(d, locale_dateTime, string, i);
+    }
+
+    function parseLocaleDate(d, string, i) {
+      return parseSpecifier(d, locale_date, string, i);
+    }
+
+    function parseLocaleTime(d, string, i) {
+      return parseSpecifier(d, locale_time, string, i);
+    }
+
+    function formatShortWeekday(d) {
+      return locale_shortWeekdays[d.getDay()];
+    }
+
+    function formatWeekday(d) {
+      return locale_weekdays[d.getDay()];
+    }
+
+    function formatShortMonth(d) {
+      return locale_shortMonths[d.getMonth()];
+    }
+
+    function formatMonth(d) {
+      return locale_months[d.getMonth()];
+    }
+
+    function formatPeriod(d) {
+      return locale_periods[+(d.getHours() >= 12)];
+    }
+
+    function formatQuarter(d) {
+      return 1 + ~~(d.getMonth() / 3);
+    }
+
+    function formatUTCShortWeekday(d) {
+      return locale_shortWeekdays[d.getUTCDay()];
+    }
+
+    function formatUTCWeekday(d) {
+      return locale_weekdays[d.getUTCDay()];
+    }
+
+    function formatUTCShortMonth(d) {
+      return locale_shortMonths[d.getUTCMonth()];
+    }
+
+    function formatUTCMonth(d) {
+      return locale_months[d.getUTCMonth()];
+    }
+
+    function formatUTCPeriod(d) {
+      return locale_periods[+(d.getUTCHours() >= 12)];
+    }
+
+    function formatUTCQuarter(d) {
+      return 1 + ~~(d.getUTCMonth() / 3);
+    }
+
+    return {
+      format: function(specifier) {
+        var f = newFormat(specifier += "", formats);
+        f.toString = function() { return specifier; };
+        return f;
+      },
+      parse: function(specifier) {
+        var p = newParse(specifier += "", false);
+        p.toString = function() { return specifier; };
+        return p;
+      },
+      utcFormat: function(specifier) {
+        var f = newFormat(specifier += "", utcFormats);
+        f.toString = function() { return specifier; };
+        return f;
+      },
+      utcParse: function(specifier) {
+        var p = newParse(specifier += "", true);
+        p.toString = function() { return specifier; };
+        return p;
+      }
+    };
+  }
+
+  var pads = {"-": "", "_": " ", "0": "0"},
+      numberRe = /^\s*\d+/, // note: ignores next directive
+      percentRe = /^%/,
+      requoteRe = /[\\^$*+?|[\]().{}]/g;
+
+  function pad(value, fill, width) {
+    var sign = value < 0 ? "-" : "",
+        string = (sign ? -value : value) + "",
+        length = string.length;
+    return sign + (length < width ? new Array(width - length + 1).join(fill) + string : string);
+  }
+
+  function requote(s) {
+    return s.replace(requoteRe, "\\$&");
+  }
+
+  function formatRe(names) {
+    return new RegExp("^(?:" + names.map(requote).join("|") + ")", "i");
+  }
+
+  function formatLookup(names) {
+    return new Map(names.map((name, i) => [name.toLowerCase(), i]));
+  }
+
+  function parseWeekdayNumberSunday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 1));
+    return n ? (d.w = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekdayNumberMonday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 1));
+    return n ? (d.u = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekNumberSunday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.U = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekNumberISO(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.V = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekNumberMonday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.W = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseFullYear(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 4));
+    return n ? (d.y = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseYear(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.y = +n[0] + (+n[0] > 68 ? 1900 : 2000), i + n[0].length) : -1;
+  }
+
+  function parseZone(d, string, i) {
+    var n = /^(Z)|([+-]\d\d)(?::?(\d\d))?/.exec(string.slice(i, i + 6));
+    return n ? (d.Z = n[1] ? 0 : -(n[2] + (n[3] || "00")), i + n[0].length) : -1;
+  }
+
+  function parseQuarter(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 1));
+    return n ? (d.q = n[0] * 3 - 3, i + n[0].length) : -1;
+  }
+
+  function parseMonthNumber(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.m = n[0] - 1, i + n[0].length) : -1;
+  }
+
+  function parseDayOfMonth(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.d = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseDayOfYear(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 3));
+    return n ? (d.m = 0, d.d = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseHour24(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.H = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseMinutes(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.M = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseSeconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.S = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseMilliseconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 3));
+    return n ? (d.L = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseMicroseconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 6));
+    return n ? (d.L = Math.floor(n[0] / 1000), i + n[0].length) : -1;
+  }
+
+  function parseLiteralPercent(d, string, i) {
+    var n = percentRe.exec(string.slice(i, i + 1));
+    return n ? i + n[0].length : -1;
+  }
+
+  function parseUnixTimestamp(d, string, i) {
+    var n = numberRe.exec(string.slice(i));
+    return n ? (d.Q = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseUnixTimestampSeconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i));
+    return n ? (d.s = +n[0], i + n[0].length) : -1;
+  }
+
+  function formatDayOfMonth(d, p) {
+    return pad(d.getDate(), p, 2);
+  }
+
+  function formatHour24(d, p) {
+    return pad(d.getHours(), p, 2);
+  }
+
+  function formatHour12(d, p) {
+    return pad(d.getHours() % 12 || 12, p, 2);
+  }
+
+  function formatDayOfYear(d, p) {
+    return pad(1 + timeDay.count(timeYear(d), d), p, 3);
+  }
+
+  function formatMilliseconds(d, p) {
+    return pad(d.getMilliseconds(), p, 3);
+  }
+
+  function formatMicroseconds(d, p) {
+    return formatMilliseconds(d, p) + "000";
+  }
+
+  function formatMonthNumber(d, p) {
+    return pad(d.getMonth() + 1, p, 2);
+  }
+
+  function formatMinutes(d, p) {
+    return pad(d.getMinutes(), p, 2);
+  }
+
+  function formatSeconds(d, p) {
+    return pad(d.getSeconds(), p, 2);
+  }
+
+  function formatWeekdayNumberMonday(d) {
+    var day = d.getDay();
+    return day === 0 ? 7 : day;
+  }
+
+  function formatWeekNumberSunday(d, p) {
+    return pad(sunday.count(timeYear(d) - 1, d), p, 2);
+  }
+
+  function dISO(d) {
+    var day = d.getDay();
+    return (day >= 4 || day === 0) ? thursday(d) : thursday.ceil(d);
+  }
+
+  function formatWeekNumberISO(d, p) {
+    d = dISO(d);
+    return pad(thursday.count(timeYear(d), d) + (timeYear(d).getDay() === 4), p, 2);
+  }
+
+  function formatWeekdayNumberSunday(d) {
+    return d.getDay();
+  }
+
+  function formatWeekNumberMonday(d, p) {
+    return pad(monday.count(timeYear(d) - 1, d), p, 2);
+  }
+
+  function formatYear(d, p) {
+    return pad(d.getFullYear() % 100, p, 2);
+  }
+
+  function formatYearISO(d, p) {
+    d = dISO(d);
+    return pad(d.getFullYear() % 100, p, 2);
+  }
+
+  function formatFullYear(d, p) {
+    return pad(d.getFullYear() % 10000, p, 4);
+  }
+
+  function formatFullYearISO(d, p) {
+    var day = d.getDay();
+    d = (day >= 4 || day === 0) ? thursday(d) : thursday.ceil(d);
+    return pad(d.getFullYear() % 10000, p, 4);
+  }
+
+  function formatZone(d) {
+    var z = d.getTimezoneOffset();
+    return (z > 0 ? "-" : (z *= -1, "+"))
+        + pad(z / 60 | 0, "0", 2)
+        + pad(z % 60, "0", 2);
+  }
+
+  function formatUTCDayOfMonth(d, p) {
+    return pad(d.getUTCDate(), p, 2);
+  }
+
+  function formatUTCHour24(d, p) {
+    return pad(d.getUTCHours(), p, 2);
+  }
+
+  function formatUTCHour12(d, p) {
+    return pad(d.getUTCHours() % 12 || 12, p, 2);
+  }
+
+  function formatUTCDayOfYear(d, p) {
+    return pad(1 + utcDay$1.count(utcYear$1(d), d), p, 3);
+  }
+
+  function formatUTCMilliseconds(d, p) {
+    return pad(d.getUTCMilliseconds(), p, 3);
+  }
+
+  function formatUTCMicroseconds(d, p) {
+    return formatUTCMilliseconds(d, p) + "000";
+  }
+
+  function formatUTCMonthNumber(d, p) {
+    return pad(d.getUTCMonth() + 1, p, 2);
+  }
+
+  function formatUTCMinutes(d, p) {
+    return pad(d.getUTCMinutes(), p, 2);
+  }
+
+  function formatUTCSeconds(d, p) {
+    return pad(d.getUTCSeconds(), p, 2);
+  }
+
+  function formatUTCWeekdayNumberMonday(d) {
+    var dow = d.getUTCDay();
+    return dow === 0 ? 7 : dow;
+  }
+
+  function formatUTCWeekNumberSunday(d, p) {
+    return pad(utcSunday.count(utcYear$1(d) - 1, d), p, 2);
+  }
+
+  function UTCdISO(d) {
+    var day = d.getUTCDay();
+    return (day >= 4 || day === 0) ? utcThursday(d) : utcThursday.ceil(d);
+  }
+
+  function formatUTCWeekNumberISO(d, p) {
+    d = UTCdISO(d);
+    return pad(utcThursday.count(utcYear$1(d), d) + (utcYear$1(d).getUTCDay() === 4), p, 2);
+  }
+
+  function formatUTCWeekdayNumberSunday(d) {
+    return d.getUTCDay();
+  }
+
+  function formatUTCWeekNumberMonday(d, p) {
+    return pad(utcMonday.count(utcYear$1(d) - 1, d), p, 2);
+  }
+
+  function formatUTCYear(d, p) {
+    return pad(d.getUTCFullYear() % 100, p, 2);
+  }
+
+  function formatUTCYearISO(d, p) {
+    d = UTCdISO(d);
+    return pad(d.getUTCFullYear() % 100, p, 2);
+  }
+
+  function formatUTCFullYear(d, p) {
+    return pad(d.getUTCFullYear() % 10000, p, 4);
+  }
+
+  function formatUTCFullYearISO(d, p) {
+    var day = d.getUTCDay();
+    d = (day >= 4 || day === 0) ? utcThursday(d) : utcThursday.ceil(d);
+    return pad(d.getUTCFullYear() % 10000, p, 4);
+  }
+
+  function formatUTCZone() {
+    return "+0000";
+  }
+
+  function formatLiteralPercent() {
+    return "%";
+  }
+
+  function formatUnixTimestamp(d) {
+    return +d;
+  }
+
+  function formatUnixTimestampSeconds(d) {
+    return Math.floor(+d / 1000);
+  }
+
+  var locale$1;
+  var timeFormat;
+
+  defaultLocale$1({
+    dateTime: "%x, %X",
+    date: "%-m/%-d/%Y",
+    time: "%-I:%M:%S %p",
+    periods: ["AM", "PM"],
+    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    shortDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    shortMonths: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  });
+
+  function defaultLocale$1(definition) {
+    locale$1 = formatLocale$1(definition);
+    timeFormat = locale$1.format;
+    locale$1.parse;
+    locale$1.utcFormat;
+    locale$1.utcParse;
+    return locale$1;
   }
 
   function formatDate(d, formatter = 'title') {
@@ -15659,7 +15630,7 @@
     #getCoordinates(axis, d) {
       const { options } = this.calendar.options;
 
-      const index = this.calendar.domainSkeleton
+      const index = this.calendar.domainTemplate
         .at(options.subDomain)
         .position[axis](new Date(d));
 
@@ -16636,7 +16607,7 @@
           getSubDomainTitle(
             d,
             options,
-            calendar.domainSkeleton.at(options.subDomain).format.connector,
+            calendar.domainTemplate.at(options.subDomain).format.connector,
           ),
         );
 
@@ -16684,20 +16655,20 @@
    * @throw {Error} when domain or subdomain are not valid
    * @return {bool} True if domain and subdomain are valid and compatible
    */
-  function validateDomainType(domainSkeleton, { domain, subDomain }) {
+  function validateDomainType(domainTemplate, { domain, subDomain }) {
     if (
-      !domainSkeleton.has(domain) ||
+      !domainTemplate.has(domain) ||
       domain === 'min' ||
       domain.substring(0, 2) === 'x_'
     ) {
       throw new Error(`The domain '${domain}' is not valid`);
     }
 
-    if (!domainSkeleton.has(subDomain) || subDomain === 'year') {
+    if (!domainTemplate.has(subDomain) || subDomain === 'year') {
       throw new Error(`The subDomain '${subDomain}' is not valid`);
     }
 
-    if (domainSkeleton.at(domain).level <= domainSkeleton.at(subDomain).level) {
+    if (domainTemplate.at(domain).level <= domainTemplate.at(subDomain).level) {
       throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
     }
 
@@ -16749,7 +16720,7 @@
       case 'day':
         return 'hour';
       default:
-        return 'min';
+        return 'minute';
     }
   }
 
@@ -16789,7 +16760,9 @@
 
         domain: 'hour',
 
-        subDomain: 'min',
+        subDomain: 'minute',
+
+        domainTemplates: null,
 
         // Number of columns to split the subDomains to
         // If not null, will takes precedence over rowLimit
@@ -17065,7 +17038,7 @@
 
       // Fatal errors
       // Stop script execution on error
-      validateDomainType(this.calendar.domainSkeleton, this.options);
+      validateDomainType(this.calendar.domainTemplate, this.options);
       validateSelector(options.itemSelector, false, 'itemSelector');
 
       if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
@@ -17169,19 +17142,19 @@
 
       const { options } = this;
 
-      this.calendar.domainSkeleton.compute();
+      this.calendar.domainTemplate.init(options.domainTemplates);
       this.#validate();
 
       options.subDomainDateFormat =
         typeof options.subDomainDateFormat === 'string' ||
         typeof options.subDomainDateFormat === 'function'
           ? options.subDomainDateFormat
-          : this.calendar.domainSkeleton.at(options.subDomain).format.date;
+          : this.calendar.domainTemplate.at(options.subDomain).format.date;
       options.domainLabelFormat =
         typeof options.domainLabelFormat === 'string' ||
         typeof options.domainLabelFormat === 'function'
           ? options.domainLabelFormat
-          : this.calendar.domainSkeleton.at(options.domain).format.legend;
+          : this.calendar.domainTemplate.at(options.domain).format.legend;
       options.subDomainTextFormat =
         (typeof options.subDomainTextFormat === 'string' &&
           options.subDomainTextFormat !== '') ||
@@ -17212,8 +17185,8 @@
         options.domainHorizontalLabelWidth = options.label.width;
       }
 
-      this.set('timezone', options.timezone ?? moment.tz.guess());
-      moment.tz.setDefault(options.timezone);
+      this.set('timezone', options.timezone ?? moment$1.tz.guess());
+      moment$1.tz.setDefault(options.timezone);
 
       if (options.legendMargin === [0, 0, 0, 0]) {
         switch (options.legendVerticalPosition) {
@@ -17722,13 +17695,382 @@
     return string;
   }
 
-  class DomainSkeleton {
+  const minuteTemplate = (domainTemplate) => ({
+    name: 'minute',
+    level: 10,
+    maxItemNumber: 60,
+    defaultRowNumber: 10,
+    defaultColumnNumber: 6,
+    row(d) {
+      return domainTemplate.getSubDomainRowNumber(d);
+    },
+    column(d) {
+      return domainTemplate.getSubDomainColumnNumber(d);
+    },
+    position: {
+      x(d) {
+        return Math.floor(
+          d.getMinutes() / domainTemplate.getSubDomainRowNumber(d),
+        );
+      },
+      y(d) {
+        return d.getMinutes() % domainTemplate.getSubDomainRowNumber(d);
+      },
+    },
+    format: {
+      date: '%H:%M, %A %B %-e, %Y',
+      legend: '',
+      connector: 'at',
+    },
+    extractUnit(d) {
+      return new Date(
+        d.getFullYear(),
+        d.getMonth(),
+        d.getDate(),
+        d.getHours(),
+        d.getMinutes(),
+      ).getTime();
+    },
+  });
+
+  const hourTemplate = (
+    domainTemplate,
+    dateHelper,
+    { domain, rowLimit, colLimit, domainDynamicDimension },
+  ) => ({
+    name: 'hour',
+    level: 20,
+    maxItemNumber(d) {
+      switch (domain) {
+        case 'week':
+          return 24 * 7;
+        case 'month':
+          return (
+            24 * (domainDynamicDimension ? dateHelper.getDayCountInMonth(d) : 31)
+          );
+        case 'day':
+        default:
+          return 24;
+      }
+    },
+    defaultRowNumber: 6,
+    defaultColumnNumber(d) {
+      switch (domain) {
+        case 'week':
+          return 28;
+        case 'month':
+          return domainDynamicDimension ? dateHelper.getDayCountInMonth(d) : 31;
+        case 'day':
+        default:
+          return 4;
+      }
+    },
+    row(d) {
+      return domainTemplate.getSubDomainRowNumber(d);
+    },
+    column(d) {
+      return domainTemplate.getSubDomainColumnNumber(d);
+    },
+    position: {
+      x(d) {
+        if (domain === 'month') {
+          if (colLimit > 0 || rowLimit > 0) {
+            return Math.floor(
+              (d.getHours() + (d.getDate() - 1) * 24) /
+                domainTemplate.settings.hour.row(d),
+            );
+          }
+          return (
+            Math.floor(d.getHours() / domainTemplate.getSubDomainRowNumber(d)) +
+            (d.getDate() - 1) * 4
+          );
+        }
+        if (domain === 'week') {
+          if (colLimit > 0 || rowLimit > 0) {
+            return Math.floor(
+              (d.getHours() + dateHelper.getWeekDay(d) * 24) /
+                domainTemplate.getSubDomainRowNumber(d),
+            );
+          }
+          return (
+            Math.floor(d.getHours() / domainTemplate.getSubDomainRowNumber(d)) +
+            dateHelper.getWeekDay(d) * 4
+          );
+        }
+        return Math.floor(d.getHours() / domainTemplate.getSubDomainRowNumber(d));
+      },
+      y(d) {
+        let p = d.getHours();
+        if (colLimit > 0 || rowLimit > 0) {
+          switch (domain) {
+            case 'month':
+              p += (d.getDate() - 1) * 24;
+              break;
+            case 'week':
+              p += dateHelper.getWeekDay(d) * 24;
+              break;
+          }
+        }
+        return Math.floor(p % domainTemplate.getSubDomainRowNumber(d));
+      },
+    },
+    format: {
+      date: '%Hh, %A %B %-e, %Y',
+      legend: '%H:00',
+      connector: 'at',
+    },
+    extractUnit(d) {
+      return new Date(
+        d.getFullYear(),
+        d.getMonth(),
+        d.getDate(),
+        d.getHours(),
+      ).getTime();
+    },
+  });
+
+  const dayTemplate = (
+    domainTemplate,
+    dateHelper,
+    { domain, rowLimit, colLimit, domainDynamicDimension, verticalOrientation },
+  ) => ({
+    name: 'day',
+    level: 30,
+    maxItemNumber(d) {
+      switch (domain) {
+        case 'month':
+          return domainDynamicDimension ? dateHelper.getDayCountInMonth(d) : 31;
+        case 'year':
+          return domainDynamicDimension ? dateHelper.getDayCountInYear(d) : 366;
+        case 'week':
+        default:
+          return 7;
+      }
+    },
+    defaultColumnNumber(d) {
+      d = new Date(d);
+      switch (domain) {
+        case 'month':
+          return domainDynamicDimension && !verticalOrientation
+            ? dateHelper.getWeekNumber(
+                new Date(d.getFullYear(), d.getMonth() + 1, 0),
+              ) -
+                dateHelper.getWeekNumber(d) +
+                1
+            : 6;
+        case 'year':
+          return domainDynamicDimension
+            ? dateHelper.getWeekNumber(new Date(d.getFullYear(), 11, 31)) -
+                dateHelper.getWeekNumber(new Date(d.getFullYear(), 0)) +
+                1
+            : 54;
+        case 'week':
+        default:
+          return 1;
+      }
+    },
+    defaultRowNumber: 7,
+    row(d) {
+      return domainTemplate.getSubDomainRowNumber(d);
+    },
+    column(d) {
+      return domainTemplate.getSubDomainColumnNumber(d);
+    },
+    position: {
+      x(d) {
+        switch (domain) {
+          case 'week':
+            return Math.floor(
+              dateHelper.getWeekDay(d) / domainTemplate.getSubDomainRowNumber(d),
+            );
+          case 'month':
+            if (colLimit > 0 || rowLimit > 0) {
+              return Math.floor(
+                (d.getDate() - 1) / domainTemplate.getSubDomainRowNumber(d),
+              );
+            }
+            return (
+              dateHelper.getWeekNumber(d) -
+              dateHelper.getWeekNumber(new Date(d.getFullYear(), d.getMonth()))
+            );
+          case 'year':
+            if (colLimit > 0 || rowLimit > 0) {
+              return Math.floor(
+                (dateHelper.getDayOfYear(d) - 1) /
+                  domainTemplate.getSubDomainRowNumber(d),
+              );
+            }
+            return dateHelper.getWeekNumber(d);
+        }
+      },
+      y(d) {
+        let p = dateHelper.getWeekDay(d);
+        if (colLimit > 0 || rowLimit > 0) {
+          switch (domain) {
+            case 'year':
+              p = dateHelper.getDayOfYear(d) - 1;
+              break;
+            case 'week':
+              p = dateHelper.getWeekDay(d);
+              break;
+            case 'month':
+              p = d.getDate() - 1;
+              break;
+          }
+        }
+        return Math.floor(p % domainTemplate.getSubDomainRowNumber(d));
+      },
+    },
+    format: {
+      date: '%A %B %-e, %Y',
+      legend: '%e %b',
+      connector: 'on',
+    },
+    extractUnit(d) {
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    },
+  });
+
+  const weekTemplate = (
+    domainTemplate,
+    dateHelper,
+    { domain, domainDynamicDimension },
+  ) => ({
+    name: 'week',
+    level: 40,
+    maxItemNumber: 54,
+    defaultColumnNumber(d) {
+      d = new Date(d);
+      switch (domain) {
+        case 'year':
+          return domainTemplate.settings.week.maxItemNumber;
+        case 'month':
+          return domainDynamicDimension
+            ? dateHelper.getWeekNumber(
+                new Date(d.getFullYear(), d.getMonth() + 1, 0),
+              ) - dateHelper.getWeekNumber(d)
+            : 5;
+      }
+    },
+    defaultRowNumber: 1,
+    row(d) {
+      return domainTemplate.getSubDomainRowNumber(d);
+    },
+    column(d) {
+      return domainTemplate.getSubDomainColumnNumber(d);
+    },
+    position: {
+      x(d) {
+        switch (domain) {
+          case 'year':
+            return Math.floor(
+              dateHelper.getWeekNumber(d) /
+                domainTemplate.getSubDomainRowNumber(d),
+            );
+          case 'month':
+            return Math.floor(
+              dateHelper.getMonthWeekNumber(d) /
+                domainTemplate.getSubDomainRowNumber(d),
+            );
+        }
+      },
+      y(d) {
+        return (
+          dateHelper.getWeekNumber(d) % domainTemplate.getSubDomainRowNumber(d)
+        );
+      },
+    },
+    format: {
+      date: '%B Week #%W',
+      legend: '%B Week #%W',
+      connector: 'in',
+    },
+    extractUnit(d) {
+      const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      // According to ISO-8601, week number computation are based on week starting on Monday
+      let weekDay = dt.getDay();
+      if (weekDay < 0) {
+        weekDay = 6;
+      }
+      dt.setDate(dt.getDate() - weekDay);
+      return dt.getTime();
+    },
+  });
+
+  const monthTemplate = (domainTemplate) => ({
+    name: 'month',
+    level: 50,
+    maxItemNumber: 12,
+    defaultColumnNumber: 12,
+    defaultRowNumber: 1,
+    row() {
+      return domainTemplate.getSubDomainRowNumber();
+    },
+    column() {
+      return domainTemplate.getSubDomainColumnNumber();
+    },
+    position: {
+      x(d) {
+        return Math.floor(d.getMonth() / domainTemplate.getSubDomainRowNumber(d));
+      },
+      y(d) {
+        return d.getMonth() % domainTemplate.getSubDomainRowNumber(d);
+      },
+    },
+    format: {
+      date: '%B %Y',
+      legend: '%B',
+      connector: 'in',
+    },
+    extractUnit(d) {
+      return new Date(d.getFullYear(), d.getMonth()).getTime();
+    },
+  });
+
+  const yearTemplate = (domainTemplate, options) => ({
+    name: 'year',
+    level: 60,
+    row() {
+      return options.rowLimit || 1;
+    },
+    column() {
+      return options.colLimit || 1;
+    },
+    position: {
+      x() {
+        return 1;
+      },
+      y() {
+        return 1;
+      },
+    },
+    format: {
+      date: '%Y',
+      legend: '%Y',
+      connector: 'in',
+    },
+    extractUnit(d) {
+      return new Date(d.getFullYear()).getTime();
+    },
+  });
+
+  var DefaultTemplates = [
+    minuteTemplate,
+    hourTemplate,
+    dayTemplate,
+    weekTemplate,
+    monthTemplate,
+    yearTemplate,
+  ];
+
+  class DomainTemplate {
     constructor(calendar) {
       this.settings = {};
       this.calendar = calendar;
+      this.dateHelper = new DateHelper();
     }
 
-    #getSubDomainRowNumber(d) {
+    getSubDomainRowNumber(d) {
       const { options } = this.calendar.options;
 
       if (options.colLimit > 0) {
@@ -17746,7 +18088,7 @@
       return options.rowLimit || j;
     }
 
-    #getSubDomainColumnNumber(d) {
+    getSubDomainColumnNumber(d) {
       const { options } = this.calendar.options;
 
       if (options.rowLimit > 0) {
@@ -17772,366 +18114,41 @@
       return this.settings.hasOwnProperty(domain);
     }
 
-    compute() {
+    init(templates) {
       const { options } = this.calendar.options;
-      const self = this;
-      this.settings = {
-        min: {
-          name: 'minute',
-          level: 10,
-          maxItemNumber: 60,
-          defaultRowNumber: 10,
-          defaultColumnNumber: 6,
-          row(d) {
-            return self.#getSubDomainRowNumber(d);
-          },
-          column(d) {
-            return self.#getSubDomainColumnNumber(d);
-          },
-          position: {
-            x(d) {
-              return Math.floor(d.getMinutes() / self.settings.min.row(d));
-            },
-            y(d) {
-              return d.getMinutes() % self.settings.min.row(d);
-            },
-          },
-          format: {
-            date: '%H:%M, %A %B %-e, %Y',
-            legend: '',
-            connector: 'at',
-          },
-          extractUnit(d) {
-            return new Date(
-              d.getFullYear(),
-              d.getMonth(),
-              d.getDate(),
-              d.getHours(),
-              d.getMinutes(),
-            ).getTime();
-          },
-        },
-        hour: {
-          name: 'hour',
-          level: 20,
-          maxItemNumber(d) {
-            switch (options.domain) {
-              case 'day':
-                return 24;
-              case 'week':
-                return 24 * 7;
-              case 'month':
-                return (
-                  24 *
-                  (options.domainDynamicDimension ? getDayCountInMonth(d) : 31)
-                );
-            }
-          },
-          defaultRowNumber: 6,
-          defaultColumnNumber(d) {
-            switch (options.domain) {
-              case 'day':
-                return 4;
-              case 'week':
-                return 28;
-              case 'month':
-                return options.domainDynamicDimension
-                  ? getDayCountInMonth(d)
-                  : 31;
-            }
-          },
-          row(d) {
-            return self.#getSubDomainRowNumber(d);
-          },
-          column(d) {
-            return self.#getSubDomainColumnNumber(d);
-          },
-          position: {
-            x(d) {
-              if (options.domain === 'month') {
-                if (options.colLimit > 0 || options.rowLimit > 0) {
-                  return Math.floor(
-                    (d.getHours() + (d.getDate() - 1) * 24) /
-                      self.settings.hour.row(d),
-                  );
-                }
-                return (
-                  Math.floor(d.getHours() / self.settings.hour.row(d)) +
-                  (d.getDate() - 1) * 4
-                );
-              }
-              if (options.domain === 'week') {
-                if (options.colLimit > 0 || options.rowLimit > 0) {
-                  return Math.floor(
-                    (d.getHours() + getWeekDay(d) * 24) /
-                      self.settings.hour.row(d),
-                  );
-                }
-                return (
-                  Math.floor(d.getHours() / self.settings.hour.row(d)) +
-                  getWeekDay(d) * 4
-                );
-              }
-              return Math.floor(d.getHours() / self.settings.hour.row(d));
-            },
-            y(d) {
-              let p = d.getHours();
-              if (options.colLimit > 0 || options.rowLimit > 0) {
-                switch (options.domain) {
-                  case 'month':
-                    p += (d.getDate() - 1) * 24;
-                    break;
-                  case 'week':
-                    p += getWeekDay(d) * 24;
-                    break;
-                }
-              }
-              return Math.floor(p % self.settings.hour.row(d));
-            },
-          },
-          format: {
-            date: '%Hh, %A %B %-e, %Y',
-            legend: '%H:00',
-            connector: 'at',
-          },
-          extractUnit(d) {
-            return new Date(
-              d.getFullYear(),
-              d.getMonth(),
-              d.getDate(),
-              d.getHours(),
-            ).getTime();
-          },
-        },
-        day: {
-          name: 'day',
-          level: 30,
-          maxItemNumber(d) {
-            switch (options.domain) {
-              case 'week':
-                return 7;
-              case 'month':
-                return options.domainDynamicDimension
-                  ? getDayCountInMonth(d)
-                  : 31;
-              case 'year':
-                return options.domainDynamicDimension
-                  ? getDayCountInYear(d)
-                  : 366;
-            }
-          },
-          defaultColumnNumber(d) {
-            d = new Date(d);
-            switch (options.domain) {
-              case 'week':
-                return 1;
-              case 'month':
-                return options.domainDynamicDimension &&
-                  !options.verticalOrientation
-                  ? getWeekNumber(
-                      new Date(d.getFullYear(), d.getMonth() + 1, 0),
-                    ) -
-                      getWeekNumber(d) +
-                      1
-                  : 6;
-              case 'year':
-                return options.domainDynamicDimension
-                  ? getWeekNumber(new Date(d.getFullYear(), 11, 31)) -
-                      getWeekNumber(new Date(d.getFullYear(), 0)) +
-                      1
-                  : 54;
-            }
-          },
-          defaultRowNumber: 7,
-          row(d) {
-            return self.#getSubDomainRowNumber(d);
-          },
-          column(d) {
-            return self.#getSubDomainColumnNumber(d);
-          },
-          position: {
-            x(d) {
-              switch (options.domain) {
-                case 'week':
-                  return Math.floor(getWeekDay(d) / self.settings.day.row(d));
-                case 'month':
-                  if (options.colLimit > 0 || options.rowLimit > 0) {
-                    return Math.floor(
-                      (d.getDate() - 1) / self.settings.day.row(d),
-                    );
-                  }
-                  return (
-                    getWeekNumber(d) -
-                    getWeekNumber(new Date(d.getFullYear(), d.getMonth()))
-                  );
-                case 'year':
-                  if (options.colLimit > 0 || options.rowLimit > 0) {
-                    return Math.floor(
-                      (getDayOfYear() - 1) / self.settings.day.row(d),
-                    );
-                  }
-                  return getWeekNumber(d);
-              }
-            },
-            y(d) {
-              let p = getWeekDay(d);
-              if (options.colLimit > 0 || options.rowLimit > 0) {
-                switch (options.domain) {
-                  case 'year':
-                    p = getDayOfYear() - 1;
-                    break;
-                  case 'week':
-                    p = getWeekDay(d);
-                    break;
-                  case 'month':
-                    p = d.getDate() - 1;
-                    break;
-                }
-              }
-              return Math.floor(p % self.settings.day.row(d));
-            },
-          },
-          format: {
-            date: '%A %B %-e, %Y',
-            legend: '%e %b',
-            connector: 'on',
-          },
-          extractUnit(d) {
-            return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-          },
-        },
-        week: {
-          name: 'week',
-          level: 40,
-          maxItemNumber: 54,
-          defaultColumnNumber(d) {
-            d = new Date(d);
-            switch (options.domain) {
-              case 'year':
-                return self.settings.week.maxItemNumber;
-              case 'month':
-                return options.domainDynamicDimension
-                  ? getWeekNumber(
-                      new Date(d.getFullYear(), d.getMonth() + 1, 0),
-                    ) - getWeekNumber(d)
-                  : 5;
-            }
-          },
-          defaultRowNumber: 1,
-          row(d) {
-            return self.#getSubDomainRowNumber(d);
-          },
-          column(d) {
-            return self.#getSubDomainColumnNumber(d);
-          },
-          position: {
-            x(d) {
-              switch (options.domain) {
-                case 'year':
-                  return Math.floor(getWeekNumber(d) / self.settings.week.row(d));
-                case 'month':
-                  return Math.floor(
-                    getMonthWeekNumber(d) / self.settings.week.row(d),
-                  );
-              }
-            },
-            y(d) {
-              return getWeekNumber(d) % self.settings.week.row(d);
-            },
-          },
-          format: {
-            date: '%B Week #%W',
-            legend: '%B Week #%W',
-            connector: 'in',
-          },
-          extractUnit(d) {
-            const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-            // According to ISO-8601, week number computation are based on week starting on Monday
-            let weekDay = dt.getDay();
-            if (weekDay < 0) {
-              weekDay = 6;
-            }
-            dt.setDate(dt.getDate() - weekDay);
-            return dt.getTime();
-          },
-        },
-        month: {
-          name: 'month',
-          level: 50,
-          maxItemNumber: 12,
-          defaultColumnNumber: 12,
-          defaultRowNumber: 1,
-          row() {
-            return self.#getSubDomainRowNumber();
-          },
-          column() {
-            return self.#getSubDomainColumnNumber();
-          },
-          position: {
-            x(d) {
-              return Math.floor(d.getMonth() / self.settings.month.row(d));
-            },
-            y(d) {
-              return d.getMonth() % self.settings.month.row(d);
-            },
-          },
-          format: {
-            date: '%B %Y',
-            legend: '%B',
-            connector: 'in',
-          },
-          extractUnit(d) {
-            return new Date(d.getFullYear(), d.getMonth()).getTime();
-          },
-        },
-        year: {
-          name: 'year',
-          level: 60,
-          row() {
-            return options.rowLimit || 1;
-          },
-          column() {
-            return options.colLimit || 1;
-          },
-          position: {
-            x() {
-              return 1;
-            },
-            y() {
-              return 1;
-            },
-          },
-          format: {
-            date: '%Y',
-            legend: '%Y',
-            connector: 'in',
-          },
-          extractUnit(d) {
-            return new Date(d.getFullYear()).getTime();
-          },
-        },
-      };
-
-      for (const type in self.settings) {
-        if (self.settings.hasOwnProperty(type)) {
-          const d = self.settings[type];
-          self.settings[`x_${type}`] = {
-            name: `x_${type}`,
-            level: d.type,
-            maxItemNumber: d.maxItemNumber,
-            defaultRowNumber: d.defaultRowNumber,
-            defaultColumnNumber: d.defaultColumnNumber,
-            row: d.column,
-            column: d.row,
-            position: {
-              x: d.position.y,
-              y: d.position.x,
-            },
-            format: d.format,
-            extractUnit: d.extractUnit,
-          };
+      let userTemplates = [];
+      if (templates) {
+        if (!Array.isArray(templates)) {
+          userTemplates.push(templates);
+        } else {
+          userTemplates = templates;
         }
       }
+
+      [...DefaultTemplates, ...userTemplates].forEach((f) => {
+        const template = f(this, this.dateHelper, options);
+        this.settings[template.name] = template;
+      });
+
+      Object.keys(this.settings).forEach((type) => {
+        const template = this.settings[type];
+
+        this.settings[`x_${type}`] = {
+          name: `x_${type}`,
+          level: template.type,
+          maxItemNumber: template.maxItemNumber,
+          defaultRowNumber: template.defaultRowNumber,
+          defaultColumnNumber: template.defaultColumnNumber,
+          row: template.column,
+          column: template.row,
+          position: {
+            x: template.position.y,
+            y: template.position.x,
+          },
+          format: template.format,
+          extractUnit: template.extractUnit,
+        };
+      });
     }
   }
 
@@ -18282,7 +18299,7 @@
       // Default settings
       this.options = new Options(this);
 
-      this.domainSkeleton = new DomainSkeleton(this);
+      this.domainTemplate = new DomainTemplate(this);
 
       // Record all the valid domains
       // Each domain value is a timestamp in milliseconds

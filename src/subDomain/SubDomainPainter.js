@@ -97,7 +97,7 @@ export default class subDomainPainter {
   #getCoordinates(axis, d) {
     const { options } = this.calendar.options;
 
-    const index = this.calendar.domainSkeleton
+    const index = this.calendar.domainTemplate
       .at(options.subDomain)
       .position[axis](new Date(d));
 

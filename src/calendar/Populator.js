@@ -2,7 +2,7 @@ import { selectAll } from 'd3-selection';
 
 import { getSubDomainTitle } from '../subDomain';
 import { getHighlightClassName } from '../function';
-import { dateIsLessThan } from '../date';
+import { dateIsLessThan } from '../utils/date';
 
 export default class Populator {
   constructor(calendar) {
@@ -116,7 +116,7 @@ export default class Populator {
         getSubDomainTitle(
           d,
           options,
-          calendar.domainSkeleton.at(options.subDomain).format.connector,
+          calendar.domainTemplate.at(options.subDomain).format.connector,
         ),
       );
 

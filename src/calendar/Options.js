@@ -51,7 +51,7 @@ function getOptimalSubDomain(domain) {
     case 'day':
       return 'hour';
     default:
-      return 'min';
+      return 'minute';
   }
 }
 
@@ -91,7 +91,9 @@ export default class Options {
 
       domain: 'hour',
 
-      subDomain: 'min',
+      subDomain: 'minute',
+
+      domainTemplates: null,
 
       // Number of columns to split the subDomains to
       // If not null, will takes precedence over rowLimit
@@ -367,7 +369,7 @@ export default class Options {
 
     // Fatal errors
     // Stop script execution on error
-    validateDomainType(this.calendar.domainSkeleton, this.options);
+    validateDomainType(this.calendar.domainTemplate, this.options);
     validateSelector(options.itemSelector, false, 'itemSelector');
 
     if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
@@ -471,19 +473,19 @@ export default class Options {
 
     const { options } = this;
 
-    this.calendar.domainSkeleton.compute();
+    this.calendar.domainTemplate.init(options.domainTemplates);
     this.#validate();
 
     options.subDomainDateFormat =
       typeof options.subDomainDateFormat === 'string' ||
       typeof options.subDomainDateFormat === 'function'
         ? options.subDomainDateFormat
-        : this.calendar.domainSkeleton.at(options.subDomain).format.date;
+        : this.calendar.domainTemplate.at(options.subDomain).format.date;
     options.domainLabelFormat =
       typeof options.domainLabelFormat === 'string' ||
       typeof options.domainLabelFormat === 'function'
         ? options.domainLabelFormat
-        : this.calendar.domainSkeleton.at(options.domain).format.legend;
+        : this.calendar.domainTemplate.at(options.domain).format.legend;
     options.subDomainTextFormat =
       (typeof options.subDomainTextFormat === 'string' &&
         options.subDomainTextFormat !== '') ||
