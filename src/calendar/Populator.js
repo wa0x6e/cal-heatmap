@@ -120,7 +120,7 @@ export default class Populator {
         getSubDomainTitle(
           d,
           options,
-          calendar.domainTemplate.at(options.subDomain).format.connector,
+          calendar.subDomainTemplate.at(options.subDomain).format.connector,
         ),
       );
 

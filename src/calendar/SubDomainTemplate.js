@@ -1,7 +1,7 @@
 import DefaultTemplates from './templates';
 import DateHelper from '../utils/DateHelper';
 
-export default class DomainTemplate {
+export default class SubDomainTemplate {
   constructor(calendar) {
     this.settings = {};
     this.calendar = calendar;

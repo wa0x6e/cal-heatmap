@@ -173,7 +173,7 @@ export default class DomainPainter {
   // @param int d Domain start timestamp
   getWidth(d, outer = false) {
     const { options } = this.calendar.options;
-    const columnsCount = this.calendar.domainTemplate
+    const columnsCount = this.calendar.subDomainTemplate
       .at(options.subDomain)
       .column(d);
 
@@ -193,7 +193,9 @@ export default class DomainPainter {
   // Return the height of the domain block, without the domain gutter
   getHeight(d, outer = false) {
     const { options } = this.calendar.options;
-    const rowsCount = this.calendar.domainTemplate.at(options.subDomain).row(d);
+    const rowsCount = this.calendar.subDomainTemplate
+      .at(options.subDomain)
+      .row(d);
 
     let height = (options.cellSize + options.cellPadding) * rowsCount;
 

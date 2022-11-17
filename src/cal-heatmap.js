@@ -11,7 +11,7 @@ import extractSVG from './utils/extractSVG';
 import generateTimeInterval from './utils/timeInterval';
 import { getDatas } from './data';
 
-import DomainTemplate from './calendar/DomainTemplate';
+import SubDomainTemplate from './calendar/SubDomainTemplate';
 import CalendarEvent from './calendar/CalendarEvent';
 
 import { RESET_ALL_ON_UPDATE } from './constant';
@@ -23,7 +23,7 @@ export default class CalHeatMap extends CalendarEvent {
     // Default settings
     this.options = new Options(this);
 
-    this.domainTemplate = new DomainTemplate(this);
+    this.subDomainTemplate = new SubDomainTemplate(this);
 
     // Record all the valid domains
     // Each domain value is a timestamp in milliseconds

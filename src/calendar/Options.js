@@ -93,7 +93,7 @@ export default class Options {
 
       subDomain: 'minute',
 
-      domainTemplates: null,
+      subDomainTemplate: null,
 
       // First day of the week is Monday
       // 0 to start the week on Sunday
@@ -362,7 +362,7 @@ export default class Options {
 
     // Fatal errors
     // Stop script execution on error
-    validateDomainType(this.calendar.domainTemplate, this.options);
+    validateDomainType(this.calendar.subDomainTemplate, this.options);
     validateSelector(options.itemSelector, false, 'itemSelector');
 
     if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
@@ -456,19 +456,19 @@ export default class Options {
 
     const { options } = this;
 
-    this.calendar.domainTemplate.init(options.domainTemplates);
+    this.calendar.subDomainTemplate.init(options.subDomainTemplates);
     this.#validate();
 
     options.subDomainDateFormat =
       typeof options.subDomainDateFormat === 'string' ||
       typeof options.subDomainDateFormat === 'function'
         ? options.subDomainDateFormat
-        : this.calendar.domainTemplate.at(options.subDomain).format.date;
+        : this.calendar.subDomainTemplate.at(options.subDomain).format.date;
     options.domainLabelFormat =
       typeof options.domainLabelFormat === 'string' ||
       typeof options.domainLabelFormat === 'function'
         ? options.domainLabelFormat
-        : this.calendar.domainTemplate.at(options.domain).format.legend;
+        : this.calendar.subDomainTemplate.at(options.domain).format.legend;
     options.subDomainTextFormat =
       (typeof options.subDomainTextFormat === 'string' &&
         options.subDomainTextFormat !== '') ||

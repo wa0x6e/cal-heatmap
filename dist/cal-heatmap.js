@@ -10547,7 +10547,7 @@
       const subDomainIndex = newData
         .get(domainKey)
         .indexOf(
-          calendar.domainTemplate.at(options.subDomain).extractUnit(timestamp),
+          calendar.subDomainTemplate.at(options.subDomain).extractUnit(timestamp),
         );
 
       if (updateMode === RESET_SINGLE_ON_UPDATE) {
@@ -10867,7 +10867,9 @@
         this.calendar.domainCollection.set(
           newDomains[i],
           generateSubDomain(newDomains[i], options).map((d) => ({
-            t: this.calendar.domainTemplate.at(options.subDomain).extractUnit(d),
+            t: this.calendar.subDomainTemplate
+              .at(options.subDomain)
+              .extractUnit(d),
             v: null,
           })),
         );
@@ -13992,7 +13994,7 @@
     // @param int d Domain start timestamp
     getWidth(d, outer = false) {
       const { options } = this.calendar.options;
-      const columnsCount = this.calendar.domainTemplate
+      const columnsCount = this.calendar.subDomainTemplate
         .at(options.subDomain)
         .column(d);
 
@@ -14012,7 +14014,9 @@
     // Return the height of the domain block, without the domain gutter
     getHeight(d, outer = false) {
       const { options } = this.calendar.options;
-      const rowsCount = this.calendar.domainTemplate.at(options.subDomain).row(d);
+      const rowsCount = this.calendar.subDomainTemplate
+        .at(options.subDomain)
+        .row(d);
 
       let height = (options.cellSize + options.cellPadding) * rowsCount;
 
@@ -14425,7 +14429,7 @@
     #getCoordinates(axis, d) {
       const { options } = this.calendar.options;
 
-      const index = this.calendar.domainTemplate
+      const index = this.calendar.subDomainTemplate
         .at(options.subDomain)
         .position[axis](d);
 
@@ -15406,7 +15410,7 @@
           getSubDomainTitle(
             d,
             options,
-            calendar.domainTemplate.at(options.subDomain).format.connector,
+            calendar.subDomainTemplate.at(options.subDomain).format.connector,
           ),
         );
 
@@ -15454,20 +15458,22 @@
    * @throw {Error} when domain or subdomain are not valid
    * @return {bool} True if domain and subdomain are valid and compatible
    */
-  function validateDomainType(domainTemplate, { domain, subDomain }) {
+  function validateDomainType(subDomainTemplate, { domain, subDomain }) {
     if (
-      !domainTemplate.has(domain) ||
+      !subDomainTemplate.has(domain) ||
       domain === 'min' ||
       domain.substring(0, 2) === 'x_'
     ) {
       throw new Error(`The domain '${domain}' is not valid`);
     }
 
-    if (!domainTemplate.has(subDomain) || subDomain === 'year') {
+    if (!subDomainTemplate.has(subDomain) || subDomain === 'year') {
       throw new Error(`The subDomain '${subDomain}' is not valid`);
     }
 
-    if (domainTemplate.at(domain).level <= domainTemplate.at(subDomain).level) {
+    if (
+      subDomainTemplate.at(domain).level <= subDomainTemplate.at(subDomain).level
+    ) {
       throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
     }
 
@@ -15561,7 +15567,7 @@
 
         subDomain: 'minute',
 
-        domainTemplates: null,
+        subDomainTemplate: null,
 
         // First day of the week is Monday
         // 0 to start the week on Sunday
@@ -15830,7 +15836,7 @@
 
       // Fatal errors
       // Stop script execution on error
-      validateDomainType(this.calendar.domainTemplate, this.options);
+      validateDomainType(this.calendar.subDomainTemplate, this.options);
       validateSelector(options.itemSelector, false, 'itemSelector');
 
       if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
@@ -15924,19 +15930,19 @@
 
       const { options } = this;
 
-      this.calendar.domainTemplate.init(options.domainTemplates);
+      this.calendar.subDomainTemplate.init(options.subDomainTemplates);
       this.#validate();
 
       options.subDomainDateFormat =
         typeof options.subDomainDateFormat === 'string' ||
         typeof options.subDomainDateFormat === 'function'
           ? options.subDomainDateFormat
-          : this.calendar.domainTemplate.at(options.subDomain).format.date;
+          : this.calendar.subDomainTemplate.at(options.subDomain).format.date;
       options.domainLabelFormat =
         typeof options.domainLabelFormat === 'string' ||
         typeof options.domainLabelFormat === 'function'
           ? options.domainLabelFormat
-          : this.calendar.domainTemplate.at(options.domain).format.legend;
+          : this.calendar.subDomainTemplate.at(options.domain).format.legend;
       options.subDomainTextFormat =
         (typeof options.subDomainTextFormat === 'string' &&
           options.subDomainTextFormat !== '') ||
@@ -16907,7 +16913,7 @@
     yearTemplate,
   ];
 
-  class DomainTemplate {
+  class SubDomainTemplate {
     constructor(calendar) {
       this.settings = {};
       this.calendar = calendar;
@@ -17106,7 +17112,7 @@
       // Default settings
       this.options = new Options(this);
 
-      this.domainTemplate = new DomainTemplate(this);
+      this.subDomainTemplate = new SubDomainTemplate(this);
 
       // Record all the valid domains
       // Each domain value is a timestamp in milliseconds

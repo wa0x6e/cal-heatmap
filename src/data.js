@@ -98,7 +98,7 @@ function parseDatas(
     const subDomainIndex = newData
       .get(domainKey)
       .indexOf(
-        calendar.domainTemplate.at(options.subDomain).extractUnit(timestamp),
+        calendar.subDomainTemplate.at(options.subDomain).extractUnit(timestamp),
       );
 
     if (updateMode === RESET_SINGLE_ON_UPDATE) {

@@ -95,7 +95,9 @@ export default class Navigator {
       this.calendar.domainCollection.set(
         newDomains[i],
         generateSubDomain(newDomains[i], options).map((d) => ({
-          t: this.calendar.domainTemplate.at(options.subDomain).extractUnit(d),
+          t: this.calendar.subDomainTemplate
+            .at(options.subDomain)
+            .extractUnit(d),
           v: null,
         })),
       );
