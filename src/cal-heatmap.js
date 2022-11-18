@@ -49,8 +49,8 @@ export default class CalHeatMap extends CalendarEvent {
     const keys = this.getDomainKeys();
 
     return {
-      min: keys.shift(),
-      max: keys.pop(),
+      min: keys[0],
+      max: keys[keys.length - 1],
     };
   }
 
