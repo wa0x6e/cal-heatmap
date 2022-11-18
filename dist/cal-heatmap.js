@@ -13627,21 +13627,22 @@
   /**
    * Return a classname if the specified date should be highlighted
    *
-   * @param  timestamp date Date of the current subDomain
+   * @param  int timestamp Unix timestamp of the current subDomain
    * @return String the highlight class
    */
-  function getHighlightClassName(d, options) {
-    if (options.highlight.length > 0) {
-      options.highlight.forEach((i) => {
-        if (datesFromSameInterval(options.highlight[i], d, options.subDomain)) {
-          return datesFromSameInterval(options.highlight[i])
-            ? ' highlight-now'
-            : ' highlight';
+  function getHighlightClassName(timestamp, options) {
+    const { highlight, subDomain } = options;
+    let classname = '';
+
+    if (highlight.length > 0) {
+      highlight.forEach((d) => {
+        if (datesFromSameInterval(+d, timestamp, subDomain)) {
+          classname = datesFromSameInterval(+d) ? ' highlight-now' : ' highlight';
         }
       });
     }
 
-    return '';
+    return classname;
   }
 
   /**
@@ -13875,12 +13876,14 @@
   class subDomainPainter {
     constructor(calendar) {
       this.calendar = calendar;
+      this.root = null;
     }
 
     paint(root) {
       const { options } = this.calendar.options;
+      this.root = root || this.root;
 
-      const subDomainSvgGroup = root
+      const subDomainSvgGroup = this.root
         .append('svg')
         .attr('x', () => {
           let pos = options.domainMargin[LEFT];
@@ -14823,12 +14826,8 @@
      * @param  {[type]} dates [description]
      * @return {[type]}       [description]
      */
-    highlight(dates) {
-      if (dates.length > 0) {
-        this.fill();
-        return true;
-      }
-      return false;
+    highlight() {
+      this.subDomainPainter.paint();
     }
 
     removeLegend() {
@@ -17239,8 +17238,13 @@
      * @param  array Array of dates to highlight
      * @return bool True if dates were highlighted
      */
-    highlight(args) {
-      return this.calendarPainter.highlight(args);
+    highlight(dates) {
+      if (
+        this.options.set('highlight', dates) &&
+        this.options.options.highlight.length > 0
+      ) {
+        this.calendarPainter.highlight();
+      }
     }
 
     /**

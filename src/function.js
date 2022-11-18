@@ -31,21 +31,22 @@ export function formatStringWithObject(formatted, args) {
 /**
  * Return a classname if the specified date should be highlighted
  *
- * @param  timestamp date Date of the current subDomain
+ * @param  int timestamp Unix timestamp of the current subDomain
  * @return String the highlight class
  */
-export function getHighlightClassName(d, options) {
-  if (options.highlight.length > 0) {
-    options.highlight.forEach((i) => {
-      if (datesFromSameInterval(options.highlight[i], d, options.subDomain)) {
-        return datesFromSameInterval(options.highlight[i])
-          ? ' highlight-now'
-          : ' highlight';
+export function getHighlightClassName(timestamp, options) {
+  const { highlight, subDomain } = options;
+  let classname = '';
+
+  if (highlight.length > 0) {
+    highlight.forEach((d) => {
+      if (datesFromSameInterval(+d, timestamp, subDomain)) {
+        classname = datesFromSameInterval(+d) ? ' highlight-now' : ' highlight';
       }
     });
   }
 
-  return '';
+  return classname;
 }
 
 /**

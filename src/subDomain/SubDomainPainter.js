@@ -5,12 +5,14 @@ import { TOP, LEFT } from '../constant';
 export default class subDomainPainter {
   constructor(calendar) {
     this.calendar = calendar;
+    this.root = null;
   }
 
   paint(root) {
     const { options } = this.calendar.options;
+    this.root = root || this.root;
 
-    const subDomainSvgGroup = root
+    const subDomainSvgGroup = this.root
       .append('svg')
       .attr('x', () => {
         let pos = options.domainMargin[LEFT];

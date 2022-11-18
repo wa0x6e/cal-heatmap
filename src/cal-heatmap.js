@@ -232,8 +232,13 @@ export default class CalHeatMap extends CalendarEvent {
    * @param  array Array of dates to highlight
    * @return bool True if dates were highlighted
    */
-  highlight(args) {
-    return this.calendarPainter.highlight(args);
+  highlight(dates) {
+    if (
+      this.options.set('highlight', dates) &&
+      this.options.options.highlight.length > 0
+    ) {
+      this.calendarPainter.highlight();
+    }
   }
 
   /**

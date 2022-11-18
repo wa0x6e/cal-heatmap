@@ -187,12 +187,8 @@ export default class CalendarPainter {
    * @param  {[type]} dates [description]
    * @return {[type]}       [description]
    */
-  highlight(dates) {
-    if (dates.length > 0) {
-      this.fill();
-      return true;
-    }
-    return false;
+  highlight() {
+    this.subDomainPainter.paint();
   }
 
   removeLegend() {
