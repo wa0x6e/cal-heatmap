@@ -41,6 +41,13 @@ export default class DomainPainter {
         if (options.verticalOrientation) {
           return 0;
         }
+
+        if (navigationDir === false) {
+          const domains = this.calendar.getDomainKeys();
+
+          return domains.indexOf(d) * this.getWidth(d, true);
+        }
+
         return navigationDir === NAVIGATE_LEFT
           ? -this.getWidth(d, true)
           : this.dimensions.width;
@@ -113,12 +120,12 @@ export default class DomainPainter {
         }
         return 0;
       })
-      // .attr('width', (d) => {
-      //   this.#updateDimensions('width', -this.getWidth(d, true));
-      // })
-      // .attr('height', (d) => {
-      //   this.#updateDimensions('height', -this.getHeight(d, true));
-      // })
+      .attr('width', (d) => {
+        this.#updateDimensions('width', -this.getWidth(d, true));
+      })
+      .attr('height', (d) => {
+        this.#updateDimensions('height', -this.getHeight(d, true));
+      })
       .remove();
 
     return svg;

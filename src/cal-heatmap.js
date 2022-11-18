@@ -36,14 +36,6 @@ export default class CalHeatMap extends CalendarEvent {
     this.colorizer = new Colorizer(this);
   }
 
-  #initDomainCollection() {
-    const { options } = this.options;
-
-    this.navigator.loadNewDomains(
-      generateTimeInterval(options.domain, options.start, options.range),
-    );
-  }
-
   /**
    * Return the list of the calendar's domain timestamp
    *
@@ -72,19 +64,19 @@ export default class CalHeatMap extends CalendarEvent {
     this.options.init(settings);
 
     this.calendarPainter.setup();
-    this.#initDomainCollection();
-
     this.colorizer.build();
 
-    if (options.paintOnLoad) {
-      this.calendarPainter.paint();
-      this.afterLoad();
-      // Fill the graph with some datas
-      if (options.loadOnInit) {
-        this.update();
-      } else {
-        this.onComplete();
-      }
+    this.navigator.loadNewDomains(
+      generateTimeInterval(options.domain, options.start, options.range),
+    );
+
+    this.calendarPainter.paint();
+    this.afterLoad();
+    // Fill the graph with some datas
+    if (options.loadOnInit) {
+      this.update();
+    } else {
+      this.onComplete();
     }
   }
 
@@ -92,22 +84,20 @@ export default class CalHeatMap extends CalendarEvent {
    * Shift the calendar by n domains forward
    */
   next(n = 1) {
-    if (this.navigator.loadNextDomain(n)) {
-      this.calendarPainter.paint();
-      // @TODO: Update only newly inserted domains
-      this.update();
-    }
+    const loadDirection = this.navigator.loadNextDomain(n);
+    this.calendarPainter.paint(loadDirection);
+    // @TODO: Update only newly inserted domains
+    this.update();
   }
 
   /**
    * Shift the calendar by n domains backward
    */
   previous(n = 1) {
-    if (this.navigator.loadPreviousDomain(n)) {
-      this.calendarPainter.paint();
-      // @TODO: Update only newly inserted domains
-      this.update();
-    }
+    const loadDirection = this.navigator.loadPreviousDomain(n);
+    this.calendarPainter.paint(loadDirection);
+    // @TODO: Update only newly inserted domains
+    this.update();
   }
 
   /**
@@ -122,7 +112,10 @@ export default class CalHeatMap extends CalendarEvent {
    * @param bool True of the calendar was scrolled
    */
   jumpTo(date, reset = false) {
-    return this.navigator.jumpTo(date, reset);
+    const loadDirection = this.navigator.jumpTo(date, reset);
+    this.calendarPainter.paint(loadDirection);
+    // @TODO: Update only newly inserted domains
+    this.update();
   }
 
   /**

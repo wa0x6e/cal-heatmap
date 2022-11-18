@@ -105,8 +105,6 @@ export default class Navigator {
 
     const domainsBound = this.calendar.getDomainBoundKeys();
 
-    this.calendar.calendarPainter.paint(direction);
-
     this.#checkDomainsBoundaryReached(
       domainsBound.min,
       domainsBound.max,
@@ -120,7 +118,7 @@ export default class Navigator {
       this.calendar.afterLoadNextDomain(domainsBound.max);
     }
 
-    return true;
+    return direction;
   }
 
   #checkDomainsBoundaryReached(lowerBound, upperBound, min, max) {

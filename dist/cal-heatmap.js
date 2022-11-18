@@ -10464,8 +10464,6 @@
 
       const domainsBound = this.calendar.getDomainBoundKeys();
 
-      this.calendar.calendarPainter.paint(direction);
-
       this.#checkDomainsBoundaryReached(
         domainsBound.min,
         domainsBound.max,
@@ -10479,7 +10477,7 @@
         this.calendar.afterLoadNextDomain(domainsBound.max);
       }
 
-      return true;
+      return direction;
     }
 
     #checkDomainsBoundaryReached(lowerBound, upperBound, min, max) {
@@ -13368,6 +13366,13 @@
           if (options.verticalOrientation) {
             return 0;
           }
+
+          if (navigationDir === false) {
+            const domains = this.calendar.getDomainKeys();
+
+            return domains.indexOf(d) * this.getWidth(d, true);
+          }
+
           return navigationDir === NAVIGATE_LEFT
             ? -this.getWidth(d, true)
             : this.dimensions.width;
@@ -13440,12 +13445,12 @@
           }
           return 0;
         })
-        // .attr('width', (d) => {
-        //   this.#updateDimensions('width', -this.getWidth(d, true));
-        // })
-        // .attr('height', (d) => {
-        //   this.#updateDimensions('height', -this.getHeight(d, true));
-        // })
+        .attr('width', (d) => {
+          this.#updateDimensions('width', -this.getWidth(d, true));
+        })
+        .attr('height', (d) => {
+          this.#updateDimensions('height', -this.getHeight(d, true));
+        })
         .remove();
 
       return svg;
@@ -15047,10 +15052,6 @@
         // Accept any string value accepted by document.querySelector or CSS3
         // or an Element object
         itemSelector: '#cal-heatmap',
-
-        // Whether to paint the calendar on init()
-        // Used by testsuite to reduce testing time
-        paintOnLoad: true,
 
         // ================================================
         // DOMAIN
@@ -17009,14 +17010,6 @@
       this.colorizer = new Colorizer(this);
     }
 
-    #initDomainCollection() {
-      const { options } = this.options;
-
-      this.navigator.loadNewDomains(
-        generateTimeInterval(options.domain, options.start, options.range),
-      );
-    }
-
     /**
      * Return the list of the calendar's domain timestamp
      *
@@ -17045,19 +17038,19 @@
       this.options.init(settings);
 
       this.calendarPainter.setup();
-      this.#initDomainCollection();
-
       this.colorizer.build();
 
-      if (options.paintOnLoad) {
-        this.calendarPainter.paint();
-        this.afterLoad();
-        // Fill the graph with some datas
-        if (options.loadOnInit) {
-          this.update();
-        } else {
-          this.onComplete();
-        }
+      this.navigator.loadNewDomains(
+        generateTimeInterval(options.domain, options.start, options.range),
+      );
+
+      this.calendarPainter.paint();
+      this.afterLoad();
+      // Fill the graph with some datas
+      if (options.loadOnInit) {
+        this.update();
+      } else {
+        this.onComplete();
       }
     }
 
@@ -17065,22 +17058,20 @@
      * Shift the calendar by n domains forward
      */
     next(n = 1) {
-      if (this.navigator.loadNextDomain(n)) {
-        this.calendarPainter.paint();
-        // @TODO: Update only newly inserted domains
-        this.update();
-      }
+      const loadDirection = this.navigator.loadNextDomain(n);
+      this.calendarPainter.paint(loadDirection);
+      // @TODO: Update only newly inserted domains
+      this.update();
     }
 
     /**
      * Shift the calendar by n domains backward
      */
     previous(n = 1) {
-      if (this.navigator.loadPreviousDomain(n)) {
-        this.calendarPainter.paint();
-        // @TODO: Update only newly inserted domains
-        this.update();
-      }
+      const loadDirection = this.navigator.loadPreviousDomain(n);
+      this.calendarPainter.paint(loadDirection);
+      // @TODO: Update only newly inserted domains
+      this.update();
     }
 
     /**
@@ -17095,7 +17086,10 @@
      * @param bool True of the calendar was scrolled
      */
     jumpTo(date, reset = false) {
-      return this.navigator.jumpTo(date, reset);
+      const loadDirection = this.navigator.jumpTo(date, reset);
+      this.calendarPainter.paint(loadDirection);
+      // @TODO: Update only newly inserted domains
+      this.update();
     }
 
     /**

@@ -65,10 +65,6 @@ export default class Options {
       // or an Element object
       itemSelector: '#cal-heatmap',
 
-      // Whether to paint the calendar on init()
-      // Used by testsuite to reduce testing time
-      paintOnLoad: true,
-
       // ================================================
       // DOMAIN
       // ================================================
