@@ -14921,7 +14921,7 @@
         htmlClass.push('hover_cursor');
       }
 
-      return htmlClass.join(' ');
+      return htmlClass.join(' ').trim();
     }
 
     #formatSubDomainText(element) {
