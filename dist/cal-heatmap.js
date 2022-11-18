@@ -10199,8 +10199,14 @@
   const moment$1 = MomentRange.extendMoment(moment$2);
   const tz$1 = moment$1.tz.defaultZone;
 
-  function getTimeInterval(interval, date) {
-    return moment$1.tz(date, tz$1).startOf(interval);
+  function getTimeInterval(interval, date, asMoment = false) {
+    const newDate = moment$1.tz(date, tz$1).startOf(interval);
+
+    if (asMoment) {
+      return newDate;
+    }
+
+    return newDate.valueOf();
   }
 
   // @TODO Handle week start day

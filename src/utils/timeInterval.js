@@ -4,8 +4,14 @@ import MomentRange from 'moment-range';
 const moment = MomentRange.extendMoment(Moment);
 const tz = moment.tz.defaultZone;
 
-export function getTimeInterval(interval, date) {
-  return moment.tz(date, tz).startOf(interval);
+export function getTimeInterval(interval, date, asMoment = false) {
+  const newDate = moment.tz(date, tz).startOf(interval);
+
+  if (asMoment) {
+    return newDate;
+  }
+
+  return newDate.valueOf();
 }
 
 // @TODO Handle week start day
