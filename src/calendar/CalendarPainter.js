@@ -75,7 +75,7 @@ export default class CalendarPainter {
     this.subDomainPainter.paint(domainSvg);
     this.domainLabelPainter.paint(domainSvg);
     this.domainSecondaryLabelPainter.paint(domainSvg);
-    this.legendPainter.paint(this.root);
+    this.legendPainter.paint();
 
     this.resize();
 
@@ -196,10 +196,10 @@ export default class CalendarPainter {
   }
 
   removeLegend() {
-    return this.legendPainter.destroy(this.root) && this.resize();
+    return this.legendPainter.destroy() && this.resize();
   }
 
   showLegend() {
-    return this.legendPainter.paint(this.root) && this.resize();
+    return this.legendPainter.paint() && this.resize();
   }
 }

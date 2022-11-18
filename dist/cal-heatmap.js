@@ -13350,7 +13350,7 @@
     }
 
     paint(navigationDir, calendarNode) {
-      this.#assignData(calendarNode);
+      this.root = this.#assignData(calendarNode);
 
       const domainNode = this.#paintEnteringDomain(navigationDir);
       this.#paintTransitioningDomain(navigationDir);
@@ -13365,7 +13365,6 @@
       const svg = this.root
         .enter()
         .append('svg')
-
         .attr('x', (d) => {
           if (options.verticalOrientation) {
             return 0;
@@ -13526,7 +13525,7 @@
     }
 
     #assignData(calendarNode) {
-      this.root = calendarNode
+      return calendarNode
         .select('.graph')
         .selectAll('.graph-domain')
         .data(
@@ -14439,14 +14438,6 @@
       this.shown = calendar.options.options.displayLegend;
     }
 
-    #legendCellLayout(selection) {
-      const { legendCellSize, legendCellPadding } = this.calendar.options.options;
-      selection
-        .attr('width', legendCellSize)
-        .attr('height', legendCellSize)
-        .attr('x', (d, i) => i * (legendCellSize + legendCellPadding));
-    }
-
     #getX(width) {
       const { options } = this.calendar.options;
 
@@ -14468,15 +14459,14 @@
     }
 
     #getY() {
-      const { options } = this.calendar.options;
+      const { legendVerticalPosition, legendMargin } =
+        this.calendar.options.options;
+      let pos = legendMargin[TOP];
 
-      if (options.legendVerticalPosition === 'bottom') {
-        return (
-          this.calendar.calendarPainter.domainPainter.dimensions.height +
-          options.legendMargin[TOP]
-        );
+      if (legendVerticalPosition === 'bottom') {
+        pos += this.calendar.calendarPainter.domainPainter.dimensions.height;
       }
-      return options.legendMargin[TOP];
+      return pos;
     }
 
     #computeDimensions() {
@@ -14490,91 +14480,41 @@
       };
     }
 
-    destroy(root) {
+    destroy() {
       if (!this.shown) {
         return false;
       }
 
       this.shown = false;
-      root.select(DEFAULT_CLASSNAME).remove();
+      this.calendar.calendarPainter.root.select(DEFAULT_CLASSNAME).remove();
 
       return true;
     }
 
-    paint(root) {
-      const { calendar } = this;
-      const { options } = calendar.options;
+    paint() {
+      const { options } = this.calendar.options;
       const width =
-        calendar.calendarPainter.getWidth() -
+        this.calendar.calendarPainter.getWidth() -
         options.domainGutter -
         options.cellPadding;
-      let legend = calendar.calendarPainter.root;
-      let legendItem;
+
       this.shown = true;
 
       this.#computeDimensions();
 
-      const legendItems = options.legend.slice(0);
-      legendItems.push(legendItems[legendItems.length - 1] + 1);
-
-      const legendElement = root.select(DEFAULT_CLASSNAME);
-      if (!legendElement.empty()) {
-        legend = legendElement;
-        legendItem = legend.select('g').selectAll('rect').data(legendItems);
-      } else {
-        // Creating the new legend DOM if it doesn't already exist
-        legend =
-          options.legendVerticalPosition === 'top'
-            ? legend.insert('svg', '.graph')
-            : legend.append('svg');
-
-        legend.attr('x', this.#getX(width)).attr('y', this.#getY());
-
-        legendItem = legend
-          .attr('class', 'graph-legend')
-          .attr('height', this.getHeight())
-          .attr('width', this.getWidth())
-          .append('g')
-          .selectAll()
-          .data(legendItems);
+      let legendNode =
+        this.calendar.calendarPainter.root.select(DEFAULT_CLASSNAME);
+      if (legendNode.empty()) {
+        legendNode = this.calendar.calendarPainter.root
+          .append('svg')
+          .attr('class', DEFAULT_CLASSNAME.slice(1));
       }
 
-      legendItem
-        .enter()
-        .append('rect')
-        .call((s) => this.#legendCellLayout(s))
-        .attr('class', (d) => this.calendar.colorizer.getClassName(d))
-        .call((selection) => {
-          selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
-        })
-        .append('title');
-
-      legendItem.exit().transition().duration(options.animationDuration).remove();
-
-      legendItem
-        .transition()
-        .delay((d, i) => (options.animationDuration * i) / 10)
-        .call((s) => this.#legendCellLayout(s))
-        .call((element) => {
-          element.attr('fill', (d, i) => {
-            if (this.calendar.colorizer.scale === null) {
-              return '';
-            }
-
-            if (i === 0) {
-              return this.calendar.colorizer.scale(d - 1);
-            }
-            return this.calendar.colorizer.scale(options.legend[i - 1]);
-          });
-
-          element.attr('class', (d) => this.calendar.colorizer.getClassName(d));
-        });
-
-      legendItem
-        .select('title')
-        .text((d, i) => this.#getLegendTitle(d, i, legendItems));
-
-      legend
+      legendNode
+        .attr('x', this.#getX(width))
+        .attr('y', this.#getY())
+        .attr('width', this.getWidth())
+        .attr('height', this.getHeight())
         .transition()
         .duration(options.animationDuration)
         .attr('x', this.#getX(width))
@@ -14582,7 +14522,7 @@
         .attr('width', this.getWidth())
         .attr('height', this.getHeight());
 
-      legend
+      legendNode
         .select('g')
         .transition()
         .duration(options.animationDuration)
@@ -14592,10 +14532,64 @@
             options.legendCellSize / 2
           })`;
           }
-          return '';
+          return null;
         });
 
+      this.#populate(legendNode);
+
       return true;
+    }
+
+    #populate(legendNode) {
+      const { options } = this.calendar.options;
+
+      const items = options.legend.slice(0);
+      items.push(items[items.length - 1] + 1);
+
+      const legendItemsNode = legendNode.append('g').selectAll().data(items);
+
+      legendItemsNode
+        .enter()
+        .append('rect')
+        .attr('width', options.legendCellSize)
+        .attr('height', options.legendCellSize)
+        .attr(
+          'x',
+          (d, i) => i * (options.legendCellSize + options.legendCellPadding),
+        )
+        .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+        .attr('fill', (d, i) => {
+          if (this.calendar.colorizer.scale === null) {
+            return this.calendar.colorizer.getCustomColor('base');
+          }
+
+          if (i === 0) {
+            return this.calendar.colorizer.scale(d - 1);
+          }
+          return this.calendar.colorizer.scale(options.legend[i - 1]);
+        })
+        .append('title')
+        .text((d, i) => this.#getLegendTitle(d, i, items));
+
+      legendItemsNode
+        .exit()
+        .transition()
+        .duration(options.animationDuration)
+        .remove();
+
+      legendItemsNode
+        .transition()
+        .attr('fill', (d, i) => {
+          if (this.calendar.colorizer.scale === null) {
+            return;
+          }
+
+          if (i === 0) {
+            return this.calendar.colorizer.scale(d - 1);
+          }
+          return this.calendar.colorizer.scale(options.legend[i - 1]);
+        })
+        .attr('class', (d) => this.calendar.colorizer.getClassName(d));
     }
 
     #getLegendTitle(d, i, legendItems) {
@@ -14717,7 +14711,7 @@
       this.subDomainPainter.paint(domainSvg);
       this.domainLabelPainter.paint(domainSvg);
       this.domainSecondaryLabelPainter.paint(domainSvg);
-      this.legendPainter.paint(this.root);
+      this.legendPainter.paint();
 
       this.resize();
 
@@ -14838,11 +14832,11 @@
     }
 
     removeLegend() {
-      return this.legendPainter.destroy(this.root) && this.resize();
+      return this.legendPainter.destroy() && this.resize();
     }
 
     showLegend() {
-      return this.legendPainter.paint(this.root) && this.resize();
+      return this.legendPainter.paint() && this.resize();
     }
   }
 
@@ -17224,7 +17218,7 @@
      * @return bool False if the legend was already displayed
      */
     showLegend() {
-      if (this.options.set('displayLegend', true)) {
+      if (!this.options.set('displayLegend', true)) {
         return false;
       }
 

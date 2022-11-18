@@ -212,7 +212,7 @@ export default class CalHeatMap extends CalendarEvent {
    * @return bool False if the legend was already displayed
    */
   showLegend() {
-    if (this.options.set('displayLegend', true)) {
+    if (!this.options.set('displayLegend', true)) {
       return false;
     }
 

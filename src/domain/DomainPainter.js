@@ -19,7 +19,7 @@ export default class DomainPainter {
   }
 
   paint(navigationDir, calendarNode) {
-    this.#assignData(calendarNode);
+    this.root = this.#assignData(calendarNode);
 
     const domainNode = this.#paintEnteringDomain(navigationDir);
     this.#paintTransitioningDomain(navigationDir);
@@ -34,7 +34,6 @@ export default class DomainPainter {
     const svg = this.root
       .enter()
       .append('svg')
-
       .attr('x', (d) => {
         if (options.verticalOrientation) {
           return 0;
@@ -196,7 +195,7 @@ export default class DomainPainter {
   }
 
   #assignData(calendarNode) {
-    this.root = calendarNode
+    return calendarNode
       .select('.graph')
       .selectAll('.graph-domain')
       .data(
