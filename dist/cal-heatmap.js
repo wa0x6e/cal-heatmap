@@ -16612,9 +16612,10 @@
         case 'week':
           return (TOTAL_ITEMS / ROWS_COUNT) * 7;
         case 'month':
-          return (TOTAL_ITEMS / ROWS_COUNT) * domainDynamicDimension
-            ? dateHelper.moment(d).daysInMonth()
-            : 31;
+          return (
+            (TOTAL_ITEMS / ROWS_COUNT) *
+            (domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31)
+          );
         case 'day':
         default:
           return TOTAL_ITEMS / ROWS_COUNT;
