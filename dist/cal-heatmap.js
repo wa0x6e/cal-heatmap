@@ -17149,14 +17149,18 @@
     ) {
       const { options } = this.options;
       const domainsBound = this.getDomainBoundKeys();
-      const lastSubDomain = this.domainCollection.get(domainsBound.max);
+      const endTimestamp = generateTimeInterval(
+        options.domain,
+        domainsBound.max,
+        1,
+      ).slice(1);
 
       getDatas(
         this,
         options,
         dataSource,
         domainsBound.min,
-        lastSubDomain[lastSubDomain.length - 1].t,
+        endTimestamp,
         () => {
           this.populator.populate();
           this.afterUpdate();
