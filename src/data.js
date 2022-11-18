@@ -1,6 +1,6 @@
 import { json, csv, dsv, text } from 'd3-fetch';
 
-import generateTimeInterval from './utils/timeInterval';
+import { getTimeInterval } from './utils/timeInterval';
 import DateHelper from './utils/DateHelper';
 
 import {
@@ -66,20 +66,17 @@ function parseDatas(
 
   const newData = new Map();
 
-  const extractTime = (d) => d.t;
-
-  Object.keys(data).forEach((d) => {
-    if (Number.isNaN(d)) {
+  Object.keys(data).forEach((date) => {
+    if (Number.isNaN(date)) {
       return;
     }
 
-    const timestamp = d * 1000;
+    const timestamp = date * 1000;
 
-    const domainKey = generateTimeInterval(
+    const domainKey = getTimeInterval(
       calendar.options.options.domain,
       timestamp,
-      1,
-    )[0];
+    );
 
     // Skip if data is not relevant to current domain
     if (
@@ -92,7 +89,10 @@ function parseDatas(
     const subDomainsData = calendar.domainCollection.get(domainKey);
 
     if (!newData.has(domainKey)) {
-      newData.set(domainKey, subDomainsData.map(extractTime));
+      newData.set(
+        domainKey,
+        subDomainsData.map((d) => d.t),
+      );
     }
 
     const subDomainIndex = newData
@@ -102,11 +102,11 @@ function parseDatas(
       );
 
     if (updateMode === RESET_SINGLE_ON_UPDATE) {
-      subDomainsData[subDomainIndex].v = data[d];
+      subDomainsData[subDomainIndex].v = data[date];
     } else if (!Number.isNaN(subDomainsData[subDomainIndex].v)) {
-      subDomainsData[subDomainIndex].v += data[d];
+      subDomainsData[subDomainIndex].v += data[date];
     } else {
-      subDomainsData[subDomainIndex].v = data[d];
+      subDomainsData[subDomainIndex].v = data[date];
     }
   });
 }

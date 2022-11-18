@@ -1,15 +1,19 @@
 import Moment from 'moment-timezone';
 import MomentRange from 'moment-range';
 
+const moment = MomentRange.extendMoment(Moment);
+const tz = moment.tz.defaultZone;
+
+export function getTimeInterval(interval, date) {
+  return moment.tz(date, tz).startOf(interval);
+}
+
 // @TODO Handle week start day
 // see: https://github.com/rotaready/moment-range/pull/183
 function generate(interval, date, range) {
-  const moment = MomentRange.extendMoment(Moment);
-  const tz = moment.tz.defaultZone;
   let dateRange;
 
-  let start = moment.tz(date, tz);
-  start = start.startOf(interval);
+  const start = getTimeInterval(interval, date);
 
   if (typeof range === 'number') {
     dateRange = moment.rangeFromInterval(interval, range - 1, start);
@@ -29,6 +33,6 @@ function generate(interval, date, range) {
  * @param  int|Date range Number of dates to get, or a stop date
  * @return Array of dates
  */
-export default function generateTimeInterval(domain, date, range) {
-  return generate(domain, date, range);
+export function generateTimeInterval(interval, date, range) {
+  return generate(interval, date, range);
 }

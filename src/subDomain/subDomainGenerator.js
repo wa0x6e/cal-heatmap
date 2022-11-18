@@ -1,5 +1,5 @@
 import DateHelper from '../utils/DateHelper';
-import generateTimeInterval from '../utils/timeInterval';
+import { generateTimeInterval } from '../utils/timeInterval';
 
 /**
  * @return int

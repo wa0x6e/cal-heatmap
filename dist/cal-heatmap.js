@@ -2941,12 +2941,12 @@
   	throw new Error('Could not dynamically require "' + path + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
   }
 
-  var moment$2 = {exports: {}};
+  var moment$3 = {exports: {}};
 
   var hasRequiredMoment;
 
   function requireMoment () {
-  	if (hasRequiredMoment) return moment$2.exports;
+  	if (hasRequiredMoment) return moment$3.exports;
   	hasRequiredMoment = 1;
   	(function (module, exports) {
   (function (global, factory) {
@@ -8625,8 +8625,8 @@
   		    return hooks;
 
   		})));
-  } (moment$2));
-  	return moment$2.exports;
+  } (moment$3));
+  	return moment$3.exports;
   }
 
   (function (module) {
@@ -10185,7 +10185,7 @@
   	moment.tz.load(require$$1);
   } (momentTimezone$1));
 
-  var moment$1 = /*@__PURE__*/getDefaultExportFromCjs(momentTimezone$1.exports);
+  var moment$2 = /*@__PURE__*/getDefaultExportFromCjs(momentTimezone$1.exports);
 
   var momentRange = {exports: {}};
 
@@ -10196,24 +10196,28 @@
 
   var MomentRange = /*@__PURE__*/getDefaultExportFromCjs(momentRange.exports);
 
+  const moment$1 = MomentRange.extendMoment(moment$2);
+  const tz$1 = moment$1.tz.defaultZone;
+
+  function getTimeInterval(interval, date) {
+    return moment$1.tz(date, tz$1).startOf(interval);
+  }
+
   // @TODO Handle week start day
   // see: https://github.com/rotaready/moment-range/pull/183
   function generate(interval, date, range) {
-    const moment = MomentRange.extendMoment(moment$1);
-    const tz = moment.tz.defaultZone;
     let dateRange;
 
-    let start = moment.tz(date, tz);
-    start = start.startOf(interval);
+    const start = getTimeInterval(interval, date);
 
     if (typeof range === 'number') {
-      dateRange = moment.rangeFromInterval(interval, range - 1, start);
+      dateRange = moment$1.rangeFromInterval(interval, range - 1, start);
     } else {
-      dateRange = moment.range(start, moment.tz(range, tz).endOf(interval));
+      dateRange = moment$1.range(start, moment$1.tz(range, tz$1).endOf(interval));
     }
 
     return Array.from(dateRange.by(interval)).map((d) => {
-      return moment.tz(d, tz).valueOf();
+      return moment$1.tz(d, tz$1).valueOf();
     });
   }
 
@@ -10224,218 +10228,11 @@
    * @param  int|Date range Number of dates to get, or a stop date
    * @return Array of dates
    */
-  function generateTimeInterval(domain, date, range) {
-    return generate(domain, date, range);
+  function generateTimeInterval(interval, date, range) {
+    return generate(interval, date, range);
   }
 
-  var EOL = {},
-      EOF = {},
-      QUOTE = 34,
-      NEWLINE = 10,
-      RETURN = 13;
-
-  function objectConverter(columns) {
-    return new Function("d", "return {" + columns.map(function(name, i) {
-      return JSON.stringify(name) + ": d[" + i + "] || \"\"";
-    }).join(",") + "}");
-  }
-
-  function customConverter(columns, f) {
-    var object = objectConverter(columns);
-    return function(row, i) {
-      return f(object(row), i, columns);
-    };
-  }
-
-  // Compute unique columns in order of discovery.
-  function inferColumns(rows) {
-    var columnSet = Object.create(null),
-        columns = [];
-
-    rows.forEach(function(row) {
-      for (var column in row) {
-        if (!(column in columnSet)) {
-          columns.push(columnSet[column] = column);
-        }
-      }
-    });
-
-    return columns;
-  }
-
-  function pad(value, width) {
-    var s = value + "", length = s.length;
-    return length < width ? new Array(width - length + 1).join(0) + s : s;
-  }
-
-  function formatYear(year) {
-    return year < 0 ? "-" + pad(-year, 6)
-      : year > 9999 ? "+" + pad(year, 6)
-      : pad(year, 4);
-  }
-
-  function formatDate$1(date) {
-    var hours = date.getUTCHours(),
-        minutes = date.getUTCMinutes(),
-        seconds = date.getUTCSeconds(),
-        milliseconds = date.getUTCMilliseconds();
-    return isNaN(date) ? "Invalid Date"
-        : formatYear(date.getUTCFullYear()) + "-" + pad(date.getUTCMonth() + 1, 2) + "-" + pad(date.getUTCDate(), 2)
-        + (milliseconds ? "T" + pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2) + "." + pad(milliseconds, 3) + "Z"
-        : seconds ? "T" + pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2) + "Z"
-        : minutes || hours ? "T" + pad(hours, 2) + ":" + pad(minutes, 2) + "Z"
-        : "");
-  }
-
-  function dsvFormat(delimiter) {
-    var reFormat = new RegExp("[\"" + delimiter + "\n\r]"),
-        DELIMITER = delimiter.charCodeAt(0);
-
-    function parse(text, f) {
-      var convert, columns, rows = parseRows(text, function(row, i) {
-        if (convert) return convert(row, i - 1);
-        columns = row, convert = f ? customConverter(row, f) : objectConverter(row);
-      });
-      rows.columns = columns || [];
-      return rows;
-    }
-
-    function parseRows(text, f) {
-      var rows = [], // output rows
-          N = text.length,
-          I = 0, // current character index
-          n = 0, // current line number
-          t, // current token
-          eof = N <= 0, // current token followed by EOF?
-          eol = false; // current token followed by EOL?
-
-      // Strip the trailing newline.
-      if (text.charCodeAt(N - 1) === NEWLINE) --N;
-      if (text.charCodeAt(N - 1) === RETURN) --N;
-
-      function token() {
-        if (eof) return EOF;
-        if (eol) return eol = false, EOL;
-
-        // Unescape quotes.
-        var i, j = I, c;
-        if (text.charCodeAt(j) === QUOTE) {
-          while (I++ < N && text.charCodeAt(I) !== QUOTE || text.charCodeAt(++I) === QUOTE);
-          if ((i = I) >= N) eof = true;
-          else if ((c = text.charCodeAt(I++)) === NEWLINE) eol = true;
-          else if (c === RETURN) { eol = true; if (text.charCodeAt(I) === NEWLINE) ++I; }
-          return text.slice(j + 1, i - 1).replace(/""/g, "\"");
-        }
-
-        // Find next delimiter or newline.
-        while (I < N) {
-          if ((c = text.charCodeAt(i = I++)) === NEWLINE) eol = true;
-          else if (c === RETURN) { eol = true; if (text.charCodeAt(I) === NEWLINE) ++I; }
-          else if (c !== DELIMITER) continue;
-          return text.slice(j, i);
-        }
-
-        // Return last token before EOF.
-        return eof = true, text.slice(j, N);
-      }
-
-      while ((t = token()) !== EOF) {
-        var row = [];
-        while (t !== EOL && t !== EOF) row.push(t), t = token();
-        if (f && (row = f(row, n++)) == null) continue;
-        rows.push(row);
-      }
-
-      return rows;
-    }
-
-    function preformatBody(rows, columns) {
-      return rows.map(function(row) {
-        return columns.map(function(column) {
-          return formatValue(row[column]);
-        }).join(delimiter);
-      });
-    }
-
-    function format(rows, columns) {
-      if (columns == null) columns = inferColumns(rows);
-      return [columns.map(formatValue).join(delimiter)].concat(preformatBody(rows, columns)).join("\n");
-    }
-
-    function formatBody(rows, columns) {
-      if (columns == null) columns = inferColumns(rows);
-      return preformatBody(rows, columns).join("\n");
-    }
-
-    function formatRows(rows) {
-      return rows.map(formatRow).join("\n");
-    }
-
-    function formatRow(row) {
-      return row.map(formatValue).join(delimiter);
-    }
-
-    function formatValue(value) {
-      return value == null ? ""
-          : value instanceof Date ? formatDate$1(value)
-          : reFormat.test(value += "") ? "\"" + value.replace(/"/g, "\"\"") + "\""
-          : value;
-    }
-
-    return {
-      parse: parse,
-      parseRows: parseRows,
-      format: format,
-      formatBody: formatBody,
-      formatRows: formatRows,
-      formatRow: formatRow,
-      formatValue: formatValue
-    };
-  }
-
-  var csv$1 = dsvFormat(",");
-
-  var csvParse = csv$1.parse;
-
-  function responseText(response) {
-    if (!response.ok) throw new Error(response.status + " " + response.statusText);
-    return response.text();
-  }
-
-  function text(input, init) {
-    return fetch(input, init).then(responseText);
-  }
-
-  function dsvParse(parse) {
-    return function(input, init, row) {
-      if (arguments.length === 2 && typeof init === "function") row = init, init = undefined;
-      return text(input, init).then(function(response) {
-        return parse(response, row);
-      });
-    };
-  }
-
-  function dsv(delimiter, input, init, row) {
-    if (arguments.length === 3 && typeof init === "function") row = init, init = undefined;
-    var format = dsvFormat(delimiter);
-    return text(input, init).then(function(response) {
-      return format.parse(response, row);
-    });
-  }
-
-  var csv = dsvParse(csvParse);
-
-  function responseJson(response) {
-    if (!response.ok) throw new Error(response.status + " " + response.statusText);
-    if (response.status === 204 || response.status === 205) return;
-    return response.json();
-  }
-
-  function json(input, init) {
-    return fetch(input, init).then(responseJson);
-  }
-
-  const moment = MomentRange.extendMoment(moment$1);
+  const moment = MomentRange.extendMoment(moment$2);
   const tz = moment.tz.defaultZone;
 
   class DateHelper {
@@ -10455,217 +10252,6 @@
 
     static moment(d = new Date()) {
       return moment.tz(d, tz);
-    }
-  }
-
-  function interpretCSV(data) {
-    const d = {};
-    const keys = Object.keys(data[0]);
-    let i;
-    let total;
-    for (i = 0, total = data.length; i < total; i++) {
-      d[data[i][keys[0]]] = +data[i][keys[1]];
-    }
-    return d;
-  }
-
-  function parseURI(str, startTimestamp, endTimestamp) {
-    // Use a timestamp in seconds
-    let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
-    newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
-
-    // Use a string date, following the ISO-8601
-    newUri = newUri.replace(
-      /\{\{d:start\}\}/g,
-      DateHelper.moment(startTimestamp).toISOString(),
-    );
-    newUri = newUri.replace(
-      /\{\{d:end\}\}/g,
-      DateHelper.moment(endTimestamp).toISOString(),
-    );
-
-    return newUri;
-  }
-
-  /**
-   * Populate the calendar internal data
-   *
-   * @param object data
-   * @param constant updateMode
-   * @param Date startTimestamp
-   * @param Date endTimestamp
-   *
-   * @return void
-   */
-  function parseDatas(
-    calendar,
-    data,
-    updateMode,
-    startTimestamp,
-    endTimestamp,
-    options,
-  ) {
-    if (updateMode === RESET_ALL_ON_UPDATE) {
-      calendar.domainCollection.forEach((value) => {
-        value.forEach((element, index, array) => {
-          array[index].v = null;
-        });
-      });
-    }
-
-    const newData = new Map();
-
-    const extractTime = (d) => d.t;
-
-    Object.keys(data).forEach((d) => {
-      if (Number.isNaN(d)) {
-        return;
-      }
-
-      const timestamp = d * 1000;
-
-      const domainKey = generateTimeInterval(
-        calendar.options.options.domain,
-        timestamp,
-        1,
-      )[0];
-
-      // Skip if data is not relevant to current domain
-      if (
-        !calendar.domainCollection.has(domainKey) ||
-        !(domainKey >= startTimestamp && domainKey < endTimestamp)
-      ) {
-        return;
-      }
-
-      const subDomainsData = calendar.domainCollection.get(domainKey);
-
-      if (!newData.has(domainKey)) {
-        newData.set(domainKey, subDomainsData.map(extractTime));
-      }
-
-      const subDomainIndex = newData
-        .get(domainKey)
-        .indexOf(
-          calendar.subDomainTemplate.at(options.subDomain).extractUnit(timestamp),
-        );
-
-      if (updateMode === RESET_SINGLE_ON_UPDATE) {
-        subDomainsData[subDomainIndex].v = data[d];
-      } else if (!Number.isNaN(subDomainsData[subDomainIndex].v)) {
-        subDomainsData[subDomainIndex].v += data[d];
-      } else {
-        subDomainsData[subDomainIndex].v = data[d];
-      }
-    });
-  }
-
-  /**
-   * Fetch and interpret data from the datasource
-   *
-   * @param string|object source
-   * @param int startTimestamp
-   * @param int endTimestamp
-   * @param function callback
-   * @param function|boolean afterLoad function used to convert the data into a json object. Use true to use the afterLoad callback
-   * @param updateMode
-   *
-   * @return mixed
-   * - True if there are no data to load
-   * - False if data are loaded asynchronously
-   */
-  // eslint-disable-next-line import/prefer-default-export
-  function getDatas(
-    calendar,
-    options,
-    source,
-    startTimestamp,
-    endTimestamp,
-    callback,
-    afterLoad = true,
-    updateMode = APPEND_ON_UPDATE,
-  ) {
-    const _callback = function (data) {
-      if (afterLoad !== false) {
-        if (typeof afterLoad === 'function') {
-          data = afterLoad(data);
-        } else if (typeof options.afterLoadData === 'function') {
-          data = options.afterLoadData(data);
-        } else {
-          console.log('Provided callback for afterLoadData is not a function.');
-        }
-      } else if (options.dataType === 'csv' || options.dataType === 'tsv') {
-        data = interpretCSV(data);
-      }
-      parseDatas(
-        calendar,
-        data,
-        updateMode,
-        startTimestamp,
-        endTimestamp,
-        options,
-      );
-      if (typeof callback === 'function') {
-        callback();
-      }
-    };
-
-    switch (typeof source) {
-      case 'string':
-        if (source === '') {
-          _callback({});
-          return true;
-        }
-        const url = parseURI(source, startTimestamp, endTimestamp);
-
-        const reqInit = { method: 'GET' };
-        if (options.dataPostPayload !== null) {
-          reqInit.method = 'POST';
-        }
-        if (options.dataPostPayload !== null) {
-          reqInit.body = parseURI(
-            options.dataPostPayload,
-            startTimestamp,
-            endTimestamp,
-          );
-        }
-        if (options.dataRequestHeaders !== null) {
-          const myheaders = new Headers();
-          for (const header in options.dataRequestHeaders) {
-            if (options.dataRequestHeaders.hasOwnProperty(header)) {
-              myheaders.append(header, options.dataRequestHeaders[header]);
-            }
-          }
-          reqInit.headers = myheaders;
-        }
-
-        let request = null;
-        switch (options.dataType) {
-          case 'json':
-            request = json(url, reqInit);
-            break;
-          case 'csv':
-            request = csv(url, reqInit);
-            break;
-          case 'tsv':
-            request = dsv('\t', url, reqInit);
-            break;
-          case 'txt':
-            request = text(url, reqInit);
-            break;
-        }
-        request.then(_callback);
-
-        return false;
-      case 'object':
-        if (source === Object(source)) {
-          _callback(source);
-          return false;
-        }
-      /* falls through */
-      default:
-        _callback({});
-        return true;
     }
   }
 
@@ -10817,25 +10403,23 @@
     }
 
     jumpTo(date, reset) {
-      const domains = this.calendar.getDomainKeys();
-      const firstDomain = domains[0];
-      const lastDomain = domains[domains.length - 1];
-      const { options } = this.calendar.options;
+      const domainsBound = this.calendar.getDomainBoundKeys();
+      const { domain } = this.calendar.options.options;
 
-      if (date < firstDomain) {
+      if (date < domainsBound.min) {
         return this.loadPreviousDomain(
-          generateTimeInterval(options.domain, date, firstDomain).length,
+          generateTimeInterval(domain, date, domainsBound.min).length,
         );
       }
       if (reset) {
         return this.loadNextDomain(
-          generateTimeInterval(options.domain, firstDomain, date).length,
+          generateTimeInterval(domain, domainsBound.min, date).length,
         );
       }
 
-      if (date > lastDomain) {
+      if (date > domainsBound.max) {
         return this.loadNextDomain(
-          generateTimeInterval(options.domain, lastDomain, date).length,
+          generateTimeInterval(domain, domainsBound.max, date).length,
         );
       }
 
@@ -10844,29 +10428,28 @@
 
     loadNewDomains(newDomains, direction = NAVIGATE_RIGHT) {
       const backward = direction === NAVIGATE_LEFT;
-      let i = -1;
-      let total = newDomains.length;
-      let domains = this.calendar.getDomainKeys();
-      const { options } = this.calendar.options;
+      const { options, minDate, maxDate } = this.calendar.options;
+      const minDateInterval = minDate ? getTimeInterval(minDate) : null;
+      const maxDateInterval = maxDate ? getTimeInterval(maxDate) : null;
+      const domains = this.calendar.getDomainKeys();
 
-      // Remove out of bound domains from list of new domains to prepend
-      while (++i < total) {
-        if (backward && this.#minDomainIsReached(newDomains[i])) {
-          newDomains = newDomains.slice(0, i + 1);
-          break;
+      // Removing out-of-bonds domains
+      const boundedNewDomains = newDomains
+        .filter(
+          (i) =>
+            (minDateInterval ? i >= minDateInterval : true) &&
+            (maxDateInterval ? i <= maxDateInterval : true),
+        )
+        .slice(-options.range);
+
+      boundedNewDomains.forEach((domain) => {
+        if (this.calendar.domainCollection.has(domain)) {
+          return;
         }
-        if (!backward && this.#maxDomainIsReached(newDomains[i])) {
-          newDomains = newDomains.slice(0, i);
-          break;
-        }
-      }
 
-      newDomains = newDomains.slice(-options.range);
-
-      for (i = 0, total = newDomains.length; i < total; i++) {
         this.calendar.domainCollection.set(
-          newDomains[i],
-          generateSubDomain(newDomains[i], options).map((d) => ({
+          domain,
+          generateSubDomain(domain, options).map((d) => ({
             t: this.calendar.subDomainTemplate
               .at(options.subDomain)
               .extractUnit(d),
@@ -10877,113 +10460,35 @@
         this.calendar.domainCollection.delete(
           backward ? domains.pop() : domains.shift(),
         );
-      }
+      });
 
-      domains = this.calendar.getDomainKeys();
-
-      if (backward) {
-        newDomains = newDomains.reverse();
-      }
+      const domainsBound = this.calendar.getDomainBoundKeys();
 
       this.calendar.calendarPainter.paint(direction);
 
-      // getDatas(
-      //   this.calendar,
-      //   options,
-      //   options.data,
-      //   newDomains[0],
-      //   generateSubDomain(
-      //     newDomains[newDomains.length - 1],
-      //     options,
-      //     this.calendar.DTSDomain
-      //   ).pop(),
-      //   () => {
-      //     this.calendar.fill(this.calendar.lastInsertedSvg);
-      //   }
-      // );
-
-      this.#checkIfMinDomainIsReached(domains[0], domains[domains.length - 1]);
-      this.#checkIfMaxDomainIsReached(this.#getNextDomain());
+      this.#checkDomainsBoundaryReached(
+        domainsBound.min,
+        domainsBound.max,
+        minDateInterval,
+        maxDateInterval,
+      );
 
       if (direction === NAVIGATE_LEFT) {
-        this.calendar.afterLoadPreviousDomain(newDomains[backward ? 0 : 1]);
+        this.calendar.afterLoadPreviousDomain(domainsBound.min);
       } else if (direction === NAVIGATE_RIGHT) {
-        this.calendar.afterLoadNextDomain(domains[domains.length - 1]);
+        this.calendar.afterLoadNextDomain(domainsBound.max);
       }
 
-      return {
-        start: newDomains[backward ? 0 : 1],
-        end: domains[domains.length - 1],
-      };
+      return true;
     }
 
-    #checkIfMinDomainIsReached(date, upperBound) {
-      if (this.#minDomainIsReached(date)) {
-        this.onMinDomainReached(true);
+    #checkDomainsBoundaryReached(lowerBound, upperBound, min, max) {
+      if (min) {
+        this.minDomainReached = lowerBound <= min;
       }
-
-      if (arguments.length === 2) {
-        if (this.maxDomainReached && !this.#maxDomainIsReached(upperBound)) {
-          this.onMaxDomainReached(false);
-        }
+      if (max) {
+        this.maxDomainReached = upperBound >= max;
       }
-    }
-
-    #checkIfMaxDomainIsReached(date, lowerBound) {
-      if (this.#maxDomainIsReached(date)) {
-        this.onMaxDomainReached(true);
-      }
-
-      if (arguments.length === 2) {
-        if (this.minDomainReached && !this.#minDomainIsReached(lowerBound)) {
-          this.onMinDomainReached(false);
-        }
-      }
-    }
-
-    /**
-     * Get the n-th next domain after the calendar newest (rightmost) domain
-     * @return Date The start date of the wanted domain
-     */
-    #getNextDomain() {
-      const { options } = this.calendar.options;
-
-      return generateTimeInterval(
-        options.domain,
-        this.calendar.getDomainKeys().pop(),
-        1,
-      ).slice(1);
-    }
-
-    #setMinDomainReached(status) {
-      this.minDomainReached = status;
-    }
-
-    #setMaxDomainReached(status) {
-      this.maxDomainReached = status;
-    }
-
-    /**
-     * Return whether a date is inside the scope determined by maxDate
-     *
-     * @param int datetimestamp The timestamp in ms to test
-     * @return bool True if the specified date correspond to the calendar upper bound
-     */
-    #maxDomainIsReached(datetimestamp) {
-      const { maxDate } = this.calendar.options.options;
-      return maxDate?.getTime() < datetimestamp;
-    }
-
-    /**
-     * Return whether a date is inside the scope determined by minDate
-     *
-     * @param int datetimestamp The timestamp in ms to test
-     * @return bool True if the specified date correspond to the calendar lower bound
-     */
-    #minDomainIsReached(datetimestamp) {
-      const { minDate } = this.calendar.options.options;
-
-      return minDate?.getTime() >= datetimestamp;
     }
   }
 
@@ -14053,7 +13558,7 @@
     return DateHelper.moment(dateA).isSame(DateHelper.moment(dateB), domain);
   }
 
-  function formatDate(d, formatter = 'title') {
+  function formatDate$1(d, formatter = 'title') {
     if (typeof formatter === 'function') {
       return formatter(new Date(d));
     }
@@ -14203,7 +13708,7 @@
         .attr('dominant-baseline', () =>
           options.verticalDomainLabel ? 'middle' : 'top',
         )
-        .text((d) => formatDate(d, options.domainLabelFormat))
+        .text((d) => formatDate$1(d, options.domainLabelFormat))
         .call((s) => this.#domainRotate(s));
     }
 
@@ -14415,7 +13920,7 @@
         .attr('y', (d) => this.#getY(d.t) + options.cellSize / 2)
         .attr('text-anchor', 'middle')
         .attr('dominant-baseline', 'central')
-        .text((d) => formatDate(d.t, options.subDomainTextFormat));
+        .text((d) => formatDate$1(d.t, options.subDomainTextFormat));
     }
 
     #appendTitle(elem) {
@@ -14423,7 +13928,7 @@
 
       elem
         .append('title')
-        .text((d) => formatDate(d.t, options.subDomainDateFormat));
+        .text((d) => formatDate$1(d.t, options.subDomainDateFormat));
     }
 
     #getCoordinates(axis, d) {
@@ -14775,7 +14280,7 @@
   function getSubDomainTitle(d, options, connector) {
     if (d.v === null && !options.considerMissingDataAsZero) {
       return formatStringWithObject(options.subDomainTitleFormat.empty, {
-        date: formatDate(d.t, options.subDomainDateFormat),
+        date: formatDate$1(d.t, options.subDomainDateFormat),
       });
     }
     let value = d.v;
@@ -14788,7 +14293,7 @@
       count: format(',d')(value),
       name: options.itemName[value !== 1 ? 1 : 0],
       connector,
-      date: formatDate(d.t, options.subDomainDateFormat),
+      date: formatDate$1(d.t, options.subDomainDateFormat),
     });
   }
 
@@ -15975,8 +15480,8 @@
         options.domainHorizontalLabelWidth = options.label.width;
       }
 
-      this.set('timezone', options.timezone ?? moment$1.tz.guess());
-      moment$1.tz.setDefault(options.timezone);
+      this.set('timezone', options.timezone ?? moment$2.tz.guess());
+      moment$2.tz.setDefault(options.timezone);
 
       if (options.legendMargin === [0, 0, 0, 0]) {
         switch (options.legendVerticalPosition) {
@@ -16615,6 +16120,424 @@
     return string;
   }
 
+  var EOL = {},
+      EOF = {},
+      QUOTE = 34,
+      NEWLINE = 10,
+      RETURN = 13;
+
+  function objectConverter(columns) {
+    return new Function("d", "return {" + columns.map(function(name, i) {
+      return JSON.stringify(name) + ": d[" + i + "] || \"\"";
+    }).join(",") + "}");
+  }
+
+  function customConverter(columns, f) {
+    var object = objectConverter(columns);
+    return function(row, i) {
+      return f(object(row), i, columns);
+    };
+  }
+
+  // Compute unique columns in order of discovery.
+  function inferColumns(rows) {
+    var columnSet = Object.create(null),
+        columns = [];
+
+    rows.forEach(function(row) {
+      for (var column in row) {
+        if (!(column in columnSet)) {
+          columns.push(columnSet[column] = column);
+        }
+      }
+    });
+
+    return columns;
+  }
+
+  function pad(value, width) {
+    var s = value + "", length = s.length;
+    return length < width ? new Array(width - length + 1).join(0) + s : s;
+  }
+
+  function formatYear(year) {
+    return year < 0 ? "-" + pad(-year, 6)
+      : year > 9999 ? "+" + pad(year, 6)
+      : pad(year, 4);
+  }
+
+  function formatDate(date) {
+    var hours = date.getUTCHours(),
+        minutes = date.getUTCMinutes(),
+        seconds = date.getUTCSeconds(),
+        milliseconds = date.getUTCMilliseconds();
+    return isNaN(date) ? "Invalid Date"
+        : formatYear(date.getUTCFullYear()) + "-" + pad(date.getUTCMonth() + 1, 2) + "-" + pad(date.getUTCDate(), 2)
+        + (milliseconds ? "T" + pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2) + "." + pad(milliseconds, 3) + "Z"
+        : seconds ? "T" + pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2) + "Z"
+        : minutes || hours ? "T" + pad(hours, 2) + ":" + pad(minutes, 2) + "Z"
+        : "");
+  }
+
+  function dsvFormat(delimiter) {
+    var reFormat = new RegExp("[\"" + delimiter + "\n\r]"),
+        DELIMITER = delimiter.charCodeAt(0);
+
+    function parse(text, f) {
+      var convert, columns, rows = parseRows(text, function(row, i) {
+        if (convert) return convert(row, i - 1);
+        columns = row, convert = f ? customConverter(row, f) : objectConverter(row);
+      });
+      rows.columns = columns || [];
+      return rows;
+    }
+
+    function parseRows(text, f) {
+      var rows = [], // output rows
+          N = text.length,
+          I = 0, // current character index
+          n = 0, // current line number
+          t, // current token
+          eof = N <= 0, // current token followed by EOF?
+          eol = false; // current token followed by EOL?
+
+      // Strip the trailing newline.
+      if (text.charCodeAt(N - 1) === NEWLINE) --N;
+      if (text.charCodeAt(N - 1) === RETURN) --N;
+
+      function token() {
+        if (eof) return EOF;
+        if (eol) return eol = false, EOL;
+
+        // Unescape quotes.
+        var i, j = I, c;
+        if (text.charCodeAt(j) === QUOTE) {
+          while (I++ < N && text.charCodeAt(I) !== QUOTE || text.charCodeAt(++I) === QUOTE);
+          if ((i = I) >= N) eof = true;
+          else if ((c = text.charCodeAt(I++)) === NEWLINE) eol = true;
+          else if (c === RETURN) { eol = true; if (text.charCodeAt(I) === NEWLINE) ++I; }
+          return text.slice(j + 1, i - 1).replace(/""/g, "\"");
+        }
+
+        // Find next delimiter or newline.
+        while (I < N) {
+          if ((c = text.charCodeAt(i = I++)) === NEWLINE) eol = true;
+          else if (c === RETURN) { eol = true; if (text.charCodeAt(I) === NEWLINE) ++I; }
+          else if (c !== DELIMITER) continue;
+          return text.slice(j, i);
+        }
+
+        // Return last token before EOF.
+        return eof = true, text.slice(j, N);
+      }
+
+      while ((t = token()) !== EOF) {
+        var row = [];
+        while (t !== EOL && t !== EOF) row.push(t), t = token();
+        if (f && (row = f(row, n++)) == null) continue;
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function preformatBody(rows, columns) {
+      return rows.map(function(row) {
+        return columns.map(function(column) {
+          return formatValue(row[column]);
+        }).join(delimiter);
+      });
+    }
+
+    function format(rows, columns) {
+      if (columns == null) columns = inferColumns(rows);
+      return [columns.map(formatValue).join(delimiter)].concat(preformatBody(rows, columns)).join("\n");
+    }
+
+    function formatBody(rows, columns) {
+      if (columns == null) columns = inferColumns(rows);
+      return preformatBody(rows, columns).join("\n");
+    }
+
+    function formatRows(rows) {
+      return rows.map(formatRow).join("\n");
+    }
+
+    function formatRow(row) {
+      return row.map(formatValue).join(delimiter);
+    }
+
+    function formatValue(value) {
+      return value == null ? ""
+          : value instanceof Date ? formatDate(value)
+          : reFormat.test(value += "") ? "\"" + value.replace(/"/g, "\"\"") + "\""
+          : value;
+    }
+
+    return {
+      parse: parse,
+      parseRows: parseRows,
+      format: format,
+      formatBody: formatBody,
+      formatRows: formatRows,
+      formatRow: formatRow,
+      formatValue: formatValue
+    };
+  }
+
+  var csv$1 = dsvFormat(",");
+
+  var csvParse = csv$1.parse;
+
+  function responseText(response) {
+    if (!response.ok) throw new Error(response.status + " " + response.statusText);
+    return response.text();
+  }
+
+  function text(input, init) {
+    return fetch(input, init).then(responseText);
+  }
+
+  function dsvParse(parse) {
+    return function(input, init, row) {
+      if (arguments.length === 2 && typeof init === "function") row = init, init = undefined;
+      return text(input, init).then(function(response) {
+        return parse(response, row);
+      });
+    };
+  }
+
+  function dsv(delimiter, input, init, row) {
+    if (arguments.length === 3 && typeof init === "function") row = init, init = undefined;
+    var format = dsvFormat(delimiter);
+    return text(input, init).then(function(response) {
+      return format.parse(response, row);
+    });
+  }
+
+  var csv = dsvParse(csvParse);
+
+  function responseJson(response) {
+    if (!response.ok) throw new Error(response.status + " " + response.statusText);
+    if (response.status === 204 || response.status === 205) return;
+    return response.json();
+  }
+
+  function json(input, init) {
+    return fetch(input, init).then(responseJson);
+  }
+
+  function interpretCSV(data) {
+    const d = {};
+    const keys = Object.keys(data[0]);
+    let i;
+    let total;
+    for (i = 0, total = data.length; i < total; i++) {
+      d[data[i][keys[0]]] = +data[i][keys[1]];
+    }
+    return d;
+  }
+
+  function parseURI(str, startTimestamp, endTimestamp) {
+    // Use a timestamp in seconds
+    let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
+    newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
+
+    // Use a string date, following the ISO-8601
+    newUri = newUri.replace(
+      /\{\{d:start\}\}/g,
+      DateHelper.moment(startTimestamp).toISOString(),
+    );
+    newUri = newUri.replace(
+      /\{\{d:end\}\}/g,
+      DateHelper.moment(endTimestamp).toISOString(),
+    );
+
+    return newUri;
+  }
+
+  /**
+   * Populate the calendar internal data
+   *
+   * @param object data
+   * @param constant updateMode
+   * @param Date startTimestamp
+   * @param Date endTimestamp
+   *
+   * @return void
+   */
+  function parseDatas(
+    calendar,
+    data,
+    updateMode,
+    startTimestamp,
+    endTimestamp,
+    options,
+  ) {
+    if (updateMode === RESET_ALL_ON_UPDATE) {
+      calendar.domainCollection.forEach((value) => {
+        value.forEach((element, index, array) => {
+          array[index].v = null;
+        });
+      });
+    }
+
+    const newData = new Map();
+
+    Object.keys(data).forEach((date) => {
+      if (Number.isNaN(date)) {
+        return;
+      }
+
+      const timestamp = date * 1000;
+
+      const domainKey = getTimeInterval(
+        calendar.options.options.domain,
+        timestamp,
+      );
+
+      // Skip if data is not relevant to current domain
+      if (
+        !calendar.domainCollection.has(domainKey) ||
+        !(domainKey >= startTimestamp && domainKey < endTimestamp)
+      ) {
+        return;
+      }
+
+      const subDomainsData = calendar.domainCollection.get(domainKey);
+
+      if (!newData.has(domainKey)) {
+        newData.set(
+          domainKey,
+          subDomainsData.map((d) => d.t),
+        );
+      }
+
+      const subDomainIndex = newData
+        .get(domainKey)
+        .indexOf(
+          calendar.subDomainTemplate.at(options.subDomain).extractUnit(timestamp),
+        );
+
+      if (updateMode === RESET_SINGLE_ON_UPDATE) {
+        subDomainsData[subDomainIndex].v = data[date];
+      } else if (!Number.isNaN(subDomainsData[subDomainIndex].v)) {
+        subDomainsData[subDomainIndex].v += data[date];
+      } else {
+        subDomainsData[subDomainIndex].v = data[date];
+      }
+    });
+  }
+
+  /**
+   * Fetch and interpret data from the datasource
+   *
+   * @param string|object source
+   * @param int startTimestamp
+   * @param int endTimestamp
+   * @param function callback
+   * @param function|boolean afterLoad function used to convert the data into a json object. Use true to use the afterLoad callback
+   * @param updateMode
+   *
+   * @return mixed
+   * - True if there are no data to load
+   * - False if data are loaded asynchronously
+   */
+  // eslint-disable-next-line import/prefer-default-export
+  function getDatas(
+    calendar,
+    options,
+    source,
+    startTimestamp,
+    endTimestamp,
+    callback,
+    afterLoad = true,
+    updateMode = APPEND_ON_UPDATE,
+  ) {
+    const _callback = function (data) {
+      if (afterLoad !== false) {
+        if (typeof afterLoad === 'function') {
+          data = afterLoad(data);
+        } else if (typeof options.afterLoadData === 'function') {
+          data = options.afterLoadData(data);
+        } else {
+          console.log('Provided callback for afterLoadData is not a function.');
+        }
+      } else if (options.dataType === 'csv' || options.dataType === 'tsv') {
+        data = interpretCSV(data);
+      }
+      parseDatas(
+        calendar,
+        data,
+        updateMode,
+        startTimestamp,
+        endTimestamp,
+        options,
+      );
+      if (typeof callback === 'function') {
+        callback();
+      }
+    };
+
+    switch (typeof source) {
+      case 'string':
+        if (source === '') {
+          _callback({});
+          return true;
+        }
+        const url = parseURI(source, startTimestamp, endTimestamp);
+
+        const reqInit = { method: 'GET' };
+        if (options.dataPostPayload !== null) {
+          reqInit.method = 'POST';
+        }
+        if (options.dataPostPayload !== null) {
+          reqInit.body = parseURI(
+            options.dataPostPayload,
+            startTimestamp,
+            endTimestamp,
+          );
+        }
+        if (options.dataRequestHeaders !== null) {
+          const myheaders = new Headers();
+          for (const header in options.dataRequestHeaders) {
+            if (options.dataRequestHeaders.hasOwnProperty(header)) {
+              myheaders.append(header, options.dataRequestHeaders[header]);
+            }
+          }
+          reqInit.headers = myheaders;
+        }
+
+        let request = null;
+        switch (options.dataType) {
+          case 'json':
+            request = json(url, reqInit);
+            break;
+          case 'csv':
+            request = csv(url, reqInit);
+            break;
+          case 'tsv':
+            request = dsv('\t', url, reqInit);
+            break;
+          case 'txt':
+            request = text(url, reqInit);
+            break;
+        }
+        request.then(_callback);
+
+        return false;
+      case 'object':
+        if (source === Object(source)) {
+          _callback(source);
+          return false;
+        }
+      /* falls through */
+      default:
+        _callback({});
+        return true;
+    }
+  }
+
   const minuteTemplate = (dateHelper) => {
     const COLUMNS_COUNT = 10;
     const ROWS_COUNT = 6;
@@ -17103,6 +17026,15 @@
       return Array.from(this.domainCollection.keys()).sort();
     }
 
+    getDomainBoundKeys() {
+      const keys = this.getDomainKeys();
+
+      return {
+        min: keys.shift(),
+        max: keys.pop(),
+      };
+    }
+
     // =========================================================================
     // PUBLIC API
     // =========================================================================
@@ -17189,16 +17121,14 @@
       updateMode = RESET_ALL_ON_UPDATE,
     ) {
       const { options } = this.options;
-      const domains = this.getDomainKeys();
-      const lastSubDomain = this.domainCollection.get(
-        domains[domains.length - 1],
-      );
+      const domainsBound = this.getDomainBoundKeys();
+      const lastSubDomain = this.domainCollection.get(domainsBound.max);
 
       getDatas(
         this,
         options,
         dataSource,
-        domains[0],
+        domainsBound.min,
         lastSubDomain[lastSubDomain.length - 1].t,
         () => {
           this.populator.populate();

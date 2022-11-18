@@ -8,7 +8,7 @@ import Colorizer from './calendar/Colorizer';
 
 import extractSVG from './utils/extractSVG';
 
-import generateTimeInterval from './utils/timeInterval';
+import { generateTimeInterval } from './utils/timeInterval';
 import { getDatas } from './data';
 
 import SubDomainTemplate from './calendar/SubDomainTemplate';
@@ -51,6 +51,15 @@ export default class CalHeatMap extends CalendarEvent {
    */
   getDomainKeys() {
     return Array.from(this.domainCollection.keys()).sort();
+  }
+
+  getDomainBoundKeys() {
+    const keys = this.getDomainKeys();
+
+    return {
+      min: keys.shift(),
+      max: keys.pop(),
+    };
   }
 
   // =========================================================================
@@ -139,16 +148,14 @@ export default class CalHeatMap extends CalendarEvent {
     updateMode = RESET_ALL_ON_UPDATE,
   ) {
     const { options } = this.options;
-    const domains = this.getDomainKeys();
-    const lastSubDomain = this.domainCollection.get(
-      domains[domains.length - 1],
-    );
+    const domainsBound = this.getDomainBoundKeys();
+    const lastSubDomain = this.domainCollection.get(domainsBound.max);
 
     getDatas(
       this,
       options,
       dataSource,
-      domains[0],
+      domainsBound.min,
       lastSubDomain[lastSubDomain.length - 1].t,
       () => {
         this.populator.populate();
