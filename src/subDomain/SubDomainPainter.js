@@ -1,5 +1,7 @@
 import { getHighlightClassName, formatDate } from '../function';
 
+import { TOP, LEFT } from '../constant';
+
 export default class subDomainPainter {
   constructor(calendar) {
     this.calendar = calendar;
@@ -11,17 +13,18 @@ export default class subDomainPainter {
     const subDomainSvgGroup = root
       .append('svg')
       .attr('x', () => {
+        let pos = options.domainMargin[LEFT];
         if (options.label.position === 'left') {
-          return options.domainHorizontalLabelWidth + options.domainMargin[3];
+          pos += options.domainHorizontalLabelWidth;
         }
-        return options.domainMargin[3];
+        return pos;
       })
       .attr('y', () => {
+        let pos = options.domainMargin[TOP];
         if (options.label.position === 'top') {
-          return options.domainVerticalLabelHeight + options.domainMargin[0];
+          pos += options.domainVerticalLabelHeight;
         }
-
-        return options.domainMargin[0];
+        return pos;
       })
       .attr('class', 'graph-subdomain-group');
 
@@ -33,13 +36,7 @@ export default class subDomainPainter {
 
     rect
       .append('rect')
-      .attr(
-        'class',
-        (d) =>
-          `graph-rect${getHighlightClassName(d.t, options)}${
-            options.onClick !== null ? ' hover_cursor' : ''
-          }`,
-      )
+      .attr('class', (d) => this.#getClassName(d))
       .attr('width', options.cellSize)
       .attr('height', options.cellSize)
       .attr('x', (d) => this.#getX(d.t))
@@ -72,6 +69,14 @@ export default class subDomainPainter {
     if (options.subDomainTextFormat !== null) {
       this.#appendText(rect);
     }
+  }
+
+  #getClassName(d) {
+    const { options } = this.calendar.options;
+
+    return `graph-rect${getHighlightClassName(d.t, options)}${
+      options.onClick !== null ? ' hover_cursor' : ''
+    }`;
   }
 
   #appendText(elem) {

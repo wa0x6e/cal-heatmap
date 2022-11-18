@@ -13345,29 +13345,27 @@
         width: 0,
         height: 0,
       };
+
+      this.root = null;
     }
 
-    paint(navigationDir, root) {
+    paint(navigationDir, calendarNode) {
+      this.#assignData(calendarNode);
+
+      const domainNode = this.#paintEnteringDomain(navigationDir);
+      this.#paintTransitioningDomain(navigationDir);
+      this.#paintExitingDomain(navigationDir);
+
+      return domainNode;
+    }
+
+    #paintEnteringDomain(navigationDir) {
       const { options } = this.calendar.options;
 
-      // Painting all the domains
-      const domainSvg = root
-        .select('.graph')
-        .selectAll('.graph-domain')
-        .data(
-          () => this.calendar.getDomainKeys(),
-          (d) => d,
-        );
-
-      const svg = domainSvg
+      const svg = this.root
         .enter()
         .append('svg')
-        .attr('width', (d) => {
-          this.#updateDimensions('width', this.getWidth(d, true));
-        })
-        .attr('height', (d) => {
-          this.#updateDimensions('height', this.getHeight(d, true));
-        })
+
         .attr('x', (d) => {
           if (options.verticalOrientation) {
             return 0;
@@ -13390,7 +13388,22 @@
 
           return 0;
         })
+        .attr('width', (d) => {
+          this.#updateDimensions('width', this.getWidth(d, true));
+        })
+        .attr('height', (d) => {
+          this.#updateDimensions('height', this.getHeight(d, true));
+        })
         .attr('class', (d) => this.#getClassName(d));
+
+      svg
+        .transition()
+        .duration(options.animationDuration)
+        .attr('x', (d) => {
+          const domains = this.calendar.getDomainKeys();
+
+          return domains.indexOf(d) * this.getWidth(d, true);
+        });
 
       svg
         .append('rect')
@@ -13406,8 +13419,47 @@
         )
         .attr('class', 'domain-background');
 
+      return svg;
+    }
+
+    #paintExitingDomain(navigationDir) {
+      const { options } = this.calendar.options;
+
+      // At the time of exit, domainsWidth and domainsHeight already automatically shifted
+      this.root
+        .exit()
+        .transition()
+        .duration(options.animationDuration)
+        .attr('x', (d) => {
+          if (options.verticalOrientation) {
+            return 0;
+          }
+          return navigationDir === NAVIGATE_LEFT
+            ? this.dimensions.width
+            : -this.getWidth(d, true);
+        })
+        .attr('y', (d) => {
+          if (options.verticalOrientation) {
+            return navigationDir === NAVIGATE_LEFT
+              ? this.dimensions.height
+              : -this.getHeight(d, true);
+          }
+          return 0;
+        })
+        .attr('width', (d) => {
+          this.#updateDimensions('width', -this.getWidth(d, true));
+        })
+        .attr('height', (d) => {
+          this.#updateDimensions('height', -this.getHeight(d, true));
+        })
+        .remove();
+    }
+
+    #paintTransitioningDomain() {
+      const { options } = this.calendar.options;
+
       // if (navigationDir !== false) {
-      domainSvg
+      this.root
         .transition()
         .duration(options.animationDuration)
         .attr('x', (d) => {
@@ -13427,39 +13479,6 @@
           return 0;
         });
       // }
-
-      // At the time of exit, domainsWidth and domainsHeight already automatically shifted
-      domainSvg
-        .exit()
-        .transition()
-        .duration(options.animationDuration)
-        .attr('x', (d) => {
-          if (options.verticalOrientation) {
-            return 0;
-          }
-          return navigationDir === NAVIGATE_LEFT
-            ? this.dimensions.width
-            : -this.getWidth(d, true);
-        })
-        .attr('y', (d) => {
-          if (options.verticalOrientation) {
-            if (navigationDir === NAVIGATE_LEFT) {
-              return this.dimensions.height;
-            }
-
-            return -this.getHeight(d, true);
-          }
-          return 0;
-        })
-        .attr('width', (d) => {
-          this.#updateDimensions('width', -this.getWidth(d, true));
-        })
-        .attr('height', (d) => {
-          this.#updateDimensions('height', -this.getHeight(d, true));
-        })
-        .remove();
-
-      return svg;
     }
 
     #updateDimensions(axis, value) {
@@ -13504,6 +13523,16 @@
           break;
       }
       return classname;
+    }
+
+    #assignData(calendarNode) {
+      this.root = calendarNode
+        .select('.graph')
+        .selectAll('.graph-domain')
+        .data(
+          () => this.calendar.getDomainKeys(),
+          (d) => d,
+        );
     }
 
     // Return the width of the domain block, without the domain gutter
@@ -13855,17 +13884,18 @@
       const subDomainSvgGroup = root
         .append('svg')
         .attr('x', () => {
+          let pos = options.domainMargin[LEFT];
           if (options.label.position === 'left') {
-            return options.domainHorizontalLabelWidth + options.domainMargin[3];
+            pos += options.domainHorizontalLabelWidth;
           }
-          return options.domainMargin[3];
+          return pos;
         })
         .attr('y', () => {
+          let pos = options.domainMargin[TOP];
           if (options.label.position === 'top') {
-            return options.domainVerticalLabelHeight + options.domainMargin[0];
+            pos += options.domainVerticalLabelHeight;
           }
-
-          return options.domainMargin[0];
+          return pos;
         })
         .attr('class', 'graph-subdomain-group');
 
@@ -13877,13 +13907,7 @@
 
       rect
         .append('rect')
-        .attr(
-          'class',
-          (d) =>
-            `graph-rect${getHighlightClassName(d.t, options)}${
-            options.onClick !== null ? ' hover_cursor' : ''
-          }`,
-        )
+        .attr('class', (d) => this.#getClassName(d))
         .attr('width', options.cellSize)
         .attr('height', options.cellSize)
         .attr('x', (d) => this.#getX(d.t))
@@ -13916,6 +13940,14 @@
       if (options.subDomainTextFormat !== null) {
         this.#appendText(rect);
       }
+    }
+
+    #getClassName(d) {
+      const { options } = this.calendar.options;
+
+      return `graph-rect${getHighlightClassName(d.t, options)}${
+      options.onClick !== null ? ' hover_cursor' : ''
+    }`;
     }
 
     #appendText(elem) {
