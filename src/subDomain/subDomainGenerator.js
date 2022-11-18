@@ -54,17 +54,13 @@ const computeHourSubDomainSize = (date, domain) => {
  */
 const computeWeekSubDomainSize = (date, domain) => {
   if (domain === 'month') {
-    const endWeekNb = DateHelper.moment(
-      DateHelper.moment(date).endOf('month'),
-    ).isoWeek();
-    const startWeekNb = DateHelper.moment(
-      DateHelper.moment(date).startOf('month'),
-    ).isoWeek();
+    const endWeekNb = DateHelper.moment(date).endOf('month').isoWeek();
+    const startWeekNb = DateHelper.moment(date).startOf('month').isoWeek();
 
     return endWeekNb - startWeekNb;
   }
   if (domain === 'year') {
-    return DateHelper.moment(DateHelper.moment(date).endOf('year')).isoWeek();
+    return DateHelper.moment(date).isoWeeksInYear();
   }
 };
 

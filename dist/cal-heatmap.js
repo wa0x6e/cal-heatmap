@@ -10314,17 +10314,13 @@
    */
   const computeWeekSubDomainSize = (date, domain) => {
     if (domain === 'month') {
-      const endWeekNb = DateHelper.moment(
-        DateHelper.moment(date).endOf('month'),
-      ).isoWeek();
-      const startWeekNb = DateHelper.moment(
-        DateHelper.moment(date).startOf('month'),
-      ).isoWeek();
+      const endWeekNb = DateHelper.moment(date).endOf('month').isoWeek();
+      const startWeekNb = DateHelper.moment(date).startOf('month').isoWeek();
 
       return endWeekNb - startWeekNb;
     }
     if (domain === 'year') {
-      return DateHelper.moment(DateHelper.moment(date).endOf('year')).isoWeek();
+      return DateHelper.moment(date).isoWeeksInYear();
     }
   };
 
@@ -16727,19 +16723,22 @@
     function getTotalColNumber(d) {
       switch (domain) {
         case 'year':
-          return 52;
+          return domainDynamicDimension
+            ? dateHelper.moment(d).endOf('year').isoWeeksInYear()
+            : 52;
         case 'month':
           return domainDynamicDimension
-            ? dateHelper.moment(dateHelper.moment(d).endOf('year')).isoWeek() -
-                dateHelper.moment(d).isoWeek()
+            ? dateHelper.moment(d).endOf('month').isoWeek()
             : 5;
+        default:
+          return;
       }
     }
 
     return {
       name: 'week',
       level: 40,
-      rowsCount(d) {
+      rowsCount() {
         return 1;
       },
       columnsCount(d) {
@@ -16749,13 +16748,13 @@
         x(d) {
           switch (domain) {
             case 'year':
-              return Math.floor(dateHelper.moment(d).isoWeek());
+              return dateHelper.moment(d).isoWeek() - 1;
             case 'month':
               return Math.floor(dateHelper.getMonthWeekNumber(d));
           }
         },
-        y(d) {
-          return dateHelper.moment(d).isoWeek() % 1;
+        y() {
+          return 0;
         },
       },
       format: {

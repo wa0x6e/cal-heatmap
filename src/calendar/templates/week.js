@@ -2,20 +2,22 @@ const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
   function getTotalColNumber(d) {
     switch (domain) {
       case 'year':
-        return 52;
+        return domainDynamicDimension
+          ? dateHelper.moment(d).endOf('year').isoWeeksInYear()
+          : 52;
       case 'month':
         return domainDynamicDimension
-          ? dateHelper.moment(dateHelper.moment(d).endOf('year')).isoWeek() -
-              dateHelper.moment(d).isoWeek()
+          ? dateHelper.moment(d).endOf('month').isoWeek()
           : 5;
       default:
+        return;
     }
   }
 
   return {
     name: 'week',
     level: 40,
-    rowsCount(d) {
+    rowsCount() {
       return 1;
     },
     columnsCount(d) {
@@ -25,14 +27,14 @@ const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       x(d) {
         switch (domain) {
           case 'year':
-            return Math.floor(dateHelper.moment(d).isoWeek());
+            return dateHelper.moment(d).isoWeek() - 1;
           case 'month':
             return Math.floor(dateHelper.getMonthWeekNumber(d));
           default:
         }
       },
-      y(d) {
-        return dateHelper.moment(d).isoWeek() % 1;
+      y() {
+        return 0;
       },
     },
     format: {
