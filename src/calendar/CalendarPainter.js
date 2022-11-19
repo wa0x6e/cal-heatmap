@@ -37,7 +37,7 @@ export default class CalendarPainter {
       .append('svg')
       .attr('class', 'cal-heatmap-container');
 
-    this.tooltip.init(this.root);
+    this.tooltip.init();
 
     this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
 

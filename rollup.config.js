@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
 
 export default {
   input: 'src/cal-heatmap.js',
@@ -18,5 +19,12 @@ export default {
       'd3-fetch',
     ],
   },
-  plugins: [json(), commonjs(), resolve()],
+  plugins: [
+    json(),
+    commonjs(),
+    resolve(),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+  ],
 };

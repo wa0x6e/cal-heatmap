@@ -14,6 +14,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.6",
     "d3-fetch": "^3.0.1",
     "d3-format": "^3.1.0",
     "d3-interpolate": "^3.0.1",
@@ -28,6 +29,7 @@
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-json": "^5.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.1",
     "eslint": "^8.27.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-jest": "^27.1.5",

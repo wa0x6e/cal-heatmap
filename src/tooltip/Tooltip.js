@@ -1,89 +1,88 @@
 import { select } from 'd3-selection';
+import { createPopper } from '@popperjs/core';
 
 import { getSubDomainTitle } from '../subDomain';
 
 export default class Tooltip {
   constructor(calendar) {
     this.calendar = calendar;
-    this.node = null;
+    this.root = null;
+    this.virtualElement = {
+      getBoundingClientRect: null,
+    };
+    this.popperInstance = null;
+    this.popperOptions = {
+      placement: 'top',
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 8],
+          },
+        },
+      ],
+    };
   }
 
   init() {
-    const { itemSelector } = this.calendar.options.options;
-
-    this.node = select(itemSelector)
-      .attr('style', () => {
-        const current = select(itemSelector).attr('style');
-        return `${current ?? ''}position:relative;`;
-      })
+    this.root = select('body')
       .append('div')
-      .attr('class', 'ch-tooltip');
-  }
+      .attr('id', 'ch-tooltip')
+      .attr('role', 'tooltip');
+    this.root
+      .append('div')
+      .attr('id', 'ch-tooltip-arrow')
+      .attr('data-popper-arrow', true);
+    this.root.append('span').attr('id', 'ch-tooltip-body');
 
-  update(element) {
-    const { options } = this.calendar.options;
-
-    element.on('mouseover', (ev, d) => {
-      if (options.onTooltip) {
-        this.#setTitle(options.onTooltip(new Date(d.t), d.v));
-      } else {
-        this.#setTitle(getSubDomainTitle(d, options));
-      }
-
-      this.#show(ev.target);
-    });
-
-    element.on('mouseout', () => this.#hide());
-  }
-
-  #getCoordinates(axis, cell) {
-    const { options } = this.calendar.options;
-    const domainNode = cell.parentNode.parentNode;
-
-    let coordinate =
-      cell.getAttribute(axis) -
-      (axis === 'x'
-        ? this.node.node().offsetWidth / 2 - options.cellSize / 2
-        : this.node.node().offsetHeight + options.cellSize);
-    // Offset by the domain position
-    coordinate += parseInt(domainNode.getAttribute(axis), 10);
-
-    // Offset by the calendar position (when legend is left/top)
-    coordinate += parseInt(
-      this.calendar.calendarPainter.root.select('.graph').attr(axis) || 0,
-      10,
+    this.popperInstance = createPopper(
+      this.virtualElement,
+      this.root.node(),
+      this.popperOptions,
     );
-
-    // Offset by the inside domain position (when label is left/top)
-    coordinate += parseInt(domainNode.parentNode.getAttribute(axis), 10);
-
-    return coordinate;
   }
 
-  #getX(cell) {
-    return this.#getCoordinates('x', cell);
+  show(e, d) {
+    this.#update(e, d);
+
+    this.popperInstance.setOptions(() => ({
+      ...this.popperOptions,
+      modifiers: [
+        ...this.popperOptions.modifiers,
+        { name: 'eventListeners', enabled: true },
+      ],
+    }));
+
+    this.popperInstance.update();
+
+    this.root.attr('data-show', true);
   }
 
-  #getY(cell) {
-    return this.#getCoordinates('y', cell);
+  hide() {
+    this.root.attr('data-show', null);
+
+    this.popperInstance.setOptions(() => ({
+      ...this.popperOptions,
+      modifiers: [
+        ...this.popperOptions.modifiers,
+        { name: 'eventListeners', enabled: false },
+      ],
+    }));
+  }
+
+  #update(e, d) {
+    const { options } = this.calendar.options;
+
+    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
+
+    if (options.onTooltip) {
+      this.#setTitle(options.onTooltip(new Date(d.t), d.v));
+    } else {
+      this.#setTitle(getSubDomainTitle(d, options));
+    }
   }
 
   #setTitle(title) {
-    this.node.html(title);
-  }
-
-  #show(cell) {
-    // Force display:block, because `offsetHeight` returns 0 on hidden element
-    this.node.attr('style', 'display: block;');
-    this.node.attr(
-      'style',
-      'display: block;' +
-        `left: ${this.#getX(cell)}px; ` +
-        `top: ${this.#getY(cell)}px;`,
-    );
-  }
-
-  #hide() {
-    this.node.attr('style', 'display:none').html('');
+    this.root.select('#ch-tooltip-body').html(title);
   }
 }

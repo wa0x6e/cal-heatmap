@@ -109,34 +109,54 @@ Remove comment to apply this style to date with value equal to 0
 	fill: #999;
 }
 
-.ch-tooltip {
-	padding: 10px;
+#ch-tooltip {
+	padding: 5px 10px;
 	background: #222;
 	color: #bbb;
 	font-size: 12px;
 	line-height: 1.4;
-	width: 140px;
-	position: absolute;
-	z-index: 99999;
 	text-align: center;
 	border-radius: 2px;
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 	display: none;
 	box-sizing: border-box;
 }
-
-.ch-tooltip::after {
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-color: transparent;
-	border-style: solid;
-	content: '';
-	padding: 0;
+#ch-tooltip[data-show] {
 	display: block;
-	bottom: -6px;
-	left: 50%;
-	margin-left: -6px;
-	border-width: 6px 6px 0;
-	border-top-color: #222;
+}
+
+#ch-tooltip-arrow,
+#ch-tooltip-arrow::before {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: inherit;
+}
+
+#ch-tooltip-arrow {
+	visibility: hidden;
+}
+
+#ch-tooltip-arrow::before {
+	visibility: visible;
+	content: '';
+	transform: rotate(45deg);
+}
+
+#ch-tooltip[data-popper-placement^='top'] > #ch-tooltip-arrow {
+	bottom: -4px;
+	margin-left: -4px;
+}
+
+#ch-tooltip[data-popper-placement^='bottom'] > #ch-tooltip-arrow {
+	top: -4px;
+	margin-left: -4px;
+}
+
+#ch-tooltip[data-popper-placement^='left'] > #ch-tooltip-arrow {
+	right: -4px;
+}
+
+#ch-tooltip[data-popper-placement^='right'] > #ch-tooltip-arrow {
+	left: -4px;
 }
