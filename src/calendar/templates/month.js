@@ -16,8 +16,8 @@ const monthTemplate = (dateHelper) => ({
     },
   },
   format: {
-    date: '%B %Y',
-    legend: '%B',
+    date: 'MMMM Y',
+    legend: 'MMMM',
     connector: 'in',
   },
   extractUnit(d) {

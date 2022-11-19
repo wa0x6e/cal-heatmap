@@ -31,7 +31,7 @@ export default class DomainSecondaryLabel {
     //   }
     //   // Get the first character of the day name
     //   const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-    //     formatDate(time[day](new Date()), '%a').charAt(0)
+    //     formatDate(time[day](new Date()), 'dd').charAt(0)
     //   );
 
     //   // Append "day-name" group to SVG

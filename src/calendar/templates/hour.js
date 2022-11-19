@@ -46,8 +46,8 @@ const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       },
     },
     format: {
-      date: '%Hh, %A %B %-e, %Y',
-      legend: '%H:00',
+      date: 'HH[h], dddd MMMM D, Y',
+      legend: 'HH:00',
       connector: 'at',
     },
     extractUnit(d) {

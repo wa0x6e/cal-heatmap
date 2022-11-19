@@ -236,11 +236,11 @@ export default class Options {
 
       // Formatting of the domain label
       // @default: null, will use the formatting according to domain type
-      // Accept a string used as specifier by timeFormat()
+      // Accept a string used as specifier by moment().format()
       // or a function
       //
-      // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-      // for accepted date formatting used by timeFormat()
+      // Refer to https://momentjs.com/docs/#/displaying/
+      // for accepted date formatting used by moment().format()
       domainLabelFormat: null,
 
       // Formatting of the title displayed when hovering a subDomain cell
@@ -251,20 +251,20 @@ export default class Options {
 
       // Formatting of the {date} used in subDomainTitleFormat
       // @default: null, will use the formatting according to subDomain type
-      // Accept a string used as specifier by timeFormat()
+      // Accept a string used as specifier by moment().format()
       // or a function
       //
-      // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-      // for accepted date formatting used by timeFormat()
+      // Refer to https://momentjs.com/docs/#/displaying/
+      // for accepted date formatting used by moment().format()
       subDomainDateFormat: null,
 
       // Formatting of the text inside each subDomain cell
       // @default: null, no text
-      // Accept a string used as specifier by timeFormat()
+      // Accept a string used as specifier by moment().format()
       // or a function
       //
-      // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-      // for accepted date formatting used by timeFormat()
+      // Refer to https://momentjs.com/docs/#/displaying/
+      // for accepted date formatting used by moment().format()
       subDomainTextFormat: null,
 
       // Formatting of the title displayed when hovering a legend cell

@@ -16,8 +16,8 @@ const yearTemplate = (dateHelper) => ({
     },
   },
   format: {
-    date: '%Y',
-    legend: '%Y',
+    date: 'Y',
+    legend: 'Y',
     connector: 'in',
   },
   extractUnit(d) {

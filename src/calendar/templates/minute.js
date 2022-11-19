@@ -20,7 +20,7 @@ const minuteTemplate = (dateHelper) => {
       },
     },
     format: {
-      date: '%H:%M, %A %B %-e, %Y',
+      date: 'LT, dddd MMMM D, Y',
       legend: '',
       connector: 'at',
     },

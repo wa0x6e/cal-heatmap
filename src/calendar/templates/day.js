@@ -52,8 +52,8 @@ const dayTemplate = (
       },
     },
     format: {
-      date: '%A %B %-e, %Y',
-      legend: '%e %b',
+      date: 'dddd MMMM D, Y',
+      legend: 'Do MMM',
       connector: 'on',
     },
     extractUnit(d) {

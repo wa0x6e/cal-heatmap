@@ -13824,7 +13824,7 @@
       //   }
       //   // Get the first character of the day name
       //   const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-      //     formatDate(time[day](new Date()), '%a').charAt(0)
+      //     formatDate(time[day](new Date()), 'dd').charAt(0)
       //   );
 
       //   // Append "day-name" group to SVG
@@ -17050,11 +17050,11 @@
 
         // Formatting of the domain label
         // @default: null, will use the formatting according to domain type
-        // Accept a string used as specifier by timeFormat()
+        // Accept a string used as specifier by moment().format()
         // or a function
         //
-        // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-        // for accepted date formatting used by timeFormat()
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
         domainLabelFormat: null,
 
         // Formatting of the title displayed when hovering a subDomain cell
@@ -17065,20 +17065,20 @@
 
         // Formatting of the {date} used in subDomainTitleFormat
         // @default: null, will use the formatting according to subDomain type
-        // Accept a string used as specifier by timeFormat()
+        // Accept a string used as specifier by moment().format()
         // or a function
         //
-        // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-        // for accepted date formatting used by timeFormat()
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
         subDomainDateFormat: null,
 
         // Formatting of the text inside each subDomain cell
         // @default: null, no text
-        // Accept a string used as specifier by timeFormat()
+        // Accept a string used as specifier by moment().format()
         // or a function
         //
-        // Refer to https://github.com/mbostock/d3/wiki/Time-Formatting
-        // for accepted date formatting used by timeFormat()
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
         subDomainTextFormat: null,
 
         // Formatting of the title displayed when hovering a legend cell
@@ -18387,7 +18387,7 @@
         },
       },
       format: {
-        date: '%H:%M, %A %B %-e, %Y',
+        date: 'LT, dddd MMMM D, Y',
         legend: '',
         connector: 'at',
       },
@@ -18445,8 +18445,8 @@
         },
       },
       format: {
-        date: '%Hh, %A %B %-e, %Y',
-        legend: '%H:00',
+        date: 'HH[h], dddd MMMM D, Y',
+        legend: 'HH:00',
         connector: 'at',
       },
       extractUnit(d) {
@@ -18508,8 +18508,8 @@
         },
       },
       format: {
-        date: '%A %B %-e, %Y',
-        legend: '%e %b',
+        date: 'dddd MMMM D, Y',
+        legend: 'Do MMM',
         connector: 'on',
       },
       extractUnit(d) {
@@ -18557,9 +18557,9 @@
         },
       },
       format: {
-        date: '%B Week #%W',
-        legend: '%B Week #%W',
-        connector: 'in',
+        date: 'wo [week] Y',
+        legend: 'wo [week] Y',
+        connector: 'at',
       },
       extractUnit(d) {
         return dateHelper.moment(d).startOf('isoWeek').valueOf();
@@ -18585,8 +18585,8 @@
       },
     },
     format: {
-      date: '%B %Y',
-      legend: '%B',
+      date: 'MMMM Y',
+      legend: 'MMMM',
       connector: 'in',
     },
     extractUnit(d) {
@@ -18612,8 +18612,8 @@
       },
     },
     format: {
-      date: '%Y',
-      legend: '%Y',
+      date: 'Y',
+      legend: 'Y',
       connector: 'in',
     },
     extractUnit(d) {

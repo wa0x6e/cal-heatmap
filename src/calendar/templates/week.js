@@ -38,9 +38,9 @@ const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       },
     },
     format: {
-      date: '%B Week #%W',
-      legend: '%B Week #%W',
-      connector: 'in',
+      date: 'wo [week] Y',
+      legend: 'wo [week] Y',
+      connector: 'at',
     },
     extractUnit(d) {
       return dateHelper.moment(d).startOf('isoWeek').valueOf();
