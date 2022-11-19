@@ -145,8 +145,8 @@ export default class CalHeatMap extends CalendarEvent {
     const endTimestamp = generateTimeInterval(
       options.domain,
       domainsBound.max,
-      1,
-    ).slice(1);
+      2,
+    )[1];
 
     getDatas(
       this,

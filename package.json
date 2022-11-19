@@ -48,7 +48,7 @@
   "scripts": {
     "build": "rollup --config",
     "dev": "rollup --config -w",
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest --silent"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",

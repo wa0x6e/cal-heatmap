@@ -64,8 +64,6 @@ function parseDatas(
     });
   }
 
-  const newData = new Map();
-
   Object.keys(data).forEach((date) => {
     if (Number.isNaN(date)) {
       return;
@@ -86,27 +84,20 @@ function parseDatas(
       return;
     }
 
-    const subDomainsData = calendar.domainCollection.get(domainKey);
+    const existingSubDomainsData = calendar.domainCollection.get(domainKey);
 
-    if (!newData.has(domainKey)) {
-      newData.set(
-        domainKey,
-        subDomainsData.map((d) => d.t),
-      );
-    }
-
-    const subDomainIndex = newData
-      .get(domainKey)
+    const subDomainIndex = existingSubDomainsData
+      .map((d) => d.t)
       .indexOf(
         calendar.subDomainTemplate.at(options.subDomain).extractUnit(timestamp),
       );
 
     if (updateMode === RESET_SINGLE_ON_UPDATE) {
-      subDomainsData[subDomainIndex].v = data[date];
-    } else if (!Number.isNaN(subDomainsData[subDomainIndex].v)) {
-      subDomainsData[subDomainIndex].v += data[date];
+      existingSubDomainsData[subDomainIndex].v = data[date];
+    } else if (typeof existingSubDomainsData[subDomainIndex].v === 'number') {
+      existingSubDomainsData[subDomainIndex].v += data[date];
     } else {
-      subDomainsData[subDomainIndex].v = data[date];
+      existingSubDomainsData[subDomainIndex].v = data[date];
     }
   });
 }

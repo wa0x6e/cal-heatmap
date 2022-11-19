@@ -19,7 +19,7 @@ export function getTimeInterval(interval, date, asMoment = false) {
 function generate(interval, date, range) {
   let dateRange;
 
-  const start = getTimeInterval(interval, date);
+  const start = getTimeInterval(interval, date, true);
 
   if (typeof range === 'number') {
     dateRange = moment.rangeFromInterval(interval, range - 1, start);
