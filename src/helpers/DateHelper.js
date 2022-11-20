@@ -78,26 +78,27 @@ export default class DateHelper {
     return this.date(dateA).isSame(this.date(dateB), interval);
   }
 
-  // @TODO Handle week start day
-  // see: https://github.com/rotaready/moment-range/pull/183
   #generateInterval(interval, date, range) {
     let dateRange;
 
-    const start = this.getTimeInterval(interval, date, true);
+    const start = this.date(date);
 
     if (typeof range === 'number') {
       dateRange = this.momentInstance.rangeFromInterval(
         interval,
-        range - 1,
+        range >= 0 ? range - 1 : range,
         start,
       );
     } else {
-      dateRange = this.momentInstance.range(
-        start,
-        this.date(range).endOf(interval),
-      );
+      dateRange = this.momentInstance.range(start, this.date(range));
     }
 
-    return Array.from(dateRange.by(interval)).map((d) => d.valueOf());
+    dateRange = dateRange.snapTo(interval);
+
+    return Array.from(
+      dateRange.by(interval, {
+        excludeEnd: typeof range === 'number' && range < 0,
+      }),
+    ).map((d) => d.valueOf());
   }
 }
