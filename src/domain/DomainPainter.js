@@ -67,9 +67,20 @@ export default class DomainPainter {
       .transition()
       .duration(options.animationDuration)
       .attr('x', (d) => {
+        if (options.verticalOrientation) {
+          return 0;
+        }
         const domains = this.calendar.getDomainKeys();
 
         return domains.indexOf(d) * this.getWidth(d, true);
+      })
+      .attr('y', (d) => {
+        if (options.verticalOrientation) {
+          const domains = this.calendar.getDomainKeys();
+
+          return domains.indexOf(d) * this.getHeight(d, true);
+        }
+        return 0;
       });
 
     svg
@@ -101,6 +112,12 @@ export default class DomainPainter {
         if (options.verticalOrientation) {
           return 0;
         }
+        console.log(
+          navigationDir === NAVIGATE_LEFT
+            ? this.dimensions.width
+            : -this.getWidth(d, true),
+        );
+
         return navigationDir === NAVIGATE_LEFT
           ? this.dimensions.width
           : -this.getWidth(d, true);
