@@ -43,7 +43,7 @@ const dayTemplate = (
           case 'month':
             return DateHelper.getMonthWeekNumber(d);
           case 'year':
-            return DateHelper.date(d).isoWeek() - 1;
+            return DateHelper.date(d).week() - 1;
           default:
         }
       },

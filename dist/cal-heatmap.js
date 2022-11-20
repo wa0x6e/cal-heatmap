@@ -2980,13 +2980,13 @@
    */
   const computeWeekSubDomainSize = (date, domain) => {
     if (domain === 'month') {
-      const endWeekNb = date.endOf('month').isoWeek();
-      const startWeekNb = date.startOf('month').isoWeek();
+      const endWeekNb = date.endOf('month').week();
+      const startWeekNb = date.startOf('month').week();
 
       return endWeekNb - startWeekNb;
     }
     if (domain === 'year') {
-      return date.isoWeeksInYear();
+      return date.weeksInYear();
     }
   };
 
@@ -6093,9 +6093,20 @@
         .transition()
         .duration(options.animationDuration)
         .attr('x', (d) => {
+          if (options.verticalOrientation) {
+            return 0;
+          }
           const domains = this.calendar.getDomainKeys();
 
           return domains.indexOf(d) * this.getWidth(d, true);
+        })
+        .attr('y', (d) => {
+          if (options.verticalOrientation) {
+            const domains = this.calendar.getDomainKeys();
+
+            return domains.indexOf(d) * this.getHeight(d, true);
+          }
+          return 0;
         });
 
       svg
@@ -6127,6 +6138,12 @@
           if (options.verticalOrientation) {
             return 0;
           }
+          console.log(
+            navigationDir === NAVIGATE_LEFT
+              ? this.dimensions.width
+              : -this.getWidth(d, true),
+          );
+
           return navigationDir === NAVIGATE_LEFT
             ? this.dimensions.width
             : -this.getWidth(d, true);
@@ -6206,7 +6223,7 @@
           classname += ` d_${helper.date()} dy_${helper.isoWeekday()}`;
           break;
         case 'week':
-          classname += ` w_${helper.isoWeek()}`;
+          classname += ` w_${helper.week()}`;
           break;
         case 'month':
           classname += ` m_${helper.month() + 1}`;
@@ -6425,7 +6442,7 @@
       //   }
       //   // Get the first character of the day name
       //   const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-      //     this.calendar.helpers.dateHelper.format(time[day](new Date()), 'dd').charAt(0)
+      //     this.calendar.helpers.DateHelper.format(time[day](new Date()), 'dd').charAt(0)
       //   );
 
       //   // Append "day-name" group to SVG
@@ -16804,9 +16821,9 @@
      * @return int Week number, relative to the month [0-5]
      */
     getMonthWeekNumber(d) {
-      const monthFirstWeekNumber = this.date(d).startOf('month').isoWeek();
+      const monthFirstWeekNumber = this.date(d).startOf('month').week();
 
-      return this.date(d).isoWeek() - monthFirstWeekNumber;
+      return this.date(d).week() - monthFirstWeekNumber;
     }
 
     date(d = new Date()) {
@@ -18563,9 +18580,9 @@
             case 'week':
               return Math.floor(weekDay / ROWS_COUNT);
             case 'month':
-              return dateHelper.getMonthWeekNumber(d);
+              return DateHelper.getMonthWeekNumber(d);
             case 'year':
-              return DateHelper.date(d).isoWeek() - 1;
+              return DateHelper.date(d).week() - 1;
           }
         },
         y(d) {
@@ -18588,11 +18605,11 @@
       switch (domain) {
         case 'year':
           return domainDynamicDimension
-            ? DateHelper.date(d).endOf('year').isoWeeksInYear()
-            : 52;
+            ? DateHelper.date(d).endOf('year').weeksInYear()
+            : 53;
         case 'month':
           return domainDynamicDimension
-            ? DateHelper.date(d).endOf('month').isoWeek()
+            ? DateHelper.date(d).endOf('month').week()
             : 5;
         default:
           return;
@@ -18612,9 +18629,9 @@
         x(d) {
           switch (domain) {
             case 'year':
-              return DateHelper.date(d).isoWeek() - 1;
+              return DateHelper.date(d).week() - 1;
             case 'month':
-              return Math.floor(dateHelper.getMonthWeekNumber(d));
+              return Math.floor(DateHelper.getMonthWeekNumber(d));
           }
         },
         y() {
@@ -18627,7 +18644,7 @@
         connector: 'at',
       },
       extractUnit(d) {
-        return DateHelper.date(d).startOf('isoWeek').valueOf();
+        return DateHelper.date(d).startOf('week').valueOf();
       },
     };
   };

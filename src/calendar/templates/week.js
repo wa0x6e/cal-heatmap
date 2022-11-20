@@ -3,11 +3,11 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     switch (domain) {
       case 'year':
         return domainDynamicDimension
-          ? DateHelper.date(d).endOf('year').isoWeeksInYear()
-          : 52;
+          ? DateHelper.date(d).endOf('year').weeksInYear()
+          : 53;
       case 'month':
         return domainDynamicDimension
-          ? DateHelper.date(d).endOf('month').isoWeek()
+          ? DateHelper.date(d).endOf('month').week()
           : 5;
       default:
         return;
@@ -27,9 +27,9 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
       x(d) {
         switch (domain) {
           case 'year':
-            return DateHelper.date(d).isoWeek() - 1;
+            return DateHelper.date(d).week() - 1;
           case 'month':
-            return Math.floor(dateHelper.getMonthWeekNumber(d));
+            return Math.floor(DateHelper.getMonthWeekNumber(d));
           default:
         }
       },
@@ -43,7 +43,7 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
       connector: 'at',
     },
     extractUnit(d) {
-      return DateHelper.date(d).startOf('isoWeek').valueOf();
+      return DateHelper.date(d).startOf('week').valueOf();
     },
   };
 };

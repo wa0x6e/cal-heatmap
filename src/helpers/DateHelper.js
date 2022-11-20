@@ -18,9 +18,9 @@ export default class DateHelper {
    * @return int Week number, relative to the month [0-5]
    */
   getMonthWeekNumber(d) {
-    const monthFirstWeekNumber = this.date(d).startOf('month').isoWeek();
+    const monthFirstWeekNumber = this.date(d).startOf('month').week();
 
-    return this.date(d).isoWeek() - monthFirstWeekNumber;
+    return this.date(d).week() - monthFirstWeekNumber;
   }
 
   date(d = new Date()) {

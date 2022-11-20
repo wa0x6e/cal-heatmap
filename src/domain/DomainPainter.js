@@ -197,7 +197,7 @@ export default class DomainPainter {
         classname += ` d_${helper.date()} dy_${helper.isoWeekday()}`;
         break;
       case 'week':
-        classname += ` w_${helper.isoWeek()}`;
+        classname += ` w_${helper.week()}`;
         break;
       case 'month':
         classname += ` m_${helper.month() + 1}`;

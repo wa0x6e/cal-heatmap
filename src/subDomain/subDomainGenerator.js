@@ -51,13 +51,13 @@ const computeHourSubDomainSize = (date, domain) => {
  */
 const computeWeekSubDomainSize = (date, domain) => {
   if (domain === 'month') {
-    const endWeekNb = date.endOf('month').isoWeek();
-    const startWeekNb = date.startOf('month').isoWeek();
+    const endWeekNb = date.endOf('month').week();
+    const startWeekNb = date.startOf('month').week();
 
     return endWeekNb - startWeekNb;
   }
   if (domain === 'year') {
-    return date.isoWeeksInYear();
+    return date.weeksInYear();
   }
 };
 
