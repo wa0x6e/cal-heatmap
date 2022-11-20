@@ -29,7 +29,7 @@ export default class DomainSecondaryLabel {
     //   }
     //   // Get the first character of the day name
     //   const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-    //     this.calendar.helpers.dateHelper.format(time[day](new Date()), 'dd').charAt(0)
+    //     this.calendar.helpers.DateHelper.format(time[day](new Date()), 'dd').charAt(0)
     //   );
 
     //   // Append "day-name" group to SVG

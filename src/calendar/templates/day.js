@@ -41,7 +41,7 @@ const dayTemplate = (
           case 'week':
             return Math.floor(weekDay / ROWS_COUNT);
           case 'month':
-            return dateHelper.getMonthWeekNumber(d);
+            return DateHelper.getMonthWeekNumber(d);
           case 'year':
             return DateHelper.date(d).isoWeek() - 1;
           default:
