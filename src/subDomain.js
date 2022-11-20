@@ -1,11 +1,14 @@
 import { format } from 'd3-format';
 
-import { formatDate, formatStringWithObject } from './function';
+import { formatStringWithObject } from './function';
 
-export function getSubDomainTitle(d, options, connector) {
+export function getSubDomainTitle(calendar, d, options, connector) {
   if (d.v === null && !options.considerMissingDataAsZero) {
     return formatStringWithObject(options.subDomainTitleFormat.empty, {
-      date: formatDate(d.t, options.subDomainDateFormat),
+      date: calendar.helpers.DateHelper.format(
+        d.t,
+        options.subDomainDateFormat,
+      ),
     });
   }
   let value = d.v;
@@ -18,6 +21,6 @@ export function getSubDomainTitle(d, options, connector) {
     count: format(',d')(value),
     name: options.itemName[value !== 1 ? 1 : 0],
     connector,
-    date: formatDate(d.t, options.subDomainDateFormat),
+    date: calendar.helpers.DateHelper.format(d.t, options.subDomainDateFormat),
   });
 }

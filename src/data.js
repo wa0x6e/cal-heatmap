@@ -1,8 +1,5 @@
 import { json, csv, dsv, text } from 'd3-fetch';
 
-import { getTimeInterval } from './utils/timeInterval';
-import DateHelper from './utils/DateHelper';
-
 import {
   RESET_ALL_ON_UPDATE,
   APPEND_ON_UPDATE,
@@ -20,7 +17,7 @@ function interpretCSV(data) {
   return d;
 }
 
-function parseURI(str, startTimestamp, endTimestamp) {
+function parseURI(calendar, str, startTimestamp, endTimestamp) {
   // Use a timestamp in seconds
   let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
   newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
@@ -28,11 +25,11 @@ function parseURI(str, startTimestamp, endTimestamp) {
   // Use a string date, following the ISO-8601
   newUri = newUri.replace(
     /\{\{d:start\}\}/g,
-    DateHelper.moment(startTimestamp).toISOString(),
+    calendar.helpers.DateHelper.date(startTimestamp).toISOString(),
   );
   newUri = newUri.replace(
     /\{\{d:end\}\}/g,
-    DateHelper.moment(endTimestamp).toISOString(),
+    calendar.helpers.DateHelper.date(endTimestamp).toISOString(),
   );
 
   return newUri;
@@ -71,7 +68,7 @@ function parseDatas(
 
     const timestamp = date * 1000;
 
-    const domainKey = getTimeInterval(
+    const domainKey = calendar.helpers.DateHelper.getTimeInterval(
       calendar.options.options.domain,
       timestamp,
     );
@@ -158,7 +155,7 @@ export function getDatas(
         _callback({});
         return true;
       }
-      const url = parseURI(source, startTimestamp, endTimestamp);
+      const url = parseURI(calendar, source, startTimestamp, endTimestamp);
 
       const reqInit = { method: 'GET' };
       if (options.dataPostPayload !== null) {
@@ -166,6 +163,7 @@ export function getDatas(
       }
       if (options.dataPostPayload !== null) {
         reqInit.body = parseURI(
+          calendar,
           options.dataPostPayload,
           startTimestamp,
           endTimestamp,

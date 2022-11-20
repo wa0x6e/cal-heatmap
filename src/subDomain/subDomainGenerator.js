@@ -1,15 +1,12 @@
-import DateHelper from '../utils/DateHelper';
-import { generateTimeInterval } from '../utils/timeInterval';
-
 /**
  * @return int
  */
 const computeDaySubDomainSize = (d, domain) => {
   switch (domain) {
     case 'year':
-      return DateHelper.moment(d).endOf('year').dayOfYear();
+      return d.endOf('year').dayOfYear();
     case 'month':
-      return DateHelper.moment(d).daysInMonth();
+      return d.daysInMonth();
     case 'week':
       return 7;
     default:
@@ -43,7 +40,7 @@ const computeHourSubDomainSize = (date, domain) => {
     case 'week':
       return 168;
     case 'month':
-      return DateHelper.moment(date).daysInMonth() * 24;
+      return date.daysInMonth() * 24;
     default:
       throw new Error('Invalid domain');
   }
@@ -54,50 +51,66 @@ const computeHourSubDomainSize = (date, domain) => {
  */
 const computeWeekSubDomainSize = (date, domain) => {
   if (domain === 'month') {
-    const endWeekNb = DateHelper.moment(date).endOf('month').isoWeek();
-    const startWeekNb = DateHelper.moment(date).startOf('month').isoWeek();
+    const endWeekNb = date.endOf('month').isoWeek();
+    const startWeekNb = date.startOf('month').isoWeek();
 
     return endWeekNb - startWeekNb;
   }
   if (domain === 'year') {
-    return DateHelper.moment(date).isoWeeksInYear();
+    return date.isoWeeksInYear();
   }
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export function generateSubDomain(date, options) {
+export function generateSubDomain(calendar, date, options) {
   switch (options.subDomain) {
     case 'x_minute':
     case 'minute':
-      return generateTimeInterval(
+      return calendar.helpers.DateHelper.generateTimeInterval(
         'minute',
         date,
-        computeMinuteSubDomainSize(date, options.domain),
+        computeMinuteSubDomainSize(
+          calendar.helpers.DateHelper.date(date),
+          options.domain,
+        ),
       );
     case 'x_hour':
     case 'hour':
-      return generateTimeInterval(
+      return calendar.helpers.DateHelper.generateTimeInterval(
         'hour',
         date,
-        computeHourSubDomainSize(date, options.domain),
+        computeHourSubDomainSize(
+          calendar.helpers.DateHelper.date(date),
+          options.domain,
+        ),
       );
     case 'x_day':
     case 'day':
-      return generateTimeInterval(
+      return calendar.helpers.DateHelper.generateTimeInterval(
         'day',
         date,
-        computeDaySubDomainSize(date, options.domain),
+        computeDaySubDomainSize(
+          calendar.helpers.DateHelper.date(date),
+          options.domain,
+        ),
       );
     case 'x_week':
     case 'week':
-      return generateTimeInterval(
+      return calendar.helpers.DateHelper.generateTimeInterval(
         'week',
         date,
-        computeWeekSubDomainSize(date, options.domain),
+        computeWeekSubDomainSize(
+          calendar.helpers.DateHelper.date(date),
+          options.domain,
+        ),
       );
     case 'x_month':
     case 'month':
-      return generateTimeInterval('month', date, 12);
+      return calendar.helpers.DateHelper.generateTimeInterval(
+        'month',
+        date,
+        12,
+      );
     default:
       throw new Error('Invalid subDomain');
   }

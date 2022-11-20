@@ -90,6 +90,7 @@ export default class CalendarEvent {
   afterLoadPreviousDomain(start) {
     return this.#triggerEvent('afterLoadPreviousDomain', () => {
       const subDomain = generateSubDomain(
+        this.calendar,
         start,
         this.options.options,
         this.DTSDomain,
@@ -107,6 +108,7 @@ export default class CalendarEvent {
   afterLoadNextDomain(start) {
     return this.#triggerEvent('afterLoadNextDomain', () => {
       const subDomain = generateSubDomain(
+        this.calendar,
         start,
         this.options.options,
         this.DTSDomain,

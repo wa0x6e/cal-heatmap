@@ -1,4 +1,4 @@
-const monthTemplate = (dateHelper) => ({
+const monthTemplate = (DateHelper) => ({
   name: 'month',
   level: 50,
   rowsCount() {
@@ -9,7 +9,7 @@ const monthTemplate = (dateHelper) => ({
   },
   position: {
     x(d) {
-      return dateHelper.moment(d).month();
+      return DateHelper.date(d).month();
     },
     y() {
       return 0;
@@ -21,7 +21,7 @@ const monthTemplate = (dateHelper) => ({
     connector: 'in',
   },
   extractUnit(d) {
-    return dateHelper.moment(d).startOf('month').valueOf();
+    return DateHelper.date(d).startOf('month').valueOf();
   },
 });
 

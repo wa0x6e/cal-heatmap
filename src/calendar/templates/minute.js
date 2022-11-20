@@ -1,4 +1,4 @@
-const minuteTemplate = (dateHelper) => {
+const minuteTemplate = (DateHelper) => {
   const COLUMNS_COUNT = 10;
   const ROWS_COUNT = 6;
 
@@ -13,10 +13,10 @@ const minuteTemplate = (dateHelper) => {
     },
     position: {
       x(d) {
-        return Math.floor(dateHelper.moment(d).minute() / COLUMNS_COUNT);
+        return Math.floor(DateHelper.date(d).minute() / COLUMNS_COUNT);
       },
       y(d) {
-        return dateHelper.moment(d).minute() % COLUMNS_COUNT;
+        return DateHelper.date(d).minute() % COLUMNS_COUNT;
       },
     },
     format: {
@@ -25,7 +25,7 @@ const minuteTemplate = (dateHelper) => {
       connector: 'at',
     },
     extractUnit(d) {
-      return dateHelper.moment(d).startOf('minute').valueOf();
+      return DateHelper.date(d).startOf('minute').valueOf();
     },
   };
 };

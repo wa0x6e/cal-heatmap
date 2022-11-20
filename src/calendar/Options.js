@@ -1,10 +1,10 @@
 import { select } from 'd3-selection';
 import { merge } from 'lodash-es';
-import moment from 'moment-timezone';
 
 import { validateSelector, validateDomainType } from '../utils/validator';
 import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
 import { expandMarginSetting } from '../function';
+import DateHelper from '../helpers/DateHelper';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 const DEFAULT_LEGEND_MARGIN = 10;
@@ -231,6 +231,9 @@ export default class Options {
       // TEXT FORMATTING / i18n
       // ================================================
 
+      // MomentJS locale
+      locale: 'en',
+
       // Name of the items to represent in the calendar
       itemName: ['item', 'items'],
 
@@ -452,6 +455,10 @@ export default class Options {
 
     const { options } = this;
 
+    this.calendar.helpers.DateHelper = new DateHelper(
+      options.locale,
+      options.timezone,
+    );
     this.calendar.subDomainTemplate.init(options.subDomainTemplates);
     this.#validate();
 
@@ -492,9 +499,6 @@ export default class Options {
       options.domainVerticalLabelHeight = 0;
       options.domainHorizontalLabelWidth = options.label.width;
     }
-
-    this.set('timezone', options.timezone ?? moment.tz.guess());
-    moment.tz.setDefault(options.timezone);
 
     if (options.legendMargin === [0, 0, 0, 0]) {
       switch (options.legendVerticalPosition) {

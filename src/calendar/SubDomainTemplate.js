@@ -1,5 +1,4 @@
 import DefaultTemplates from './templates';
-import DateHelper from '../utils/DateHelper';
 
 export default class SubDomainTemplate {
   constructor(calendar) {
@@ -27,7 +26,7 @@ export default class SubDomainTemplate {
     }
 
     [...DefaultTemplates, ...userTemplates].forEach((f) => {
-      const template = f(DateHelper, options);
+      const template = f(this.calendar.helpers.DateHelper, options);
       this.settings[template.name] = template;
     });
 

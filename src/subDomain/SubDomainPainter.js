@@ -1,4 +1,4 @@
-import { getHighlightClassName, formatDate } from '../function';
+import { getHighlightClassName } from '../function';
 
 import { TOP, LEFT } from '../constant';
 
@@ -79,7 +79,7 @@ export default class subDomainPainter {
   #getClassName(d) {
     const { options } = this.calendar.options;
 
-    return `graph-rect${getHighlightClassName(d.t, options)}${
+    return `graph-rect${getHighlightClassName(this.calendar, d.t, options)}${
       options.onClick !== null ? ' hover_cursor' : ''
     }`;
   }
@@ -91,13 +91,19 @@ export default class subDomainPainter {
       .append('text')
       .attr(
         'class',
-        (d) => `subdomain-text${getHighlightClassName(d.t, options)}`,
+        (d) =>
+          `subdomain-text${getHighlightClassName(this.calendar, d.t, options)}`,
       )
       .attr('x', (d) => this.#getX(d.t) + options.cellSize / 2)
       .attr('y', (d) => this.#getY(d.t) + options.cellSize / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d) => formatDate(d.t, options.subDomainTextFormat));
+      .text((d) =>
+        this.calendar.helpers.DateHelper.format(
+          d.t,
+          options.subDomainTextFormat,
+        ),
+      );
   }
 
   #appendTitle(elem) {
@@ -105,7 +111,12 @@ export default class subDomainPainter {
 
     elem
       .append('title')
-      .text((d) => formatDate(d.t, options.subDomainDateFormat));
+      .text((d) =>
+        this.calendar.helpers.DateHelper.format(
+          d.t,
+          options.subDomainDateFormat,
+        ),
+      );
   }
 
   #getCoordinates(axis, d) {

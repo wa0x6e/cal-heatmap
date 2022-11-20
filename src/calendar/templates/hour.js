@@ -1,4 +1,4 @@
-const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
+const hourTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
 
@@ -9,7 +9,7 @@ const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       case 'month':
         return (
           (TOTAL_ITEMS / ROWS_COUNT) *
-          (domainDynamicDimension ? dateHelper.moment(d).daysInMonth() : 31)
+          (domainDynamicDimension ? DateHelper.date(d).daysInMonth() : 31)
         );
       case 'day':
       default:
@@ -28,8 +28,8 @@ const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
     },
     position: {
       x(d) {
-        const hour = dateHelper.moment(d).hour();
-        const date = dateHelper.moment(d).date();
+        const hour = DateHelper.date(d).hour();
+        const date = DateHelper.date(d).date();
         const baseX = Math.floor(hour / ROWS_COUNT);
         const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
@@ -37,12 +37,12 @@ const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
           return baseX + (date - 1) * columnOffset;
         }
         if (domain === 'week') {
-          return baseX + (dateHelper.moment(d).isoWeekday() - 1) * columnOffset;
+          return baseX + (DateHelper.date(d).isoWeekday() - 1) * columnOffset;
         }
         return baseX;
       },
       y(d) {
-        return Math.floor(dateHelper.moment(d).hour() % ROWS_COUNT);
+        return Math.floor(DateHelper.date(d).hour() % ROWS_COUNT);
       },
     },
     format: {
@@ -51,7 +51,7 @@ const hourTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       connector: 'at',
     },
     extractUnit(d) {
-      return dateHelper.moment(d).startOf('hour').valueOf();
+      return DateHelper.date(d).startOf('hour').valueOf();
     },
   };
 };

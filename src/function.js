@@ -1,14 +1,3 @@
-import { datesFromSameInterval } from './utils/date';
-import DateHelper from './utils/DateHelper';
-
-export function formatDate(d, formatter = 'title') {
-  if (typeof formatter === 'function') {
-    return formatter(new Date(d));
-  }
-
-  return DateHelper.moment(d).format(formatter);
-}
-
 /**
  * Sprintf like function.
  * Replaces placeholders {0} in string with values from provided object.
@@ -34,14 +23,25 @@ export function formatStringWithObject(formatted, args) {
  * @param  int timestamp Unix timestamp of the current subDomain
  * @return String the highlight class
  */
-export function getHighlightClassName(timestamp, options) {
+export function getHighlightClassName(calendar, timestamp, options) {
   const { highlight, subDomain } = options;
   let classname = '';
 
   if (highlight.length > 0) {
     highlight.forEach((d) => {
-      if (datesFromSameInterval(+d, timestamp, subDomain)) {
-        classname = datesFromSameInterval(+d) ? ' highlight-now' : ' highlight';
+      if (
+        calendar.helpers.DateHelper.datesFromSameInterval(
+          subDomain,
+          +d,
+          timestamp,
+        )
+      ) {
+        classname = calendar.helpers.DateHelper.datesFromSameInterval(
+          subDomain,
+          +d,
+        )
+          ? ' highlight-now'
+          : ' highlight';
       }
     });
   }

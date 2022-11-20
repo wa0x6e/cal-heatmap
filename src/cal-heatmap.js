@@ -8,7 +8,6 @@ import Colorizer from './calendar/Colorizer';
 
 import extractSVG from './utils/extractSVG';
 
-import { generateTimeInterval } from './utils/timeInterval';
 import { getDatas } from './data';
 
 import SubDomainTemplate from './calendar/SubDomainTemplate';
@@ -34,6 +33,7 @@ export default class CalHeatMap extends CalendarEvent {
 
     this.calendarPainter = new CalendarPainter(this);
     this.colorizer = new Colorizer(this);
+    this.helpers = {};
   }
 
   /**
@@ -67,7 +67,11 @@ export default class CalHeatMap extends CalendarEvent {
     this.colorizer.build();
 
     this.navigator.loadNewDomains(
-      generateTimeInterval(options.domain, options.start, options.range),
+      this.helpers.DateHelper.generateTimeInterval(
+        options.domain,
+        options.start,
+        options.range,
+      ),
     );
 
     this.calendarPainter.paint();
@@ -142,7 +146,7 @@ export default class CalHeatMap extends CalendarEvent {
   ) {
     const { options } = this.options;
     const domainsBound = this.getDomainBoundKeys();
-    const endTimestamp = generateTimeInterval(
+    const endTimestamp = this.helpers.DateHelper.generateTimeInterval(
       options.domain,
       domainsBound.max,
       2,

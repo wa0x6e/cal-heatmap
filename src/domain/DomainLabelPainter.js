@@ -1,5 +1,3 @@
-import { formatDate } from '../function';
-
 export default class DomainLabelPainter {
   constructor(calendar) {
     this.calendar = calendar;
@@ -75,7 +73,9 @@ export default class DomainLabelPainter {
       .attr('dominant-baseline', () =>
         options.verticalDomainLabel ? 'middle' : 'top',
       )
-      .text((d) => formatDate(d, options.domainLabelFormat))
+      .text((d) =>
+        this.calendar.helpers.DateHelper.format(d, options.domainLabelFormat),
+      )
       .call((s) => this.#domainRotate(s));
   }
 

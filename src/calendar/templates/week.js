@@ -1,13 +1,13 @@
-const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
+const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
   function getTotalColNumber(d) {
     switch (domain) {
       case 'year':
         return domainDynamicDimension
-          ? dateHelper.moment(d).endOf('year').isoWeeksInYear()
+          ? DateHelper.date(d).endOf('year').isoWeeksInYear()
           : 52;
       case 'month':
         return domainDynamicDimension
-          ? dateHelper.moment(d).endOf('month').isoWeek()
+          ? DateHelper.date(d).endOf('month').isoWeek()
           : 5;
       default:
         return;
@@ -27,7 +27,7 @@ const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       x(d) {
         switch (domain) {
           case 'year':
-            return dateHelper.moment(d).isoWeek() - 1;
+            return DateHelper.date(d).isoWeek() - 1;
           case 'month':
             return Math.floor(dateHelper.getMonthWeekNumber(d));
           default:
@@ -43,7 +43,7 @@ const weekTemplate = (dateHelper, { domain, domainDynamicDimension }) => {
       connector: 'at',
     },
     extractUnit(d) {
-      return dateHelper.moment(d).startOf('isoWeek').valueOf();
+      return DateHelper.date(d).startOf('isoWeek').valueOf();
     },
   };
 };

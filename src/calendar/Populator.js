@@ -2,7 +2,6 @@ import { selectAll } from 'd3-selection';
 
 import { getSubDomainTitle } from '../subDomain';
 import { getHighlightClassName } from '../function';
-import { dateFromPreviousInterval } from '../utils/date';
 
 export default class Populator {
   constructor(calendar) {
@@ -58,11 +57,13 @@ export default class Populator {
     const { calendar } = this;
     const { options } = calendar.options;
 
-    const htmlClass = getHighlightClassName(d.t, options).trim().split(' ');
-    const pastDate = dateFromPreviousInterval(
+    const htmlClass = getHighlightClassName(calendar, d.t, options)
+      .trim()
+      .split(' ');
+    const pastDate = calendar.helpers.DateHelper.dateFromPreviousInterval(
+      options.subDomain,
       d.t,
       new Date(),
-      options.subDomain,
     );
 
     if (
@@ -118,6 +119,7 @@ export default class Populator {
       .select('title')
       .text((d) =>
         getSubDomainTitle(
+          calendar,
           d,
           options,
           calendar.subDomainTemplate.at(options.subDomain).format.connector,
@@ -135,7 +137,7 @@ export default class Populator {
       .select('text')
       .attr(
         'class',
-        (d) => `subdomain-text${getHighlightClassName(d.t, options)}`,
+        (d) => `subdomain-text${getHighlightClassName(calendar, d.t, options)}`,
       )
       .call((e) => this.#formatSubDomainText(e));
   }

@@ -2,7 +2,6 @@ import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
 import { NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT } from '../constant';
-import DateHelper from '../utils/DateHelper';
 
 export default class DomainPainter {
   constructor(calendar) {
@@ -171,23 +170,23 @@ export default class DomainPainter {
 
   #getClassName(d) {
     let classname = 'graph-domain';
-    const moment = DateHelper.moment(d);
+    const helper = this.calendar.helpers.DateHelper.date(d);
 
     switch (this.calendar.options.options.domain) {
       case 'hour':
-        classname += ` h_${moment.hour()}`;
+        classname += ` h_${helper.hour()}`;
         break;
       case 'day':
-        classname += ` d_${moment.date()} dy_${moment.isoWeekday()}`;
+        classname += ` d_${helper.date()} dy_${helper.isoWeekday()}`;
         break;
       case 'week':
-        classname += ` w_${moment.isoWeek()}`;
+        classname += ` w_${helper.isoWeek()}`;
         break;
       case 'month':
-        classname += ` m_${moment.month() + 1}`;
+        classname += ` m_${helper.month() + 1}`;
         break;
       case 'year':
-        classname += ` y_${moment.year()}`;
+        classname += ` y_${helper.year()}`;
         break;
       default:
     }

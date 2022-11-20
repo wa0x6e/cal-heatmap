@@ -1,4 +1,4 @@
-const yearTemplate = (dateHelper) => ({
+const yearTemplate = (DateHelper) => ({
   name: 'year',
   level: 60,
   row() {
@@ -21,7 +21,7 @@ const yearTemplate = (dateHelper) => ({
     connector: 'in',
   },
   extractUnit(d) {
-    return dateHelper.moment(d).startOf('year').valueOf();
+    return DateHelper.date(d).startOf('year').valueOf();
   },
 });
 

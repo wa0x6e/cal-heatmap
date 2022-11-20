@@ -1,5 +1,5 @@
 const dayTemplate = (
-  dateHelper,
+  DateHelper,
   { domain, domainDynamicDimension, verticalOrientation },
 ) => {
   const ROWS_COUNT = 7;
@@ -9,13 +9,13 @@ const dayTemplate = (
       case 'month':
         return Math.ceil(
           domainDynamicDimension && !verticalOrientation
-            ? dateHelper.moment(d).daysInMonth() / ROWS_COUNT
+            ? DateHelper.date(d).daysInMonth() / ROWS_COUNT
             : 31 / ROWS_COUNT,
         );
       case 'year':
         return Math.ceil(
           domainDynamicDimension
-            ? dateHelper.moment(d).endOf('year').dayOfYear() / ROWS_COUNT
+            ? DateHelper.date(d).endOf('year').dayOfYear() / ROWS_COUNT
             : 366 / ROWS_COUNT,
         );
       case 'week':
@@ -35,7 +35,7 @@ const dayTemplate = (
     },
     position: {
       x(d) {
-        const weekDay = dateHelper.moment(d).isoWeekday() - 1;
+        const weekDay = DateHelper.date(d).isoWeekday() - 1;
 
         switch (domain) {
           case 'week':
@@ -43,12 +43,12 @@ const dayTemplate = (
           case 'month':
             return dateHelper.getMonthWeekNumber(d);
           case 'year':
-            return dateHelper.moment(d).isoWeek() - 1;
+            return DateHelper.date(d).isoWeek() - 1;
           default:
         }
       },
       y(d) {
-        return Math.floor(dateHelper.moment(d).isoWeekday() % ROWS_COUNT);
+        return Math.floor(DateHelper.date(d).isoWeekday() % ROWS_COUNT);
       },
     },
     format: {
@@ -57,7 +57,7 @@ const dayTemplate = (
       connector: 'on',
     },
     extractUnit(d) {
-      return dateHelper.moment(d).startOf('day').valueOf();
+      return DateHelper.date(d).startOf('day').valueOf();
     },
   };
 };

@@ -78,7 +78,7 @@ export default class Tooltip {
     if (options.onTooltip) {
       this.#setTitle(options.onTooltip(new Date(d.t), d.v));
     } else {
-      this.#setTitle(getSubDomainTitle(d, options));
+      this.#setTitle(getSubDomainTitle(this.calendar, d, options));
     }
   }
 
