@@ -16821,9 +16821,13 @@
      * @return int Week number, relative to the month [0-5]
      */
     getMonthWeekNumber(d) {
-      const monthFirstWeekNumber = this.date(d).startOf('month').week();
+      const date = this.date(d).startOf('day');
+      const endOfWeek = this.date(d).startOf('month').endOf('week');
 
-      return this.date(d).week() - monthFirstWeekNumber;
+      if (date <= endOfWeek) {
+        return 1;
+      }
+      return Math.ceil(date.diff(endOfWeek, 'weeks', true)) + 1;
     }
 
     date(d = new Date()) {
@@ -18580,13 +18584,13 @@
             case 'week':
               return Math.floor(weekDay / ROWS_COUNT);
             case 'month':
-              return DateHelper.getMonthWeekNumber(d);
+              return DateHelper.getMonthWeekNumber(d) - 1;
             case 'year':
               return DateHelper.date(d).week() - 1;
           }
         },
         y(d) {
-          return Math.floor(DateHelper.date(d).isoWeekday() % ROWS_COUNT);
+          return DateHelper.date(d).isoWeekday() - 1;
         },
       },
       format: {

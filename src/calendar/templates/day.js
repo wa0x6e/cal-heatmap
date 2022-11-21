@@ -41,14 +41,14 @@ const dayTemplate = (
           case 'week':
             return Math.floor(weekDay / ROWS_COUNT);
           case 'month':
-            return DateHelper.getMonthWeekNumber(d);
+            return DateHelper.getMonthWeekNumber(d) - 1;
           case 'year':
             return DateHelper.date(d).week() - 1;
           default:
         }
       },
       y(d) {
-        return Math.floor(DateHelper.date(d).isoWeekday() % ROWS_COUNT);
+        return DateHelper.date(d).isoWeekday() - 1;
       },
     },
     format: {

@@ -1,6 +1,8 @@
 import DateHelper from '../../src/helpers/DateHelper';
 import TimeIntervalTest from './TimeIntervalTest';
 
+import weekData from '../data/weekNumberDates';
+
 describe('DateHelper', () => {
   describe('new()', () => {
     ['en', 'fr'].forEach((locale) => {
@@ -54,6 +56,20 @@ describe('DateHelper', () => {
       xit('returns the result of the function', () => {});
       xit('passes the date args to the function', () => {});
     });
+  });
+
+  describe('getMonthWeekNumber()', () => {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [locale, value] of Object.entries(weekData)) {
+      value.forEach((dates, index) => {
+        dates.forEach((date) => {
+          it(`assigns ${date} to the week ${index + 1}`, () => {
+            const h = new DateHelper(locale);
+            expect(h.getMonthWeekNumber(date)).toEqual(index + 1);
+          });
+        });
+      });
+    }
   });
 });
 
