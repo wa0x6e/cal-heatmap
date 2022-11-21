@@ -1,7 +1,7 @@
 import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
-import { NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+import { NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT, X, Y } from '../constant';
 
 export default class DomainPainter {
   constructor(calendar) {
@@ -223,7 +223,7 @@ export default class DomainPainter {
       .at(options.subDomain)
       .columnsCount(d);
 
-    let width = (options.cellSize + options.cellPadding) * columnsCount;
+    let width = (options.cellSize[X] + options.cellPadding) * columnsCount;
 
     if (outer) {
       width +=
@@ -243,7 +243,7 @@ export default class DomainPainter {
       .at(options.subDomain)
       .rowsCount(d);
 
-    let height = (options.cellSize + options.cellPadding) * rowsCount;
+    let height = (options.cellSize[Y] + options.cellPadding) * rowsCount;
 
     if (outer) {
       height +=

@@ -2,7 +2,7 @@ import { select } from 'd3-selection';
 import { merge } from 'lodash-es';
 
 import { validateSelector, validateDomainType } from '../utils/validator';
-import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+import { TOP, RIGHT, BOTTOM, LEFT, X } from '../constant';
 import { expandMarginSetting } from '../function';
 import DateHelper from '../helpers/DateHelper';
 
@@ -73,6 +73,9 @@ export default class Options {
       range: 12,
 
       // Size of each cell, in pixel
+      // Accepts either:
+      // - a number, representing the width and height of each cell
+      // - an array of 2 numbers, such as [width, height]
       cellSize: 10,
 
       // Padding between each cell, in pixel
@@ -488,7 +491,7 @@ export default class Options {
       options.label.position === 'top' || options.label.position === 'bottom';
 
     options.domainVerticalLabelHeight =
-      options.label.height ?? Math.max(25, options.cellSize * 2);
+      options.label.height ?? Math.max(25, options.cellSize[X] * 2);
     options.domainHorizontalLabelWidth = 0;
 
     if (options.domainLabelFormat === '' && options.label.height === null) {
@@ -498,6 +501,10 @@ export default class Options {
     if (!options.verticalDomainLabel) {
       options.domainVerticalLabelHeight = 0;
       options.domainHorizontalLabelWidth = options.label.width;
+    }
+
+    if (typeof options.cellSize === 'number') {
+      options.cellSize = [options.cellSize, options.cellSize];
     }
 
     if (options.legendMargin === [0, 0, 0, 0]) {

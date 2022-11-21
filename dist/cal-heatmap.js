@@ -2926,6 +2926,8 @@
   const RIGHT = 1;
   const BOTTOM = 2;
   const LEFT = 3;
+  const X = 0;
+  const Y = 1;
 
   class Navigator {
     constructor(calendar) {
@@ -6140,7 +6142,7 @@
         .at(options.subDomain)
         .columnsCount(d);
 
-      let width = (options.cellSize + options.cellPadding) * columnsCount;
+      let width = (options.cellSize[X] + options.cellPadding) * columnsCount;
 
       if (outer) {
         width +=
@@ -6160,7 +6162,7 @@
         .at(options.subDomain)
         .rowsCount(d);
 
-      let height = (options.cellSize + options.cellPadding) * rowsCount;
+      let height = (options.cellSize[Y] + options.cellPadding) * rowsCount;
 
       if (outer) {
         height +=
@@ -6491,8 +6493,8 @@
       rect
         .append('rect')
         .attr('class', (d) => this.#getClassName(d))
-        .attr('width', options.cellSize)
-        .attr('height', options.cellSize)
+        .attr('width', options.cellSize[X])
+        .attr('height', options.cellSize[Y])
         .attr('x', (d) => this.#getX(d))
         .attr('y', (d) => this.#getY(d))
         .on('click', (ev, d) => this.calendar.onClick(ev, new Date(d.t), d.v))
@@ -6546,8 +6548,8 @@
           (d) =>
             `subdomain-text${getHighlightClassName(this.calendar, d.t, options)}`,
         )
-        .attr('x', (d) => this.#getX(d) + options.cellSize / 2)
-        .attr('y', (d) => this.#getY(d) + options.cellSize / 2)
+        .attr('x', (d) => this.#getX(d) + options.cellSize[X] / 2)
+        .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
         .attr('text-anchor', 'middle')
         .attr('dominant-baseline', 'central')
         .text((d) =>
@@ -6573,7 +6575,7 @@
 
     #getCoordinates(axis, d) {
       const { cellSize, cellPadding } = this.calendar.options.options;
-      return d[axis] * (cellSize + cellPadding);
+      return d[axis] * (cellSize[axis === 'x' ? X : Y] + cellPadding);
     }
 
     #getX(d) {
@@ -16845,6 +16847,9 @@
         range: 12,
 
         // Size of each cell, in pixel
+        // Accepts either:
+        // - a number, representing the width and height of each cell
+        // - an array of 2 numbers, such as [width, height]
         cellSize: 10,
 
         // Padding between each cell, in pixel
@@ -17260,7 +17265,7 @@
         options.label.position === 'top' || options.label.position === 'bottom';
 
       options.domainVerticalLabelHeight =
-        options.label.height ?? Math.max(25, options.cellSize * 2);
+        options.label.height ?? Math.max(25, options.cellSize[X] * 2);
       options.domainHorizontalLabelWidth = 0;
 
       if (options.domainLabelFormat === '' && options.label.height === null) {
@@ -17270,6 +17275,10 @@
       if (!options.verticalDomainLabel) {
         options.domainVerticalLabelHeight = 0;
         options.domainHorizontalLabelWidth = options.label.width;
+      }
+
+      if (typeof options.cellSize === 'number') {
+        options.cellSize = [options.cellSize, options.cellSize];
       }
 
       if (options.legendMargin === [0, 0, 0, 0]) {
