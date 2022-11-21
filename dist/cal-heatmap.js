@@ -2927,124 +2927,6 @@
   const BOTTOM = 2;
   const LEFT = 3;
 
-  /**
-   * @return int
-   */
-  const computeDaySubDomainSize = (d, domain) => {
-    switch (domain) {
-      case 'year':
-        return d.endOf('year').dayOfYear();
-      case 'month':
-        return d.daysInMonth();
-      case 'week':
-        return 7;
-      default:
-        throw new Error('Invalid domain');
-    }
-  };
-
-  /**
-   * @return int
-   */
-  const computeMinuteSubDomainSize = (date, domain) => {
-    switch (domain) {
-      case 'hour':
-        return 60;
-      case 'day':
-        return 60 * 24;
-      case 'week':
-        return 60 * 24 * 7;
-      default:
-        throw new Error('Invalid domain');
-    }
-  };
-
-  /**
-   * @return int
-   */
-  const computeHourSubDomainSize = (date, domain) => {
-    switch (domain) {
-      case 'day':
-        return 24;
-      case 'week':
-        return 168;
-      case 'month':
-        return date.daysInMonth() * 24;
-      default:
-        throw new Error('Invalid domain');
-    }
-  };
-
-  /**
-   * @return int
-   */
-  const computeWeekSubDomainSize = (date, domain) => {
-    if (domain === 'month') {
-      const endWeekNb = date.endOf('month').week();
-      const startWeekNb = date.startOf('month').week();
-
-      return endWeekNb - startWeekNb;
-    }
-    if (domain === 'year') {
-      return date.weeksInYear();
-    }
-  };
-
-  // eslint-disable-next-line import/prefer-default-export
-  function generateSubDomain(calendar, date, options) {
-    switch (options.subDomain) {
-      case 'x_minute':
-      case 'minute':
-        return calendar.helpers.DateHelper.generateTimeInterval(
-          'minute',
-          date,
-          computeMinuteSubDomainSize(
-            calendar.helpers.DateHelper.date(date),
-            options.domain,
-          ),
-        );
-      case 'x_hour':
-      case 'hour':
-        return calendar.helpers.DateHelper.generateTimeInterval(
-          'hour',
-          date,
-          computeHourSubDomainSize(
-            calendar.helpers.DateHelper.date(date),
-            options.domain,
-          ),
-        );
-      case 'x_day':
-      case 'day':
-        return calendar.helpers.DateHelper.generateTimeInterval(
-          'day',
-          date,
-          computeDaySubDomainSize(
-            calendar.helpers.DateHelper.date(date),
-            options.domain,
-          ),
-        );
-      case 'x_week':
-      case 'week':
-        return calendar.helpers.DateHelper.generateTimeInterval(
-          'week',
-          date,
-          computeWeekSubDomainSize(
-            calendar.helpers.DateHelper.date(date),
-            options.domain,
-          ),
-        );
-      case 'x_month':
-      case 'month':
-        return calendar.helpers.DateHelper.generateTimeInterval(
-          'month',
-          date,
-          12,
-        );
-      default:
-        throw new Error('Invalid subDomain');
-    }
-  }
-
   class Navigator {
     constructor(calendar) {
       this.calendar = calendar;
@@ -3125,11 +3007,12 @@
     loadNewDomains(newDomains, direction = NAVIGATE_RIGHT) {
       const backward = direction === NAVIGATE_LEFT;
       const { options, minDate, maxDate } = this.calendar.options;
+      const template = this.calendar.subDomainTemplate;
       const minDateInterval = minDate
-        ? this.calendar.helpers.DateHelper.getTimeInterval(minDate)
+        ? template.at(options.domain).extractUnit(minDate)
         : null;
       const maxDateInterval = maxDate
-        ? this.calendar.helpers.DateHelper.getTimeInterval(maxDate)
+        ? template.at(options.domain).extractUnit(maxDate)
         : null;
       const domains = this.calendar.getDomainKeys();
 
@@ -3142,19 +3025,28 @@
         )
         .slice(-options.range);
 
-      boundedNewDomains.forEach((domain) => {
+      boundedNewDomains.forEach((domain, index) => {
         if (this.calendar.domainCollection.has(domain)) {
           return;
         }
 
+        let subDomainEndDate = null;
+        if (boundedNewDomains[index + 1]) {
+          subDomainEndDate = boundedNewDomains[index + 1];
+        } else {
+          subDomainEndDate =
+            this.calendar.helpers.DateHelper.generateTimeInterval(
+              options.domain,
+              domain,
+              2,
+            ).pop();
+        }
+
         this.calendar.domainCollection.set(
           domain,
-          generateSubDomain(this.calendar, domain, options).map((d) => ({
-            t: this.calendar.subDomainTemplate
-              .at(options.subDomain)
-              .extractUnit(d),
-            v: null,
-          })),
+          template
+            .at(options.subDomain)
+            .mapping(domain, subDomainEndDate - 1000, { v: null }),
         );
 
         this.calendar.domainCollection.delete(
@@ -6138,11 +6030,6 @@
           if (options.verticalOrientation) {
             return 0;
           }
-          console.log(
-            navigationDir === NAVIGATE_LEFT
-              ? this.dimensions.width
-              : -this.getWidth(d, true),
-          );
 
           return navigationDir === NAVIGATE_LEFT
             ? this.dimensions.width
@@ -6606,8 +6493,8 @@
         .attr('class', (d) => this.#getClassName(d))
         .attr('width', options.cellSize)
         .attr('height', options.cellSize)
-        .attr('x', (d) => this.#getX(d.t))
-        .attr('y', (d) => this.#getY(d.t))
+        .attr('x', (d) => this.#getX(d))
+        .attr('y', (d) => this.#getY(d))
         .on('click', (ev, d) => this.calendar.onClick(ev, new Date(d.t), d.v))
         .on('mouseover', (ev, d) => {
           if (options.tooltip) {
@@ -6659,8 +6546,8 @@
           (d) =>
             `subdomain-text${getHighlightClassName(this.calendar, d.t, options)}`,
         )
-        .attr('x', (d) => this.#getX(d.t) + options.cellSize / 2)
-        .attr('y', (d) => this.#getY(d.t) + options.cellSize / 2)
+        .attr('x', (d) => this.#getX(d) + options.cellSize / 2)
+        .attr('y', (d) => this.#getY(d) + options.cellSize / 2)
         .attr('text-anchor', 'middle')
         .attr('dominant-baseline', 'central')
         .text((d) =>
@@ -6685,13 +6572,8 @@
     }
 
     #getCoordinates(axis, d) {
-      const { options } = this.calendar.options;
-
-      const index = this.calendar.subDomainTemplate
-        .at(options.subDomain)
-        .position[axis](d);
-
-      return index * (options.cellSize + options.cellPadding);
+      const { cellSize, cellPadding } = this.calendar.options.options;
+      return d[axis] * (cellSize + cellPadding);
     }
 
     #getX(d) {
@@ -9514,11 +9396,7 @@
    * @return {bool} True if domain and subdomain are valid and compatible
    */
   function validateDomainType(subDomainTemplate, { domain, subDomain }) {
-    if (
-      !subDomainTemplate.has(domain) ||
-      domain === 'min' ||
-      domain.substring(0, 2) === 'x_'
-    ) {
+    if (!subDomainTemplate.has(domain) || domain === 'minute') {
       throw new Error(`The domain '${domain}' is not valid`);
     }
 
@@ -16842,16 +16720,6 @@
       return this.date(d).format(formatter);
     }
 
-    getTimeInterval(interval, date, asMoment = false) {
-      const newDate = this.date(date).startOf(interval);
-
-      if (asMoment) {
-        return newDate;
-      }
-
-      return newDate.valueOf();
-    }
-
     /**
      * Return an array of time interval
      *
@@ -18310,10 +18178,9 @@
 
       const timestamp = date * 1000;
 
-      const domainKey = calendar.helpers.DateHelper.getTimeInterval(
-        calendar.options.options.domain,
-        timestamp,
-      );
+      const domainKey = calendar.subDomainTemplate
+        .at(calendar.options.options.domain)
+        .extractUnit(timestamp);
 
       // Skip if data is not relevant to current domain
       if (
@@ -18464,14 +18331,21 @@
       columnsCount() {
         return ROWS_COUNT;
       },
-      position: {
-        x(d) {
-          return Math.floor(DateHelper.date(d).minute() / COLUMNS_COUNT);
-        },
-        y(d) {
-          return DateHelper.date(d).minute() % COLUMNS_COUNT;
-        },
-      },
+      mapping: (startTimestamp, endTimestamp, defaultValues = {}) =>
+        DateHelper.generateTimeInterval(
+          'minute',
+          startTimestamp,
+          DateHelper.date(endTimestamp),
+        ).map((d) => {
+          const minute = DateHelper.date(d).minute();
+
+          return {
+            t: d,
+            x: Math.floor(minute / COLUMNS_COUNT),
+            y: minute % COLUMNS_COUNT,
+            ...defaultValues,
+          };
+        }),
       format: {
         date: 'LT, dddd MMMM D, Y',
         legend: '',
@@ -18511,25 +18385,33 @@
       columnsCount(d) {
         return getTotalColNumber(d);
       },
-      position: {
-        x(d) {
-          const hour = DateHelper.date(d).hour();
-          const date = DateHelper.date(d).date();
+      mapping: (startTimestamp, endTimestamp, defaultValues) =>
+        DateHelper.generateTimeInterval(
+          'hour',
+          startTimestamp,
+          DateHelper.date(endTimestamp),
+        ).map((d) => {
+          const date = DateHelper.date(d);
+          const hour = date.hour();
+          const monthDate = date.date();
           const baseX = Math.floor(hour / ROWS_COUNT);
           const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
           if (domain === 'month') {
-            return baseX + (date - 1) * columnOffset;
+            return baseX + (monthDate - 1) * columnOffset;
           }
           if (domain === 'week') {
-            return baseX + (DateHelper.date(d).isoWeekday() - 1) * columnOffset;
+            return baseX + (date.isoWeekday() - 1) * columnOffset;
           }
-          return baseX;
-        },
-        y(d) {
-          return Math.floor(DateHelper.date(d).hour() % ROWS_COUNT);
-        },
-      },
+
+          return {
+            t: d,
+            x: baseX,
+            y: Math.floor(hour % ROWS_COUNT),
+            ...defaultValues,
+          };
+        }),
+
       format: {
         date: 'HH[h], dddd MMMM D, Y',
         legend: 'HH:00',
@@ -18547,52 +18429,67 @@
   ) => {
     const ROWS_COUNT = 7;
 
-    function getTotalColNumber(d) {
-      switch (domain) {
-        case 'month':
-          return Math.ceil(
-            domainDynamicDimension && !verticalOrientation
-              ? DateHelper.date(d).daysInMonth() / ROWS_COUNT
-              : 31 / ROWS_COUNT,
-          );
-        case 'year':
-          return Math.ceil(
-            domainDynamicDimension
-              ? DateHelper.date(d).endOf('year').dayOfYear() / ROWS_COUNT
-              : 366 / ROWS_COUNT,
-          );
-        case 'week':
-        default:
-          return 1;
-      }
-    }
-
     return {
       name: 'day',
       level: 30,
       rowsCount() {
+        if (domain === 'week') {
+          return 1;
+        }
         return ROWS_COUNT;
       },
       columnsCount(d) {
-        return getTotalColNumber(d);
+        switch (domain) {
+          case 'month':
+            return Math.ceil(
+              domainDynamicDimension && !verticalOrientation
+                ? DateHelper.date(d).daysInMonth() / ROWS_COUNT
+                : 31 / ROWS_COUNT,
+            );
+          case 'year':
+            return Math.ceil(
+              domainDynamicDimension
+                ? DateHelper.date(d).endOf('year').dayOfYear() / ROWS_COUNT
+                : 54,
+            );
+          case 'week':
+          default:
+            return ROWS_COUNT;
+        }
       },
-      position: {
-        x(d) {
-          const weekDay = DateHelper.date(d).isoWeekday() - 1;
+      mapping: (startTimestamp, endTimestamp, defaultValues) =>
+        DateHelper.generateTimeInterval(
+          'day',
+          startTimestamp,
+          DateHelper.date(endTimestamp),
+        ).map((d) => {
+          const date = DateHelper.date(d);
+          const endWeekNumber = DateHelper.date(d).endOf('year').week();
+          let x = 0;
 
           switch (domain) {
-            case 'week':
-              return Math.floor(weekDay / ROWS_COUNT);
             case 'month':
-              return DateHelper.getMonthWeekNumber(d) - 1;
+              x = DateHelper.getMonthWeekNumber(d) - 1;
+              break;
             case 'year':
-              return DateHelper.date(d).week() - 1;
+              if (endWeekNumber === 1 && date.week() === endWeekNumber) {
+                x = DateHelper.date(d).subtract(1, 'week').week() + 1;
+              }
+
+              x = date.week() - 1;
+              break;
+            case 'week':
+              x = date.weekday();
+              break;
           }
-        },
-        y(d) {
-          return DateHelper.date(d).isoWeekday() - 1;
-        },
-      },
+
+          return {
+            t: d,
+            x,
+            y: domain === 'week' ? 0 : date.weekday(),
+            ...defaultValues,
+          };
+        }),
       format: {
         date: 'dddd MMMM D, Y',
         legend: 'Do MMM',
@@ -18629,15 +18526,31 @@
       columnsCount(d) {
         return getTotalColNumber(d);
       },
-      position: {
-        x(d) {
+      mapping: (startTimestamp, endTimestamp, defaultValues) =>
+        DateHelper.generateTimeInterval(
+          'week',
+          startTimestamp,
+          DateHelper.date(endTimestamp),
+        ).map((d) => {
+          let x = 0;
           switch (domain) {
             case 'year':
-              return DateHelper.date(d).week() - 1;
+              x = DateHelper.date(d).week() - 1;
+              break;
             case 'month':
-              return Math.floor(DateHelper.getMonthWeekNumber(d));
+              x = Math.floor(DateHelper.getMonthWeekNumber(d));
+              break;
           }
-        },
+
+          return {
+            t: d,
+            x,
+            y: 0,
+            ...defaultValues,
+          };
+        }),
+      position: {
+        x(d) {},
         y() {
           return 0;
         },
@@ -18662,14 +18575,18 @@
     columnsCount() {
       return 12;
     },
-    position: {
-      x(d) {
-        return DateHelper.date(d).month();
-      },
-      y() {
-        return 0;
-      },
-    },
+    mapping: (startTimestamp, endTimestamp, defaultValues) =>
+      DateHelper.generateTimeInterval(
+        'week',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((d) => ({
+        t: d,
+        x: DateHelper.date(d).month(),
+        y: 0,
+        ...defaultValues,
+      })),
+
     format: {
       date: 'MMMM Y',
       legend: 'MMMM',
@@ -18689,14 +18606,18 @@
     column() {
       return 1;
     },
-    position: {
-      x() {
-        return 1;
-      },
-      y() {
-        return 1;
-      },
-    },
+    mapping: (startTimestamp, endTimestamp, defaultValues) =>
+      DateHelper.generateTimeInterval(
+        'year',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((d, index) => ({
+        t: d,
+        x: index,
+        y: 0,
+        ...defaultValues,
+      })),
+
     format: {
       date: 'Y',
       legend: 'Y',
@@ -18744,24 +18665,6 @@
       [...DefaultTemplates, ...userTemplates].forEach((f) => {
         const template = f(this.calendar.helpers.DateHelper, options);
         this.settings[template.name] = template;
-      });
-
-      Object.keys(this.settings).forEach((type) => {
-        const template = this.settings[type];
-
-        this.settings[`x_${type}`] = {
-          name: `x_${type}`,
-          level: template.type,
-          maxItemNumber: template.maxItemNumber,
-          row: template.column,
-          column: template.row,
-          position: {
-            x: template.position.y,
-            y: template.position.x,
-          },
-          format: template.format,
-          extractUnit: template.extractUnit,
-        };
       });
     }
   }
@@ -18855,13 +18758,7 @@
      */
     afterLoadPreviousDomain(start) {
       return this.#triggerEvent('afterLoadPreviousDomain', () => {
-        const subDomain = generateSubDomain(
-          this.calendar,
-          start,
-          this.options.options,
-          this.DTSDomain,
-        );
-        return [subDomain.shift(), subDomain.pop()];
+        return [];
       });
     }
 
@@ -18873,13 +18770,7 @@
      */
     afterLoadNextDomain(start) {
       return this.#triggerEvent('afterLoadNextDomain', () => {
-        const subDomain = generateSubDomain(
-          this.calendar,
-          start,
-          this.options.options,
-          this.DTSDomain,
-        );
-        return [subDomain.shift(), subDomain.pop()];
+        return [];
       });
     }
 

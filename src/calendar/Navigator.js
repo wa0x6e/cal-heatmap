@@ -80,11 +80,12 @@ export default class Navigator {
   loadNewDomains(newDomains, direction = NAVIGATE_RIGHT) {
     const backward = direction === NAVIGATE_LEFT;
     const { options, minDate, maxDate } = this.calendar.options;
+    const template = this.calendar.subDomainTemplate;
     const minDateInterval = minDate
-      ? this.calendar.subDomainTemplate.at(options.domain).extractUnit(minDate)
+      ? template.at(options.domain).extractUnit(minDate)
       : null;
     const maxDateInterval = maxDate
-      ? this.calendar.subDomainTemplate.at(options.domain).extractUnit(maxDate)
+      ? template.at(options.domain).extractUnit(maxDate)
       : null;
     const domains = this.calendar.getDomainKeys();
 
@@ -97,22 +98,28 @@ export default class Navigator {
       )
       .slice(-options.range);
 
-    boundedNewDomains.forEach((domain) => {
+    boundedNewDomains.forEach((domain, index) => {
       if (this.calendar.domainCollection.has(domain)) {
         return;
       }
 
-      const boundaries = this.calendar.helpers.DateHelper.generateTimeInterval(
-        options.domain,
-        domain,
-        2,
-      );
+      let subDomainEndDate = null;
+      if (boundedNewDomains[index + 1]) {
+        subDomainEndDate = boundedNewDomains[index + 1];
+      } else {
+        subDomainEndDate =
+          this.calendar.helpers.DateHelper.generateTimeInterval(
+            options.domain,
+            domain,
+            2,
+          ).pop();
+      }
 
       this.calendar.domainCollection.set(
         domain,
-        this.calendar.subDomainTemplate
+        template
           .at(options.subDomain)
-          .mapping(boundaries[0], boundaries[1] - 1000, { v: null }),
+          .mapping(domain, subDomainEndDate - 1000, { v: null }),
       );
 
       this.calendar.domainCollection.delete(
