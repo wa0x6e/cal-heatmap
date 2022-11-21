@@ -64,7 +64,6 @@ const computeWeekSubDomainSize = (date, domain) => {
 // eslint-disable-next-line import/prefer-default-export
 export function generateSubDomain(calendar, date, options) {
   switch (options.subDomain) {
-    case 'x_minute':
     case 'minute':
       return calendar.helpers.DateHelper.generateTimeInterval(
         'minute',
@@ -74,7 +73,6 @@ export function generateSubDomain(calendar, date, options) {
           options.domain,
         ),
       );
-    case 'x_hour':
     case 'hour':
       return calendar.helpers.DateHelper.generateTimeInterval(
         'hour',
@@ -84,7 +82,6 @@ export function generateSubDomain(calendar, date, options) {
           options.domain,
         ),
       );
-    case 'x_day':
     case 'day':
       return calendar.helpers.DateHelper.generateTimeInterval(
         'day',
@@ -94,7 +91,6 @@ export function generateSubDomain(calendar, date, options) {
           options.domain,
         ),
       );
-    case 'x_week':
     case 'week':
       return calendar.helpers.DateHelper.generateTimeInterval(
         'week',
@@ -104,7 +100,6 @@ export function generateSubDomain(calendar, date, options) {
           options.domain,
         ),
       );
-    case 'x_month':
     case 'month':
       return calendar.helpers.DateHelper.generateTimeInterval(
         'month',

@@ -112,11 +112,6 @@ export default class DomainPainter {
         if (options.verticalOrientation) {
           return 0;
         }
-        console.log(
-          navigationDir === NAVIGATE_LEFT
-            ? this.dimensions.width
-            : -this.getWidth(d, true),
-        );
 
         return navigationDir === NAVIGATE_LEFT
           ? this.dimensions.width

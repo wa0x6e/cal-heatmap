@@ -29,23 +29,5 @@ export default class SubDomainTemplate {
       const template = f(this.calendar.helpers.DateHelper, options);
       this.settings[template.name] = template;
     });
-
-    Object.keys(this.settings).forEach((type) => {
-      const template = this.settings[type];
-
-      this.settings[`x_${type}`] = {
-        name: `x_${type}`,
-        level: template.type,
-        maxItemNumber: template.maxItemNumber,
-        row: template.column,
-        column: template.row,
-        position: {
-          x: template.position.y,
-          y: template.position.x,
-        },
-        format: template.format,
-        extractUnit: template.extractUnit,
-      };
-    });
   }
 }

@@ -26,11 +26,7 @@ export function validateSelector(selector, canBeFalse, name) {
  * @return {bool} True if domain and subdomain are valid and compatible
  */
 export function validateDomainType(subDomainTemplate, { domain, subDomain }) {
-  if (
-    !subDomainTemplate.has(domain) ||
-    domain === 'min' ||
-    domain.substring(0, 2) === 'x_'
-  ) {
+  if (!subDomainTemplate.has(domain) || domain === 'minute') {
     throw new Error(`The domain '${domain}' is not valid`);
   }
 
