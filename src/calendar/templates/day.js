@@ -4,53 +4,68 @@ const dayTemplate = (
 ) => {
   const ROWS_COUNT = 7;
 
-  function getTotalColNumber(d) {
-    switch (domain) {
-      case 'month':
-        return Math.ceil(
-          domainDynamicDimension && !verticalOrientation
-            ? DateHelper.date(d).daysInMonth() / ROWS_COUNT
-            : 31 / ROWS_COUNT,
-        );
-      case 'year':
-        return Math.ceil(
-          domainDynamicDimension
-            ? DateHelper.date(d).endOf('year').dayOfYear() / ROWS_COUNT
-            : 366 / ROWS_COUNT,
-        );
-      case 'week':
-      default:
-        return 1;
-    }
-  }
-
   return {
     name: 'day',
     level: 30,
     rowsCount() {
+      if (domain === 'week') {
+        return 1;
+      }
       return ROWS_COUNT;
     },
     columnsCount(d) {
-      return getTotalColNumber(d);
+      switch (domain) {
+        case 'month':
+          return Math.ceil(
+            domainDynamicDimension && !verticalOrientation
+              ? DateHelper.date(d).daysInMonth() / ROWS_COUNT
+              : 31 / ROWS_COUNT,
+          );
+        case 'year':
+          return Math.ceil(
+            domainDynamicDimension
+              ? DateHelper.date(d).endOf('year').dayOfYear() / ROWS_COUNT
+              : 54,
+          );
+        case 'week':
+        default:
+          return ROWS_COUNT;
+      }
     },
-    position: {
-      x(d) {
-        const weekDay = DateHelper.date(d).isoWeekday() - 1;
+    mapping: (startTimestamp, endTimestamp, defaultValues) =>
+      DateHelper.generateTimeInterval(
+        'day',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((d) => {
+        const date = DateHelper.date(d);
+        const endWeekNumber = DateHelper.date(d).endOf('year').week();
+        let x = 0;
 
         switch (domain) {
-          case 'week':
-            return Math.floor(weekDay / ROWS_COUNT);
           case 'month':
-            return DateHelper.getMonthWeekNumber(d) - 1;
+            x = DateHelper.getMonthWeekNumber(d) - 1;
+            break;
           case 'year':
-            return DateHelper.date(d).week() - 1;
+            if (endWeekNumber === 1 && date.week() === endWeekNumber) {
+              x = DateHelper.date(d).subtract(1, 'week').week() + 1;
+            }
+
+            x = date.week() - 1;
+            break;
+          case 'week':
+            x = date.weekday();
+            break;
           default:
         }
-      },
-      y(d) {
-        return DateHelper.date(d).isoWeekday() - 1;
-      },
-    },
+
+        return {
+          t: d,
+          x,
+          y: domain === 'week' ? 0 : date.weekday(),
+          ...defaultValues,
+        };
+      }),
     format: {
       date: 'dddd MMMM D, Y',
       legend: 'Do MMM',

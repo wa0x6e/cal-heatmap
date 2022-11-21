@@ -11,14 +11,21 @@ const minuteTemplate = (DateHelper) => {
     columnsCount() {
       return ROWS_COUNT;
     },
-    position: {
-      x(d) {
-        return Math.floor(DateHelper.date(d).minute() / COLUMNS_COUNT);
-      },
-      y(d) {
-        return DateHelper.date(d).minute() % COLUMNS_COUNT;
-      },
-    },
+    mapping: (startTimestamp, endTimestamp, defaultValues = {}) =>
+      DateHelper.generateTimeInterval(
+        'minute',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((d) => {
+        const minute = DateHelper.date(d).minute();
+
+        return {
+          t: d,
+          x: Math.floor(minute / COLUMNS_COUNT),
+          y: minute % COLUMNS_COUNT,
+          ...defaultValues,
+        };
+      }),
     format: {
       date: 'LT, dddd MMMM D, Y',
       legend: '',

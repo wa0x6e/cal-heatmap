@@ -102,15 +102,6 @@ export default function TimeIntervalTest() {
           });
         });
       });
-
-      describe('#getTimeInterval', () => {
-        describe(`on ${interval} interval`, () => {
-          it(`returns an the timestamp of the start of ${interval} intervals`, () => {
-            const result = helper.getTimeInterval(interval, date);
-            expect(result).toEqual(+expectations[intervalKey][0]);
-          });
-        });
-      });
     });
   };
 

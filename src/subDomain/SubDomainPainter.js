@@ -41,8 +41,8 @@ export default class subDomainPainter {
       .attr('class', (d) => this.#getClassName(d))
       .attr('width', options.cellSize)
       .attr('height', options.cellSize)
-      .attr('x', (d) => this.#getX(d.t))
-      .attr('y', (d) => this.#getY(d.t))
+      .attr('x', (d) => this.#getX(d))
+      .attr('y', (d) => this.#getY(d))
       .on('click', (ev, d) => this.calendar.onClick(ev, new Date(d.t), d.v))
       .on('mouseover', (ev, d) => {
         if (options.tooltip) {
@@ -94,8 +94,8 @@ export default class subDomainPainter {
         (d) =>
           `subdomain-text${getHighlightClassName(this.calendar, d.t, options)}`,
       )
-      .attr('x', (d) => this.#getX(d.t) + options.cellSize / 2)
-      .attr('y', (d) => this.#getY(d.t) + options.cellSize / 2)
+      .attr('x', (d) => this.#getX(d) + options.cellSize / 2)
+      .attr('y', (d) => this.#getY(d) + options.cellSize / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .text((d) =>
@@ -120,13 +120,8 @@ export default class subDomainPainter {
   }
 
   #getCoordinates(axis, d) {
-    const { options } = this.calendar.options;
-
-    const index = this.calendar.subDomainTemplate
-      .at(options.subDomain)
-      .position[axis](d);
-
-    return index * (options.cellSize + options.cellPadding);
+    const { cellSize, cellPadding } = this.calendar.options.options;
+    return d[axis] * (cellSize + cellPadding);
   }
 
   #getX(d) {

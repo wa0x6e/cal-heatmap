@@ -26,25 +26,33 @@ const hourTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     columnsCount(d) {
       return getTotalColNumber(d);
     },
-    position: {
-      x(d) {
-        const hour = DateHelper.date(d).hour();
-        const date = DateHelper.date(d).date();
+    mapping: (startTimestamp, endTimestamp, defaultValues) =>
+      DateHelper.generateTimeInterval(
+        'hour',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((d) => {
+        const date = DateHelper.date(d);
+        const hour = date.hour();
+        const monthDate = date.date();
         const baseX = Math.floor(hour / ROWS_COUNT);
         const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
         if (domain === 'month') {
-          return baseX + (date - 1) * columnOffset;
+          return baseX + (monthDate - 1) * columnOffset;
         }
         if (domain === 'week') {
-          return baseX + (DateHelper.date(d).isoWeekday() - 1) * columnOffset;
+          return baseX + (date.isoWeekday() - 1) * columnOffset;
         }
-        return baseX;
-      },
-      y(d) {
-        return Math.floor(DateHelper.date(d).hour() % ROWS_COUNT);
-      },
-    },
+
+        return {
+          t: d,
+          x: baseX,
+          y: Math.floor(hour % ROWS_COUNT),
+          ...defaultValues,
+        };
+      }),
+
     format: {
       date: 'HH[h], dddd MMMM D, Y',
       legend: 'HH:00',

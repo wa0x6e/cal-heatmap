@@ -23,16 +23,32 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     columnsCount(d) {
       return getTotalColNumber(d);
     },
-    position: {
-      x(d) {
+    mapping: (startTimestamp, endTimestamp, defaultValues) =>
+      DateHelper.generateTimeInterval(
+        'week',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((d) => {
+        let x = 0;
         switch (domain) {
           case 'year':
-            return DateHelper.date(d).week() - 1;
+            x = DateHelper.date(d).week() - 1;
+            break;
           case 'month':
-            return Math.floor(DateHelper.getMonthWeekNumber(d));
+            x = Math.floor(DateHelper.getMonthWeekNumber(d));
+            break;
           default:
         }
-      },
+
+        return {
+          t: d,
+          x,
+          y: 0,
+          ...defaultValues,
+        };
+      }),
+    position: {
+      x(d) {},
       y() {
         return 0;
       },

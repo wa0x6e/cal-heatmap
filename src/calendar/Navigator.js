@@ -1,5 +1,4 @@
 import { NAVIGATE_RIGHT, NAVIGATE_LEFT } from '../constant';
-import { generateSubDomain } from '../subDomain/subDomainGenerator';
 
 export default class Navigator {
   constructor(calendar) {
@@ -82,10 +81,10 @@ export default class Navigator {
     const backward = direction === NAVIGATE_LEFT;
     const { options, minDate, maxDate } = this.calendar.options;
     const minDateInterval = minDate
-      ? this.calendar.helpers.DateHelper.getTimeInterval(minDate)
+      ? this.calendar.subDomainTemplate.at(options.domain).extractUnit(minDate)
       : null;
     const maxDateInterval = maxDate
-      ? this.calendar.helpers.DateHelper.getTimeInterval(maxDate)
+      ? this.calendar.subDomainTemplate.at(options.domain).extractUnit(maxDate)
       : null;
     const domains = this.calendar.getDomainKeys();
 
@@ -103,14 +102,17 @@ export default class Navigator {
         return;
       }
 
+      const boundaries = this.calendar.helpers.DateHelper.generateTimeInterval(
+        options.domain,
+        domain,
+        2,
+      );
+
       this.calendar.domainCollection.set(
         domain,
-        generateSubDomain(this.calendar, domain, options).map((d) => ({
-          t: this.calendar.subDomainTemplate
-            .at(options.subDomain)
-            .extractUnit(d),
-          v: null,
-        })),
+        this.calendar.subDomainTemplate
+          .at(options.subDomain)
+          .mapping(boundaries[0], boundaries[1] - 1000, { v: null }),
       );
 
       this.calendar.domainCollection.delete(

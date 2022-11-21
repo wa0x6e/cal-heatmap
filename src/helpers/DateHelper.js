@@ -39,16 +39,6 @@ export default class DateHelper {
     return this.date(d).format(formatter);
   }
 
-  getTimeInterval(interval, date, asMoment = false) {
-    const newDate = this.date(date).startOf(interval);
-
-    if (asMoment) {
-      return newDate;
-    }
-
-    return newDate.valueOf();
-  }
-
   /**
    * Return an array of time interval
    *

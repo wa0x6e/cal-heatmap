@@ -68,10 +68,9 @@ function parseDatas(
 
     const timestamp = date * 1000;
 
-    const domainKey = calendar.helpers.DateHelper.getTimeInterval(
-      calendar.options.options.domain,
-      timestamp,
-    );
+    const domainKey = calendar.subDomainTemplate
+      .at(calendar.options.options.domain)
+      .extractUnit(timestamp);
 
     // Skip if data is not relevant to current domain
     if (

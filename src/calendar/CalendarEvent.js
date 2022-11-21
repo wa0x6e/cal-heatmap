@@ -1,5 +1,3 @@
-import { generateSubDomain } from '../subDomain/subDomainGenerator';
-
 export default class CalendarEvent {
   constructor() {
     this.statusComplete = false;
@@ -89,13 +87,7 @@ export default class CalendarEvent {
    */
   afterLoadPreviousDomain(start) {
     return this.#triggerEvent('afterLoadPreviousDomain', () => {
-      const subDomain = generateSubDomain(
-        this.calendar,
-        start,
-        this.options.options,
-        this.DTSDomain,
-      );
-      return [subDomain.shift(), subDomain.pop()];
+      return [];
     });
   }
 
@@ -107,13 +99,7 @@ export default class CalendarEvent {
    */
   afterLoadNextDomain(start) {
     return this.#triggerEvent('afterLoadNextDomain', () => {
-      const subDomain = generateSubDomain(
-        this.calendar,
-        start,
-        this.options.options,
-        this.DTSDomain,
-      );
-      return [subDomain.shift(), subDomain.pop()];
+      return [];
     });
   }
 
