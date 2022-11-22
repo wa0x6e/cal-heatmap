@@ -6029,11 +6029,11 @@
       const items = options.legend.slice(0);
       items.push(items[items.length - 1] + 1);
 
-      const legendItemsNode = legendNode.append('g').selectAll().data(items);
-
-      legendItemsNode
-        .enter()
-        .append('rect')
+      legendNode
+        .append('g')
+        .selectAll('rect')
+        .data(items)
+        .join('rect')
         .attr('width', options.legendCellSize)
         .attr('height', options.legendCellSize)
         .attr(
@@ -6053,26 +6053,6 @@
         })
         .append('title')
         .text((d, i) => this.#getLegendTitle(d, i, items));
-
-      legendItemsNode
-        .exit()
-        .transition()
-        .duration(options.animationDuration)
-        .remove();
-
-      legendItemsNode
-        .transition()
-        .attr('fill', (d, i) => {
-          if (this.calendar.colorizer.scale === null) {
-            return null;
-          }
-
-          if (i === 0) {
-            return this.calendar.colorizer.scale(d - 1);
-          }
-          return this.calendar.colorizer.scale(options.legend[i - 1]);
-        })
-        .attr('class', (d) => this.calendar.colorizer.getClassName(d));
     }
 
     #getLegendTitle(d, i, legendItems) {
@@ -18273,14 +18253,19 @@
      * minimum and maximum colors
      */
     setLegend(legend, legendColors) {
-      if (
-        this.options.set('legend', legend) ||
-        this.options.set('legendColors', legendColors)
-      ) {
-        this.calendarPainter.legend.buildColors();
-        this.calendarPainter.legend.paint();
-        this.populator.populate();
+      const changeResults = [];
+
+      changeResults.push(this.options.set('legend', legend));
+      changeResults.push(this.options.set('legendColors', legendColors));
+
+      // Trigger repaint only if legend options have changed
+      if (!changeResults.includes(true)) {
+        return;
       }
+
+      this.colorizer.build();
+      this.calendarPainter.legendPainter.paint();
+      this.populator.populate();
     }
 
     /**

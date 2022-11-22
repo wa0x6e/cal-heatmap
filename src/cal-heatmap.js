@@ -178,14 +178,19 @@ export default class CalHeatMap extends CalendarEvent {
    * minimum and maximum colors
    */
   setLegend(legend, legendColors) {
-    if (
-      this.options.set('legend', legend) ||
-      this.options.set('legendColors', legendColors)
-    ) {
-      this.calendarPainter.legend.buildColors();
-      this.calendarPainter.legend.paint();
-      this.populator.populate();
+    const changeResults = [];
+
+    changeResults.push(this.options.set('legend', legend));
+    changeResults.push(this.options.set('legendColors', legendColors));
+
+    // Trigger repaint only if legend options have changed
+    if (!changeResults.includes(true)) {
+      return;
     }
+
+    this.colorizer.build();
+    this.calendarPainter.legendPainter.paint();
+    this.populator.populate();
   }
 
   /**
