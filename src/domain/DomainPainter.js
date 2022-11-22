@@ -1,7 +1,11 @@
+// eslint-disable-next-line no-unused-vars
 import { select, selectAll } from 'd3-selection';
+// eslint-disable-next-line no-unused-vars
 import { transition } from 'd3-transition';
 
-import { NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT, X, Y } from '../constant';
+import {
+  NAVIGATE_LEFT, TOP, RIGHT, BOTTOM, LEFT, X, Y,
+} from '../constant';
 
 export default class DomainPainter {
   constructor(calendar) {
@@ -44,11 +48,11 @@ export default class DomainPainter {
           return domains.indexOf(d) * this.getWidth(d, true);
         }
 
-        return navigationDir === NAVIGATE_LEFT
-          ? -this.getWidth(d, true)
-          : this.dimensions.width;
+        return navigationDir === NAVIGATE_LEFT ?
+          -this.getWidth(d, true) :
+          this.dimensions.width;
       })
-      .attr('y', (d) => {
+      .attr('y', () => {
         if (options.verticalOrientation) {
           return this.dimensions.height;
         }
@@ -85,16 +89,12 @@ export default class DomainPainter {
 
     svg
       .append('rect')
-      .attr(
-        'width',
-        (d) =>
-          this.getWidth(d, true) - options.domainGutter - options.cellPadding,
-      )
-      .attr(
-        'height',
-        (d) =>
-          this.getHeight(d, true) - options.domainGutter - options.cellPadding,
-      )
+      .attr('width', (d) => (
+        this.getWidth(d, true) - options.domainGutter - options.cellPadding
+      ))
+      .attr('height', (d) => (
+        this.getHeight(d, true) - options.domainGutter - options.cellPadding
+      ))
       .attr('class', 'domain-background');
 
     return svg;
@@ -103,7 +103,8 @@ export default class DomainPainter {
   #paintExitingDomain(navigationDir) {
     const { options } = this.calendar.options;
 
-    // At the time of exit, domainsWidth and domainsHeight already automatically shifted
+    // At the time of exit, domainsWidth and domainsHeight
+    // already automatically shifted
     this.root
       .exit()
       .transition()
@@ -113,15 +114,15 @@ export default class DomainPainter {
           return 0;
         }
 
-        return navigationDir === NAVIGATE_LEFT
-          ? this.dimensions.width
-          : -this.getWidth(d, true);
+        return navigationDir === NAVIGATE_LEFT ?
+          this.dimensions.width :
+          -this.getWidth(d, true);
       })
       .attr('y', (d) => {
         if (options.verticalOrientation) {
-          return navigationDir === NAVIGATE_LEFT
-            ? this.dimensions.height
-            : -this.getHeight(d, true);
+          return navigationDir === NAVIGATE_LEFT ?
+            this.dimensions.height :
+            -this.getHeight(d, true);
         }
         return 0;
       })

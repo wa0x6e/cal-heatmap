@@ -2,7 +2,9 @@ import { select } from 'd3-selection';
 import { merge } from 'lodash-es';
 
 import { validateSelector, validateDomainType } from '../utils/validator';
-import { TOP, RIGHT, BOTTOM, LEFT, X } from '../constant';
+import {
+  TOP, RIGHT, BOTTOM, LEFT, X,
+} from '../constant';
 import { expandMarginSetting } from '../function';
 import DateHelper from '../helpers/DateHelper';
 
@@ -305,7 +307,8 @@ export default class Options {
       onMouseOut: null,
 
       // Callback after painting the empty calendar
-      // Can be used to trigger an API call, once the calendar is ready to be filled
+      // Can be used to trigger an API call,
+      // once the calendar is ready to be filled
       afterLoad: null,
 
       // Callback after loading the next domain in the calendar
@@ -319,7 +322,8 @@ export default class Options {
 
       onResize: null,
 
-      // Callback after fetching the datas, but before applying them to the calendar
+      // Callback after fetching the datas,
+      // but before applying them to the calendar
       // Used mainly to convert the datas if they're not formatted like expected
       // Takes the fetched "data" object as argument, must return a json object
       // formatted like {timestamp:count, timestamp2:count2},
@@ -375,7 +379,8 @@ export default class Options {
 
     if (select(options.itemSelector).empty()) {
       throw new Error(
-        `The node '${options.itemSelector}' specified in itemSelector does not exist`,
+        `The node '${options.itemSelector}' specified in itemSelector ` +
+          'does not exist',
       );
     }
 
@@ -383,6 +388,7 @@ export default class Options {
       validateSelector(options.nextSelector, true, 'nextSelector');
       validateSelector(options.previousSelector, true, 'previousSelector');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error.message);
       return false;
     }
@@ -397,6 +403,7 @@ export default class Options {
       typeof options.itemNamespace !== 'string' ||
       options.itemNamespace === ''
     ) {
+      // eslint-disable-next-line no-console
       console.log(
         'itemNamespace can not be empty, falling back to cal-heatmap',
       );
@@ -467,20 +474,20 @@ export default class Options {
 
     options.subDomainDateFormat =
       typeof options.subDomainDateFormat === 'string' ||
-      typeof options.subDomainDateFormat === 'function'
-        ? options.subDomainDateFormat
-        : this.calendar.subDomainTemplate.at(options.subDomain).format.date;
+      typeof options.subDomainDateFormat === 'function' ?
+        options.subDomainDateFormat :
+        this.calendar.subDomainTemplate.at(options.subDomain).format.date;
     options.domainLabelFormat =
       typeof options.domainLabelFormat === 'string' ||
-      typeof options.domainLabelFormat === 'function'
-        ? options.domainLabelFormat
-        : this.calendar.subDomainTemplate.at(options.domain).format.legend;
+      typeof options.domainLabelFormat === 'function' ?
+        options.domainLabelFormat :
+        this.calendar.subDomainTemplate.at(options.domain).format.legend;
     options.subDomainTextFormat =
       (typeof options.subDomainTextFormat === 'string' &&
         options.subDomainTextFormat !== '') ||
-      typeof options.subDomainTextFormat === 'function'
-        ? options.subDomainTextFormat
-        : null;
+      typeof options.subDomainTextFormat === 'function' ?
+        options.subDomainTextFormat :
+        null;
     options.domainMargin = expandMarginSetting(options.domainMargin);
     options.legendMargin = expandMarginSetting(options.legendMargin);
     options.itemName = expandItemName(options.itemName);

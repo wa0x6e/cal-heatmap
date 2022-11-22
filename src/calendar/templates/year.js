@@ -7,17 +7,16 @@ const yearTemplate = (DateHelper) => ({
   column() {
     return 1;
   },
-  mapping: (startTimestamp, endTimestamp, defaultValues) =>
-    DateHelper.generateTimeInterval(
-      'year',
-      startTimestamp,
-      DateHelper.date(endTimestamp),
-    ).map((d, index) => ({
-      t: d,
-      x: index,
-      y: 0,
-      ...defaultValues,
-    })),
+  mapping: (startDate, endDate, defaultValues) =>
+    // eslint-disable-next-line implicit-arrow-linebreak
+    DateHelper.intervals('year', startDate, DateHelper.date(endDate)).map(
+      (d, index) => ({
+        t: d,
+        x: index,
+        y: 0,
+        ...defaultValues,
+      }),
+    ),
 
   format: {
     date: 'Y',

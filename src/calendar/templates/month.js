@@ -7,17 +7,16 @@ const monthTemplate = (DateHelper) => ({
   columnsCount() {
     return 12;
   },
-  mapping: (startTimestamp, endTimestamp, defaultValues) =>
-    DateHelper.generateTimeInterval(
-      'week',
-      startTimestamp,
-      DateHelper.date(endTimestamp),
-    ).map((d) => ({
-      t: d,
-      x: DateHelper.date(d).month(),
-      y: 0,
-      ...defaultValues,
-    })),
+  mapping: (startDate, endDate, defaultValues) =>
+    // eslint-disable-next-line implicit-arrow-linebreak
+    DateHelper.intervals('week', startDate, DateHelper.date(endDate)).map(
+      (d) => ({
+        t: d,
+        x: DateHelper.date(d).month(),
+        y: 0,
+        ...defaultValues,
+      }),
+    ),
 
   format: {
     date: 'MMMM Y',

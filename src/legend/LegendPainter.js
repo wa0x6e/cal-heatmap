@@ -1,8 +1,12 @@
+// eslint-disable-next-line no-unused-vars
 import { select, selectAll } from 'd3-selection';
+// eslint-disable-next-line no-unused-vars
 import { transition } from 'd3-transition';
 
 import { formatStringWithObject } from '../function';
-import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+import {
+  TOP, RIGHT, BOTTOM, LEFT,
+} from '../constant';
 
 const DEFAULT_CLASSNAME = '.graph-legend';
 
@@ -160,7 +164,7 @@ export default class LegendPainter {
       .transition()
       .attr('fill', (d, i) => {
         if (this.calendar.colorizer.scale === null) {
-          return;
+          return null;
         }
 
         if (i === 0) {

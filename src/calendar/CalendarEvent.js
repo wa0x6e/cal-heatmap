@@ -9,7 +9,8 @@ export default class CalendarEvent {
    * @param  string  eventName       Name of the event to trigger
    * @param  array  successArgs     List of argument to pass to the callback
    * @param  boolean  skip      Whether to skip the event triggering
-   * @return mixed  True when the triggering was skipped, false on error, else the callback function
+   * @return mixed  True when the triggering was skipped,
+   * false on error, else the callback function
    */
   #triggerEvent(eventName, successArgs, skip = false) {
     if (skip || !this.options.options[eventName]) {
@@ -17,11 +18,12 @@ export default class CalendarEvent {
     }
 
     if (typeof this.options.options[eventName] === 'function') {
-      if (typeof successArgs === 'function') {
-        successArgs = successArgs();
-      }
-      return this.options.options[eventName].apply(this, successArgs);
+      return this.options.options[eventName].apply(
+        this,
+        typeof successArgs === 'function' ? successArgs() : successArgs,
+      );
     }
+    // eslint-disable-next-line no-console
     console.log(`Provided callback for ${eventName} is not a function.`);
     return false;
   }
@@ -86,9 +88,7 @@ export default class CalendarEvent {
    * @param  Date    end    Domain end date
    */
   afterLoadPreviousDomain(start) {
-    return this.#triggerEvent('afterLoadPreviousDomain', () => {
-      return [];
-    });
+    return this.#triggerEvent('afterLoadPreviousDomain', () => [start]);
   }
 
   /**
@@ -98,9 +98,7 @@ export default class CalendarEvent {
    * @param  Date    end    Domain end date
    */
   afterLoadNextDomain(start) {
-    return this.#triggerEvent('afterLoadNextDomain', () => {
-      return [];
-    });
+    return this.#triggerEvent('afterLoadNextDomain', () => [start]);
   }
 
   /**

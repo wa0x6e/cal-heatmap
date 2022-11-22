@@ -1,6 +1,8 @@
 import { getHighlightClassName } from '../function';
 
-import { TOP, LEFT, X, Y } from '../constant';
+import {
+  TOP, LEFT, X, Y,
+} from '../constant';
 
 export default class subDomainPainter {
   constructor(calendar) {
@@ -91,19 +93,17 @@ export default class subDomainPainter {
       .append('text')
       .attr(
         'class',
-        (d) =>
-          `subdomain-text${getHighlightClassName(this.calendar, d.t, options)}`,
+        (d) => 'subdomain-text' +
+          `${getHighlightClassName(this.calendar, d.t, options)}`,
       )
       .attr('x', (d) => this.#getX(d) + options.cellSize[X] / 2)
       .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d) =>
-        this.calendar.helpers.DateHelper.format(
-          d.t,
-          options.subDomainTextFormat,
-        ),
-      );
+      .text((d) => this.calendar.helpers.DateHelper.format(
+        d.t,
+        options.subDomainTextFormat,
+      ));
   }
 
   #appendTitle(elem) {
@@ -111,12 +111,10 @@ export default class subDomainPainter {
 
     elem
       .append('title')
-      .text((d) =>
-        this.calendar.helpers.DateHelper.format(
-          d.t,
-          options.subDomainDateFormat,
-        ),
-      );
+      .text((d) => this.calendar.helpers.DateHelper.format(
+        d.t,
+        options.subDomainDateFormat,
+      ));
   }
 
   #getCoordinates(axis, d) {

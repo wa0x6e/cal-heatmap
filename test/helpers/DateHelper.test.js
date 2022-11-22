@@ -73,4 +73,6 @@ describe('DateHelper', () => {
   });
 });
 
-TimeIntervalTest();
+describe('intervals', () => {
+  TimeIntervalTest();
+});

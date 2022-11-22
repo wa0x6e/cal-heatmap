@@ -1,3 +1,5 @@
+import { format } from 'd3-format';
+
 /**
  * Sprintf like function.
  * Replaces placeholders {0} in string with values from provided object.
@@ -7,14 +9,16 @@
  *
  * @return String
  */
-export function formatStringWithObject(formatted, args) {
-  for (const prop in args) {
-    if (args.hasOwnProperty(prop)) {
-      const regexp = new RegExp(`\\{${prop}\\}`, 'gi');
-      formatted = formatted.replace(regexp, args[prop]);
-    }
-  }
-  return formatted;
+export function formatStringWithObject(string, args) {
+  let formattedString = string;
+
+  Object.entries(args).forEach(([key, value]) => {
+    formattedString = formattedString.replace(
+      new RegExp(`\\{${key}\\}`, 'gi'),
+      value,
+    );
+  });
+  return formattedString;
 }
 
 /**
@@ -39,9 +43,9 @@ export function getHighlightClassName(calendar, timestamp, options) {
         classname = calendar.helpers.DateHelper.datesFromSameInterval(
           subDomain,
           +d,
-        )
-          ? ' highlight-now'
-          : ' highlight';
+        ) ?
+          ' highlight-now' :
+          ' highlight';
       }
     });
   }
@@ -62,6 +66,7 @@ export function expandMarginSetting(settings) {
   }
 
   if (!Array.isArray(value) || !value.every((d) => typeof d === 'number')) {
+    // eslint-disable-next-line no-console
     console.log('Margin only accepts an integer or an array of integers');
     value = [0];
   }
@@ -76,4 +81,27 @@ export function expandMarginSetting(settings) {
     default:
       return value.slice(0, 4);
   }
+}
+
+export function getSubDomainTitle(calendar, d, options, connector) {
+  if (d.v === null && !options.considerMissingDataAsZero) {
+    return formatStringWithObject(options.subDomainTitleFormat.empty, {
+      date: calendar.helpers.DateHelper.format(
+        d.t,
+        options.subDomainDateFormat,
+      ),
+    });
+  }
+  let value = d.v;
+  // Consider null as 0
+  if (value === null && options.considerMissingDataAsZero) {
+    value = 0;
+  }
+
+  return formatStringWithObject(options.subDomainTitleFormat.filled, {
+    count: format(',d')(value),
+    name: options.itemName[value !== 1 ? 1 : 0],
+    connector,
+    date: calendar.helpers.DateHelper.format(d.t, options.subDomainDateFormat),
+  });
 }

@@ -1,5 +1,3 @@
-import { isEqual } from 'lodash-es';
-
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
@@ -67,7 +65,7 @@ export default class CalHeatMap extends CalendarEvent {
     this.colorizer.build();
 
     this.navigator.loadNewDomains(
-      this.helpers.DateHelper.generateTimeInterval(
+      this.helpers.DateHelper.intervals(
         options.domain,
         options.start,
         options.range,
@@ -112,7 +110,8 @@ export default class CalHeatMap extends CalendarEvent {
    * will not necessarily be the first (leftmost) domain of the calendar.
    *
    * @param Date date Jump to the domain containing that date
-   * @param bool reset Whether the wanted domain should be the first domain of the calendar
+   * @param bool reset Whether the wanted domain
+   * should be the first domain of the calendar
    * @param bool True of the calendar was scrolled
    */
   jumpTo(date, reset = false) {
@@ -135,8 +134,10 @@ export default class CalHeatMap extends CalendarEvent {
   /**
    * Update the calendar with new data
    *
-   * @param  object|string    dataSource    The calendar's datasource, same type as this.options.data
-   * @param  boolean|function    afterLoadDataCallback    Whether to execute afterLoadDataCallback() on the data. Pass directly a function
+   * @param  object|string    dataSource    The calendar's datasource,
+   * same type as this.options.data
+   * @param  boolean|function    afterLoadDataCallback    Whether to
+   * execute afterLoadDataCallback() on the data. Pass directly a function
    * if you don't want to use the afterLoadDataCallback() callback
    */
   update(
@@ -146,7 +147,7 @@ export default class CalHeatMap extends CalendarEvent {
   ) {
     const { options } = this.options;
     const domainsBound = this.getDomainBoundKeys();
-    const endTimestamp = this.helpers.DateHelper.generateTimeInterval(
+    const endDate = this.helpers.DateHelper.intervals(
       options.domain,
       domainsBound.max,
       2,
@@ -157,7 +158,7 @@ export default class CalHeatMap extends CalendarEvent {
       options,
       dataSource,
       domainsBound.min,
-      endTimestamp,
+      endDate,
       () => {
         this.populator.populate();
         this.afterUpdate();
@@ -171,35 +172,20 @@ export default class CalHeatMap extends CalendarEvent {
   /**
    * Set the legend
    *
-   * @param array legend an array of integer, representing the different threshold value
-   * @param array colorRange an array of 2 hex colors, for the minimum and maximum colors
+   * @param array legend an array of integer,
+   * representing the different threshold value
+   * @param array colorRange an array of 2 hex colors, for the
+   * minimum and maximum colors
    */
-  setLegend() {
-    const { options } = this.options;
-    const { legend, legendColors } = this.options.options;
-
-    const oldLegend = options.legend.slice(0);
-    if (arguments.length >= 1 && Array.isArray(arguments[0])) {
-      legend = arguments[0];
-    }
-    if (arguments.length >= 2) {
-      if (Array.isArray(arguments[1]) && arguments[1].length >= 2) {
-        legendColors = [arguments[1][0], arguments[1][1]];
-      } else {
-        legendColors = arguments[1];
-      }
-    }
-
+  setLegend(legend, legendColors) {
     if (
-      (arguments.length > 0 &&
-        !isEqual([...oldLegend].sort(), [...legend].sort())) ||
-      arguments.length >= 2
+      this.options.set('legend', legend) ||
+      this.options.set('legendColors', legendColors)
     ) {
       this.calendarPainter.legend.buildColors();
+      this.calendarPainter.legend.paint();
       this.populator.populate();
     }
-
-    this.calendarPainter.legend.paint();
   }
 
   /**
@@ -251,7 +237,8 @@ export default class CalHeatMap extends CalendarEvent {
    * Usage: cal = cal.destroy();
    *
    * @since  3.3.6
-   * @param function A callback function to trigger after destroying the calendar
+   * @param function A callback function to trigger
+   * after destroying the calendar
    * @return null
    */
   destroy(callback) {

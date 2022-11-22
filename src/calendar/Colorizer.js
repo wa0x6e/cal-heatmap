@@ -76,7 +76,7 @@ export default class Colorizer {
     const { legend } = this.calendar.options.options;
     let index = [legend.length + 1];
 
-    for (let i = 0, total = legend.length - 1; i <= total; i++) {
+    for (let i = 0, total = legend.length - 1; i <= total; i += 1) {
       if (legend[0] > 0 && n < 0) {
         index = ['1', 'i'];
         break;

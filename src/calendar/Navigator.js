@@ -15,7 +15,7 @@ export default class Navigator {
     const { options } = this.calendar.options;
 
     return this.loadNewDomains(
-      this.calendar.helpers.DateHelper.generateTimeInterval(
+      this.calendar.helpers.DateHelper.intervals(
         options.domain,
         this.calendar.getDomainKeys().pop(),
         typeof n === 'number' ? n + 1 : n,
@@ -32,7 +32,7 @@ export default class Navigator {
     const { options } = this.calendar.options;
 
     return this.loadNewDomains(
-      this.calendar.helpers.DateHelper.generateTimeInterval(
+      this.calendar.helpers.DateHelper.intervals(
         options.domain,
         this.calendar.getDomainKeys()[0],
         typeof n === 'number' ? -n : n,
@@ -47,7 +47,7 @@ export default class Navigator {
 
     if (date < domainsBound.min) {
       return this.loadPreviousDomain(
-        this.calendar.helpers.DateHelper.generateTimeInterval(
+        this.calendar.helpers.DateHelper.intervals(
           domain,
           date,
           domainsBound.min,
@@ -56,7 +56,7 @@ export default class Navigator {
     }
     if (reset) {
       return this.loadNextDomain(
-        this.calendar.helpers.DateHelper.generateTimeInterval(
+        this.calendar.helpers.DateHelper.intervals(
           domain,
           domainsBound.min,
           date,
@@ -66,7 +66,7 @@ export default class Navigator {
 
     if (date > domainsBound.max) {
       return this.loadNextDomain(
-        this.calendar.helpers.DateHelper.generateTimeInterval(
+        this.calendar.helpers.DateHelper.intervals(
           domain,
           domainsBound.max,
           date,
@@ -81,19 +81,18 @@ export default class Navigator {
     const backward = direction === NAVIGATE_LEFT;
     const { options, minDate, maxDate } = this.calendar.options;
     const template = this.calendar.subDomainTemplate;
-    const minDateInterval = minDate
-      ? template.at(options.domain).extractUnit(minDate)
-      : null;
-    const maxDateInterval = maxDate
-      ? template.at(options.domain).extractUnit(maxDate)
-      : null;
+    const minDateInterval = minDate ?
+      template.at(options.domain).extractUnit(minDate) :
+      null;
+    const maxDateInterval = maxDate ?
+      template.at(options.domain).extractUnit(maxDate) :
+      null;
     const domains = this.calendar.getDomainKeys();
 
     // Removing out-of-bonds domains
     const boundedNewDomains = newDomains
       .filter(
-        (i) =>
-          (minDateInterval ? i >= minDateInterval : true) &&
+        (i) => (minDateInterval ? i >= minDateInterval : true) &&
           (maxDateInterval ? i <= maxDateInterval : true),
       )
       .slice(-options.range);
@@ -107,12 +106,11 @@ export default class Navigator {
       if (boundedNewDomains[index + 1]) {
         subDomainEndDate = boundedNewDomains[index + 1];
       } else {
-        subDomainEndDate =
-          this.calendar.helpers.DateHelper.generateTimeInterval(
-            options.domain,
-            domain,
-            2,
-          ).pop();
+        subDomainEndDate = this.calendar.helpers.DateHelper.intervals(
+          options.domain,
+          domain,
+          2,
+        ).pop();
       }
 
       this.calendar.domainCollection.set(

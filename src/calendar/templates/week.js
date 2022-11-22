@@ -2,15 +2,15 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
   function getTotalColNumber(d) {
     switch (domain) {
       case 'year':
-        return domainDynamicDimension
-          ? DateHelper.date(d).endOf('year').weeksInYear()
-          : 53;
+        return domainDynamicDimension ?
+          DateHelper.date(d).endOf('year').weeksInYear() :
+          53;
       case 'month':
-        return domainDynamicDimension
-          ? DateHelper.date(d).endOf('month').week()
-          : 5;
+        return domainDynamicDimension ?
+          DateHelper.date(d).endOf('month').week() :
+          5;
       default:
-        return;
+        return 1;
     }
   }
 
@@ -23,32 +23,31 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     columnsCount(d) {
       return getTotalColNumber(d);
     },
-    mapping: (startTimestamp, endTimestamp, defaultValues) =>
-      DateHelper.generateTimeInterval(
-        'week',
-        startTimestamp,
-        DateHelper.date(endTimestamp),
-      ).map((d) => {
-        let x = 0;
-        switch (domain) {
-          case 'year':
-            x = DateHelper.date(d).week() - 1;
-            break;
-          case 'month':
-            x = Math.floor(DateHelper.getMonthWeekNumber(d));
-            break;
-          default:
-        }
+    mapping: (startDate, endDate, defaultValues) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      DateHelper.intervals('week', startDate, DateHelper.date(endDate)).map(
+        (d) => {
+          let x = 0;
+          switch (domain) {
+            case 'year':
+              x = DateHelper.date(d).week() - 1;
+              break;
+            case 'month':
+              x = Math.floor(DateHelper.getMonthWeekNumber(d));
+              break;
+            default:
+          }
 
-        return {
-          t: d,
-          x,
-          y: 0,
-          ...defaultValues,
-        };
-      }),
+          return {
+            t: d,
+            x,
+            y: 0,
+            ...defaultValues,
+          };
+        },
+      ),
     position: {
-      x(d) {},
+      x() {},
       y() {
         return 0;
       },

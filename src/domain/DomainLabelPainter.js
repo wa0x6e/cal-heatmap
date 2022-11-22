@@ -7,7 +7,7 @@ export default class DomainLabelPainter {
     const { options } = this.calendar.options;
 
     if (options.domainLabelFormat === '') {
-      return false;
+      return;
     }
 
     root
@@ -30,9 +30,9 @@ export default class DomainLabelPainter {
             ((options.label.rotate === 'right' &&
               options.label.position === 'right') ||
             (options.label.rotate === 'left' &&
-              options.label.position === 'left')
-              ? -1
-              : 1)
+              options.label.position === 'left') ?
+              -1 :
+              1)
         );
       })
       .attr('x', (d) => {
@@ -71,16 +71,17 @@ export default class DomainLabelPainter {
         }
       })
       .attr('dominant-baseline', () =>
-        options.verticalDomainLabel ? 'middle' : 'top',
-      )
+        // eslint-disable-next-line implicit-arrow-linebreak
+        (options.verticalDomainLabel ? 'middle' : 'top'))
       .text((d) =>
-        this.calendar.helpers.DateHelper.format(d, options.domainLabelFormat),
-      )
+        // eslint-disable-next-line implicit-arrow-linebreak
+        this.calendar.helpers.DateHelper.format(d, options.domainLabelFormat))
       .call((s) => this.#domainRotate(s));
   }
 
   #domainRotate(selection) {
     const { options } = this.calendar.options;
+    const { domainPainter } = this.calendar.calendarPainter;
 
     switch (options.label.rotate) {
       case 'right':
@@ -88,11 +89,9 @@ export default class DomainLabelPainter {
           let s = 'rotate(90), ';
           switch (options.label.position) {
             case 'right':
-              s += `translate(-${this.calendar.calendarPainter.domainPainter.getWidth(
+              s += `translate(-${domainPainter.getWidth(
                 d,
-              )} , -${this.calendar.calendarPainter.domainPainter.getWidth(
-                d,
-              )})`;
+              )} , -${domainPainter.getWidth(d)})`;
               break;
             case 'left':
               s += `translate(0, -${options.domainHorizontalLabelWidth})`;
@@ -114,7 +113,9 @@ export default class DomainLabelPainter {
               } , ${this.calendar.calendarPainter.domainPainter.getWidth(d)})`;
               break;
             case 'left':
-              s += `translate(-${options.domainHorizontalLabelWidth} , ${options.domainHorizontalLabelWidth})`;
+              s +=
+                `translate(-${options.domainHorizontalLabelWidth}, ${
+                  options`${options.domainHorizontalLabelWidth})`}`;
               break;
             default:
           }

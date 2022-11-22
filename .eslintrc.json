@@ -10,7 +10,8 @@
   },
   "rules": {
     "no-prototype-builtins": "off",
-    "operator-linebreak": ["error", "after"]
+    "operator-linebreak": ["error", "after"],
+    "max-len": ["error", { "code": 80 }]
   },
   "plugins": ["jest"]
 }

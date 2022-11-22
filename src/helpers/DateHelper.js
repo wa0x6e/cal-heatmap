@@ -46,12 +46,13 @@ export default class DateHelper {
    * @param  int|Date range Number of dates to get, or a stop date
    * @return Array of dates
    */
-  generateTimeInterval(interval, date, range) {
+  intervals(interval, date, range) {
     return this.#generateInterval(interval, date, range);
   }
 
   /**
-   * Returns wether or not dateA is less than or equal to dateB. This function is subdomain aware.
+   * Returns wether or not dateA is less than or equal to dateB.
+   * This function is subdomain aware.
    * Performs automatic conversion of values.
    * @param dateA may be a number or a Date
    * @param dateB may be a number or a Date

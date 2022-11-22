@@ -1,7 +1,7 @@
+// eslint-disable-next-line no-unused-vars
 import { selectAll } from 'd3-selection';
 
-import { getSubDomainTitle } from '../subDomain';
-import { getHighlightClassName } from '../function';
+import { getHighlightClassName, getSubDomainTitle } from '../function';
 
 export default class Populator {
   constructor(calendar) {
@@ -15,7 +15,7 @@ export default class Populator {
     const { options } = this.calendar.options;
 
     if (!this.calendar.colorizer.scale) {
-      return false;
+      return;
     }
 
     element.attr('fill', (d) => {
@@ -117,14 +117,12 @@ export default class Populator {
       .transition()
       .duration(options.animationDuration)
       .select('title')
-      .text((d) =>
-        getSubDomainTitle(
-          calendar,
-          d,
-          options,
-          calendar.subDomainTemplate.at(options.subDomain).format.connector,
-        ),
-      );
+      .text((d) => getSubDomainTitle(
+        calendar,
+        d,
+        options,
+        calendar.subDomainTemplate.at(options.subDomain).format.connector,
+      ));
 
     /**
      * Change the subDomainText class if necessary

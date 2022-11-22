@@ -16,9 +16,9 @@ function extractSVG(root, options) {
     '.qi': {},
   };
 
-  for (let j = 1, total = options.legend.length + 1; j <= total; j++) {
-    styles[`.q${j}`] = {};
-  }
+  options.legend.forEach((l, index) => {
+    styles[`.q${index + 1}`] = {};
+  });
 
   const whitelistStyles = [
     // SVG specific properties
@@ -59,57 +59,53 @@ function extractSVG(root, options) {
     }
   };
 
-  const getElement = e => root.select(e).node();
+  const getElement = (e) => root.select(e).node();
 
-  for (const element in styles) {
-    if (!styles.hasOwnProperty(element)) {
-      continue;
-    }
-
+  Object.keys(styles).forEach((element) => {
     const dom = getElement(element);
 
     if (dom === null) {
-      continue;
+      return;
     }
 
     // The DOM Level 2 CSS way
     if ('getComputedStyle' in window) {
       const cs = getComputedStyle(dom, null);
       if (cs.length !== 0) {
-        for (let i = 0; i < cs.length; i++) {
-          filterStyles(element, cs.item(i), cs.getPropertyValue(cs.item(i)));
-        }
+        cs.item.forEach((item) => {
+          filterStyles(element, item, cs.getPropertyValue(item));
+        });
 
         // Opera workaround. Opera doesn"t support `item`/`length`
         // on CSSStyleDeclaration.
       } else {
-        for (const k in cs) {
-          if (cs.hasOwnProperty(k)) {
-            filterStyles(element, k, cs[k]);
-          }
-        }
+        Object.entries(cs).forEach(([key, value]) => {
+          filterStyles(element, key, value);
+        });
       }
 
       // The IE way
     } else if ('currentStyle' in dom) {
       const css = dom.currentStyle;
-      for (const p in css) {
-        filterStyles(element, p, css[p]);
-      }
+
+      Object.entries(css).forEach(([key, value]) => {
+        filterStyles(element, key, value);
+      });
     }
-  }
+  });
 
   let string =
     '<svg xmlns="http://www.w3.org/2000/svg" ' +
-    'xmlns:xlink="http://www.w3.org/1999/xlink"><style type="text/css"><![CDATA[ ';
+    'xmlns:xlink="http://www.w3.org/1999/xlink">' +
+    '<style type="text/css"><![CDATA[ ';
 
-  for (const style in styles) {
-    string += `${style} {\n`;
-    for (const l in styles[style]) {
-      string += `\t${l}:${styles[style][l]};\n`;
-    }
+  Object.entries(styles).forEach(([classname, values]) => {
+    string += `${classname} {\n`;
+    Object.entries(values).forEach((property, value) => {
+      string += `\t${property}:${value};\n`;
+    });
     string += '}\n';
-  }
+  });
 
   string += ']]></style>';
   string += new XMLSerializer().serializeToString(root.node());

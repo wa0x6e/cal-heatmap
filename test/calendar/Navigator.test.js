@@ -1,4 +1,4 @@
-import Navigator from '../../src/calendar/Navigator';
+// import Navigator from '../../src/calendar/Navigator';
 
 describe('loadNextDomain()', () => {
   xit('returns false if max domain is reached', () => {});

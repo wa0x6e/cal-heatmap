@@ -26,32 +26,31 @@ const hourTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     columnsCount(d) {
       return getTotalColNumber(d);
     },
-    mapping: (startTimestamp, endTimestamp, defaultValues) =>
-      DateHelper.generateTimeInterval(
-        'hour',
-        startTimestamp,
-        DateHelper.date(endTimestamp),
-      ).map((d) => {
-        const date = DateHelper.date(d);
-        const hour = date.hour();
-        const monthDate = date.date();
-        const baseX = Math.floor(hour / ROWS_COUNT);
-        const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
+    mapping: (startDate, endDate, defaultValues) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      DateHelper.intervals('hour', startDate, DateHelper.date(endDate)).map(
+        (d) => {
+          const date = DateHelper.date(d);
+          const hour = date.hour();
+          const monthDate = date.date();
+          const baseX = Math.floor(hour / ROWS_COUNT);
+          const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
-        if (domain === 'month') {
-          return baseX + (monthDate - 1) * columnOffset;
-        }
-        if (domain === 'week') {
-          return baseX + (date.isoWeekday() - 1) * columnOffset;
-        }
+          if (domain === 'month') {
+            return baseX + (monthDate - 1) * columnOffset;
+          }
+          if (domain === 'week') {
+            return baseX + (date.isoWeekday() - 1) * columnOffset;
+          }
 
-        return {
-          t: d,
-          x: baseX,
-          y: Math.floor(hour % ROWS_COUNT),
-          ...defaultValues,
-        };
-      }),
+          return {
+            t: d,
+            x: baseX,
+            y: Math.floor(hour % ROWS_COUNT),
+            ...defaultValues,
+          };
+        },
+      ),
 
     format: {
       date: 'HH[h], dddd MMMM D, Y',

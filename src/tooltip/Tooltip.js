@@ -1,7 +1,7 @@
 import { select } from 'd3-selection';
 import { createPopper } from '@popperjs/core';
 
-import { getSubDomainTitle } from '../subDomain';
+import { getSubDomainTitle } from '../function';
 
 export default class Tooltip {
   constructor(calendar) {

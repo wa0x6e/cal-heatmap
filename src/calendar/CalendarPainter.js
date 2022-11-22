@@ -1,6 +1,8 @@
 import { select } from 'd3-selection';
 
-import { TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+import {
+  TOP, RIGHT, BOTTOM, LEFT,
+} from '../constant';
 
 import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
@@ -85,11 +87,11 @@ export default class CalendarPainter {
   getHeight() {
     const { options } = this.calendar.options;
 
-    const legendHeight = options.displayLegend
-      ? this.legendPainter.getHeight() +
+    const legendHeight = options.displayLegend ?
+      this.legendPainter.getHeight() +
         options.legendMargin[TOP] +
-        options.legendMargin[BOTTOM]
-      : 0;
+        options.legendMargin[BOTTOM] :
+      0;
 
     if (
       options.legendVerticalPosition === 'middle' ||
@@ -103,11 +105,11 @@ export default class CalendarPainter {
   getWidth() {
     const { options } = this.calendar.options;
 
-    const legendWidth = options.displayLegend
-      ? this.legendPainter.getWidth() +
+    const legendWidth = options.displayLegend ?
+      this.legendPainter.getWidth() +
         options.legendMargin[RIGHT] +
-        options.legendMargin[LEFT]
-      : 0;
+        options.legendMargin[LEFT] :
+      0;
     const domainsWidth =
       this.domainPainter.dimensions.width -
       options.domainMargin[RIGHT] -
@@ -174,6 +176,7 @@ export default class CalendarPainter {
         if (typeof callback === 'function') {
           callback();
         } else if (typeof callback !== 'undefined') {
+          // eslint-disable-next-line no-console
           console.log('Provided callback for destroy() is not a function.');
         }
       });

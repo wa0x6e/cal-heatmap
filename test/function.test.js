@@ -34,9 +34,13 @@ describe('expandMarginSetting()', () => {
   });
 
   describe('when passing an array of > 4 values', () => {
-    it('assigns the value to all directions, and ignore all irrelevant values', () => {
-      expect(expandMarginSetting([1, 2, 3, 4, 5, 6])).toEqual([1, 2, 3, 4]);
-    });
+    it(
+      'assigns the value to all directions, ' +
+        'and ignore all irrelevant values',
+      () => {
+        expect(expandMarginSetting([1, 2, 3, 4, 5, 6])).toEqual([1, 2, 3, 4]);
+      },
+    );
   });
 
   describe('when passing anything other than a number', () => {

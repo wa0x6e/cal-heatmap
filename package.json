@@ -42,10 +42,13 @@
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
     "prettier": "^2.7.1",
+    "prettier-eslint-cli": "^7.1.0",
     "puppeteer": "^19.2.2",
     "rollup": "^3.2.5"
   },
   "scripts": {
+    "format": "npx prettier-eslint --write \"src/**/*.js\" \"test/**/*.js\"",
+    "lint": "npx eslint src/ test/",
     "build": "rollup --config",
     "dev": "rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest"

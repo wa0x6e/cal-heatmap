@@ -1,4 +1,6 @@
-import { json, csv, dsv, text } from 'd3-fetch';
+import {
+  json, csv, dsv, text,
+} from 'd3-fetch';
 
 import {
   RESET_ALL_ON_UPDATE,
@@ -9,27 +11,27 @@ import {
 function interpretCSV(data) {
   const d = {};
   const keys = Object.keys(data[0]);
-  let i;
-  let total;
-  for (i = 0, total = data.length; i < total; i++) {
-    d[data[i][keys[0]]] = +data[i][keys[1]];
-  }
+
+  data.forEach((datum) => {
+    d[datum[keys[0]]] = +datum[keys[1]];
+  });
+
   return d;
 }
 
-function parseURI(calendar, str, startTimestamp, endTimestamp) {
+function parseURI(calendar, str, startDate, endDate) {
   // Use a timestamp in seconds
-  let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
-  newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
+  let newUri = str.replace(/\{\{t:start\}\}/g, startDate / 1000);
+  newUri = newUri.replace(/\{\{t:end\}\}/g, endDate / 1000);
 
   // Use a string date, following the ISO-8601
   newUri = newUri.replace(
     /\{\{d:start\}\}/g,
-    calendar.helpers.DateHelper.date(startTimestamp).toISOString(),
+    calendar.helpers.DateHelper.date(startDate).toISOString(),
   );
   newUri = newUri.replace(
     /\{\{d:end\}\}/g,
-    calendar.helpers.DateHelper.date(endTimestamp).toISOString(),
+    calendar.helpers.DateHelper.date(endDate).toISOString(),
   );
 
   return newUri;
@@ -40,23 +42,17 @@ function parseURI(calendar, str, startTimestamp, endTimestamp) {
  *
  * @param object data
  * @param constant updateMode
- * @param Date startTimestamp
- * @param Date endTimestamp
+ * @param Date startDate
+ * @param Date endDate
  *
  * @return void
  */
-function parseDatas(
-  calendar,
-  data,
-  updateMode,
-  startTimestamp,
-  endTimestamp,
-  options,
-) {
+function parseDatas(calendar, data, updateMode, startDate, endDate, options) {
   if (updateMode === RESET_ALL_ON_UPDATE) {
     calendar.domainCollection.forEach((value) => {
-      value.forEach((element, index, array) => {
-        array[index].v = null;
+      value.forEach((element, index) => {
+        // eslint-disable-next-line no-param-reassign
+        value[index].v = null;
       });
     });
   }
@@ -75,7 +71,7 @@ function parseDatas(
     // Skip if data is not relevant to current domain
     if (
       !calendar.domainCollection.has(domainKey) ||
-      !(domainKey >= startTimestamp && domainKey < endTimestamp)
+      !(domainKey >= startDate && domainKey < endDate)
     ) {
       return;
     }
@@ -102,10 +98,11 @@ function parseDatas(
  * Fetch and interpret data from the datasource
  *
  * @param string|object source
- * @param int startTimestamp
- * @param int endTimestamp
+ * @param int startDate
+ * @param int endDate
  * @param function callback
- * @param function|boolean afterLoad function used to convert the data into a json object. Use true to use the afterLoad callback
+ * @param function|boolean afterLoad function used to convert
+ * the data into a json object. Use true to use the afterLoad callback
  * @param updateMode
  *
  * @return mixed
@@ -117,30 +114,34 @@ export function getDatas(
   calendar,
   options,
   source,
-  startTimestamp,
-  endTimestamp,
+  startDate,
+  endDate,
   callback,
   afterLoad = true,
   updateMode = APPEND_ON_UPDATE,
 ) {
-  const _callback = function (data) {
+  const processData = (data) => {
+    let processedData = data;
+
     if (afterLoad !== false) {
       if (typeof afterLoad === 'function') {
-        data = afterLoad(data);
+        processedData = afterLoad(data);
       } else if (typeof options.afterLoadData === 'function') {
-        data = options.afterLoadData(data);
+        processedData = options.afterLoadData(data);
       } else {
+        // eslint-disable-next-line no-console
         console.log('Provided callback for afterLoadData is not a function.');
       }
     } else if (options.dataType === 'csv' || options.dataType === 'tsv') {
-      data = interpretCSV(data);
+      processedData = interpretCSV(data);
     }
+
     parseDatas(
       calendar,
-      data,
+      processedData,
       updateMode,
-      startTimestamp,
-      endTimestamp,
+      startDate,
+      endDate,
       options,
     );
     if (typeof callback === 'function') {
@@ -149,12 +150,12 @@ export function getDatas(
   };
 
   switch (typeof source) {
-    case 'string':
+    case 'string': {
       if (source === '') {
-        _callback({});
+        processData({});
         return true;
       }
-      const url = parseURI(calendar, source, startTimestamp, endTimestamp);
+      const url = parseURI(calendar, source, startDate, endDate);
 
       const reqInit = { method: 'GET' };
       if (options.dataPostPayload !== null) {
@@ -164,17 +165,16 @@ export function getDatas(
         reqInit.body = parseURI(
           calendar,
           options.dataPostPayload,
-          startTimestamp,
-          endTimestamp,
+          startDate,
+          endDate,
         );
       }
       if (options.dataRequestHeaders !== null) {
         const myheaders = new Headers();
-        for (const header in options.dataRequestHeaders) {
-          if (options.dataRequestHeaders.hasOwnProperty(header)) {
-            myheaders.append(header, options.dataRequestHeaders[header]);
-          }
-        }
+        Object(options.dataRequestHeaders).forEach(([key, value]) => {
+          myheaders.append(key, value);
+        });
+
         reqInit.headers = myheaders;
       }
 
@@ -194,17 +194,18 @@ export function getDatas(
           break;
         default:
       }
-      request.then(_callback);
+      request.then(processData);
 
       return false;
+    }
     case 'object':
       if (source === Object(source)) {
-        _callback(source);
+        processData(source);
         return false;
       }
     /* falls through */
     default:
-      _callback({});
+      processData({});
       return true;
   }
 }

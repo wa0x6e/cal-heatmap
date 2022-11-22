@@ -3,8 +3,9 @@ export default class DomainSecondaryLabel {
     this.calendar = calendar;
   }
 
-  paint(root) {
-    const { options } = this.calendar.options;
+  // eslint-disable-next-line class-methods-use-this
+  paint() {
+    // const { options } = this.calendar.options;
 
     return true;
 
@@ -13,7 +14,8 @@ export default class DomainSecondaryLabel {
     //   options.domain === 'month' &&
     //   options.subDomain === 'day'
     // ) {
-    //   // Create a list of all day names starting with Sunday or Monday, depending on configuration
+    //   // Create a list of all day names starting with
+    //   Sunday or Monday, depending on configuration
     //   const daysOfTheWeek = [
     //     'monday',
     //     'tuesday',
@@ -29,7 +31,8 @@ export default class DomainSecondaryLabel {
     //   }
     //   // Get the first character of the day name
     //   const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-    //     this.calendar.helpers.DateHelper.format(time[day](new Date()), 'dd').charAt(0)
+    //     this.calendar.helpers.DateHelper
+    //     .format(time[day](new Date()), 'dd').charAt(0)
     //   );
 
     //   // Append "day-name" group to SVG
