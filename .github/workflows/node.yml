@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18]
-        platform: [ubuntu-latest, macos-latest]
+        platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Install node
@@ -20,6 +20,10 @@ jobs:
         run: npm install
       - name: Install grunt-cli
         run: npm install -g grunt-cli
+      - name: Linting files
+        run: npx eslint src/
+      - name: Build files
+        run: npm run build
       - name: Run tests
         run: npm run test
       - name: Run build task
