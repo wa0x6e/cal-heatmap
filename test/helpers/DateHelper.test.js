@@ -2,8 +2,9 @@ import DateHelper from '../../src/helpers/DateHelper';
 import weekData from '../data/weekNumberDates';
 import dates from '../data/dates';
 
-const date = new Date('2020-01-02T04:24:25.256+04:00');
+const date = new Date('2020-01-02T04:24:25.256+00:00');
 const DEFAULT_LOCALE = 'en';
+const DEFAULT_TIMEZONE = 'utc';
 
 describe('DateHelper', () => {
   describe('new()', () => {
@@ -36,12 +37,12 @@ describe('DateHelper', () => {
   describe('moment()', () => {
     describe('is locale aware', () => {
       it('returns monday as first week day on FR locale', () => {
-        const h = new DateHelper('fr');
+        const h = new DateHelper('fr', DEFAULT_TIMEZONE);
         expect(h.date().startOf('week').format('dddd')).toEqual('lundi');
       });
 
       it('returns sunday as first week day on EN locale', () => {
-        const h = new DateHelper('en');
+        const h = new DateHelper('en', DEFAULT_TIMEZONE);
         expect(h.date().startOf('week').format('dddd')).toEqual('Sunday');
       });
     });
@@ -53,7 +54,7 @@ describe('DateHelper', () => {
       value.forEach((key, index) => {
         key.forEach((monthDate) => {
           it(`assigns ${monthDate} to the week ${index + 1}`, () => {
-            const h = new DateHelper(locale);
+            const h = new DateHelper(locale, DEFAULT_TIMEZONE);
             expect(h.getMonthWeekNumber(monthDate)).toEqual(index + 1);
           });
         });
@@ -66,13 +67,13 @@ describe('intervals', () => {
   const expectations = dates;
 
   const testRun = (interval, locale) => {
-    const toUnix = (a) => a.map((k) => +k);
+    const toDates = (a) => a.map((k) => new Date(k));
 
     describe(`With moment [${locale}] locale`, () => {
       let helper = null;
 
       beforeEach(() => {
-        helper = new DateHelper(locale);
+        helper = new DateHelper(locale, DEFAULT_TIMEZONE);
       });
 
       let intervalKey = interval;
@@ -82,23 +83,27 @@ describe('intervals', () => {
 
       describe(`on ${interval} interval`, () => {
         describe('when date args is a Date object', () => {
-          it(`returns [date first ${interval}]`, () => {
+          it(`returns [date start of ${interval}]`, () => {
             const intervals = helper.intervals(interval, date, 1);
-            expect(intervals[0]).toEqual(+expectations[intervalKey][0]);
+            expect(new Date(intervals[0])).toEqual(
+              expectations[intervalKey][0],
+            );
           });
         });
 
         describe('when date args is a number', () => {
           it(`returns [date first ${interval}]`, () => {
             const intervals = helper.intervals(interval, +date, 1);
-            expect(intervals[0]).toEqual(+expectations[intervalKey][0]);
+            expect(new Date(intervals[0])).toEqual(
+              expectations[intervalKey][0],
+            );
           });
         });
 
         describe('when range args is a 1', () => {
           it('returns [start of current interval]', () => {
             const intervals = helper.intervals(interval, date, 1);
-            expect(intervals).toEqual([+expectations[intervalKey][0]]);
+            expect(toDates(intervals)).toEqual([expectations[intervalKey][0]]);
           });
         });
 
@@ -109,7 +114,7 @@ describe('intervals', () => {
               expectations[intervalKey][1],
               -1,
             );
-            expect(intervals).toEqual(toUnix([expectations[intervalKey][0]]));
+            expect(toDates(intervals)).toEqual([expectations[intervalKey][0]]);
           });
         });
 
@@ -117,7 +122,7 @@ describe('intervals', () => {
           it(`returns [${interval}](x range)`, () => {
             //
             const intervals = helper.intervals(interval, date, 4);
-            expect(intervals).toEqual(toUnix(expectations[intervalKey]));
+            expect(toDates(intervals)).toEqual(expectations[intervalKey]);
             expect(intervals.length).toEqual(4);
           });
         });
@@ -130,8 +135,8 @@ describe('intervals', () => {
               expectations[intervalKey][3],
               -3,
             );
-            expect(intervals).toEqual(
-              toUnix(expectations[intervalKey].slice(0, 3)),
+            expect(toDates(intervals)).toEqual(
+              expectations[intervalKey].slice(0, 3),
             );
             expect(intervals.length).toEqual(3);
           });
@@ -148,7 +153,9 @@ describe('intervals', () => {
                 date,
                 expectations[intervalKey][0],
               );
-              expect(intervals).toEqual([+expectations[intervalKey][0]]);
+              expect(toDates(intervals)).toEqual([
+                expectations[intervalKey][0],
+              ]);
             });
           },
         );
@@ -165,7 +172,7 @@ describe('intervals', () => {
                 expectations[intervalKey][3],
               );
 
-              expect(intervals).toEqual(toUnix(expectations[intervalKey]));
+              expect(toDates(intervals)).toEqual(expectations[intervalKey]);
             });
           },
         );
