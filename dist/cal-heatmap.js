@@ -16227,7 +16227,7 @@
         },
 
         // Animation duration, in ms
-        animationDuration: 500,
+        animationDuration: 200,
 
         nextSelector: false,
 
