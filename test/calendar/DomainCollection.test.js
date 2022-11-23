@@ -10,6 +10,14 @@ describe('DomainCollection class', () => {
     ]);
   });
 
+  describe('setBatch()', () => {
+    it('populates the collection with the passed array', () => {
+      const keys = [0, 1, 2, 100];
+      d.setBatch(keys);
+      expect(d.keys).toEqual([0, 1, 2, 10, 20, 30, 100]);
+    });
+  });
+
   describe('pop()', () => {
     it('removes the last item of the collection', () => {
       expect(d.pop()).toEqual(true);

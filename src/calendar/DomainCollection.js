@@ -10,6 +10,14 @@ export default class DomainCollection {
     }
   }
 
+  setBatch(keys) {
+    keys.forEach((key) => {
+      this.collection.set(key);
+    });
+
+    this.#resetKeys();
+  }
+
   has(key) {
     return this.collection.has(key);
   }
@@ -63,7 +71,9 @@ export default class DomainCollection {
   }
 
   #resetKeys() {
-    this.keys = Array.from(this.collection.keys()).sort();
+    this.keys = Array.from(this.collection.keys())
+      .map((d) => parseInt(d, 10))
+      .sort((a, b) => a - b);
 
     const { keys } = this;
     // eslint-disable-next-line prefer-destructuring
