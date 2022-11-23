@@ -1,5 +1,4 @@
-name: node
-
+name: Test
 on: push
 
 jobs:
@@ -18,13 +17,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         run: npm install
-      - name: Install grunt-cli
-        run: npm install -g grunt-cli
-      - name: Linting files
-        run: npx eslint src/
       - name: Build files
         run: npm run build
       - name: Run tests
         run: npm run test
-      - name: Run build task
-        run: grunt build
