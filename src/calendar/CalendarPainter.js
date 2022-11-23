@@ -111,9 +111,7 @@ export default class CalendarPainter {
         options.legendMargin[LEFT] :
       0;
     const domainsWidth =
-      this.domainPainter.dimensions.width -
-      options.domainMargin[RIGHT] -
-      options.domainGutter * 2;
+      this.domainPainter.dimensions.width - options.domainGutter;
 
     if (
       options.legendVerticalPosition === 'middle' ||

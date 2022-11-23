@@ -1,8 +1,8 @@
 export const RESET_ALL_ON_UPDATE = 0;
 export const RESET_SINGLE_ON_UPDATE = 1;
 export const APPEND_ON_UPDATE = 2;
-export const NAVIGATE_LEFT = 1;
-export const NAVIGATE_RIGHT = 2;
+export const SCROLL_BACKWARD = 1;
+export const SCROLL_FORWARD = 2;
 export const TOP = 0;
 export const RIGHT = 1;
 export const BOTTOM = 2;

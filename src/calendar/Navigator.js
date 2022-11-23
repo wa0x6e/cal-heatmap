@@ -1,4 +1,4 @@
-import { NAVIGATE_RIGHT, NAVIGATE_LEFT } from '../constant';
+import { SCROLL_FORWARD, SCROLL_BACKWARD } from '../constant';
 
 export default class Navigator {
   constructor(calendar) {
@@ -20,7 +20,7 @@ export default class Navigator {
         this.calendar.getDomainKeys().pop(),
         typeof n === 'number' ? n + 1 : n,
       ).slice(1),
-      NAVIGATE_RIGHT,
+      SCROLL_FORWARD,
     );
   }
 
@@ -37,7 +37,7 @@ export default class Navigator {
         this.calendar.getDomainKeys()[0],
         typeof n === 'number' ? -n : n,
       ),
-      NAVIGATE_LEFT,
+      SCROLL_BACKWARD,
     );
   }
 
@@ -77,8 +77,8 @@ export default class Navigator {
     return false;
   }
 
-  loadNewDomains(newDomains, direction = NAVIGATE_RIGHT) {
-    const backward = direction === NAVIGATE_LEFT;
+  loadNewDomains(newDomains, direction = SCROLL_FORWARD) {
+    const backward = direction === SCROLL_BACKWARD;
     const { options, minDate, maxDate } = this.calendar.options;
     const template = this.calendar.subDomainTemplate;
     const minDateInterval = minDate ?
@@ -134,9 +134,9 @@ export default class Navigator {
       maxDateInterval,
     );
 
-    if (direction === NAVIGATE_LEFT) {
+    if (direction === SCROLL_BACKWARD) {
       this.calendar.afterLoadPreviousDomain(domainsBound.min);
-    } else if (direction === NAVIGATE_RIGHT) {
+    } else if (direction === SCROLL_FORWARD) {
       this.calendar.afterLoadNextDomain(domainsBound.max);
     }
 

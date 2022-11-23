@@ -7,8 +7,8 @@
   const RESET_ALL_ON_UPDATE = 0;
   const RESET_SINGLE_ON_UPDATE = 1;
   const APPEND_ON_UPDATE = 2;
-  const NAVIGATE_LEFT = 1;
-  const NAVIGATE_RIGHT = 2;
+  const SCROLL_BACKWARD = 1;
+  const SCROLL_FORWARD = 2;
   const TOP = 0;
   const RIGHT = 1;
   const BOTTOM = 2;
@@ -36,7 +36,7 @@
           this.calendar.getDomainKeys().pop(),
           typeof n === 'number' ? n + 1 : n,
         ).slice(1),
-        NAVIGATE_RIGHT,
+        SCROLL_FORWARD,
       );
     }
 
@@ -53,7 +53,7 @@
           this.calendar.getDomainKeys()[0],
           typeof n === 'number' ? -n : n,
         ),
-        NAVIGATE_LEFT,
+        SCROLL_BACKWARD,
       );
     }
 
@@ -93,8 +93,8 @@
       return false;
     }
 
-    loadNewDomains(newDomains, direction = NAVIGATE_RIGHT) {
-      const backward = direction === NAVIGATE_LEFT;
+    loadNewDomains(newDomains, direction = SCROLL_FORWARD) {
+      const backward = direction === SCROLL_BACKWARD;
       const { options, minDate, maxDate } = this.calendar.options;
       const template = this.calendar.subDomainTemplate;
       const minDateInterval = minDate ?
@@ -150,9 +150,9 @@
         maxDateInterval,
       );
 
-      if (direction === NAVIGATE_LEFT) {
+      if (direction === SCROLL_BACKWARD) {
         this.calendar.afterLoadPreviousDomain(domainsBound.min);
-      } else if (direction === NAVIGATE_RIGHT) {
+      } else if (direction === SCROLL_FORWARD) {
         this.calendar.afterLoadNextDomain(domainsBound.max);
       }
 
@@ -3020,148 +3020,100 @@
         width: 0,
         height: 0,
       };
-
-      this.root = null;
     }
 
-    paint(navigationDir, calendarNode) {
-      this.root = this.#assignData(calendarNode);
-
-      const domainNode = this.#paintEnteringDomain(navigationDir);
-      this.#paintTransitioningDomain(navigationDir);
-      this.#paintExitingDomain(navigationDir);
-
-      return domainNode;
-    }
-
-    #paintEnteringDomain(navigationDir) {
+    paint(scrollDirection, calendarNode) {
       const { options } = this.calendar.options;
+      const scrollBackward = scrollDirection === SCROLL_BACKWARD;
+      const t = calendarNode.transition().duration(options.animationDuration);
 
-      const svg = this.root
-        .enter()
-        .append('svg')
-        .attr('x', (d) => {
-          if (options.verticalOrientation) {
-            return 0;
-          }
-
-          if (navigationDir === false) {
-            const domains = this.calendar.getDomainKeys();
-
-            return domains.indexOf(d) * this.getWidth(d, true);
-          }
-
-          return navigationDir === NAVIGATE_LEFT ?
-            -this.getWidth(d, true) :
-            this.dimensions.width;
-        })
-        .attr('y', () => {
-          if (options.verticalOrientation) {
-            return this.dimensions.height;
-          }
-
-          return 0;
-        })
-        .attr('width', (d) => {
-          this.#updateDimensions('width', this.getWidth(d, true));
-        })
-        .attr('height', (d) => {
-          this.#updateDimensions('height', this.getHeight(d, true));
-        })
-        .attr('class', (d) => this.#getClassName(d));
-
-      svg
-        .transition()
-        .duration(options.animationDuration)
-        .attr('x', (d) => {
-          if (options.verticalOrientation) {
-            return 0;
-          }
-          const domains = this.calendar.getDomainKeys();
-
-          return domains.indexOf(d) * this.getWidth(d, true);
-        })
-        .attr('y', (d) => {
-          if (options.verticalOrientation) {
-            const domains = this.calendar.getDomainKeys();
-
-            return domains.indexOf(d) * this.getHeight(d, true);
-          }
-          return 0;
-        });
-
-      svg
-        .append('rect')
-        .attr('width', (d) => (
-          this.getWidth(d, true) - options.domainGutter - options.cellPadding
-        ))
-        .attr('height', (d) => (
-          this.getHeight(d, true) - options.domainGutter - options.cellPadding
-        ))
-        .attr('class', 'domain-background');
-
-      return svg;
+      return calendarNode
+        .select('.graph')
+        .selectAll('.graph-domain')
+        .data(
+          () => this.calendar.getDomainKeys(),
+          (d) => d,
+        )
+        .join(
+          (enter) => enter
+            .append('svg')
+            .attr('x', (d) => this.#getOuterX(d, scrollBackward))
+            .attr('y', (d) => this.#getOuterY(d, scrollBackward))
+            .attr('width', (d) => this.#updateWidth(this.getWidth(d)))
+            .attr('height', (d) => this.#updateHeight(this.getHeight(d)))
+            .attr('class', (d) => this.#getClassName(d))
+            .call((enterSelection) => enterSelection
+              .append('rect')
+              .attr('width', (d) => this.getWidth(d) - options.domainGutter)
+              .attr('height', (d) => this.getHeight(d) - options.domainGutter)
+              .attr('class', 'domain-background'))
+            .call((enterSelection) => enterSelection
+              .transition(t)
+              .attr('x', (d) => this.#getX(d))
+              .attr('y', (d) => this.#getY(d))),
+          (update) => update.call((updateSelection) => updateSelection
+            .transition(t)
+            .attr('x', (d) => this.#getX(d))
+            .attr('y', (d) => this.#getY(d))),
+          (exit) => exit.call((exitSelection) => exitSelection
+            .transition(t)
+            .attr('width', (d) => {
+              this.#updateWidth(-this.getWidth(d));
+            })
+            .attr('height', (d) => {
+              this.#updateHeight(-this.getHeight(d));
+            })
+            .attr('x', (d) => this.#getOuterX(d, !scrollBackward))
+            .attr('y', (d) => this.#getOuterY(d, !scrollBackward))
+            .remove()),
+        );
     }
 
-    #paintExitingDomain(navigationDir) {
-      const { options } = this.calendar.options;
+    #applyScrollingAxis(axis, callback) {
+      const { verticalOrientation } = this.calendar.options.options;
 
-      // At the time of exit, domainsWidth and domainsHeight
-      // already automatically shifted
-      this.root
-        .exit()
-        .transition()
-        .duration(options.animationDuration)
-        .attr('x', (d) => {
-          if (options.verticalOrientation) {
-            return 0;
-          }
+      if (
+        (verticalOrientation && axis === 'x') ||
+        (!verticalOrientation && axis === 'y')
+      ) {
+        return 0;
+      }
 
-          return navigationDir === NAVIGATE_LEFT ?
-            this.dimensions.width :
-            -this.getWidth(d, true);
-        })
-        .attr('y', (d) => {
-          if (options.verticalOrientation) {
-            return navigationDir === NAVIGATE_LEFT ?
-              this.dimensions.height :
-              -this.getHeight(d, true);
-          }
-          return 0;
-        })
-        .attr('width', (d) => {
-          this.#updateDimensions('width', -this.getWidth(d, true));
-        })
-        .attr('height', (d) => {
-          this.#updateDimensions('height', -this.getHeight(d, true));
-        })
-        .remove();
+      return callback();
     }
 
-    #paintTransitioningDomain() {
-      const { options } = this.calendar.options;
+    #getOuterX(d, start) {
+      return this.#applyScrollingAxis('x', () =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        (start ? -this.getWidth(d) : this.dimensions.width));
+    }
 
-      // if (navigationDir !== false) {
-      this.root
-        .transition()
-        .duration(options.animationDuration)
-        .attr('x', (d) => {
-          if (options.verticalOrientation) {
-            return 0;
-          }
-          const domains = this.calendar.getDomainKeys();
+    #getOuterY(d, start) {
+      return this.#applyScrollingAxis('y', () =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        (start ? -this.getHeight(d) : this.dimensions.height));
+    }
 
-          return domains.indexOf(d) * this.getWidth(d, true);
-        })
-        .attr('y', (d) => {
-          if (options.verticalOrientation) {
-            const domains = this.calendar.getDomainKeys();
+    #getX(d) {
+      return this.#applyScrollingAxis(
+        'x',
+        () => this.calendar.getDomainKeys().indexOf(d) * this.getWidth(d),
+      );
+    }
 
-            return domains.indexOf(d) * this.getHeight(d, true);
-          }
-          return 0;
-        });
-      // }
+    #getY(d) {
+      return this.#applyScrollingAxis(
+        'y',
+        () => this.calendar.getDomainKeys().indexOf(d) * this.getHeight(d),
+      );
+    }
+
+    #updateHeight(value) {
+      return this.#updateDimensions('height', value);
+    }
+
+    #updateWidth(value) {
+      return this.#updateDimensions('width', value);
     }
 
     #updateDimensions(axis, value) {
@@ -3169,15 +3121,15 @@
 
       if (axis === 'width') {
         if (options.verticalOrientation) {
-          this.dimensions.width = Math.abs(value);
+          this.dimensions[axis] = Math.abs(value);
         } else {
-          this.dimensions.width += value;
+          this.dimensions[axis] += value;
         }
       } else if (axis === 'height') {
         if (options.verticalOrientation) {
-          this.dimensions.height += value;
+          this.dimensions[axis] += value;
         } else {
-          this.dimensions.height = Math.abs(value);
+          this.dimensions[axis] = Math.abs(value);
         }
       }
 
@@ -3208,54 +3160,54 @@
       return classname;
     }
 
-    #assignData(calendarNode) {
-      return calendarNode
-        .select('.graph')
-        .selectAll('.graph-domain')
-        .data(
-          () => this.calendar.getDomainKeys(),
-          (d) => d,
-        );
-    }
-
-    // Return the width of the domain block, without the domain gutter
-    // @param int d Domain start timestamp
-    getWidth(d, outer = false) {
+    /**
+     * Return the full width of the domain block
+     * @param int d Domain start timestamp
+     * @return int The full width of the domain, including all margins.
+     * Used to compute the x position of the domains on the x axis
+     */
+    getWidth(d) {
       const { options } = this.calendar.options;
       const columnsCount = this.calendar.subDomainTemplate
         .at(options.subDomain)
         .columnsCount(d);
 
-      let width = (options.cellSize[X] + options.cellPadding) * columnsCount;
+      const subDomainWidth =
+        (options.cellSize[X] + options.cellPadding) * columnsCount -
+        options.cellPadding;
 
-      if (outer) {
-        width +=
-          options.domainHorizontalLabelWidth +
-          options.domainGutter +
-          options.domainMargin[RIGHT] +
-          options.domainMargin[LEFT];
-      }
-
-      return width;
+      return (
+        options.domainMargin[LEFT] +
+        options.domainHorizontalLabelWidth +
+        options.domainGutter +
+        subDomainWidth +
+        options.domainMargin[RIGHT]
+      );
     }
 
-    // Return the height of the domain block, without the domain gutter
-    getHeight(d, outer = false) {
+    /**
+     * Return the full height of the domain block
+     * @param int d Domain start timestamp
+     * @return int The full height of the domain, including all margins.
+     * Used to compute the y position of the domains on the y axis
+     */
+    getHeight(d) {
       const { options } = this.calendar.options;
       const rowsCount = this.calendar.subDomainTemplate
         .at(options.subDomain)
         .rowsCount(d);
 
-      let height = (options.cellSize[Y] + options.cellPadding) * rowsCount;
+      const subDomainHeight =
+        (options.cellSize[Y] + options.cellPadding) * rowsCount -
+        options.cellPadding;
 
-      if (outer) {
-        height +=
-          options.domainGutter +
-          options.domainVerticalLabelHeight +
-          options.domainMargin[TOP] +
-          options.domainMargin[BOTTOM];
-      }
-      return height;
+      return (
+        options.domainMargin[TOP] +
+        subDomainHeight +
+        options.domainGutter +
+        options.domainVerticalLabelHeight +
+        options.domainMargin[BOTTOM]
+      );
     }
   }
 
@@ -3275,14 +3227,11 @@
         .append('text')
         .attr('class', 'graph-label')
         .attr('y', (d) => {
-          let y = options.domainMargin[0];
+          let y =
+            options.domainMargin[TOP] + options.domainVerticalLabelHeight / 2;
 
-          if (options.label.position === 'top') {
-            y += options.domainVerticalLabelHeight / 2;
-          } else {
-            y +=
-              this.calendar.calendarPainter.domainPainter.getHeight(d) +
-              options.domainVerticalLabelHeight / 2;
+          if (options.label.position !== 'top') {
+            y += this.#getDomainInsideHeight(d);
           }
 
           return (
@@ -3297,15 +3246,15 @@
           );
         })
         .attr('x', (d) => {
-          let x = options.domainMargin[3];
+          let x = options.domainMargin[LEFT];
 
           switch (options.label.position) {
             case 'right':
-              x += this.calendar.calendarPainter.domainPainter.getWidth(d);
+              x += this.#getDomainInsideWidth(d);
               break;
             case 'bottom':
             case 'top':
-              x += this.calendar.calendarPainter.domainPainter.getWidth(d) / 2;
+              x += this.#getDomainInsideWidth(d) / 2;
               break;
           }
 
@@ -3339,19 +3288,39 @@
         .call((s) => this.#domainRotate(s));
     }
 
+    #getDomainInsideWidth(d) {
+      const { options } = this.calendar.options;
+      return (
+        this.calendar.calendarPainter.domainPainter.getWidth(d) -
+        options.domainHorizontalLabelWidth +
+        options.domainGutter +
+        options.domainMargin[RIGHT] +
+        options.domainMargin[LEFT]
+      );
+    }
+
+    #getDomainInsideHeight(d) {
+      const { options } = this.calendar.options;
+      return (
+        this.calendar.calendarPainter.domainPainter.getHeight(d) -
+        options.domainVerticalLabelHeight +
+        options.domainGutter +
+        options.domainMargin[TOP] +
+        options.domainMargin[BOTTOM]
+      );
+    }
+
     #domainRotate(selection) {
       const { options } = this.calendar.options;
-      const { domainPainter } = this.calendar.calendarPainter;
 
       switch (options.label.rotate) {
         case 'right':
           selection.attr('transform', (d) => {
             let s = 'rotate(90), ';
+            const width = this.#getDomainInsideWidth(d);
             switch (options.label.position) {
               case 'right':
-                s += `translate(-${domainPainter.getWidth(
-                d,
-              )} , -${domainPainter.getWidth(d)})`;
+                s += `translate(-${width} , -${width})`;
                 break;
               case 'left':
                 s += `translate(0, -${options.domainHorizontalLabelWidth})`;
@@ -3364,17 +3333,17 @@
         case 'left':
           selection.attr('transform', (d) => {
             let s = 'rotate(270), ';
+            const width = this.#getDomainInsideWidth(d);
             switch (options.label.position) {
               case 'right':
                 s += `translate(-${
-                this.calendar.calendarPainter.domainPainter.getWidth(d) +
-                options.domainHorizontalLabelWidth
-              } , ${this.calendar.calendarPainter.domainPainter.getWidth(d)})`;
+                width + options.domainHorizontalLabelWidth
+              } , ${width})`;
                 break;
               case 'left':
-                s +=
-                  `translate(-${options.domainHorizontalLabelWidth}, ${
-                  options`${options.domainHorizontalLabelWidth})`}`;
+                s += `translate(-${
+                options.domainHorizontalLabelWidth
+              }, ${options`${options.domainHorizontalLabelWidth})`}`;
                 break;
             }
 
@@ -6208,9 +6177,7 @@
           options.legendMargin[LEFT] :
         0;
       const domainsWidth =
-        this.domainPainter.dimensions.width -
-        options.domainMargin[RIGHT] -
-        options.domainGutter * 2;
+        this.domainPainter.dimensions.width - options.domainGutter;
 
       if (
         options.legendVerticalPosition === 'middle' ||
@@ -17661,7 +17628,7 @@
             return Math.ceil(
               domainDynamicDimension && !verticalOrientation ?
                 DateHelper.date(d).daysInMonth() / ROWS_COUNT :
-                31 / ROWS_COUNT,
+                6, // In rare case, when the first week contains less than 3 days
             );
           case 'year':
             return Math.ceil(
