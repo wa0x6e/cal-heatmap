@@ -13,8 +13,8 @@ import CalendarEvent from './calendar/CalendarEvent';
 
 import { RESET_ALL_ON_UPDATE } from './constant';
 
-export default class CalHeatMap extends CalendarEvent {
-  constructor() {
+export default class CalHeatmap extends CalendarEvent {
+  constructor(settings) {
     super();
 
     // Default settings
@@ -32,6 +32,8 @@ export default class CalHeatMap extends CalendarEvent {
     this.calendarPainter = new CalendarPainter(this);
     this.colorizer = new Colorizer(this);
     this.helpers = {};
+
+    this.#init(settings);
   }
 
   /**
@@ -52,11 +54,7 @@ export default class CalHeatMap extends CalendarEvent {
     };
   }
 
-  // =========================================================================
-  // PUBLIC API
-  // =========================================================================
-
-  init(settings) {
+  #init(settings) {
     const { options } = this.options;
 
     this.options.init(settings);
@@ -81,6 +79,10 @@ export default class CalHeatMap extends CalendarEvent {
       this.onComplete();
     }
   }
+
+  // =========================================================================
+  // PUBLIC API
+  // =========================================================================
 
   /**
    * Shift the calendar by n domains forward

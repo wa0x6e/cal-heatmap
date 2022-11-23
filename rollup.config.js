@@ -4,10 +4,10 @@ import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 
 export default {
-  input: 'src/cal-heatmap.js',
+  input: 'src/CalHeatmap.js',
   output: {
     file: 'dist/cal-heatmap.js',
-    name: 'CalHeatMap',
+    name: 'CalHeatmap',
     format: 'umd',
     external: [
       'd3-selection',

@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.CalHeatMap = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.CalHeatmap = factory());
 })(this, (function () { 'use strict';
 
   const RESET_ALL_ON_UPDATE = 0;
@@ -18055,8 +18055,8 @@
     }
   }
 
-  class CalHeatMap extends CalendarEvent {
-    constructor() {
+  class CalHeatmap extends CalendarEvent {
+    constructor(settings) {
       super();
 
       // Default settings
@@ -18074,6 +18074,8 @@
       this.calendarPainter = new CalendarPainter(this);
       this.colorizer = new Colorizer(this);
       this.helpers = {};
+
+      this.#init(settings);
     }
 
     /**
@@ -18094,11 +18096,7 @@
       };
     }
 
-    // =========================================================================
-    // PUBLIC API
-    // =========================================================================
-
-    init(settings) {
+    #init(settings) {
       const { options } = this.options;
 
       this.options.init(settings);
@@ -18123,6 +18121,10 @@
         this.onComplete();
       }
     }
+
+    // =========================================================================
+    // PUBLIC API
+    // =========================================================================
 
     /**
      * Shift the calendar by n domains forward
@@ -18299,6 +18301,6 @@
     }
   }
 
-  return CalHeatMap;
+  return CalHeatmap;
 
 }));
