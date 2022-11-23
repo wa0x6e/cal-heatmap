@@ -28,7 +28,7 @@ export default class DomainPainter {
       .select('.graph')
       .selectAll('.graph-domain')
       .data(
-        () => this.calendar.getDomainKeys(),
+        () => this.calendar.domainCollection.keys,
         (d) => d,
       )
       .join(
@@ -94,14 +94,14 @@ export default class DomainPainter {
   #getX(d) {
     return this.#applyScrollingAxis(
       'x',
-      () => this.calendar.getDomainKeys().indexOf(d) * this.getWidth(d),
+      () => this.calendar.domainCollection.keyIndex(d) * this.getWidth(d),
     );
   }
 
   #getY(d) {
     return this.#applyScrollingAxis(
       'y',
-      () => this.calendar.getDomainKeys().indexOf(d) * this.getHeight(d),
+      () => this.calendar.domainCollection.keyIndex(d) * this.getHeight(d),
     );
   }
 

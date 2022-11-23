@@ -17,7 +17,7 @@ export default class Navigator {
     return this.loadNewDomains(
       this.calendar.helpers.DateHelper.intervals(
         options.domain,
-        this.calendar.getDomainKeys().pop(),
+        this.calendar.domainCollection.max,
         typeof n === 'number' ? n + 1 : n,
       ).slice(1),
       SCROLL_FORWARD,
@@ -34,7 +34,7 @@ export default class Navigator {
     return this.loadNewDomains(
       this.calendar.helpers.DateHelper.intervals(
         options.domain,
-        this.calendar.getDomainKeys()[0],
+        this.calendar.domainCollection.min,
         typeof n === 'number' ? -n : n,
       ),
       SCROLL_BACKWARD,
@@ -42,15 +42,15 @@ export default class Navigator {
   }
 
   jumpTo(date, reset) {
-    const domainsBound = this.calendar.getDomainBoundKeys();
     const { domain } = this.calendar.options.options;
+    const { domainCollection } = this.calendar;
 
-    if (date < domainsBound.min) {
+    if (date < domainCollection.min) {
       return this.loadPreviousDomain(
         this.calendar.helpers.DateHelper.intervals(
           domain,
           date,
-          domainsBound.min,
+          domainCollection.min,
         ).length,
       );
     }
@@ -58,17 +58,17 @@ export default class Navigator {
       return this.loadNextDomain(
         this.calendar.helpers.DateHelper.intervals(
           domain,
-          domainsBound.min,
+          domainCollection.min,
           date,
         ).length,
       );
     }
 
-    if (date > domainsBound.max) {
+    if (date > domainCollection.max) {
       return this.loadNextDomain(
         this.calendar.helpers.DateHelper.intervals(
           domain,
-          domainsBound.max,
+          domainCollection.max,
           date,
         ).length,
       );
@@ -78,7 +78,6 @@ export default class Navigator {
   }
 
   loadNewDomains(newDomains, direction = SCROLL_FORWARD) {
-    const backward = direction === SCROLL_BACKWARD;
     const { options, minDate, maxDate } = this.calendar.options;
     const template = this.calendar.subDomainTemplate;
     const minDateInterval = minDate ?
@@ -87,7 +86,7 @@ export default class Navigator {
     const maxDateInterval = maxDate ?
       template.at(options.domain).extractUnit(maxDate) :
       null;
-    const domains = this.calendar.getDomainKeys();
+    const { domainCollection } = this.calendar;
 
     // Removing out-of-bonds domains
     const boundedNewDomains = newDomains
@@ -98,7 +97,7 @@ export default class Navigator {
       .slice(-options.range);
 
     boundedNewDomains.forEach((domain, index) => {
-      if (this.calendar.domainCollection.has(domain)) {
+      if (domainCollection.has(domain)) {
         return;
       }
 
@@ -113,31 +112,27 @@ export default class Navigator {
         ).pop();
       }
 
-      this.calendar.domainCollection.set(
+      domainCollection.set(
         domain,
         template
           .at(options.subDomain)
           .mapping(domain, subDomainEndDate - 1000, { v: null }),
       );
 
-      this.calendar.domainCollection.delete(
-        backward ? domains.pop() : domains.shift(),
-      );
+      domainCollection.trim(options.range, direction === SCROLL_FORWARD);
     });
 
-    const domainsBound = this.calendar.getDomainBoundKeys();
-
     this.#checkDomainsBoundaryReached(
-      domainsBound.min,
-      domainsBound.max,
+      domainCollection.min,
+      domainCollection.max,
       minDateInterval,
       maxDateInterval,
     );
 
     if (direction === SCROLL_BACKWARD) {
-      this.calendar.afterLoadPreviousDomain(domainsBound.min);
+      this.calendar.afterLoadPreviousDomain(domainCollection.min);
     } else if (direction === SCROLL_FORWARD) {
-      this.calendar.afterLoadNextDomain(domainsBound.max);
+      this.calendar.afterLoadNextDomain(domainCollection.max);
     }
 
     return direction;

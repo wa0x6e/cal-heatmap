@@ -33,7 +33,7 @@
       return this.loadNewDomains(
         this.calendar.helpers.DateHelper.intervals(
           options.domain,
-          this.calendar.getDomainKeys().pop(),
+          this.calendar.domainCollection.max,
           typeof n === 'number' ? n + 1 : n,
         ).slice(1),
         SCROLL_FORWARD,
@@ -50,7 +50,7 @@
       return this.loadNewDomains(
         this.calendar.helpers.DateHelper.intervals(
           options.domain,
-          this.calendar.getDomainKeys()[0],
+          this.calendar.domainCollection.min,
           typeof n === 'number' ? -n : n,
         ),
         SCROLL_BACKWARD,
@@ -58,15 +58,15 @@
     }
 
     jumpTo(date, reset) {
-      const domainsBound = this.calendar.getDomainBoundKeys();
       const { domain } = this.calendar.options.options;
+      const { domainCollection } = this.calendar;
 
-      if (date < domainsBound.min) {
+      if (date < domainCollection.min) {
         return this.loadPreviousDomain(
           this.calendar.helpers.DateHelper.intervals(
             domain,
             date,
-            domainsBound.min,
+            domainCollection.min,
           ).length,
         );
       }
@@ -74,17 +74,17 @@
         return this.loadNextDomain(
           this.calendar.helpers.DateHelper.intervals(
             domain,
-            domainsBound.min,
+            domainCollection.min,
             date,
           ).length,
         );
       }
 
-      if (date > domainsBound.max) {
+      if (date > domainCollection.max) {
         return this.loadNextDomain(
           this.calendar.helpers.DateHelper.intervals(
             domain,
-            domainsBound.max,
+            domainCollection.max,
             date,
           ).length,
         );
@@ -94,7 +94,6 @@
     }
 
     loadNewDomains(newDomains, direction = SCROLL_FORWARD) {
-      const backward = direction === SCROLL_BACKWARD;
       const { options, minDate, maxDate } = this.calendar.options;
       const template = this.calendar.subDomainTemplate;
       const minDateInterval = minDate ?
@@ -103,7 +102,7 @@
       const maxDateInterval = maxDate ?
         template.at(options.domain).extractUnit(maxDate) :
         null;
-      const domains = this.calendar.getDomainKeys();
+      const { domainCollection } = this.calendar;
 
       // Removing out-of-bonds domains
       const boundedNewDomains = newDomains
@@ -114,7 +113,7 @@
         .slice(-options.range);
 
       boundedNewDomains.forEach((domain, index) => {
-        if (this.calendar.domainCollection.has(domain)) {
+        if (domainCollection.has(domain)) {
           return;
         }
 
@@ -129,31 +128,27 @@
           ).pop();
         }
 
-        this.calendar.domainCollection.set(
+        domainCollection.set(
           domain,
           template
             .at(options.subDomain)
             .mapping(domain, subDomainEndDate - 1000, { v: null }),
         );
 
-        this.calendar.domainCollection.delete(
-          backward ? domains.pop() : domains.shift(),
-        );
+        domainCollection.trim(options.range, direction === SCROLL_FORWARD);
       });
 
-      const domainsBound = this.calendar.getDomainBoundKeys();
-
       this.#checkDomainsBoundaryReached(
-        domainsBound.min,
-        domainsBound.max,
+        domainCollection.min,
+        domainCollection.max,
         minDateInterval,
         maxDateInterval,
       );
 
       if (direction === SCROLL_BACKWARD) {
-        this.calendar.afterLoadPreviousDomain(domainsBound.min);
+        this.calendar.afterLoadPreviousDomain(domainCollection.min);
       } else if (direction === SCROLL_FORWARD) {
-        this.calendar.afterLoadNextDomain(domainsBound.max);
+        this.calendar.afterLoadNextDomain(domainCollection.max);
       }
 
       return direction;
@@ -3031,7 +3026,7 @@
         .select('.graph')
         .selectAll('.graph-domain')
         .data(
-          () => this.calendar.getDomainKeys(),
+          () => this.calendar.domainCollection.keys,
           (d) => d,
         )
         .join(
@@ -3097,14 +3092,14 @@
     #getX(d) {
       return this.#applyScrollingAxis(
         'x',
-        () => this.calendar.getDomainKeys().indexOf(d) * this.getWidth(d),
+        () => this.calendar.domainCollection.keyIndex(d) * this.getWidth(d),
       );
     }
 
     #getY(d) {
       return this.#applyScrollingAxis(
         'y',
-        () => this.calendar.getDomainKeys().indexOf(d) * this.getHeight(d),
+        () => this.calendar.domainCollection.keyIndex(d) * this.getHeight(d),
       );
     }
 
@@ -16980,6 +16975,80 @@
     }
   }
 
+  class DomainCollection {
+    constructor(args) {
+      this.collection = new Map(args);
+      this.min = null;
+      this.max = null;
+      this.keys = [];
+
+      if (args) {
+        this.#resetKeys();
+      }
+    }
+
+    has(key) {
+      return this.collection.has(key);
+    }
+
+    get(key) {
+      return this.collection.get(key);
+    }
+
+    set(key, value) {
+      this.collection.set(key, value);
+      this.#resetKeys();
+
+      return this.has(key);
+    }
+
+    delete(key) {
+      const r = this.collection.delete(key);
+      this.#resetKeys();
+
+      return r;
+    }
+
+    forEach(callback) {
+      return this.collection.forEach((element) => callback(element));
+    }
+
+    keyIndex(d) {
+      return this.keys.indexOf(d);
+    }
+
+    pop() {
+      const r = this.collection.delete(this.max);
+      this.#resetKeys();
+
+      return r;
+    }
+
+    shift() {
+      const r = this.collection.delete(this.min);
+      this.#resetKeys();
+
+      return r;
+    }
+
+    trim(count, fromBeginning) {
+      if (this.keys.length > count) {
+        return fromBeginning ? this.shift() : this.pop();
+      }
+
+      return false;
+    }
+
+    #resetKeys() {
+      this.keys = Array.from(this.collection.keys()).sort();
+
+      const { keys } = this;
+      // eslint-disable-next-line prefer-destructuring
+      this.min = keys[0];
+      this.max = keys[keys.length - 1];
+    }
+  }
+
   function extractSVG(root, options) {
     const styles = {
       '.cal-heatmap-container': {},
@@ -18066,7 +18135,7 @@
 
       // Record all the valid domains
       // Each domain value is a timestamp in milliseconds
-      this.domainCollection = new Map();
+      this.domainCollection = new DomainCollection();
 
       this.navigator = new Navigator(this);
       this.populator = new Populator(this);
@@ -18076,24 +18145,6 @@
       this.helpers = {};
 
       this.#init(settings);
-    }
-
-    /**
-     * Return the list of the calendar's domain timestamp
-     *
-     * @return Array a sorted array of timestamp
-     */
-    getDomainKeys() {
-      return Array.from(this.domainCollection.keys()).sort();
-    }
-
-    getDomainBoundKeys() {
-      const keys = this.getDomainKeys();
-
-      return {
-        min: keys[0],
-        max: keys[keys.length - 1],
-      };
     }
 
     #init(settings) {
@@ -18190,10 +18241,9 @@
       updateMode = RESET_ALL_ON_UPDATE,
     ) {
       const { options } = this.options;
-      const domainsBound = this.getDomainBoundKeys();
       const endDate = this.helpers.DateHelper.intervals(
         options.domain,
-        domainsBound.max,
+        this.domainCollection.max,
         2,
       )[1];
 
@@ -18201,7 +18251,7 @@
         this,
         options,
         dataSource,
-        domainsBound.min,
+        this.domainCollection.min,
         endDate,
         () => {
           this.populator.populate();

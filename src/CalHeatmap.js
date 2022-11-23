@@ -3,6 +3,7 @@ import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
 import Options from './calendar/Options';
 import Colorizer from './calendar/Colorizer';
+import DomainCollection from './calendar/DomainCollection';
 
 import extractSVG from './utils/extractSVG';
 
@@ -24,7 +25,7 @@ export default class CalHeatmap extends CalendarEvent {
 
     // Record all the valid domains
     // Each domain value is a timestamp in milliseconds
-    this.domainCollection = new Map();
+    this.domainCollection = new DomainCollection();
 
     this.navigator = new Navigator(this);
     this.populator = new Populator(this);
@@ -34,24 +35,6 @@ export default class CalHeatmap extends CalendarEvent {
     this.helpers = {};
 
     this.#init(settings);
-  }
-
-  /**
-   * Return the list of the calendar's domain timestamp
-   *
-   * @return Array a sorted array of timestamp
-   */
-  getDomainKeys() {
-    return Array.from(this.domainCollection.keys()).sort();
-  }
-
-  getDomainBoundKeys() {
-    const keys = this.getDomainKeys();
-
-    return {
-      min: keys[0],
-      max: keys[keys.length - 1],
-    };
   }
 
   #init(settings) {
@@ -148,10 +131,9 @@ export default class CalHeatmap extends CalendarEvent {
     updateMode = RESET_ALL_ON_UPDATE,
   ) {
     const { options } = this.options;
-    const domainsBound = this.getDomainBoundKeys();
     const endDate = this.helpers.DateHelper.intervals(
       options.domain,
-      domainsBound.max,
+      this.domainCollection.max,
       2,
     )[1];
 
@@ -159,7 +141,7 @@ export default class CalHeatmap extends CalendarEvent {
       this,
       options,
       dataSource,
-      domainsBound.min,
+      this.domainCollection.min,
       endDate,
       () => {
         this.populator.populate();
