@@ -11,11 +11,6 @@ describe('DomainCollection', () => {
     d = new DomainCollection(dateHelper, 'day', true, true, true);
   });
 
-  it('removes the specified key from the collection', () => {
-    expect(d.delete(2)).toEqual(true);
-    expect(d.keys).toEqual([1, 3, 4, 5, 6]);
-  });
-
   it('get the specified key from the collection', () => {
     expect(d.get(2)).toBe(20);
   });
@@ -77,8 +72,8 @@ describe('DomainCollection', () => {
   });
 
   it('clamps the domain to the maximum limit', () => {
-    d.clamp(3, 5);
-    expect(d.keys).toEqual([3, 4, 5]);
+    d.clamp(0, 3);
+    expect(d.keys).toEqual([1, 2, 3]);
   });
 
   it('does nothing when min clamp time is lower than collection min', () => {

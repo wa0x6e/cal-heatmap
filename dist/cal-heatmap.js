@@ -23,60 +23,30 @@
       this.minDomainReached = false;
     }
 
-    loadNextDomain(newDomainCollection) {
-      if (this.maxDomainReached) {
-        return false;
-      }
-
-      return this.loadNewDomains(newDomainCollection, SCROLL_FORWARD);
-    }
-
-    loadPreviousDomain(newDomainCollection) {
-      if (this.minDomainReached) {
-        return false;
-      }
-
-      return this.loadNewDomains(newDomainCollection, SCROLL_BACKWARD);
-    }
-
-    jumpTo(date, reset) {
-      const { domainCollection } = this.calendar;
-      const minDate = new Date(domainCollection.min);
-      const maxDate = new Date(domainCollection.max);
-
-      if (date < minDate) {
-        return this.loadPreviousDomain(
-          this.calendar.createDomainCollection(date, minDate),
-        );
-      }
-      if (reset) {
-        return this.loadNextDomain(
-          this.calendar.createDomainCollection(minDate, date),
-        );
-      }
-
-      if (date > maxDate) {
-        return this.loadNextDomain(
-          this.calendar.createDomainCollection(maxDate, date),
-        );
-      }
-
-      return false;
-    }
-
     loadNewDomains(newDomainCollection, direction = SCROLL_FORWARD) {
-      const { options, minDate, maxDate } = this.calendar.options;
+      const { options } = this.calendar.options;
       const template = this.calendar.subDomainTemplate;
-      const minDateInterval = minDate ?
-        template.at(options.domain).extractUnit(minDate) :
+      const minDate = options.minDate ?
+        template.at(options.domain).extractUnit(options.minDate) :
         null;
-      const maxDateInterval = maxDate ?
-        template.at(options.domain).extractUnit(maxDate) :
+      const maxDate = options.maxDate ?
+        template.at(options.domain).extractUnit(options.maxDate) :
         null;
       const { domainCollection } = this.calendar;
+
+      if (
+        this.#isDomainBoundaryReached(
+          newDomainCollection,
+          minDate,
+          maxDate,
+          direction,
+        )
+      ) {
+        return false;
+      }
 
       newDomainCollection
-        .clamp(minDateInterval, maxDateInterval)
+        .clamp(minDate, maxDate)
         .slice(options.range, direction === SCROLL_FORWARD);
 
       domainCollection.merge(
@@ -99,11 +69,11 @@
         },
       );
 
-      this.#checkDomainsBoundaryReached(
+      this.#setDomainsBoundaryReached(
         domainCollection.min,
         domainCollection.max,
-        minDateInterval,
-        maxDateInterval,
+        minDate,
+        maxDate,
       );
 
       if (direction === SCROLL_BACKWARD) {
@@ -115,7 +85,58 @@
       return direction;
     }
 
-    #checkDomainsBoundaryReached(lowerBound, upperBound, min, max) {
+    jumpTo(date, reset) {
+      const { domainCollection } = this.calendar;
+      const minDate = new Date(domainCollection.min);
+      const maxDate = new Date(domainCollection.max);
+
+      if (date < minDate) {
+        return this.loadNewDomains(
+          this.calendar.createDomainCollection(date, minDate),
+          SCROLL_BACKWARD,
+        );
+      }
+      if (reset) {
+        return this.loadNewDomains(
+          this.calendar.createDomainCollection(
+            date,
+            this.calendar.options.options.range,
+          ),
+          SCROLL_BACKWARD,
+        );
+      }
+
+      if (date > maxDate) {
+        return this.loadNewDomains(
+          this.calendar.createDomainCollection(maxDate, date),
+          SCROLL_FORWARD,
+        );
+      }
+
+      return false;
+    }
+
+    #isDomainBoundaryReached(newDomainCollection, minDate, maxDate, direction) {
+      if (
+        newDomainCollection.max >= maxDate &&
+        this.maxDomainReached &&
+        direction === SCROLL_FORWARD
+      ) {
+        return true;
+      }
+
+      if (
+        newDomainCollection.min <= minDate &&
+        this.minDomainReached &&
+        direction === SCROLL_BACKWARD
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+
+    #setDomainsBoundaryReached(lowerBound, upperBound, min, max) {
       if (min) {
         this.minDomainReached = lowerBound <= min;
       }
@@ -16966,13 +16987,6 @@
       return this.collection.get(key);
     }
 
-    delete(key) {
-      const r = this.collection.delete(key);
-      this.#refreshKeys();
-
-      return r;
-    }
-
     forEach(callback) {
       return this.collection.forEach(callback);
     }
@@ -16987,12 +17001,18 @@
 
     clamp(minDate, maxDate) {
       if (minDate && this.min < minDate) {
-        this.keys.filter((key) => key < minDate).forEach((d) => this.delete(d));
+        this.keys
+          .filter((key) => key < minDate)
+          .forEach((d) => this.collection.delete(d));
       }
 
       if (maxDate && this.max > maxDate) {
-        this.keys.filter((key) => key > maxDate).forEach((d) => this.delete(d));
+        this.keys
+          .filter((key) => key > maxDate)
+          .forEach((d) => this.collection.delete(d));
       }
+
+      this.#refreshKeys();
 
       return this;
     }
@@ -17022,15 +17042,13 @@
           this.keys.slice(limit);
 
         keysToDelete.forEach((key) => {
-          this.delete(key);
+          this.collection.delete(key);
         });
+
+        this.#refreshKeys();
       }
 
       return this;
-    }
-
-    debug() {
-      console.log(this.keys.map((d) => new Date(d)));
     }
 
     #refreshKeys() {
@@ -18183,8 +18201,9 @@
      * Shift the calendar by n domains forward
      */
     next(n = 1) {
-      const loadDirection = this.navigator.loadNextDomain(
+      const loadDirection = this.navigator.loadNewDomains(
         this.createDomainCollection(this.domainCollection.max, n + 1).slice(1),
+        SCROLL_FORWARD,
       );
       this.calendarPainter.paint(loadDirection);
       // @TODO: Update only newly inserted domains
@@ -18195,8 +18214,9 @@
      * Shift the calendar by n domains backward
      */
     previous(n = 1) {
-      const loadDirection = this.navigator.loadPreviousDomain(
+      const loadDirection = this.navigator.loadNewDomains(
         this.createDomainCollection(this.domainCollection.min, -n),
+        SCROLL_BACKWARD,
       );
       this.calendarPainter.paint(loadDirection);
       // @TODO: Update only newly inserted domains

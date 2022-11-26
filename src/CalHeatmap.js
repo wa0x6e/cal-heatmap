@@ -12,7 +12,11 @@ import { getDatas } from './data';
 import SubDomainTemplate from './calendar/SubDomainTemplate';
 import CalendarEvent from './calendar/CalendarEvent';
 
-import { RESET_ALL_ON_UPDATE } from './constant';
+import {
+  RESET_ALL_ON_UPDATE,
+  SCROLL_FORWARD,
+  SCROLL_BACKWARD,
+} from './constant';
 
 export default class CalHeatmap extends CalendarEvent {
   constructor(settings) {
@@ -75,8 +79,9 @@ export default class CalHeatmap extends CalendarEvent {
    * Shift the calendar by n domains forward
    */
   next(n = 1) {
-    const loadDirection = this.navigator.loadNextDomain(
+    const loadDirection = this.navigator.loadNewDomains(
       this.createDomainCollection(this.domainCollection.max, n + 1).slice(1),
+      SCROLL_FORWARD,
     );
     this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
@@ -87,8 +92,9 @@ export default class CalHeatmap extends CalendarEvent {
    * Shift the calendar by n domains backward
    */
   previous(n = 1) {
-    const loadDirection = this.navigator.loadPreviousDomain(
+    const loadDirection = this.navigator.loadNewDomains(
       this.createDomainCollection(this.domainCollection.min, -n),
+      SCROLL_BACKWARD,
     );
     this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains

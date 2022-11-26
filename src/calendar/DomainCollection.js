@@ -28,13 +28,6 @@ export default class DomainCollection {
     return this.collection.get(key);
   }
 
-  delete(key) {
-    const r = this.collection.delete(key);
-    this.#refreshKeys();
-
-    return r;
-  }
-
   forEach(callback) {
     return this.collection.forEach(callback);
   }
@@ -49,12 +42,18 @@ export default class DomainCollection {
 
   clamp(minDate, maxDate) {
     if (minDate && this.min < minDate) {
-      this.keys.filter((key) => key < minDate).forEach((d) => this.delete(d));
+      this.keys
+        .filter((key) => key < minDate)
+        .forEach((d) => this.collection.delete(d));
     }
 
     if (maxDate && this.max > maxDate) {
-      this.keys.filter((key) => key > maxDate).forEach((d) => this.delete(d));
+      this.keys
+        .filter((key) => key > maxDate)
+        .forEach((d) => this.collection.delete(d));
     }
+
+    this.#refreshKeys();
 
     return this;
   }
@@ -84,15 +83,13 @@ export default class DomainCollection {
         this.keys.slice(limit);
 
       keysToDelete.forEach((key) => {
-        this.delete(key);
+        this.collection.delete(key);
       });
+
+      this.#refreshKeys();
     }
 
     return this;
-  }
-
-  debug() {
-    console.log(this.keys.map((d) => new Date(d)));
   }
 
   #refreshKeys() {
