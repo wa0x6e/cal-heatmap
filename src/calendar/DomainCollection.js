@@ -14,6 +14,7 @@ export default class DomainCollection {
     this.max = null;
     this.keys = [];
     this.dateHelper = dateHelper;
+    this.yankedDomains = [];
 
     if (this.collection.size > 0) {
       this.#refreshKeys();
@@ -58,22 +59,29 @@ export default class DomainCollection {
     return this;
   }
 
-  merge(newCollection, limit, subDomainCallback) {
+  merge(newCollection, limit, createValueCallback) {
+    this.yankedDomains = [];
+
     newCollection.keys.forEach((domain, index) => {
       if (this.has(domain)) {
         return;
       }
 
       if (this.collection.size >= limit) {
+        let keyToRemove = this.max;
+
         if (domain > this.max) {
-          this.collection.delete(this.min);
-        } else {
-          this.collection.delete(this.max);
+          keyToRemove = this.min;
+        }
+
+        if (this.collection.delete(keyToRemove)) {
+          this.yankedDomains.push(keyToRemove);
         }
       }
-      this.collection.set(domain, subDomainCallback(domain, index));
+      this.collection.set(domain, createValueCallback(domain, index));
       this.#refreshKeys();
     });
+    this.yankedDomains = this.yankedDomains.sort((a, b) => a - b);
   }
 
   slice(limit, fromBeginning = true) {

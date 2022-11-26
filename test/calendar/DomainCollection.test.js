@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
+
 import DomainCollection from '../../src/calendar/DomainCollection';
 
 describe('DomainCollection', () => {
@@ -25,6 +28,13 @@ describe('DomainCollection', () => {
 
   it('return the key at the specified index', () => {
     expect(d.at(1)).toBe(2);
+  });
+
+  it('iterates the collection', () => {
+    const mock = jest.fn();
+    d.forEach(mock);
+
+    expect(mock).toHaveBeenCalledTimes(6);
   });
 
   describe('slice()', () => {
@@ -64,8 +74,6 @@ describe('DomainCollection', () => {
     expect(d.keyIndex(5)).toBe(4);
   });
 
-  it.todo('merge with another DomainCollection');
-
   it('clamps the domain to the minimum limit', () => {
     d.clamp(3);
     expect(d.keys).toEqual([3, 4, 5, 6]);
@@ -92,4 +100,35 @@ describe('DomainCollection', () => {
   });
 
   it.todo('creates a collection with the specified intervals value');
+
+  describe('when merging with another collection', () => {
+    const dateHelperA = {
+      intervals: () => [-2, -1, 0, 1],
+    };
+    const dateHelperB = {
+      intervals: () => [10, 20, 30],
+    };
+    let h = null;
+    let g = null;
+
+    beforeEach(() => {
+      h = new DomainCollection(dateHelperA, 'day', true, true, true);
+      g = new DomainCollection(dateHelperB, 'day', true, true, true);
+    });
+
+    it('prepends the new collection', () => {
+      d.merge(h, 6, () => {});
+      expect(d.keys).toEqual([-2, -1, 0, 1, 2, 3]);
+    });
+
+    it('appends the new collection', () => {
+      d.merge(g, 6, () => {});
+      expect(d.keys).toEqual([4, 5, 6, 10, 20, 30]);
+    });
+
+    it('remembers the deleted domains', () => {
+      d.merge(h, 6, () => {});
+      expect(d.yankedDomains).toEqual([4, 5, 6]);
+    });
+  });
 });
