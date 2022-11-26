@@ -12,8 +12,8 @@ const dayTemplate = (
         case 'month':
           return Math.ceil(
             domainDynamicDimension && !verticalOrientation ?
-              DateHelper.date(d).daysInMonth() / COLUMNS_COUNT :
-              31 / COLUMNS_COUNT,
+              DateHelper.getMonthWeekNumber(DateHelper.date(d).endOf('month')) :
+              6, // In rare case, when the first week contains less than 3 days
           );
         case 'year':
           return Math.ceil(
