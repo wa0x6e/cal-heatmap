@@ -36,27 +36,6 @@ function expandItemName(value) {
   return ['item', 'items'];
 }
 
-/**
- * Return the optimal subDomain for the specified domain
- *
- * @param  {string} domain a domain name
- * @return {string}        the subDomain name
- */
-function getOptimalSubDomain(domain) {
-  switch (domain) {
-    case 'year':
-      return 'month';
-    case 'month':
-      return 'day';
-    case 'week':
-      return 'day';
-    case 'day':
-      return 'hour';
-    default:
-      return 'minute';
-  }
-}
-
 export default class Options {
   constructor(calendar) {
     this.calendar = calendar;
@@ -393,11 +372,11 @@ export default class Options {
       return false;
     }
 
-    // If other settings contains error, will fallback to default
-
     if (!options.hasOwnProperty('subDomain')) {
-      options.subDomain = getOptimalSubDomain(options.domain);
+      throw new Error('The subDomain options is missing');
     }
+
+    // If other settings contains error, will fallback to default
 
     if (
       typeof options.itemNamespace !== 'string' ||

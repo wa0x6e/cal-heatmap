@@ -15962,27 +15962,6 @@
     return ['item', 'items'];
   }
 
-  /**
-   * Return the optimal subDomain for the specified domain
-   *
-   * @param  {string} domain a domain name
-   * @return {string}        the subDomain name
-   */
-  function getOptimalSubDomain(domain) {
-    switch (domain) {
-      case 'year':
-        return 'month';
-      case 'month':
-        return 'day';
-      case 'week':
-        return 'day';
-      case 'day':
-        return 'hour';
-      default:
-        return 'minute';
-    }
-  }
-
   class Options {
     constructor(calendar) {
       this.calendar = calendar;
@@ -16319,11 +16298,11 @@
         return false;
       }
 
-      // If other settings contains error, will fallback to default
-
       if (!options.hasOwnProperty('subDomain')) {
-        options.subDomain = getOptimalSubDomain(options.domain);
+        throw new Error('The subDomain options is missing');
       }
+
+      // If other settings contains error, will fallback to default
 
       if (
         typeof options.itemNamespace !== 'string' ||
@@ -16973,6 +16952,7 @@
       this.max = null;
       this.keys = [];
       this.dateHelper = dateHelper;
+      this.yankedDomains = [];
 
       if (this.collection.size > 0) {
         this.#refreshKeys();
@@ -17017,22 +16997,29 @@
       return this;
     }
 
-    merge(newCollection, limit, subDomainCallback) {
+    merge(newCollection, limit, createValueCallback) {
+      this.yankedDomains = [];
+
       newCollection.keys.forEach((domain, index) => {
         if (this.has(domain)) {
           return;
         }
 
         if (this.collection.size >= limit) {
+          let keyToRemove = this.max;
+
           if (domain > this.max) {
-            this.collection.delete(this.min);
-          } else {
-            this.collection.delete(this.max);
+            keyToRemove = this.min;
+          }
+
+          if (this.collection.delete(keyToRemove)) {
+            this.yankedDomains.push(keyToRemove);
           }
         }
-        this.collection.set(domain, subDomainCallback(domain, index));
+        this.collection.set(domain, createValueCallback(domain, index));
         this.#refreshKeys();
       });
+      this.yankedDomains = this.yankedDomains.sort((a, b) => a - b);
     }
 
     slice(limit, fromBeginning = true) {

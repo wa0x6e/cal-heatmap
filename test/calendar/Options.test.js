@@ -1,6 +1,6 @@
 import Options from '../../src/calendar/Options';
 
-describe('set()', () => {
+describe('Options', () => {
   let options;
   let defaultValue;
   beforeEach(() => {
@@ -8,17 +8,17 @@ describe('set()', () => {
     defaultValue = options.options.data;
   });
 
-  it('set the new value', () => {
+  it('sets the new value', () => {
     expect(options.set('data', 'hello')).toEqual(true);
     expect(options.options.data).toEqual('hello');
   });
 
-  it('ignores if key is not valid', () => {
+  it('ignores if setting an invalid key', () => {
     expect(options.set('test', 0)).toEqual(false);
     expect(options.options.data).toEqual(defaultValue);
   });
 
-  it('ignores if value is the same', () => {
+  it('ignores if setting a key with the same value', () => {
     expect(options.set('data', defaultValue)).toEqual(false);
     expect(options.options.data).toEqual(defaultValue);
   });
