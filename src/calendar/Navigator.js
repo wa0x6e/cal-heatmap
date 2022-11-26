@@ -7,77 +7,48 @@ export default class Navigator {
     this.minDomainReached = false;
   }
 
-  loadNextDomain(n) {
-    if (this.maxDomainReached || n === 0) {
+  loadNextDomain(newDomainCollection) {
+    if (this.maxDomainReached) {
       return false;
     }
 
-    const { options } = this.calendar.options;
-
-    return this.loadNewDomains(
-      this.calendar.helpers.DateHelper.intervals(
-        options.domain,
-        this.calendar.domainCollection.max,
-        typeof n === 'number' ? n + 1 : n,
-      ).slice(1),
-      SCROLL_FORWARD,
-    );
+    return this.loadNewDomains(newDomainCollection, SCROLL_FORWARD);
   }
 
-  loadPreviousDomain(n) {
-    if (this.minDomainReached || n === 0) {
+  loadPreviousDomain(newDomainCollection) {
+    if (this.minDomainReached) {
       return false;
     }
 
-    const { options } = this.calendar.options;
-
-    return this.loadNewDomains(
-      this.calendar.helpers.DateHelper.intervals(
-        options.domain,
-        this.calendar.domainCollection.min,
-        typeof n === 'number' ? -n : n,
-      ),
-      SCROLL_BACKWARD,
-    );
+    return this.loadNewDomains(newDomainCollection, SCROLL_BACKWARD);
   }
 
   jumpTo(date, reset) {
-    const { domain } = this.calendar.options.options;
     const { domainCollection } = this.calendar;
+    const minDate = new Date(domainCollection.min);
+    const maxDate = new Date(domainCollection.max);
 
-    if (date < domainCollection.min) {
+    if (date < minDate) {
       return this.loadPreviousDomain(
-        this.calendar.helpers.DateHelper.intervals(
-          domain,
-          date,
-          domainCollection.min,
-        ).length,
+        this.calendar.createDomainCollection(date, minDate),
       );
     }
     if (reset) {
       return this.loadNextDomain(
-        this.calendar.helpers.DateHelper.intervals(
-          domain,
-          domainCollection.min,
-          date,
-        ).length,
+        this.calendar.createDomainCollection(minDate, date),
       );
     }
 
-    if (date > domainCollection.max) {
+    if (date > maxDate) {
       return this.loadNextDomain(
-        this.calendar.helpers.DateHelper.intervals(
-          domain,
-          domainCollection.max,
-          date,
-        ).length,
+        this.calendar.createDomainCollection(maxDate, date),
       );
     }
 
     return false;
   }
 
-  loadNewDomains(newDomains, direction = SCROLL_FORWARD) {
+  loadNewDomains(newDomainCollection, direction = SCROLL_FORWARD) {
     const { options, minDate, maxDate } = this.calendar.options;
     const template = this.calendar.subDomainTemplate;
     const minDateInterval = minDate ?
@@ -88,39 +59,29 @@ export default class Navigator {
       null;
     const { domainCollection } = this.calendar;
 
-    // Removing out-of-bonds domains
-    const boundedNewDomains = newDomains
-      .filter(
-        (i) => (minDateInterval ? i >= minDateInterval : true) &&
-          (maxDateInterval ? i <= maxDateInterval : true),
-      )
-      .slice(-options.range);
+    newDomainCollection
+      .clamp(minDateInterval, maxDateInterval)
+      .slice(options.range, direction === SCROLL_FORWARD);
 
-    boundedNewDomains.forEach((domain, index) => {
-      if (domainCollection.has(domain)) {
-        return;
-      }
-
-      let subDomainEndDate = null;
-      if (boundedNewDomains[index + 1]) {
-        subDomainEndDate = boundedNewDomains[index + 1];
-      } else {
-        subDomainEndDate = this.calendar.helpers.DateHelper.intervals(
-          options.domain,
-          domain,
-          2,
-        ).pop();
-      }
-
-      domainCollection.set(
-        domain,
-        template
+    domainCollection.merge(
+      newDomainCollection,
+      options.range,
+      (domain, index) => {
+        let subDomainEndDate = null;
+        if (newDomainCollection.at(index + 1)) {
+          subDomainEndDate = newDomainCollection.at(index + 1);
+        } else {
+          subDomainEndDate = this.calendar.helpers.DateHelper.intervals(
+            options.domain,
+            domain,
+            2,
+          ).pop();
+        }
+        return template
           .at(options.subDomain)
-          .mapping(domain, subDomainEndDate - 1000, { v: null }),
-      );
-
-      domainCollection.trim(options.range, direction === SCROLL_FORWARD);
-    });
+          .mapping(domain, subDomainEndDate - 1000, { v: null });
+      },
+    );
 
     this.#checkDomainsBoundaryReached(
       domainCollection.min,
