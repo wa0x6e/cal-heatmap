@@ -3411,32 +3411,6 @@
 	    return dimensions;
 	  }
 
-	  #getOuterX(d, start) {
-	    return this.#applyScrollingAxis('x', () =>
-	      // eslint-disable-next-line implicit-arrow-linebreak
-	      (start ? -this.#getWidth(d) : this.dimensions.width));
-	  }
-
-	  #getOuterY(d, start) {
-	    return this.#applyScrollingAxis('y', () =>
-	      // eslint-disable-next-line implicit-arrow-linebreak
-	      (start ? -this.#getHeight(d) : this.dimensions.height));
-	  }
-
-	  #getX(d) {
-	    return this.#applyScrollingAxis(
-	      'x',
-	      () => this.calendar.domainCollection.keyIndex(d) * this.#getWidth(d),
-	    );
-	  }
-
-	  #getY(d) {
-	    return this.#applyScrollingAxis(
-	      'y',
-	      () => this.calendar.domainCollection.keyIndex(d) * this.#getHeight(d),
-	    );
-	  }
-
 	  /**
 	   * Return the full width of the domain block
 	   * @param int d Domain start timestamp
