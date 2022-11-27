@@ -116,10 +116,6 @@ export default class Options {
       // as equal to 0, or just leave them as missing
       considerMissingDataAsZero: false,
 
-      // Load remote data on calendar creation
-      // When false, the calendar will be left empty
-      loadOnInit: true,
-
       // Timezone of the calendar
       // When null, will default to browser local timezone
       timezone: null,
@@ -272,19 +268,15 @@ export default class Options {
 
       tooltip: false,
 
-      // ================================================
-      // EVENTS CALLBACK
-      // ================================================
+      // Format the content of the tooltip
+      tooltipFormat: (title) => title,
 
       // Callback after fetching the datas,
       // but before applying them to the calendar
       // Used mainly to convert the datas if they're not formatted like expected
       // Takes the fetched "data" object as argument, must return a json object
       // formatted like {timestamp:count, timestamp2:count2},
-      afterLoadData: (data) => data,
-
-      // Callback when hovering over a time block
-      onTooltip: (title) => title,
+      dataProcessor: (data) => data,
     };
   }
 

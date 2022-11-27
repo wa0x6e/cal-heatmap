@@ -75,8 +75,8 @@ export default class Tooltip {
 
     this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
 
-    if (options.onTooltip) {
-      this.#setTitle(options.onTooltip(new Date(d.t), d.v));
+    if (options.tooltipFormat) {
+      this.#setTitle(options.tooltipFormat(new Date(d.t), d.v));
     } else {
       this.#setTitle(getSubDomainTitle(this.calendar, d, options));
     }

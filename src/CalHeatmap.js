@@ -54,12 +54,10 @@ export default class CalHeatmap {
     );
     this.calendarPainter.paint();
     this.eventEmitter.emit('afterLoad');
-    // Fill the graph with some datas
-    if (options.loadOnInit) {
-      this.update();
-    } else {
-      this.eventEmitter.emit('onComplete');
-    }
+
+    this.update();
+
+    this.eventEmitter.emit('onComplete');
   }
 
   createDomainCollection(startDate, range) {
@@ -160,7 +158,6 @@ export default class CalHeatmap {
       () => {
         this.populator.populate();
         this.eventEmitter.emit('afterUpdate');
-        this.eventEmitter.emit('onComplete');
       },
       afterLoadDataCallback,
       updateMode,

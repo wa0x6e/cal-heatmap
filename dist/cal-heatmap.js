@@ -6245,8 +6245,8 @@
 
 	    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
 
-	    if (options.onTooltip) {
-	      this.#setTitle(options.onTooltip(new Date(d.t), d.v));
+	    if (options.tooltipFormat) {
+	      this.#setTitle(options.tooltipFormat(new Date(d.t), d.v));
 	    } else {
 	      this.#setTitle(getSubDomainTitle(this.calendar, d, options));
 	    }
@@ -16444,10 +16444,6 @@
 	      // as equal to 0, or just leave them as missing
 	      considerMissingDataAsZero: false,
 
-	      // Load remote data on calendar creation
-	      // When false, the calendar will be left empty
-	      loadOnInit: true,
-
 	      // Timezone of the calendar
 	      // When null, will default to browser local timezone
 	      timezone: null,
@@ -16600,19 +16596,15 @@
 
 	      tooltip: false,
 
-	      // ================================================
-	      // EVENTS CALLBACK
-	      // ================================================
+	      // Format the content of the tooltip
+	      tooltipFormat: (title) => title,
 
 	      // Callback after fetching the datas,
 	      // but before applying them to the calendar
 	      // Used mainly to convert the datas if they're not formatted like expected
 	      // Takes the fetched "data" object as argument, must return a json object
 	      // formatted like {timestamp:count, timestamp2:count2},
-	      afterLoadData: (data) => data,
-
-	      // Callback when hovering over a time block
-	      onTooltip: (title) => title,
+	      dataProcessor: (data) => data,
 	    };
 	  }
 
@@ -17852,7 +17844,7 @@
 	      if (typeof afterLoad === 'function') {
 	        processedData = afterLoad(data);
 	      } else if (typeof options.afterLoadData === 'function') {
-	        processedData = options.afterLoadData(data);
+	        processedData = options.dataProcessor(data);
 	      } else {
 	        // eslint-disable-next-line no-console
 	        console.log('Provided callback for afterLoadData is not a function.');
@@ -18392,12 +18384,10 @@
 	    );
 	    this.calendarPainter.paint();
 	    this.eventEmitter.emit('afterLoad');
-	    // Fill the graph with some datas
-	    if (options.loadOnInit) {
-	      this.update();
-	    } else {
-	      this.eventEmitter.emit('onComplete');
-	    }
+
+	    this.update();
+
+	    this.eventEmitter.emit('onComplete');
 	  }
 
 	  createDomainCollection(startDate, range) {
@@ -18498,7 +18488,6 @@
 	      () => {
 	        this.populator.populate();
 	        this.eventEmitter.emit('afterUpdate');
-	        this.eventEmitter.emit('onComplete');
 	      },
 	      afterLoadDataCallback,
 	      updateMode,

@@ -127,7 +127,7 @@ export function getDatas(
       if (typeof afterLoad === 'function') {
         processedData = afterLoad(data);
       } else if (typeof options.afterLoadData === 'function') {
-        processedData = options.afterLoadData(data);
+        processedData = options.dataProcessor(data);
       } else {
         // eslint-disable-next-line no-console
         console.log('Provided callback for afterLoadData is not a function.');
