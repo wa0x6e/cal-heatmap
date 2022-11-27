@@ -131,7 +131,10 @@ export default class CalendarPainter {
       .attr('width', this.getWidth())
       .attr('height', this.getHeight());
 
-    this.calendar.onResize(this.getHeight(), this.getWidth());
+    this.calendar.eventEmitter.emit('onResize', [
+      this.getHeight(),
+      this.getWidth(),
+    ]);
 
     // this.root
     //   .select('.graph')

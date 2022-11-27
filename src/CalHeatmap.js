@@ -1,3 +1,5 @@
+import EventEmmiter from 'eventemitter3';
+
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
@@ -10,7 +12,6 @@ import extractSVG from './utils/extractSVG';
 import { getDatas } from './data';
 
 import SubDomainTemplate from './calendar/SubDomainTemplate';
-import CalendarEvent from './calendar/CalendarEvent';
 
 import {
   RESET_ALL_ON_UPDATE,
@@ -18,10 +19,8 @@ import {
   SCROLL_BACKWARD,
 } from './constant';
 
-export default class CalHeatmap extends CalendarEvent {
+export default class CalHeatmap {
   constructor(settings) {
-    super();
-
     // Default settings
     this.options = new Options(this);
 
@@ -33,6 +32,7 @@ export default class CalHeatmap extends CalendarEvent {
     this.calendarPainter = new CalendarPainter(this);
     this.colorizer = new Colorizer(this);
     this.helpers = {};
+    this.eventEmitter = new EventEmmiter();
 
     this.#init(settings);
   }
@@ -53,12 +53,12 @@ export default class CalHeatmap extends CalendarEvent {
       this.createDomainCollection(options.start, options.range),
     );
     this.calendarPainter.paint();
-    this.afterLoad();
+    this.eventEmitter.emit('afterLoad');
     // Fill the graph with some datas
     if (options.loadOnInit) {
       this.update();
     } else {
-      this.onComplete();
+      this.eventEmitter.emit('onComplete');
     }
   }
 
@@ -159,8 +159,8 @@ export default class CalHeatmap extends CalendarEvent {
       endDate,
       () => {
         this.populator.populate();
-        this.afterUpdate();
-        this.onComplete();
+        this.eventEmitter.emit('afterUpdate');
+        this.eventEmitter.emit('onComplete');
       },
       afterLoadDataCallback,
       updateMode,
@@ -232,6 +232,10 @@ export default class CalHeatmap extends CalendarEvent {
     ) {
       this.calendarPainter.highlight();
     }
+  }
+
+  on(...args) {
+    return this.eventEmitter.on(...args);
   }
 
   /**

@@ -276,56 +276,12 @@ export default class Options {
       // EVENTS CALLBACK
       // ================================================
 
-      // Callback when clicking on a time block
-      onClick: null,
-
-      // Callback when hovering on a time block
-      onMouseOver: null,
-
-      // Callback when hovering on a time block
-      onMouseOut: null,
-
-      // Callback after painting the empty calendar
-      // Can be used to trigger an API call,
-      // once the calendar is ready to be filled
-      afterLoad: null,
-
-      // Callback after loading the next domain in the calendar
-      afterLoadNextDomain: null,
-
-      // Callback after loading the previous domain in the calendar
-      afterLoadPreviousDomain: null,
-
-      // Callback after finishing all actions on the calendar
-      onComplete: null,
-
-      onResize: null,
-
       // Callback after fetching the datas,
       // but before applying them to the calendar
       // Used mainly to convert the datas if they're not formatted like expected
       // Takes the fetched "data" object as argument, must return a json object
       // formatted like {timestamp:count, timestamp2:count2},
       afterLoadData: (data) => data,
-
-      // Callback triggered after calling and completing update().
-      afterUpdate: null,
-
-      // Callback triggered after calling next().
-      // The `status` argument is equal to true if there is no
-      // more next domain to load
-      //
-      // This callback is also executed once, after calling previous(),
-      // only when the max domain is reached
-      onMaxDomainReached: null,
-
-      // Callback triggered after calling previous().
-      // The `status` argument is equal to true if there is no
-      // more previous domain to load
-      //
-      // This callback is also executed once, after calling next(),
-      // only when the min domain is reached
-      onMinDomainReached: null,
 
       // Callback when hovering over a time block
       onTooltip: (title) => title,

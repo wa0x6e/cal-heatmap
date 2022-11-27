@@ -61,9 +61,13 @@ export default class Navigator {
     );
 
     if (direction === SCROLL_BACKWARD) {
-      this.calendar.afterLoadPreviousDomain(domainCollection.min);
+      this.calendar.eventEmitter.emit('afterLoadPreviousDomain', [
+        domainCollection.min,
+      ]);
     } else if (direction === SCROLL_FORWARD) {
-      this.calendar.afterLoadNextDomain(domainCollection.max);
+      this.calendar.eventEmitter.emit('afterLoadNextDomain', [
+        domainCollection.max,
+      ]);
     }
 
     return direction;
@@ -122,10 +126,18 @@ export default class Navigator {
 
   #setDomainsBoundaryReached(lowerBound, upperBound, min, max) {
     if (min) {
-      this.minDomainReached = lowerBound <= min;
+      const reached = lowerBound <= min;
+      if (reached) {
+        this.calendar.eventEmitter.emit('onMinDomainReached');
+      }
+      this.minDomainReached = reached;
     }
     if (max) {
-      this.maxDomainReached = upperBound >= max;
+      const reached = upperBound >= max;
+      if (reached) {
+        this.calendar.eventEmitter.emit('onMaxDomainReached');
+      }
+      this.maxDomainReached = reached;
     }
   }
 }

@@ -21,6 +21,7 @@
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
+    "eventemitter3": "^4.0.7",
     "lodash-es": "^4.17.21",
     "moment-range": "^4.0.2",
     "moment-timezone": "^0.5.39"
