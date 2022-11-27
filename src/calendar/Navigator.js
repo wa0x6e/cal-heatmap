@@ -86,7 +86,7 @@ export default class Navigator {
           date,
           this.calendar.options.options.range,
         ),
-        SCROLL_BACKWARD,
+        minDate < date ? SCROLL_FORWARD : SCROLL_BACKWARD,
       );
     }
 

@@ -32,6 +32,8 @@ export default class subDomainPainter {
       })
       .attr('class', 'graph-subdomain-group');
 
+    const { eventEmitter } = this.calendar;
+
     const rect = subDomainSvgGroup
       .selectAll('g')
       .data((d) => this.calendar.domainCollection.get(d))
@@ -45,19 +47,21 @@ export default class subDomainPainter {
       .attr('height', options.cellSize[Y])
       .attr('x', (d) => this.#getX(d))
       .attr('y', (d) => this.#getY(d))
-      .on('click', (ev, d) => this.calendar.onClick(ev, new Date(d.t), d.v))
+      .on('click', (ev, d) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        eventEmitter.emit('onClick', ev, new Date(d.t), d.v))
       .on('mouseover', (ev, d) => {
         if (options.tooltip) {
           this.calendar.calendarPainter.tooltip.show(ev.target, d);
         }
-        return this.calendar.onMouseOver(ev, new Date(d.t), d.v);
+        return eventEmitter.emit('onMouseOver', ev, new Date(d.t), d.v);
       })
       .on('mouseout', (ev, d) => {
         if (options.tooltip) {
           this.calendar.calendarPainter.tooltip.hide();
         }
 
-        return this.calendar.onMouseOut(ev, new Date(d.t), d.v);
+        return eventEmitter.emit('onMouseOut', ev, new Date(d.t), d.v);
       })
       .call((selection) => {
         if (options.cellRadius > 0) {

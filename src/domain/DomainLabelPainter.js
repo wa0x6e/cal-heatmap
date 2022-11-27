@@ -83,7 +83,7 @@ export default class DomainLabelPainter {
   #getDomainInsideWidth(d) {
     const { options } = this.calendar.options;
     return (
-      this.calendar.calendarPainter.domainPainter.getWidth(d) -
+      this.calendar.calendarPainter.domainPainter.coordinates.at(d).width -
       options.domainHorizontalLabelWidth +
       options.domainGutter +
       options.domainMargin[RIGHT] +
@@ -94,7 +94,7 @@ export default class DomainLabelPainter {
   #getDomainInsideHeight(d) {
     const { options } = this.calendar.options;
     return (
-      this.calendar.calendarPainter.domainPainter.getHeight(d) -
+      this.calendar.calendarPainter.domainPainter.coordinates.at(d).height -
       options.domainVerticalLabelHeight +
       options.domainGutter +
       options.domainMargin[TOP] +
