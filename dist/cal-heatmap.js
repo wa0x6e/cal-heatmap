@@ -18337,14 +18337,24 @@
 	    this.colorizer = new Colorizer(this);
 	    this.helpers = {};
 	    this.eventEmitter = new EventEmmiter();
-
-	    this.#init(settings);
+	    this.options.init(settings);
 	  }
 
-	  #init(settings) {
-	    const { options } = this.options;
+	  createDomainCollection(startDate, range) {
+	    return new DomainCollection(
+	      this.helpers.DateHelper,
+	      this.options.options.domain,
+	      startDate,
+	      range,
+	    );
+	  }
 
-	    this.options.init(settings);
+	  // =========================================================================
+	  // PUBLIC API
+	  // =========================================================================
+
+	  init() {
+	    const { options } = this.options;
 
 	    // Record all the valid domains
 	    // Each domain value is a timestamp in milliseconds
@@ -18363,19 +18373,6 @@
 
 	    this.eventEmitter.emit('onComplete');
 	  }
-
-	  createDomainCollection(startDate, range) {
-	    return new DomainCollection(
-	      this.helpers.DateHelper,
-	      this.options.options.domain,
-	      startDate,
-	      range,
-	    );
-	  }
-
-	  // =========================================================================
-	  // PUBLIC API
-	  // =========================================================================
 
 	  /**
 	   * Shift the calendar by n domains forward
