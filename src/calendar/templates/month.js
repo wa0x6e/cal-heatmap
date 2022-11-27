@@ -9,7 +9,7 @@ const monthTemplate = (DateHelper) => ({
   },
   mapping: (startDate, endDate, defaultValues) =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    DateHelper.intervals('week', startDate, DateHelper.date(endDate)).map(
+    DateHelper.intervals('month', startDate, DateHelper.date(endDate)).map(
       (d) => ({
         t: d,
         x: DateHelper.date(d).month(),
