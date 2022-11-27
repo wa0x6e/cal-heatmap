@@ -424,6 +424,10 @@ export default class Options {
     options.verticalDomainLabel =
       options.label.position === 'top' || options.label.position === 'bottom';
 
+    if (typeof options.cellSize === 'number') {
+      options.cellSize = [options.cellSize, options.cellSize];
+    }
+
     options.domainVerticalLabelHeight =
       options.label.height ?? Math.max(25, options.cellSize[X] * 2);
     options.domainHorizontalLabelWidth = 0;
@@ -435,10 +439,6 @@ export default class Options {
     if (!options.verticalDomainLabel) {
       options.domainVerticalLabelHeight = 0;
       options.domainHorizontalLabelWidth = options.label.width;
-    }
-
-    if (typeof options.cellSize === 'number') {
-      options.cellSize = [options.cellSize, options.cellSize];
     }
 
     if (options.legendMargin === [0, 0, 0, 0]) {
