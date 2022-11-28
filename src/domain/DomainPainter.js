@@ -33,10 +33,7 @@ export default class DomainPainter {
     return calendarNode
       .select('.graph')
       .selectAll(`.${DEFAULT_CLASSNAME}`)
-      .data(
-        () => this.calendar.domainCollection.keys,
-        (d) => d,
-      )
+      .data(this.calendar.domainCollection.keys, (d) => d)
       .join(
         (enter) => enter
           .append('svg')

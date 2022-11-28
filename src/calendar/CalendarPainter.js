@@ -35,13 +35,13 @@ export default class CalendarPainter {
   setup() {
     const { itemSelector } = this.calendar.options.options;
 
-    this.root = select(itemSelector)
-      .append('svg')
-      .attr('class', 'cal-heatmap-container');
-
-    this.tooltip.init();
-
-    this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
+    if (!this.root) {
+      this.root = select(itemSelector)
+        .append('svg')
+        .attr('class', 'cal-heatmap-container');
+      this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
+      this.tooltip.init();
+    }
 
     this.#attachNavigationEvents();
 
@@ -76,7 +76,7 @@ export default class CalendarPainter {
     const domainSvg = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(domainSvg);
     this.domainLabelPainter.paint(domainSvg);
-    this.domainSecondaryLabelPainter.paint(domainSvg);
+    // this.domainSecondaryLabelPainter.paint(domainSvg);
     this.legendPainter.paint();
 
     this.resize();

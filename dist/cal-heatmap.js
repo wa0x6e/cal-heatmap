@@ -3477,7 +3477,7 @@
 
 	// eslint-disable-next-line no-unused-vars
 
-	const DEFAULT_CLASSNAME$1 = 'graph-domain';
+	const DEFAULT_CLASSNAME$2 = 'graph-domain';
 
 	class DomainPainter {
 	  constructor(calendar) {
@@ -3504,11 +3504,8 @@
 
 	    return calendarNode
 	      .select('.graph')
-	      .selectAll(`.${DEFAULT_CLASSNAME$1}`)
-	      .data(
-	        () => this.calendar.domainCollection.keys,
-	        (d) => d,
-	      )
+	      .selectAll(`.${DEFAULT_CLASSNAME$2}`)
+	      .data(this.calendar.domainCollection.keys, (d) => d)
 	      .join(
 	        (enter) => enter
 	          .append('svg')
@@ -3539,7 +3536,7 @@
 	  }
 
 	  #getClassName(d) {
-	    let classname = DEFAULT_CLASSNAME$1;
+	    let classname = DEFAULT_CLASSNAME$2;
 	    const helper = this.calendar.helpers.DateHelper.date(d);
 
 	    switch (this.calendar.options.options.domain) {
@@ -3563,6 +3560,8 @@
 	  }
 	}
 
+	const DEFAULT_CLASSNAME$1 = 'graph-label';
+
 	class DomainLabelPainter {
 	  constructor(calendar) {
 	    this.calendar = calendar;
@@ -3576,68 +3575,78 @@
 	    }
 
 	    root
-	      .append('text')
-	      .attr('class', 'graph-label')
-	      .attr('y', (d) => {
-	        let y =
-	          options.domainMargin[TOP] + options.domainVerticalLabelHeight / 2;
+	      .selectAll(`.${DEFAULT_CLASSNAME$1}`)
+	      .data(
+	        (d) => [d],
+	        (d) => d,
+	      )
+	      .join((enter) => enter
+	        .append('text')
+	        .attr('class', DEFAULT_CLASSNAME$1)
+	        .attr('y', (d) => {
+	          let y =
+	              options.domainMargin[TOP] + options.domainVerticalLabelHeight / 2;
 
-	        if (options.label.position !== 'top') {
-	          y += this.#getDomainInsideHeight(d);
-	        }
+	          if (options.label.position !== 'top') {
+	            y += this.#getDomainInsideHeight(d);
+	          }
 
-	        return (
-	          y +
-	          options.label.offset.y *
-	            ((options.label.rotate === 'right' &&
-	              options.label.position === 'right') ||
-	            (options.label.rotate === 'left' &&
-	              options.label.position === 'left') ?
-	              -1 :
-	              1)
-	        );
-	      })
-	      .attr('x', (d) => {
-	        let x = options.domainMargin[LEFT];
-
-	        switch (options.label.position) {
-	          case 'right':
-	            x += this.#getDomainInsideWidth(d);
-	            break;
-	          case 'bottom':
-	          case 'top':
-	            x += this.#getDomainInsideWidth(d) / 2;
-	            break;
-	        }
-
-	        if (options.label.align === 'right') {
 	          return (
-	            x +
-	            options.domainHorizontalLabelWidth -
-	            options.label.offset.x * (options.label.rotate === 'right' ? -1 : 1)
+	            y +
+	              options.label.offset.y *
+	                ((options.label.rotate === 'right' &&
+	                  options.label.position === 'right') ||
+	                (options.label.rotate === 'left' &&
+	                  options.label.position === 'left') ?
+	                  -1 :
+	                  1)
 	          );
-	        }
-	        return x + options.label.offset.x;
-	      })
-	      .attr('text-anchor', () => {
-	        switch (options.label.align) {
-	          case 'start':
-	          case 'left':
-	            return 'start';
-	          case 'end':
-	          case 'right':
-	            return 'end';
-	          default:
-	            return 'middle';
-	        }
-	      })
-	      .attr('dominant-baseline', () =>
+	        })
+	        .attr('x', (d) => {
+	          let x = options.domainMargin[LEFT];
+
+	          switch (options.label.position) {
+	            case 'right':
+	              x += this.#getDomainInsideWidth(d);
+	              break;
+	            case 'bottom':
+	            case 'top':
+	              x += this.#getDomainInsideWidth(d) / 2;
+	              break;
+	          }
+
+	          if (options.label.align === 'right') {
+	            return (
+	              x +
+	                options.domainHorizontalLabelWidth -
+	                options.label.offset.x *
+	                  (options.label.rotate === 'right' ? -1 : 1)
+	            );
+	          }
+	          return x + options.label.offset.x;
+	        })
+	        .attr('text-anchor', () => {
+	          switch (options.label.align) {
+	            case 'start':
+	            case 'left':
+	              return 'start';
+	            case 'end':
+	            case 'right':
+	              return 'end';
+	            default:
+	              return 'middle';
+	          }
+	        })
+	        .attr('dominant-baseline', () =>
 	        // eslint-disable-next-line implicit-arrow-linebreak
-	        (options.verticalDomainLabel ? 'middle' : 'top'))
-	      .text((d) =>
+	          (options.verticalDomainLabel ? 'middle' : 'top'))
+	        .text((d) =>
 	        // eslint-disable-next-line implicit-arrow-linebreak
-	        this.calendar.helpers.DateHelper.format(d, options.domainLabelFormat))
-	      .call((s) => this.#domainRotate(s));
+	          this.calendar.helpers.DateHelper.format(
+	            d,
+	            options.domainLabelFormat,
+	          ))
+	        .call((s) => this.#domainRotate(s)));
 	  }
 
 	  #getDomainInsideWidth(d) {
@@ -4229,22 +4238,28 @@
 	    this.root = root || this.root;
 
 	    const subDomainSvgGroup = this.root
-	      .append('svg')
-	      .attr('x', () => {
-	        let pos = options.domainMargin[LEFT];
-	        if (options.label.position === 'left') {
-	          pos += options.domainHorizontalLabelWidth;
-	        }
-	        return pos;
-	      })
-	      .attr('y', () => {
-	        let pos = options.domainMargin[TOP];
-	        if (options.label.position === 'top') {
-	          pos += options.domainVerticalLabelHeight;
-	        }
-	        return pos;
-	      })
-	      .attr('class', 'graph-subdomain-group');
+	      .selectAll('graph-subdomain-group')
+	      .data(
+	        (d) => [d],
+	        (d) => d,
+	      )
+	      .enter((enter) => enter
+	        .append('svg')
+	        .attr('x', () => {
+	          let pos = options.domainMargin[LEFT];
+	          if (options.label.position === 'left') {
+	            pos += options.domainHorizontalLabelWidth;
+	          }
+	          return pos;
+	        })
+	        .attr('y', () => {
+	          let pos = options.domainMargin[TOP];
+	          if (options.label.position === 'top') {
+	            pos += options.domainVerticalLabelHeight;
+	          }
+	          return pos;
+	        })
+	        .attr('class', 'graph-subdomain-group'));
 
 	    const { eventEmitter } = this.calendar;
 
@@ -6231,8 +6246,6 @@
 	  }
 	}
 
-	// eslint-disable-next-line no-unused-vars
-
 	const DEFAULT_CLASSNAME = '.graph-legend';
 
 	class LegendPainter {
@@ -6294,13 +6307,22 @@
 	    }
 
 	    this.shown = false;
-	    this.calendar.calendarPainter.root.select(DEFAULT_CLASSNAME).remove();
+	    this.calendar.calendarPainter.root
+	      .select(DEFAULT_CLASSNAME)
+	      .transition()
+	      .duration(this.calendar.options.options.animationDuration)
+	      .attr('height', 0)
+	      .remove();
 
 	    return true;
 	  }
 
 	  paint() {
 	    const { options } = this.calendar.options;
+	    if (!options.displayLegend) {
+	      return false;
+	    }
+
 	    const width =
 	      this.calendar.calendarPainter.getWidth() -
 	      options.domainGutter -
@@ -6328,12 +6350,7 @@
 	      .attr('x', this.#getX(width))
 	      .attr('y', this.#getY())
 	      .attr('width', this.getWidth())
-	      .attr('height', this.getHeight());
-
-	    legendNode
-	      .select('g')
-	      .transition()
-	      .duration(options.animationDuration)
+	      .attr('height', this.getHeight())
 	      .attr('transform', () => {
 	        if (options.legendOrientation === 'vertical') {
 	          return `rotate(90 ${options.legendCellSize / 2} ${
@@ -6355,29 +6372,49 @@
 	    items.push(items[items.length - 1] + 1);
 
 	    legendNode
-	      .append('g')
 	      .selectAll('rect')
-	      .data(items)
-	      .join('rect')
-	      .attr('width', options.legendCellSize)
-	      .attr('height', options.legendCellSize)
-	      .attr(
-	        'x',
-	        (d, i) => i * (options.legendCellSize + options.legendCellPadding),
-	      )
-	      .attr('class', (d) => this.calendar.colorizer.getClassName(d))
-	      .attr('fill', (d, i) => {
-	        if (this.calendar.colorizer.scale === null) {
-	          return this.calendar.colorizer.getCustomColor('base');
-	        }
+	      .data(items, (d) => d)
+	      .join(
+	        (enter) => enter
+	          .append('rect')
+	          .attr('width', options.legendCellSize)
+	          .attr('height', options.legendCellSize)
+	          .attr(
+	            'x',
+	            (d, i) => i * (options.legendCellSize + options.legendCellPadding),
+	          )
+	          .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+	          .attr('fill', (d, i) => {
+	            if (this.calendar.colorizer.scale === null) {
+	              return this.calendar.colorizer.getCustomColor('base');
+	            }
 
-	        if (i === 0) {
-	          return this.calendar.colorizer.scale(d - 1);
-	        }
-	        return this.calendar.colorizer.scale(options.legend[i - 1]);
-	      })
-	      .append('title')
-	      .text((d, i) => this.#getLegendTitle(d, i, items));
+	            if (i === 0) {
+	              return this.calendar.colorizer.scale(d - 1);
+	            }
+	            return this.calendar.colorizer.scale(options.legend[i - 1]);
+	          })
+	          .append('title')
+	          .text((d, i) => this.#getLegendTitle(d, i, items)),
+	        (update) => update
+	          .attr(
+	            'x',
+	            (d, i) => i * (options.legendCellSize + options.legendCellPadding),
+	          )
+	          .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+	          .attr('fill', (d, i) => {
+	            if (this.calendar.colorizer.scale === null) {
+	              return this.calendar.colorizer.getCustomColor('base');
+	            }
+
+	            if (i === 0) {
+	              return this.calendar.colorizer.scale(d - 1);
+	            }
+	            return this.calendar.colorizer.scale(options.legend[i - 1]);
+	          })
+	          .append('title')
+	          .text((d, i) => this.#getLegendTitle(d, i, items)),
+	      );
 	  }
 
 	  #getLegendTitle(d, i, legendItems) {
@@ -6457,13 +6494,13 @@
 	  setup() {
 	    const { itemSelector } = this.calendar.options.options;
 
-	    this.root = select(itemSelector)
-	      .append('svg')
-	      .attr('class', 'cal-heatmap-container');
-
-	    this.tooltip.init();
-
-	    this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
+	    if (!this.root) {
+	      this.root = select(itemSelector)
+	        .append('svg')
+	        .attr('class', 'cal-heatmap-container');
+	      this.root.attr('x', 0).attr('y', 0).append('svg').attr('class', 'graph');
+	      this.tooltip.init();
+	    }
 
 	    this.#attachNavigationEvents();
 
@@ -6498,7 +6535,7 @@
 	    const domainSvg = this.domainPainter.paint(navigationDir, this.root);
 	    this.subDomainPainter.paint(domainSvg);
 	    this.domainLabelPainter.paint(domainSvg);
-	    this.domainSecondaryLabelPainter.paint(domainSvg);
+	    // this.domainSecondaryLabelPainter.paint(domainSvg);
 	    this.legendPainter.paint();
 
 	    this.resize();
@@ -18232,7 +18269,7 @@
 	  },
 	  mapping: (startDate, endDate, defaultValues) =>
 	    // eslint-disable-next-line implicit-arrow-linebreak
-	    DateHelper.intervals('week', startDate, DateHelper.date(endDate)).map(
+	    DateHelper.intervals('month', startDate, DateHelper.date(endDate)).map(
 	      (d) => ({
 	        t: d,
 	        x: DateHelper.date(d).month(),
@@ -18324,7 +18361,7 @@
 	}
 
 	class CalHeatmap {
-	  constructor(settings) {
+	  constructor() {
 	    // Default settings
 	    this.options = new Options(this);
 
@@ -18337,7 +18374,6 @@
 	    this.colorizer = new Colorizer(this);
 	    this.helpers = {};
 	    this.eventEmitter = new EventEmmiter();
-	    this.options.init(settings);
 	  }
 
 	  createDomainCollection(startDate, range) {
@@ -18353,16 +18389,17 @@
 	  // PUBLIC API
 	  // =========================================================================
 
-	  init() {
+	  init(settings) {
 	    const { options } = this.options;
 
-	    // Record all the valid domains
-	    // Each domain value is a timestamp in milliseconds
-	    this.domainCollection = new DomainCollection(this.helpers.DateHelper);
+	    this.options.init(settings);
 
 	    this.calendarPainter.setup();
 	    this.colorizer.build();
 
+	    // Record all the valid domains
+	    // Each domain value is a timestamp in milliseconds
+	    this.domainCollection = new DomainCollection(this.helpers.DateHelper);
 	    this.navigator.loadNewDomains(
 	      this.createDomainCollection(options.start, options.range),
 	    );

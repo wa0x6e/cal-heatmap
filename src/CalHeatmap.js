@@ -20,7 +20,7 @@ import {
 } from './constant';
 
 export default class CalHeatmap {
-  constructor(settings) {
+  constructor() {
     // Default settings
     this.options = new Options(this);
 
@@ -33,7 +33,6 @@ export default class CalHeatmap {
     this.colorizer = new Colorizer(this);
     this.helpers = {};
     this.eventEmitter = new EventEmmiter();
-    this.options.init(settings);
   }
 
   createDomainCollection(startDate, range) {
@@ -49,16 +48,17 @@ export default class CalHeatmap {
   // PUBLIC API
   // =========================================================================
 
-  init() {
+  init(settings) {
     const { options } = this.options;
 
-    // Record all the valid domains
-    // Each domain value is a timestamp in milliseconds
-    this.domainCollection = new DomainCollection(this.helpers.DateHelper);
+    this.options.init(settings);
 
     this.calendarPainter.setup();
     this.colorizer.build();
 
+    // Record all the valid domains
+    // Each domain value is a timestamp in milliseconds
+    this.domainCollection = new DomainCollection(this.helpers.DateHelper);
     this.navigator.loadNewDomains(
       this.createDomainCollection(options.start, options.range),
     );

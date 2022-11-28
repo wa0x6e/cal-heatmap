@@ -15,22 +15,28 @@ export default class subDomainPainter {
     this.root = root || this.root;
 
     const subDomainSvgGroup = this.root
-      .append('svg')
-      .attr('x', () => {
-        let pos = options.domainMargin[LEFT];
-        if (options.label.position === 'left') {
-          pos += options.domainHorizontalLabelWidth;
-        }
-        return pos;
-      })
-      .attr('y', () => {
-        let pos = options.domainMargin[TOP];
-        if (options.label.position === 'top') {
-          pos += options.domainVerticalLabelHeight;
-        }
-        return pos;
-      })
-      .attr('class', 'graph-subdomain-group');
+      .selectAll('graph-subdomain-group')
+      .data(
+        (d) => [d],
+        (d) => d,
+      )
+      .enter((enter) => enter
+        .append('svg')
+        .attr('x', () => {
+          let pos = options.domainMargin[LEFT];
+          if (options.label.position === 'left') {
+            pos += options.domainHorizontalLabelWidth;
+          }
+          return pos;
+        })
+        .attr('y', () => {
+          let pos = options.domainMargin[TOP];
+          if (options.label.position === 'top') {
+            pos += options.domainVerticalLabelHeight;
+          }
+          return pos;
+        })
+        .attr('class', 'graph-subdomain-group'));
 
     const { eventEmitter } = this.calendar;
 
