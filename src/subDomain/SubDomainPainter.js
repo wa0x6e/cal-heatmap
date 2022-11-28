@@ -4,6 +4,8 @@ import {
   TOP, LEFT, X, Y,
 } from '../constant';
 
+const BASE_CLASSNAME = 'graph-subdomain-group';
+
 export default class subDomainPainter {
   constructor(calendar) {
     this.calendar = calendar;
@@ -15,12 +17,12 @@ export default class subDomainPainter {
     this.root = root || this.root;
 
     const subDomainSvgGroup = this.root
-      .selectAll('graph-subdomain-group')
+      .selectAll(`.${BASE_CLASSNAME}`)
       .data(
         (d) => [d],
         (d) => d,
       )
-      .enter((enter) => enter
+      .join((enter) => enter
         .append('svg')
         .attr('x', () => {
           let pos = options.domainMargin[LEFT];
@@ -36,7 +38,7 @@ export default class subDomainPainter {
           }
           return pos;
         })
-        .attr('class', 'graph-subdomain-group'));
+        .attr('class', BASE_CLASSNAME));
 
     const { eventEmitter } = this.calendar;
 

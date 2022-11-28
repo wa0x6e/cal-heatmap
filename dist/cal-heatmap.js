@@ -3715,7 +3715,7 @@
 	  }
 	}
 
-	const BASE_CLASSNAME = 'weekday-label';
+	const BASE_CLASSNAME$1 = 'weekday-label';
 
 	class DomainSecondaryLabel {
 	  constructor(calendar) {
@@ -3746,11 +3746,11 @@
 	          1,
 	      };
 
-	      let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME}`);
+	      let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME$1}`);
 	      if (dayLabelSvgGroup.empty()) {
 	        dayLabelSvgGroup = root
 	          .append('svg')
-	          .attr('class', BASE_CLASSNAME)
+	          .attr('class', BASE_CLASSNAME$1)
 	          .attr('x', 0)
 	          .attr('y', 0);
 	      }
@@ -3763,7 +3763,7 @@
 
 	      dayLabelSvg
 	        .append('rect')
-	        .attr('class', `${BASE_CLASSNAME}-rect`)
+	        .attr('class', `${BASE_CLASSNAME$1}-rect`)
 	        .attr('width', options.cellSize[X])
 	        .attr('height', options.cellSize[Y])
 	        .attr('x', 0)
@@ -3774,7 +3774,7 @@
 
 	      dayLabelSvg
 	        .append('text')
-	        .attr('class', `${BASE_CLASSNAME}-text`)
+	        .attr('class', `${BASE_CLASSNAME$1}-text`)
 	        .attr('dominant-baseline', 'central')
 	        .attr('text-anchor', 'middle')
 	        .attr('x', options.cellSize[X] / 2)
@@ -3790,7 +3790,7 @@
 	        width: 0,
 	        height: 0,
 	      };
-	      root.select(`.${BASE_CLASSNAME}`).remove();
+	      root.select(`.${BASE_CLASSNAME$1}`).remove();
 	    }
 	  }
 	}
@@ -4228,6 +4228,8 @@
 	  });
 	}
 
+	const BASE_CLASSNAME = 'graph-subdomain-group';
+
 	class subDomainPainter {
 	  constructor(calendar) {
 	    this.calendar = calendar;
@@ -4239,12 +4241,12 @@
 	    this.root = root || this.root;
 
 	    const subDomainSvgGroup = this.root
-	      .selectAll('graph-subdomain-group')
+	      .selectAll(`.${BASE_CLASSNAME}`)
 	      .data(
 	        (d) => [d],
 	        (d) => d,
 	      )
-	      .enter((enter) => enter
+	      .join((enter) => enter
 	        .append('svg')
 	        .attr('x', () => {
 	          let pos = options.domainMargin[LEFT];
@@ -4260,7 +4262,7 @@
 	          }
 	          return pos;
 	        })
-	        .attr('class', 'graph-subdomain-group'));
+	        .attr('class', BASE_CLASSNAME));
 
 	    const { eventEmitter } = this.calendar;
 
