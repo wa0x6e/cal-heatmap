@@ -73,10 +73,17 @@ export default class CalendarPainter {
   }
 
   paint(navigationDir = false) {
+    this.domainSecondaryLabelPainter.paint(this.root);
+    this.root
+      .select('.graph')
+      .transition()
+      .duration(this.calendar.options.options.animationDuration)
+      .attr('x', this.domainSecondaryLabelPainter.dimensions.width);
+
     const domainSvg = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(domainSvg);
     this.domainLabelPainter.paint(domainSvg);
-    // this.domainSecondaryLabelPainter.paint(domainSvg);
+
     this.legendPainter.paint();
 
     this.resize();
@@ -119,7 +126,10 @@ export default class CalendarPainter {
     ) {
       return domainsWidth + legendWidth;
     }
-    return Math.max(domainsWidth, legendWidth);
+    return (
+      Math.max(domainsWidth, legendWidth) +
+      this.domainSecondaryLabelPainter.dimensions.width
+    );
   }
 
   resize() {

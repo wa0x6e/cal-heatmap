@@ -3715,82 +3715,83 @@
 	  }
 	}
 
+	const BASE_CLASSNAME = 'weekday-label';
+
 	class DomainSecondaryLabel {
 	  constructor(calendar) {
 	    this.calendar = calendar;
+	    this.dimensions = {
+	      width: 0,
+	      height: 0,
+	    };
 	  }
 
-	  // eslint-disable-next-line class-methods-use-this
-	  paint() {
-	    // const { options } = this.calendar.options;
+	  paint(root) {
+	    const { options } = this.calendar.options;
 
-	    return true;
+	    if (
+	      options.dayLabel === true &&
+	      options.domain === 'month' &&
+	      options.subDomain === 'day'
+	    ) {
+	      const dayNames = this.calendar.helpers.DateHelper.momentInstance
+	        .weekdays()
+	        .map((d) => d[0]);
 
-	    // if (
-	    //   options.dayLabel &&
-	    //   options.domain === 'month' &&
-	    //   options.subDomain === 'day'
-	    // ) {
-	    //   // Create a list of all day names starting with
-	    //   Sunday or Monday, depending on configuration
-	    //   const daysOfTheWeek = [
-	    //     'monday',
-	    //     'tuesday',
-	    //     'wednesday',
-	    //     'thursday',
-	    //     'friday',
-	    //     'saturday',
-	    //   ];
-	    //   if (options.weekStartOnMonday) {
-	    //     daysOfTheWeek.push('sunday');
-	    //   } else {
-	    //     daysOfTheWeek.shif('sunday');
-	    //   }
-	    //   // Get the first character of the day name
-	    //   const daysOfTheWeekAbbr = daysOfTheWeek.map(day =>
-	    //     this.calendar.helpers.DateHelper
-	    //     .format(time[day](new Date()), 'dd').charAt(0)
-	    //   );
+	      this.dimensions = {
+	        width: options.cellSize[X] + options.cellPadding,
+	        height:
+	          options.cellSize[Y] +
+	          dayNames.length * options.cellSize[Y] * dayNames.length -
+	          1,
+	      };
 
-	    //   // Append "day-name" group to SVG
-	    //   const dayLabelSvgGroup = root
-	    //     .append('svg')
-	    //     .attr('class', 'day-name')
-	    //     .attr('x', 0)
-	    //     .attr('y', 0);
+	      let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME}`);
+	      if (dayLabelSvgGroup.empty()) {
+	        dayLabelSvgGroup = root
+	          .append('svg')
+	          .attr('class', BASE_CLASSNAME)
+	          .attr('x', 0)
+	          .attr('y', 0);
+	      }
 
-	    //   const dayLabelSvg = dayLabelSvgGroup
-	    //     .selectAll('g')
-	    //     .data(daysOfTheWeekAbbr)
-	    //     .enter()
-	    //     .append('g');
-	    //   // Styling "day-name-rect" elements
-	    //   dayLabelSvg
-	    //     .append('rect')
-	    //     .attr('class', 'day-name-rect')
-	    //     .attr('width', options.cellSize)
-	    //     .attr('height', options.cellSize)
-	    //     .attr('x', 0)
-	    //     .attr(
-	    //       'y',
-	    //       (data, index) =>
-	    //         index * options.cellSize + index * options.cellPadding
-	    //     );
-	    //   // Adding day names to SVG
-	    //   dayLabelSvg
-	    //     .append('text')
-	    //     .attr('class', 'day-name-text')
-	    //     .attr('dominant-baseline', 'central')
-	    //     .attr('x', 0)
-	    //     .attr(
-	    //       'y',
-	    //       (data, index) =>
-	    //         index * options.cellSize +
-	    //         index * options.cellPadding +
-	    //         options.cellSize / 2
-	    //     )
-	    //     .text(data => data);
-	    // }
+	      const dayLabelSvg = dayLabelSvgGroup
+	        .selectAll('g')
+	        .data(dayNames)
+	        .enter()
+	        .append('g');
+
+	      dayLabelSvg
+	        .append('rect')
+	        .attr('class', `${BASE_CLASSNAME}-rect`)
+	        .attr('width', options.cellSize[X])
+	        .attr('height', options.cellSize[Y])
+	        .attr('x', 0)
+	        .attr(
+	          'y',
+	          (data, i) => i * options.cellSize[Y] + i * options.cellPadding,
+	        );
+
+	      dayLabelSvg
+	        .append('text')
+	        .attr('class', `${BASE_CLASSNAME}-text`)
+	        .attr('dominant-baseline', 'central')
+	        .attr('text-anchor', 'middle')
+	        .attr('x', options.cellSize[X] / 2)
+	        .attr(
+	          'y',
+	          (data, i) => i * options.cellSize[Y] +
+	            i * options.cellPadding +
+	            options.cellSize[Y] / 2,
+	        )
+	        .text((data) => data);
+	    } else {
+	      this.dimensions = {
+	        width: 0,
+	        height: 0,
+	      };
+	      root.select(`.${BASE_CLASSNAME}`).remove();
+	    }
 	  }
 	}
 
@@ -6532,10 +6533,17 @@
 	  }
 
 	  paint(navigationDir = false) {
+	    this.domainSecondaryLabelPainter.paint(this.root);
+	    this.root
+	      .select('.graph')
+	      .transition()
+	      .duration(this.calendar.options.options.animationDuration)
+	      .attr('x', this.domainSecondaryLabelPainter.dimensions.width);
+
 	    const domainSvg = this.domainPainter.paint(navigationDir, this.root);
 	    this.subDomainPainter.paint(domainSvg);
 	    this.domainLabelPainter.paint(domainSvg);
-	    // this.domainSecondaryLabelPainter.paint(domainSvg);
+
 	    this.legendPainter.paint();
 
 	    this.resize();
@@ -6578,7 +6586,10 @@
 	    ) {
 	      return domainsWidth + legendWidth;
 	    }
-	    return Math.max(domainsWidth, legendWidth);
+	    return (
+	      Math.max(domainsWidth, legendWidth) +
+	      this.domainSecondaryLabelPainter.dimensions.width
+	    );
 	  }
 
 	  resize() {

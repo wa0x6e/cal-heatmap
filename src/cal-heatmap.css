@@ -100,11 +100,11 @@ Remove comment to apply this style to date with value equal to 0
 	shape-rendering: crispedges;
 }
 
-.cal-heatmap-container .day-name-rect {
+.cal-heatmap-container .weekday-label-rect {
 	fill: transparent;
 }
 
-.cal-heatmap-container .day-name-text {
+.cal-heatmap-container .weekday-label-text {
 	font-size: 10px;
 	fill: #999;
 }
