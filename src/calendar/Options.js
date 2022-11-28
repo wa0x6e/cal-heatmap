@@ -75,10 +75,6 @@ export default class Options {
 
       subDomainTemplate: null,
 
-      // First day of the week is Monday
-      // 0 to start the week on Sunday
-      weekStartOnMonday: true,
-
       // Show week name when showing full month
       dayLabel: false,
 
