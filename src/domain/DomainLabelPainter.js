@@ -147,9 +147,9 @@ export default class DomainLabelPainter {
               } , ${width})`;
               break;
             case 'left':
-              s += `translate(-${
-                options.x.domainHorizontalLabelWidth
-              }, ${options`${options.x.domainHorizontalLabelWidth})`}`;
+              s +=
+                `translate(-${options.x.domainHorizontalLabelWidth}, ` +
+                `${options.x.domainHorizontalLabelWidth})`;
               break;
             default:
           }

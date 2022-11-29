@@ -3703,9 +3703,9 @@
               } , ${width})`;
 	              break;
 	            case 'left':
-	              s += `translate(-${
-                options.x.domainHorizontalLabelWidth
-              }, ${options`${options.x.domainHorizontalLabelWidth})`}`;
+	              s +=
+	                `translate(-${options.x.domainHorizontalLabelWidth}, ` +
+	                `${options.x.domainHorizontalLabelWidth})`;
 	              break;
 	          }
 
@@ -18661,11 +18661,11 @@
 	    if (afterLoad !== false) {
 	      if (typeof afterLoad === 'function') {
 	        processedData = afterLoad(data);
-	      } else if (typeof options.afterLoadData === 'function') {
+	      } else if (typeof options.dataProcessor === 'function') {
 	        processedData = options.dataProcessor(data);
 	      } else {
 	        // eslint-disable-next-line no-console
-	        console.log('Provided callback for afterLoadData is not a function.');
+	        console.log('Provided options for dataProcessor is not a function.');
 	      }
 	    } else if (options.dataType === 'csv' || options.dataType === 'tsv') {
 	      processedData = interpretCSV(data);
