@@ -126,11 +126,11 @@ export function getDatas(
     if (afterLoad !== false) {
       if (typeof afterLoad === 'function') {
         processedData = afterLoad(data);
-      } else if (typeof options.afterLoadData === 'function') {
+      } else if (typeof options.dataProcessor === 'function') {
         processedData = options.dataProcessor(data);
       } else {
         // eslint-disable-next-line no-console
-        console.log('Provided callback for afterLoadData is not a function.');
+        console.log('Provided options for dataProcessor is not a function.');
       }
     } else if (options.dataType === 'csv' || options.dataType === 'tsv') {
       processedData = interpretCSV(data);
