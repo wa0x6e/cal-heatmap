@@ -27,14 +27,14 @@ export default class subDomainPainter {
         .attr('x', () => {
           let pos = options.domainMargin[LEFT];
           if (options.label.position === 'left') {
-            pos += options.domainHorizontalLabelWidth;
+            pos += options.x.domainHorizontalLabelWidth;
           }
           return pos;
         })
         .attr('y', () => {
           let pos = options.domainMargin[TOP];
           if (options.label.position === 'top') {
-            pos += options.domainVerticalLabelHeight;
+            pos += options.x.domainVerticalLabelHeight;
           }
           return pos;
         })

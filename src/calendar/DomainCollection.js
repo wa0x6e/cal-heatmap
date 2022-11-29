@@ -1,12 +1,12 @@
+import { castArray } from 'lodash-es';
+
 export default class DomainCollection {
   constructor(dateHelper, interval, start, range) {
     this.collection = new Map();
 
     if (interval && start && range) {
       this.collection = new Map(
-        dateHelper
-          .intervals(interval, start, range)
-          .map((d) => (Array.isArray(d) ? d : [d])),
+        dateHelper.intervals(interval, start, range).map((d) => castArray(d)),
       );
     }
 

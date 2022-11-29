@@ -1,40 +1,107 @@
-import { select } from 'd3-selection';
-import { merge } from 'lodash-es';
+import {
+  merge,
+  isEqual,
+  castArray,
+  isFunction,
+  isString,
+  isNumber,
+} from 'lodash-es';
 
-import { validateSelector, validateDomainType } from '../utils/validator';
 import {
   TOP, RIGHT, BOTTOM, LEFT, X,
 } from '../constant';
-import { expandMarginSetting } from '../function';
 import DateHelper from '../helpers/DateHelper';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 const DEFAULT_LEGEND_MARGIN = 10;
 
 /**
- * Convert a string to an array like [singular-form, plural-form]
+ * Ensure that the domain and subdomain are valid
  *
- * @param  {string|array} value Date to convert
- * @return {array}       An array like [singular-form, plural-form]
+ * @throw {Error} when domain or subdomain are not valid
+ * @return {bool} True if domain and subdomain are valid and compatible
  */
-function expandItemName(value) {
-  if (typeof value === 'string') {
-    return [value, value + (value !== '' ? 's' : '')];
+function validateDomainType(subDomainTemplate, { domain, subDomain }) {
+  if (!subDomainTemplate.has(domain) || domain === 'minute') {
+    throw new Error(`The domain '${domain}' is not valid`);
   }
 
-  if (Array.isArray(value)) {
-    if (value.length === 1) {
-      return [value[0], `${value[0]}s`];
+  if (!subDomainTemplate.has(subDomain) || subDomain === 'year') {
+    throw new Error(`The subDomain '${subDomain}' is not valid`);
+  }
+
+  if (
+    subDomainTemplate.at(domain).level <= subDomainTemplate.at(subDomain).level
+  ) {
+    throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
+  }
+
+  return true;
+}
+
+const preProcessors = {
+  highlight: (args) => castArray(args),
+  itemName: (name) => {
+    if (isString(name)) {
+      return [name, name + (name !== '' ? 's' : '')];
     }
-    if (value.length > 2) {
-      return value.slice(0, 2);
+
+    if (Array.isArray(name)) {
+      if (name.length === 1) {
+        return [name[0], `${name[0]}s`];
+      }
+      if (name.length > 2) {
+        return name.slice(0, 2);
+      }
+    }
+    return name;
+  },
+  cellSize: (value) => {
+    if (isNumber(value)) {
+      return [value, value];
     }
 
     return value;
-  }
+  },
+  domainMargin: (args) => preProcessors.margins(args),
+  legendMargin: (args) => preProcessors.margins(args),
+  margins: (settings) => {
+    let value = settings;
+    if (isNumber(value)) {
+      value = [value];
+    }
 
-  return ['item', 'items'];
-}
+    if (!Array.isArray(value) || !value.every((d) => isNumber(d))) {
+      // eslint-disable-next-line no-console
+      console.log('Margin only accepts an integer or an array of integers');
+      value = [0];
+    }
+
+    switch (value.length) {
+      case 1:
+        return [value[0], value[0], value[0], value[0]];
+      case 2:
+        return [value[0], value[1], value[0], value[1]];
+      case 3:
+        return [value[0], value[1], value[2], value[1]];
+      default:
+        return value.slice(0, 4);
+    }
+  },
+  subDomainDateFormat: (value, calendar, options) =>
+    // eslint-disable-next-line
+    (isString(value) || isFunction(value) ?
+      value :
+      calendar.subDomainTemplate.at(options.subDomain).format.date),
+  domainLabelFormat: (value, calendar, options) =>
+    // eslint-disable-next-line
+    (isString(value) || isFunction(value) ?
+      value :
+      calendar.subDomainTemplate.at(options.domain).format.legend),
+  subDomainTextFormat: (value) =>
+    // eslint-disable-next-line
+    ((isString(value) && value !== '') || isFunction(value) ? value : null),
+};
 
 export default class Options {
   constructor(calendar) {
@@ -55,8 +122,8 @@ export default class Options {
 
       // Size of each cell, in pixel
       // Accepts either:
-      // - a number, representing the width and height of each cell
-      // - an array of 2 numbers, such as [width, height]
+      // - a number, representing the width and height of each square cell
+      // - an array of 2 numbers, in the format [width, height]
       cellSize: 10,
 
       // Padding between each cell, in pixel
@@ -199,7 +266,6 @@ export default class Options {
       // List of dates to highlight
       // Valid values:
       // - []: don't highlight anything
-      // - "now": highlight the current date
       // - an array of Date objects: highlight the specified dates
       highlight: [],
 
@@ -260,8 +326,6 @@ export default class Options {
 
       previousSelector: false,
 
-      itemNamespace: 'cal-heatmap',
-
       tooltip: false,
 
       // Format the content of the tooltip
@@ -276,12 +340,23 @@ export default class Options {
     };
   }
 
+  /**
+   * Set a new value for an option, only if unchanged
+   * @param {string} key   Name of the option
+   * @param {any} value Value of the option
+   * @return {boolean} Whether the option have been changed
+   */
   set(key, value) {
-    if (!this.options.hasOwnProperty(key) || this.options[key] === value) {
+    if (
+      !this.options.hasOwnProperty(key) ||
+      isEqual(this.options[key], value)
+    ) {
       return false;
     }
 
-    this.options[key] = value;
+    this.options[key] = preProcessors.hasOwnProperty(key) ?
+      preProcessors[key](value) :
+      value;
 
     return true;
   }
@@ -292,7 +367,6 @@ export default class Options {
     // Fatal errors
     // Stop script execution on error
     validateDomainType(this.calendar.subDomainTemplate, this.options);
-    validateSelector(options.itemSelector, false, 'itemSelector');
 
     if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
       throw new Error(
@@ -300,37 +374,8 @@ export default class Options {
       );
     }
 
-    if (select(options.itemSelector).empty()) {
-      throw new Error(
-        `The node '${options.itemSelector}' specified in itemSelector ` +
-          'does not exist',
-      );
-    }
-
-    try {
-      validateSelector(options.nextSelector, true, 'nextSelector');
-      validateSelector(options.previousSelector, true, 'previousSelector');
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error.message);
-      return false;
-    }
-
     if (!options.hasOwnProperty('subDomain')) {
       throw new Error('The subDomain options is missing');
-    }
-
-    // If other settings contains error, will fallback to default
-
-    if (
-      typeof options.itemNamespace !== 'string' ||
-      options.itemNamespace === ''
-    ) {
-      // eslint-disable-next-line no-console
-      console.log(
-        'itemNamespace can not be empty, falling back to cal-heatmap',
-      );
-      options.itemNamespace = 'cal-heatmap';
     }
 
     return true;
@@ -384,7 +429,7 @@ export default class Options {
   }
 
   init(settings) {
-    this.options = merge(this.options, settings);
+    this.options = merge(this.options, settings, { x: {} });
 
     const { options } = this;
 
@@ -395,46 +440,29 @@ export default class Options {
     this.calendar.subDomainTemplate.init(options.subDomainTemplates);
     this.#validate();
 
-    options.subDomainDateFormat =
-      typeof options.subDomainDateFormat === 'string' ||
-      typeof options.subDomainDateFormat === 'function' ?
-        options.subDomainDateFormat :
-        this.calendar.subDomainTemplate.at(options.subDomain).format.date;
-    options.domainLabelFormat =
-      typeof options.domainLabelFormat === 'string' ||
-      typeof options.domainLabelFormat === 'function' ?
-        options.domainLabelFormat :
-        this.calendar.subDomainTemplate.at(options.domain).format.legend;
-    options.subDomainTextFormat =
-      (typeof options.subDomainTextFormat === 'string' &&
-        options.subDomainTextFormat !== '') ||
-      typeof options.subDomainTextFormat === 'function' ?
-        options.subDomainTextFormat :
-        null;
-    options.domainMargin = expandMarginSetting(options.domainMargin);
-    options.legendMargin = expandMarginSetting(options.legendMargin);
-    options.itemName = expandItemName(options.itemName);
+    Object.keys(preProcessors).forEach((key) => {
+      if (!options.hasOwnProperty(key)) {
+        return;
+      }
+      options[key] = preProcessors[key](options[key], this.calendar, options);
+    });
 
     this.#autoAlignLabel();
 
-    options.verticalDomainLabel =
+    options.x.verticalDomainLabel =
       options.label.position === 'top' || options.label.position === 'bottom';
 
-    if (typeof options.cellSize === 'number') {
-      options.cellSize = [options.cellSize, options.cellSize];
-    }
-
-    options.domainVerticalLabelHeight =
+    options.x.domainVerticalLabelHeight =
       options.label.height ?? Math.max(25, options.cellSize[X] * 2);
-    options.domainHorizontalLabelWidth = 0;
+    options.x.domainHorizontalLabelWidth = 0;
 
     if (options.domainLabelFormat === '' && options.label.height === null) {
-      options.domainVerticalLabelHeight = 0;
+      options.x.domainVerticalLabelHeight = 0;
     }
 
-    if (!options.verticalDomainLabel) {
-      options.domainVerticalLabelHeight = 0;
-      options.domainHorizontalLabelWidth = options.label.width;
+    if (!options.x.verticalDomainLabel) {
+      options.x.domainVerticalLabelHeight = 0;
+      options.x.domainHorizontalLabelWidth = options.label.width;
     }
 
     if (options.legendMargin === [0, 0, 0, 0]) {

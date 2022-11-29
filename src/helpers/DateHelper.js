@@ -14,8 +14,8 @@ export default class DateHelper {
   /**
    * Return the week number, relative to its month
    *
-   * @param  int|Date d Date or timestamp in milliseconds
-   * @return int Week number, relative to the month [0-5]
+   * @param  {number|Date} d Date or timestamp in milliseconds
+   * @returns {number} Thw week number, relative to the month [0-5]
    */
   getMonthWeekNumber(d) {
     const date = this.date(d).startOf('day');
@@ -42,16 +42,16 @@ export default class DateHelper {
   /**
    * Return an array of time interval
    *
-   * @param  int|Date date A random date included in the wanted domain
-   * @param  int|Date range Number of dates to get, or a stop date
-   * @return Array of dates
+   * @param  {number|Date} date A random date included in the wanted interval
+   * @param  {number|Date} range Length of the wanted interval, or a stop date
+   * @returns {Array<number>} Array of unix timestamp, in milliseconds
    */
   intervals(interval, date, range) {
     return this.#generateInterval(interval, date, range);
   }
 
   /**
-   * Returns wether or not dateA is less than or equal to dateB.
+   * Returns whether dateA is less than or equal to dateB.
    * This function is subdomain aware.
    * Performs automatic conversion of values.
    * @param dateA may be a number or a Date
@@ -63,11 +63,11 @@ export default class DateHelper {
   }
 
   /**
-   * Return whether 2 dates belongs to the same domain
+   * Return whether 2 dates belongs to the same time interval
    *
    * @param  Date dateA First date to compare
-   * @param  Date dateB Secon date to compare
-   * @return bool true if the 2 dates belongs to the same domain
+   * @param  Date dateB Second date to compare
+   * @returns {boolean} true if the 2 dates belongs to the same time interval
    */
   datesFromSameInterval(interval, dateA, dateB) {
     return this.date(dateA).isSame(this.date(dateB), interval);

@@ -3429,7 +3429,7 @@
 
 	    return (
 	      options.domainMargin[LEFT] +
-	      options.domainHorizontalLabelWidth +
+	      options.x.domainHorizontalLabelWidth +
 	      options.domainGutter +
 	      subDomainWidth +
 	      options.domainMargin[RIGHT]
@@ -3456,7 +3456,7 @@
 	      options.domainMargin[TOP] +
 	      subDomainHeight +
 	      options.domainGutter +
-	      options.domainVerticalLabelHeight +
+	      options.x.domainVerticalLabelHeight +
 	      options.domainMargin[BOTTOM]
 	    );
 	  }
@@ -3585,7 +3585,8 @@
 	        .attr('class', DEFAULT_CLASSNAME$1)
 	        .attr('y', (d) => {
 	          let y =
-	              options.domainMargin[TOP] + options.domainVerticalLabelHeight / 2;
+	              options.domainMargin[TOP] +
+	              options.x.domainVerticalLabelHeight / 2;
 
 	          if (options.label.position !== 'top') {
 	            y += this.#getDomainInsideHeight(d);
@@ -3618,7 +3619,7 @@
 	          if (options.label.align === 'right') {
 	            return (
 	              x +
-	                options.domainHorizontalLabelWidth -
+	                options.x.domainHorizontalLabelWidth -
 	                options.label.offset.x *
 	                  (options.label.rotate === 'right' ? -1 : 1)
 	            );
@@ -3639,7 +3640,7 @@
 	        })
 	        .attr('dominant-baseline', () =>
 	        // eslint-disable-next-line implicit-arrow-linebreak
-	          (options.verticalDomainLabel ? 'middle' : 'top'))
+	          (options.x.verticalDomainLabel ? 'middle' : 'top'))
 	        .text((d) =>
 	        // eslint-disable-next-line implicit-arrow-linebreak
 	          this.calendar.helpers.DateHelper.format(
@@ -3653,7 +3654,7 @@
 	    const { options } = this.calendar.options;
 	    return (
 	      this.calendar.calendarPainter.domainPainter.coordinates.at(d).width -
-	      options.domainHorizontalLabelWidth +
+	      options.x.domainHorizontalLabelWidth +
 	      options.domainGutter +
 	      options.domainMargin[RIGHT] +
 	      options.domainMargin[LEFT]
@@ -3664,7 +3665,7 @@
 	    const { options } = this.calendar.options;
 	    return (
 	      this.calendar.calendarPainter.domainPainter.coordinates.at(d).height -
-	      options.domainVerticalLabelHeight +
+	      options.x.domainVerticalLabelHeight +
 	      options.domainGutter +
 	      options.domainMargin[TOP] +
 	      options.domainMargin[BOTTOM]
@@ -3684,7 +3685,7 @@
 	              s += `translate(-${width} , -${width})`;
 	              break;
 	            case 'left':
-	              s += `translate(0, -${options.domainHorizontalLabelWidth})`;
+	              s += `translate(0, -${options.x.domainHorizontalLabelWidth})`;
 	              break;
 	          }
 
@@ -3698,13 +3699,13 @@
 	          switch (options.label.position) {
 	            case 'right':
 	              s += `translate(-${
-                width + options.domainHorizontalLabelWidth
+                width + options.x.domainHorizontalLabelWidth
               } , ${width})`;
 	              break;
 	            case 'left':
 	              s += `translate(-${
-                options.domainHorizontalLabelWidth
-              }, ${options`${options.domainHorizontalLabelWidth})`}`;
+                options.x.domainHorizontalLabelWidth
+              }, ${options`${options.x.domainHorizontalLabelWidth})`}`;
 	              break;
 	          }
 
@@ -4175,36 +4176,6 @@
 	  return classname;
 	}
 
-	/**
-	 * Expand a number of an array of numbers to an usable 4 values array
-	 *
-	 * @param  {integer|array} value
-	 * @return {array}        array
-	 */
-	function expandMarginSetting(settings) {
-	  let value = settings;
-	  if (typeof value === 'number') {
-	    value = [value];
-	  }
-
-	  if (!Array.isArray(value) || !value.every((d) => typeof d === 'number')) {
-	    // eslint-disable-next-line no-console
-	    console.log('Margin only accepts an integer or an array of integers');
-	    value = [0];
-	  }
-
-	  switch (value.length) {
-	    case 1:
-	      return [value[0], value[0], value[0], value[0]];
-	    case 2:
-	      return [value[0], value[1], value[0], value[1]];
-	    case 3:
-	      return [value[0], value[1], value[2], value[1]];
-	    default:
-	      return value.slice(0, 4);
-	  }
-	}
-
 	function getSubDomainTitle(calendar, d, options, connector) {
 	  if (d.v === null && !options.considerMissingDataAsZero) {
 	    return formatStringWithObject(options.subDomainTitleFormat.empty, {
@@ -4251,14 +4222,14 @@
 	        .attr('x', () => {
 	          let pos = options.domainMargin[LEFT];
 	          if (options.label.position === 'left') {
-	            pos += options.domainHorizontalLabelWidth;
+	            pos += options.x.domainHorizontalLabelWidth;
 	          }
 	          return pos;
 	        })
 	        .attr('y', () => {
 	          let pos = options.domainMargin[TOP];
 	          if (options.label.position === 'top') {
-	            pos += options.domainVerticalLabelHeight;
+	            pos += options.x.domainVerticalLabelHeight;
 	          }
 	          return pos;
 	        })
@@ -6473,6 +6444,8 @@
 	  }
 	}
 
+	const EVENT_NAMESPACE = 'cal-heatmap';
+
 	class CalendarPainter {
 	  constructor(calendar) {
 	    this.calendar = calendar;
@@ -6511,26 +6484,32 @@
 	  }
 
 	  #attachNavigationEvents() {
-	    const { options } = this.calendar;
+	    const { nextSelector, previousSelector } = this.calendar.options.options;
 
-	    if (options.nextSelector !== false) {
-	      select(options.nextSelector).on(
-	        `click.${options.itemNamespace}`,
-	        (ev) => {
-	          ev.preventDefault();
-	          return this.calendar.next(1);
-	        },
-	      );
+	    if (nextSelector) {
+	      select(nextSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
+	        ev.preventDefault();
+	        return this.calendar.next(1);
+	      });
 	    }
 
-	    if (options.previousSelector !== false) {
-	      select(options.previousSelector).on(
-	        `click.${options.itemNamespace}`,
-	        (ev) => {
-	          ev.preventDefault();
-	          return this.calendar.previous(1);
-	        },
-	      );
+	    if (previousSelector) {
+	      select(previousSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
+	        ev.preventDefault();
+	        return this.calendar.previous(1);
+	      });
+	    }
+	  }
+
+	  #removeNavigationEvents() {
+	    const { nextSelector, previousSelector } = this.calendar.options.options;
+
+	    if (nextSelector !== false) {
+	      select(nextSelector).on(`.${EVENT_NAMESPACE}`, null);
+	    }
+
+	    if (previousSelector !== false) {
+	      select(previousSelector).on(`.${EVENT_NAMESPACE}`, null);
 	    }
 	  }
 
@@ -6607,54 +6586,22 @@
 	      this.getHeight(),
 	      this.getWidth(),
 	    ]);
-
-	    // this.root
-	    //   .select('.graph')
-	    //   .transition()
-	    //   .duration(options.animationDuration)
-	    //   .attr('y', () => {
-	    //     if (options.legendVerticalPosition === 'top') {
-	    //       return legendHeight;
-	    //     }
-	    //     return 0;
-	    //   })
-	    //   .attr('x', () => {
-	    //     let xPosition = 0;
-	    //     if (
-	    //       options.dayLabel &&
-	    //       options.domain === 'month' &&
-	    //       options.subDomain === 'day'
-	    //     ) {
-	    //       xPosition = options.cellSize + options.cellPadding;
-	    //     }
-	    //     if (
-	    //       (options.legendVerticalPosition === 'middle' ||
-	    //         options.legendVerticalPosition === 'center') &&
-	    //       options.legendHorizontalPosition === 'left'
-	    //     ) {
-	    //       return legendWidth + xPosition;
-	    //     }
-	    //     return xPosition;
-	    //   });
 	  }
 
 	  destroy(callback) {
+	    this.#removeNavigationEvents();
+
 	    this.root
 	      .transition()
 	      .duration(this.calendar.options.options.animationDuration)
 	      .attr('width', 0)
 	      .attr('height', 0)
 	      .remove()
-	      .each(() => {
+	      .call(() => {
 	        if (typeof callback === 'function') {
 	          callback();
-	        } else if (typeof callback !== 'undefined') {
-	          // eslint-disable-next-line no-console
-	          console.log('Provided callback for destroy() is not a function.');
 	        }
 	      });
-
-	    callback();
 	  }
 
 	  /**
@@ -6835,17 +6782,17 @@
 	var Symbol$2 = Symbol$1;
 
 	/** Used for built-in method references. */
-	var objectProto$a = Object.prototype;
+	var objectProto$e = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$8 = objectProto$a.hasOwnProperty;
+	var hasOwnProperty$b = objectProto$e.hasOwnProperty;
 
 	/**
 	 * Used to resolve the
 	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
-	var nativeObjectToString$1 = objectProto$a.toString;
+	var nativeObjectToString$1 = objectProto$e.toString;
 
 	/** Built-in value references. */
 	var symToStringTag$1 = Symbol$2 ? Symbol$2.toStringTag : undefined;
@@ -6858,7 +6805,7 @@
 	 * @returns {string} Returns the raw `toStringTag`.
 	 */
 	function getRawTag(value) {
-	  var isOwn = hasOwnProperty$8.call(value, symToStringTag$1),
+	  var isOwn = hasOwnProperty$b.call(value, symToStringTag$1),
 	      tag = value[symToStringTag$1];
 
 	  try {
@@ -6878,14 +6825,14 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$9 = Object.prototype;
+	var objectProto$d = Object.prototype;
 
 	/**
 	 * Used to resolve the
 	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
-	var nativeObjectToString = objectProto$9.toString;
+	var nativeObjectToString = objectProto$d.toString;
 
 	/**
 	 * Converts `value` to a string using `Object.prototype.toString`.
@@ -7117,17 +7064,17 @@
 
 	/** Used for built-in method references. */
 	var funcProto$1 = Function.prototype,
-	    objectProto$8 = Object.prototype;
+	    objectProto$c = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
 	var funcToString$1 = funcProto$1.toString;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
+	var hasOwnProperty$a = objectProto$c.hasOwnProperty;
 
 	/** Used to detect if a method is native. */
 	var reIsNative = RegExp('^' +
-	  funcToString$1.call(hasOwnProperty$7).replace(reRegExpChar, '\\$&')
+	  funcToString$1.call(hasOwnProperty$a).replace(reRegExpChar, '\\$&')
 	  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
 	);
 
@@ -7171,6 +7118,11 @@
 	  var value = getValue(object, key);
 	  return baseIsNative(value) ? value : undefined;
 	}
+
+	/* Built-in method references that are verified to be native. */
+	var WeakMap = getNative(root$1, 'WeakMap');
+
+	var WeakMap$1 = WeakMap;
 
 	/** Built-in value references. */
 	var objectCreate = Object.create;
@@ -7425,10 +7377,10 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$7 = Object.prototype;
+	var objectProto$b = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$6 = objectProto$7.hasOwnProperty;
+	var hasOwnProperty$9 = objectProto$b.hasOwnProperty;
 
 	/**
 	 * Assigns `value` to `key` of `object` if the existing value is not equivalent
@@ -7442,7 +7394,7 @@
 	 */
 	function assignValue(object, key, value) {
 	  var objValue = object[key];
-	  if (!(hasOwnProperty$6.call(object, key) && eq(objValue, value)) ||
+	  if (!(hasOwnProperty$9.call(object, key) && eq(objValue, value)) ||
 	      (value === undefined && !(key in object))) {
 	    baseAssignValue(object, key, value);
 	  }
@@ -7650,7 +7602,7 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$6 = Object.prototype;
+	var objectProto$a = Object.prototype;
 
 	/**
 	 * Checks if `value` is likely a prototype object.
@@ -7661,7 +7613,7 @@
 	 */
 	function isPrototype(value) {
 	  var Ctor = value && value.constructor,
-	      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto$6;
+	      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto$a;
 
 	  return value === proto;
 	}
@@ -7686,7 +7638,7 @@
 	}
 
 	/** `Object#toString` result references. */
-	var argsTag$1 = '[object Arguments]';
+	var argsTag$2 = '[object Arguments]';
 
 	/**
 	 * The base implementation of `_.isArguments`.
@@ -7696,17 +7648,17 @@
 	 * @returns {boolean} Returns `true` if `value` is an `arguments` object,
 	 */
 	function baseIsArguments(value) {
-	  return isObjectLike(value) && baseGetTag(value) == argsTag$1;
+	  return isObjectLike(value) && baseGetTag(value) == argsTag$2;
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$5 = Object.prototype;
+	var objectProto$9 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$5 = objectProto$5.hasOwnProperty;
+	var hasOwnProperty$8 = objectProto$9.hasOwnProperty;
 
 	/** Built-in value references. */
-	var propertyIsEnumerable = objectProto$5.propertyIsEnumerable;
+	var propertyIsEnumerable$1 = objectProto$9.propertyIsEnumerable;
 
 	/**
 	 * Checks if `value` is likely an `arguments` object.
@@ -7727,8 +7679,8 @@
 	 * // => false
 	 */
 	var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsArguments : function(value) {
-	  return isObjectLike(value) && hasOwnProperty$5.call(value, 'callee') &&
-	    !propertyIsEnumerable.call(value, 'callee');
+	  return isObjectLike(value) && hasOwnProperty$8.call(value, 'callee') &&
+	    !propertyIsEnumerable$1.call(value, 'callee');
 	};
 
 	var isArguments$1 = isArguments;
@@ -7787,22 +7739,22 @@
 	var isBuffer$1 = isBuffer;
 
 	/** `Object#toString` result references. */
-	var argsTag = '[object Arguments]',
-	    arrayTag = '[object Array]',
-	    boolTag = '[object Boolean]',
-	    dateTag = '[object Date]',
-	    errorTag = '[object Error]',
+	var argsTag$1 = '[object Arguments]',
+	    arrayTag$1 = '[object Array]',
+	    boolTag$1 = '[object Boolean]',
+	    dateTag$1 = '[object Date]',
+	    errorTag$1 = '[object Error]',
 	    funcTag = '[object Function]',
-	    mapTag = '[object Map]',
-	    numberTag = '[object Number]',
-	    objectTag$1 = '[object Object]',
-	    regexpTag = '[object RegExp]',
-	    setTag = '[object Set]',
-	    stringTag = '[object String]',
-	    weakMapTag = '[object WeakMap]';
+	    mapTag$2 = '[object Map]',
+	    numberTag$2 = '[object Number]',
+	    objectTag$3 = '[object Object]',
+	    regexpTag$1 = '[object RegExp]',
+	    setTag$2 = '[object Set]',
+	    stringTag$2 = '[object String]',
+	    weakMapTag$1 = '[object WeakMap]';
 
-	var arrayBufferTag = '[object ArrayBuffer]',
-	    dataViewTag = '[object DataView]',
+	var arrayBufferTag$1 = '[object ArrayBuffer]',
+	    dataViewTag$2 = '[object DataView]',
 	    float32Tag = '[object Float32Array]',
 	    float64Tag = '[object Float64Array]',
 	    int8Tag = '[object Int8Array]',
@@ -7820,14 +7772,14 @@
 	typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
 	typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
 	typedArrayTags[uint32Tag] = true;
-	typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
-	typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
-	typedArrayTags[dataViewTag] = typedArrayTags[dateTag] =
-	typedArrayTags[errorTag] = typedArrayTags[funcTag] =
-	typedArrayTags[mapTag] = typedArrayTags[numberTag] =
-	typedArrayTags[objectTag$1] = typedArrayTags[regexpTag] =
-	typedArrayTags[setTag] = typedArrayTags[stringTag] =
-	typedArrayTags[weakMapTag] = false;
+	typedArrayTags[argsTag$1] = typedArrayTags[arrayTag$1] =
+	typedArrayTags[arrayBufferTag$1] = typedArrayTags[boolTag$1] =
+	typedArrayTags[dataViewTag$2] = typedArrayTags[dateTag$1] =
+	typedArrayTags[errorTag$1] = typedArrayTags[funcTag] =
+	typedArrayTags[mapTag$2] = typedArrayTags[numberTag$2] =
+	typedArrayTags[objectTag$3] = typedArrayTags[regexpTag$1] =
+	typedArrayTags[setTag$2] = typedArrayTags[stringTag$2] =
+	typedArrayTags[weakMapTag$1] = false;
 
 	/**
 	 * The base implementation of `_.isTypedArray` without Node.js optimizations.
@@ -7908,10 +7860,10 @@
 	var isTypedArray$1 = isTypedArray;
 
 	/** Used for built-in method references. */
-	var objectProto$4 = Object.prototype;
+	var objectProto$8 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$4 = objectProto$4.hasOwnProperty;
+	var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
 
 	/**
 	 * Creates an array of the enumerable property names of the array-like `value`.
@@ -7931,7 +7883,7 @@
 	      length = result.length;
 
 	  for (var key in value) {
-	    if ((inherited || hasOwnProperty$4.call(value, key)) &&
+	    if ((inherited || hasOwnProperty$7.call(value, key)) &&
 	        !(skipIndexes && (
 	           // Safari 9 has enumerable `arguments.length` in strict mode.
 	           key == 'length' ||
@@ -7962,6 +7914,69 @@
 	  };
 	}
 
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeKeys = overArg(Object.keys, Object);
+
+	var nativeKeys$1 = nativeKeys;
+
+	/** Used for built-in method references. */
+	var objectProto$7 = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty$6 = objectProto$7.hasOwnProperty;
+
+	/**
+	 * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {Array} Returns the array of property names.
+	 */
+	function baseKeys(object) {
+	  if (!isPrototype(object)) {
+	    return nativeKeys$1(object);
+	  }
+	  var result = [];
+	  for (var key in Object(object)) {
+	    if (hasOwnProperty$6.call(object, key) && key != 'constructor') {
+	      result.push(key);
+	    }
+	  }
+	  return result;
+	}
+
+	/**
+	 * Creates an array of the own enumerable property names of `object`.
+	 *
+	 * **Note:** Non-object values are coerced to objects. See the
+	 * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+	 * for more details.
+	 *
+	 * @static
+	 * @since 0.1.0
+	 * @memberOf _
+	 * @category Object
+	 * @param {Object} object The object to query.
+	 * @returns {Array} Returns the array of property names.
+	 * @example
+	 *
+	 * function Foo() {
+	 *   this.a = 1;
+	 *   this.b = 2;
+	 * }
+	 *
+	 * Foo.prototype.c = 3;
+	 *
+	 * _.keys(new Foo);
+	 * // => ['a', 'b'] (iteration order is not guaranteed)
+	 *
+	 * _.keys('hi');
+	 * // => ['0', '1']
+	 */
+	function keys(object) {
+	  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
+	}
+
 	/**
 	 * This function is like
 	 * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
@@ -7982,10 +7997,10 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$3 = Object.prototype;
+	var objectProto$6 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$3 = objectProto$3.hasOwnProperty;
+	var hasOwnProperty$5 = objectProto$6.hasOwnProperty;
 
 	/**
 	 * The base implementation of `_.keysIn` which doesn't treat sparse arrays as dense.
@@ -8002,7 +8017,7 @@
 	      result = [];
 
 	  for (var key in object) {
-	    if (!(key == 'constructor' && (isProto || !hasOwnProperty$3.call(object, key)))) {
+	    if (!(key == 'constructor' && (isProto || !hasOwnProperty$5.call(object, key)))) {
 	      result.push(key);
 	    }
 	  }
@@ -8070,13 +8085,13 @@
 	}
 
 	/** Used to stand-in for `undefined` hash values. */
-	var HASH_UNDEFINED$1 = '__lodash_hash_undefined__';
+	var HASH_UNDEFINED$2 = '__lodash_hash_undefined__';
 
 	/** Used for built-in method references. */
-	var objectProto$2 = Object.prototype;
+	var objectProto$5 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$2 = objectProto$2.hasOwnProperty;
+	var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
 
 	/**
 	 * Gets the hash value for `key`.
@@ -8091,16 +8106,16 @@
 	  var data = this.__data__;
 	  if (nativeCreate$1) {
 	    var result = data[key];
-	    return result === HASH_UNDEFINED$1 ? undefined : result;
+	    return result === HASH_UNDEFINED$2 ? undefined : result;
 	  }
-	  return hasOwnProperty$2.call(data, key) ? data[key] : undefined;
+	  return hasOwnProperty$4.call(data, key) ? data[key] : undefined;
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$1 = Object.prototype;
+	var objectProto$4 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
+	var hasOwnProperty$3 = objectProto$4.hasOwnProperty;
 
 	/**
 	 * Checks if a hash value for `key` exists.
@@ -8113,11 +8128,11 @@
 	 */
 	function hashHas(key) {
 	  var data = this.__data__;
-	  return nativeCreate$1 ? (data[key] !== undefined) : hasOwnProperty$1.call(data, key);
+	  return nativeCreate$1 ? (data[key] !== undefined) : hasOwnProperty$3.call(data, key);
 	}
 
 	/** Used to stand-in for `undefined` hash values. */
-	var HASH_UNDEFINED = '__lodash_hash_undefined__';
+	var HASH_UNDEFINED$1 = '__lodash_hash_undefined__';
 
 	/**
 	 * Sets the hash `key` to `value`.
@@ -8132,7 +8147,7 @@
 	function hashSet(key, value) {
 	  var data = this.__data__;
 	  this.size += this.has(key) ? 0 : 1;
-	  data[key] = (nativeCreate$1 && value === undefined) ? HASH_UNDEFINED : value;
+	  data[key] = (nativeCreate$1 && value === undefined) ? HASH_UNDEFINED$1 : value;
 	  return this;
 	}
 
@@ -8435,23 +8450,42 @@
 	MapCache.prototype.has = mapCacheHas;
 	MapCache.prototype.set = mapCacheSet;
 
+	/**
+	 * Appends the elements of `values` to `array`.
+	 *
+	 * @private
+	 * @param {Array} array The array to modify.
+	 * @param {Array} values The values to append.
+	 * @returns {Array} Returns `array`.
+	 */
+	function arrayPush(array, values) {
+	  var index = -1,
+	      length = values.length,
+	      offset = array.length;
+
+	  while (++index < length) {
+	    array[offset + index] = values[index];
+	  }
+	  return array;
+	}
+
 	/** Built-in value references. */
 	var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 	var getPrototype$1 = getPrototype;
 
 	/** `Object#toString` result references. */
-	var objectTag = '[object Object]';
+	var objectTag$2 = '[object Object]';
 
 	/** Used for built-in method references. */
 	var funcProto = Function.prototype,
-	    objectProto = Object.prototype;
+	    objectProto$3 = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
 	var funcToString = funcProto.toString;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
+	var hasOwnProperty$2 = objectProto$3.hasOwnProperty;
 
 	/** Used to infer the `Object` constructor. */
 	var objectCtorString = funcToString.call(Object);
@@ -8485,16 +8519,57 @@
 	 * // => true
 	 */
 	function isPlainObject(value) {
-	  if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
+	  if (!isObjectLike(value) || baseGetTag(value) != objectTag$2) {
 	    return false;
 	  }
 	  var proto = getPrototype$1(value);
 	  if (proto === null) {
 	    return true;
 	  }
-	  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+	  var Ctor = hasOwnProperty$2.call(proto, 'constructor') && proto.constructor;
 	  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
 	    funcToString.call(Ctor) == objectCtorString;
+	}
+
+	/**
+	 * Casts `value` as an array if it's not one.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.4.0
+	 * @category Lang
+	 * @param {*} value The value to inspect.
+	 * @returns {Array} Returns the cast array.
+	 * @example
+	 *
+	 * _.castArray(1);
+	 * // => [1]
+	 *
+	 * _.castArray({ 'a': 1 });
+	 * // => [{ 'a': 1 }]
+	 *
+	 * _.castArray('abc');
+	 * // => ['abc']
+	 *
+	 * _.castArray(null);
+	 * // => [null]
+	 *
+	 * _.castArray(undefined);
+	 * // => [undefined]
+	 *
+	 * _.castArray();
+	 * // => []
+	 *
+	 * var array = [1, 2, 3];
+	 * console.log(_.castArray(array) === array);
+	 * // => true
+	 */
+	function castArray() {
+	  if (!arguments.length) {
+	    return [];
+	  }
+	  var value = arguments[0];
+	  return isArray$1(value) ? value : [value];
 	}
 
 	/**
@@ -8632,6 +8707,173 @@
 	  return result;
 	}
 
+	/**
+	 * A specialized version of `_.filter` for arrays without support for
+	 * iteratee shorthands.
+	 *
+	 * @private
+	 * @param {Array} [array] The array to iterate over.
+	 * @param {Function} predicate The function invoked per iteration.
+	 * @returns {Array} Returns the new filtered array.
+	 */
+	function arrayFilter(array, predicate) {
+	  var index = -1,
+	      length = array == null ? 0 : array.length,
+	      resIndex = 0,
+	      result = [];
+
+	  while (++index < length) {
+	    var value = array[index];
+	    if (predicate(value, index, array)) {
+	      result[resIndex++] = value;
+	    }
+	  }
+	  return result;
+	}
+
+	/**
+	 * This method returns a new empty array.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.13.0
+	 * @category Util
+	 * @returns {Array} Returns the new empty array.
+	 * @example
+	 *
+	 * var arrays = _.times(2, _.stubArray);
+	 *
+	 * console.log(arrays);
+	 * // => [[], []]
+	 *
+	 * console.log(arrays[0] === arrays[1]);
+	 * // => false
+	 */
+	function stubArray() {
+	  return [];
+	}
+
+	/** Used for built-in method references. */
+	var objectProto$2 = Object.prototype;
+
+	/** Built-in value references. */
+	var propertyIsEnumerable = objectProto$2.propertyIsEnumerable;
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeGetSymbols = Object.getOwnPropertySymbols;
+
+	/**
+	 * Creates an array of the own enumerable symbols of `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {Array} Returns the array of symbols.
+	 */
+	var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
+	  if (object == null) {
+	    return [];
+	  }
+	  object = Object(object);
+	  return arrayFilter(nativeGetSymbols(object), function(symbol) {
+	    return propertyIsEnumerable.call(object, symbol);
+	  });
+	};
+
+	var getSymbols$1 = getSymbols;
+
+	/**
+	 * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
+	 * `keysFunc` and `symbolsFunc` to get the enumerable property names and
+	 * symbols of `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {Function} keysFunc The function to get the keys of `object`.
+	 * @param {Function} symbolsFunc The function to get the symbols of `object`.
+	 * @returns {Array} Returns the array of property names and symbols.
+	 */
+	function baseGetAllKeys(object, keysFunc, symbolsFunc) {
+	  var result = keysFunc(object);
+	  return isArray$1(object) ? result : arrayPush(result, symbolsFunc(object));
+	}
+
+	/**
+	 * Creates an array of own enumerable property names and symbols of `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {Array} Returns the array of property names and symbols.
+	 */
+	function getAllKeys(object) {
+	  return baseGetAllKeys(object, keys, getSymbols$1);
+	}
+
+	/* Built-in method references that are verified to be native. */
+	var DataView$1 = getNative(root$1, 'DataView');
+
+	var DataView$2 = DataView$1;
+
+	/* Built-in method references that are verified to be native. */
+	var Promise$1 = getNative(root$1, 'Promise');
+
+	var Promise$2 = Promise$1;
+
+	/* Built-in method references that are verified to be native. */
+	var Set$1 = getNative(root$1, 'Set');
+
+	var Set$2 = Set$1;
+
+	/** `Object#toString` result references. */
+	var mapTag$1 = '[object Map]',
+	    objectTag$1 = '[object Object]',
+	    promiseTag = '[object Promise]',
+	    setTag$1 = '[object Set]',
+	    weakMapTag = '[object WeakMap]';
+
+	var dataViewTag$1 = '[object DataView]';
+
+	/** Used to detect maps, sets, and weakmaps. */
+	var dataViewCtorString = toSource(DataView$2),
+	    mapCtorString = toSource(Map$2),
+	    promiseCtorString = toSource(Promise$2),
+	    setCtorString = toSource(Set$2),
+	    weakMapCtorString = toSource(WeakMap$1);
+
+	/**
+	 * Gets the `toStringTag` of `value`.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the `toStringTag`.
+	 */
+	var getTag = baseGetTag;
+
+	// Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
+	if ((DataView$2 && getTag(new DataView$2(new ArrayBuffer(1))) != dataViewTag$1) ||
+	    (Map$2 && getTag(new Map$2) != mapTag$1) ||
+	    (Promise$2 && getTag(Promise$2.resolve()) != promiseTag) ||
+	    (Set$2 && getTag(new Set$2) != setTag$1) ||
+	    (WeakMap$1 && getTag(new WeakMap$1) != weakMapTag)) {
+	  getTag = function(value) {
+	    var result = baseGetTag(value),
+	        Ctor = result == objectTag$1 ? value.constructor : undefined,
+	        ctorString = Ctor ? toSource(Ctor) : '';
+
+	    if (ctorString) {
+	      switch (ctorString) {
+	        case dataViewCtorString: return dataViewTag$1;
+	        case mapCtorString: return mapTag$1;
+	        case promiseCtorString: return promiseTag;
+	        case setCtorString: return setTag$1;
+	        case weakMapCtorString: return weakMapTag;
+	      }
+	    }
+	    return result;
+	  };
+	}
+
+	var getTag$1 = getTag;
+
 	/** Built-in value references. */
 	var Uint8Array = root$1.Uint8Array;
 
@@ -8674,6 +8916,494 @@
 	  return (typeof object.constructor == 'function' && !isPrototype(object))
 	    ? baseCreate$1(getPrototype$1(object))
 	    : {};
+	}
+
+	/** Used to stand-in for `undefined` hash values. */
+	var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+	/**
+	 * Adds `value` to the array cache.
+	 *
+	 * @private
+	 * @name add
+	 * @memberOf SetCache
+	 * @alias push
+	 * @param {*} value The value to cache.
+	 * @returns {Object} Returns the cache instance.
+	 */
+	function setCacheAdd(value) {
+	  this.__data__.set(value, HASH_UNDEFINED);
+	  return this;
+	}
+
+	/**
+	 * Checks if `value` is in the array cache.
+	 *
+	 * @private
+	 * @name has
+	 * @memberOf SetCache
+	 * @param {*} value The value to search for.
+	 * @returns {number} Returns `true` if `value` is found, else `false`.
+	 */
+	function setCacheHas(value) {
+	  return this.__data__.has(value);
+	}
+
+	/**
+	 *
+	 * Creates an array cache object to store unique values.
+	 *
+	 * @private
+	 * @constructor
+	 * @param {Array} [values] The values to cache.
+	 */
+	function SetCache(values) {
+	  var index = -1,
+	      length = values == null ? 0 : values.length;
+
+	  this.__data__ = new MapCache;
+	  while (++index < length) {
+	    this.add(values[index]);
+	  }
+	}
+
+	// Add methods to `SetCache`.
+	SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
+	SetCache.prototype.has = setCacheHas;
+
+	/**
+	 * A specialized version of `_.some` for arrays without support for iteratee
+	 * shorthands.
+	 *
+	 * @private
+	 * @param {Array} [array] The array to iterate over.
+	 * @param {Function} predicate The function invoked per iteration.
+	 * @returns {boolean} Returns `true` if any element passes the predicate check,
+	 *  else `false`.
+	 */
+	function arraySome(array, predicate) {
+	  var index = -1,
+	      length = array == null ? 0 : array.length;
+
+	  while (++index < length) {
+	    if (predicate(array[index], index, array)) {
+	      return true;
+	    }
+	  }
+	  return false;
+	}
+
+	/**
+	 * Checks if a `cache` value for `key` exists.
+	 *
+	 * @private
+	 * @param {Object} cache The cache to query.
+	 * @param {string} key The key of the entry to check.
+	 * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+	 */
+	function cacheHas(cache, key) {
+	  return cache.has(key);
+	}
+
+	/** Used to compose bitmasks for value comparisons. */
+	var COMPARE_PARTIAL_FLAG$3 = 1,
+	    COMPARE_UNORDERED_FLAG$1 = 2;
+
+	/**
+	 * A specialized version of `baseIsEqualDeep` for arrays with support for
+	 * partial deep comparisons.
+	 *
+	 * @private
+	 * @param {Array} array The array to compare.
+	 * @param {Array} other The other array to compare.
+	 * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+	 * @param {Function} customizer The function to customize comparisons.
+	 * @param {Function} equalFunc The function to determine equivalents of values.
+	 * @param {Object} stack Tracks traversed `array` and `other` objects.
+	 * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
+	 */
+	function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
+	  var isPartial = bitmask & COMPARE_PARTIAL_FLAG$3,
+	      arrLength = array.length,
+	      othLength = other.length;
+
+	  if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
+	    return false;
+	  }
+	  // Check that cyclic values are equal.
+	  var arrStacked = stack.get(array);
+	  var othStacked = stack.get(other);
+	  if (arrStacked && othStacked) {
+	    return arrStacked == other && othStacked == array;
+	  }
+	  var index = -1,
+	      result = true,
+	      seen = (bitmask & COMPARE_UNORDERED_FLAG$1) ? new SetCache : undefined;
+
+	  stack.set(array, other);
+	  stack.set(other, array);
+
+	  // Ignore non-index properties.
+	  while (++index < arrLength) {
+	    var arrValue = array[index],
+	        othValue = other[index];
+
+	    if (customizer) {
+	      var compared = isPartial
+	        ? customizer(othValue, arrValue, index, other, array, stack)
+	        : customizer(arrValue, othValue, index, array, other, stack);
+	    }
+	    if (compared !== undefined) {
+	      if (compared) {
+	        continue;
+	      }
+	      result = false;
+	      break;
+	    }
+	    // Recursively compare arrays (susceptible to call stack limits).
+	    if (seen) {
+	      if (!arraySome(other, function(othValue, othIndex) {
+	            if (!cacheHas(seen, othIndex) &&
+	                (arrValue === othValue || equalFunc(arrValue, othValue, bitmask, customizer, stack))) {
+	              return seen.push(othIndex);
+	            }
+	          })) {
+	        result = false;
+	        break;
+	      }
+	    } else if (!(
+	          arrValue === othValue ||
+	            equalFunc(arrValue, othValue, bitmask, customizer, stack)
+	        )) {
+	      result = false;
+	      break;
+	    }
+	  }
+	  stack['delete'](array);
+	  stack['delete'](other);
+	  return result;
+	}
+
+	/**
+	 * Converts `map` to its key-value pairs.
+	 *
+	 * @private
+	 * @param {Object} map The map to convert.
+	 * @returns {Array} Returns the key-value pairs.
+	 */
+	function mapToArray(map) {
+	  var index = -1,
+	      result = Array(map.size);
+
+	  map.forEach(function(value, key) {
+	    result[++index] = [key, value];
+	  });
+	  return result;
+	}
+
+	/**
+	 * Converts `set` to an array of its values.
+	 *
+	 * @private
+	 * @param {Object} set The set to convert.
+	 * @returns {Array} Returns the values.
+	 */
+	function setToArray(set) {
+	  var index = -1,
+	      result = Array(set.size);
+
+	  set.forEach(function(value) {
+	    result[++index] = value;
+	  });
+	  return result;
+	}
+
+	/** Used to compose bitmasks for value comparisons. */
+	var COMPARE_PARTIAL_FLAG$2 = 1,
+	    COMPARE_UNORDERED_FLAG = 2;
+
+	/** `Object#toString` result references. */
+	var boolTag = '[object Boolean]',
+	    dateTag = '[object Date]',
+	    errorTag = '[object Error]',
+	    mapTag = '[object Map]',
+	    numberTag$1 = '[object Number]',
+	    regexpTag = '[object RegExp]',
+	    setTag = '[object Set]',
+	    stringTag$1 = '[object String]',
+	    symbolTag = '[object Symbol]';
+
+	var arrayBufferTag = '[object ArrayBuffer]',
+	    dataViewTag = '[object DataView]';
+
+	/** Used to convert symbols to primitives and strings. */
+	var symbolProto = Symbol$2 ? Symbol$2.prototype : undefined,
+	    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
+
+	/**
+	 * A specialized version of `baseIsEqualDeep` for comparing objects of
+	 * the same `toStringTag`.
+	 *
+	 * **Note:** This function only supports comparing values with tags of
+	 * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+	 *
+	 * @private
+	 * @param {Object} object The object to compare.
+	 * @param {Object} other The other object to compare.
+	 * @param {string} tag The `toStringTag` of the objects to compare.
+	 * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+	 * @param {Function} customizer The function to customize comparisons.
+	 * @param {Function} equalFunc The function to determine equivalents of values.
+	 * @param {Object} stack Tracks traversed `object` and `other` objects.
+	 * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+	 */
+	function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
+	  switch (tag) {
+	    case dataViewTag:
+	      if ((object.byteLength != other.byteLength) ||
+	          (object.byteOffset != other.byteOffset)) {
+	        return false;
+	      }
+	      object = object.buffer;
+	      other = other.buffer;
+
+	    case arrayBufferTag:
+	      if ((object.byteLength != other.byteLength) ||
+	          !equalFunc(new Uint8Array$1(object), new Uint8Array$1(other))) {
+	        return false;
+	      }
+	      return true;
+
+	    case boolTag:
+	    case dateTag:
+	    case numberTag$1:
+	      // Coerce booleans to `1` or `0` and dates to milliseconds.
+	      // Invalid dates are coerced to `NaN`.
+	      return eq(+object, +other);
+
+	    case errorTag:
+	      return object.name == other.name && object.message == other.message;
+
+	    case regexpTag:
+	    case stringTag$1:
+	      // Coerce regexes to strings and treat strings, primitives and objects,
+	      // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
+	      // for more details.
+	      return object == (other + '');
+
+	    case mapTag:
+	      var convert = mapToArray;
+
+	    case setTag:
+	      var isPartial = bitmask & COMPARE_PARTIAL_FLAG$2;
+	      convert || (convert = setToArray);
+
+	      if (object.size != other.size && !isPartial) {
+	        return false;
+	      }
+	      // Assume cyclic values are equal.
+	      var stacked = stack.get(object);
+	      if (stacked) {
+	        return stacked == other;
+	      }
+	      bitmask |= COMPARE_UNORDERED_FLAG;
+
+	      // Recursively compare objects (susceptible to call stack limits).
+	      stack.set(object, other);
+	      var result = equalArrays(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
+	      stack['delete'](object);
+	      return result;
+
+	    case symbolTag:
+	      if (symbolValueOf) {
+	        return symbolValueOf.call(object) == symbolValueOf.call(other);
+	      }
+	  }
+	  return false;
+	}
+
+	/** Used to compose bitmasks for value comparisons. */
+	var COMPARE_PARTIAL_FLAG$1 = 1;
+
+	/** Used for built-in method references. */
+	var objectProto$1 = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
+
+	/**
+	 * A specialized version of `baseIsEqualDeep` for objects with support for
+	 * partial deep comparisons.
+	 *
+	 * @private
+	 * @param {Object} object The object to compare.
+	 * @param {Object} other The other object to compare.
+	 * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+	 * @param {Function} customizer The function to customize comparisons.
+	 * @param {Function} equalFunc The function to determine equivalents of values.
+	 * @param {Object} stack Tracks traversed `object` and `other` objects.
+	 * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+	 */
+	function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
+	  var isPartial = bitmask & COMPARE_PARTIAL_FLAG$1,
+	      objProps = getAllKeys(object),
+	      objLength = objProps.length,
+	      othProps = getAllKeys(other),
+	      othLength = othProps.length;
+
+	  if (objLength != othLength && !isPartial) {
+	    return false;
+	  }
+	  var index = objLength;
+	  while (index--) {
+	    var key = objProps[index];
+	    if (!(isPartial ? key in other : hasOwnProperty$1.call(other, key))) {
+	      return false;
+	    }
+	  }
+	  // Check that cyclic values are equal.
+	  var objStacked = stack.get(object);
+	  var othStacked = stack.get(other);
+	  if (objStacked && othStacked) {
+	    return objStacked == other && othStacked == object;
+	  }
+	  var result = true;
+	  stack.set(object, other);
+	  stack.set(other, object);
+
+	  var skipCtor = isPartial;
+	  while (++index < objLength) {
+	    key = objProps[index];
+	    var objValue = object[key],
+	        othValue = other[key];
+
+	    if (customizer) {
+	      var compared = isPartial
+	        ? customizer(othValue, objValue, key, other, object, stack)
+	        : customizer(objValue, othValue, key, object, other, stack);
+	    }
+	    // Recursively compare objects (susceptible to call stack limits).
+	    if (!(compared === undefined
+	          ? (objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack))
+	          : compared
+	        )) {
+	      result = false;
+	      break;
+	    }
+	    skipCtor || (skipCtor = key == 'constructor');
+	  }
+	  if (result && !skipCtor) {
+	    var objCtor = object.constructor,
+	        othCtor = other.constructor;
+
+	    // Non `Object` object instances with different constructors are not equal.
+	    if (objCtor != othCtor &&
+	        ('constructor' in object && 'constructor' in other) &&
+	        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
+	          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
+	      result = false;
+	    }
+	  }
+	  stack['delete'](object);
+	  stack['delete'](other);
+	  return result;
+	}
+
+	/** Used to compose bitmasks for value comparisons. */
+	var COMPARE_PARTIAL_FLAG = 1;
+
+	/** `Object#toString` result references. */
+	var argsTag = '[object Arguments]',
+	    arrayTag = '[object Array]',
+	    objectTag = '[object Object]';
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * A specialized version of `baseIsEqual` for arrays and objects which performs
+	 * deep comparisons and tracks traversed objects enabling objects with circular
+	 * references to be compared.
+	 *
+	 * @private
+	 * @param {Object} object The object to compare.
+	 * @param {Object} other The other object to compare.
+	 * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+	 * @param {Function} customizer The function to customize comparisons.
+	 * @param {Function} equalFunc The function to determine equivalents of values.
+	 * @param {Object} [stack] Tracks traversed `object` and `other` objects.
+	 * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+	 */
+	function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
+	  var objIsArr = isArray$1(object),
+	      othIsArr = isArray$1(other),
+	      objTag = objIsArr ? arrayTag : getTag$1(object),
+	      othTag = othIsArr ? arrayTag : getTag$1(other);
+
+	  objTag = objTag == argsTag ? objectTag : objTag;
+	  othTag = othTag == argsTag ? objectTag : othTag;
+
+	  var objIsObj = objTag == objectTag,
+	      othIsObj = othTag == objectTag,
+	      isSameTag = objTag == othTag;
+
+	  if (isSameTag && isBuffer$1(object)) {
+	    if (!isBuffer$1(other)) {
+	      return false;
+	    }
+	    objIsArr = true;
+	    objIsObj = false;
+	  }
+	  if (isSameTag && !objIsObj) {
+	    stack || (stack = new Stack);
+	    return (objIsArr || isTypedArray$1(object))
+	      ? equalArrays(object, other, bitmask, customizer, equalFunc, stack)
+	      : equalByTag(object, other, objTag, bitmask, customizer, equalFunc, stack);
+	  }
+	  if (!(bitmask & COMPARE_PARTIAL_FLAG)) {
+	    var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
+	        othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+
+	    if (objIsWrapped || othIsWrapped) {
+	      var objUnwrapped = objIsWrapped ? object.value() : object,
+	          othUnwrapped = othIsWrapped ? other.value() : other;
+
+	      stack || (stack = new Stack);
+	      return equalFunc(objUnwrapped, othUnwrapped, bitmask, customizer, stack);
+	    }
+	  }
+	  if (!isSameTag) {
+	    return false;
+	  }
+	  stack || (stack = new Stack);
+	  return equalObjects(object, other, bitmask, customizer, equalFunc, stack);
+	}
+
+	/**
+	 * The base implementation of `_.isEqual` which supports partial comparisons
+	 * and tracks traversed objects.
+	 *
+	 * @private
+	 * @param {*} value The value to compare.
+	 * @param {*} other The other value to compare.
+	 * @param {boolean} bitmask The bitmask flags.
+	 *  1 - Unordered comparison
+	 *  2 - Partial comparison
+	 * @param {Function} [customizer] The function to customize comparisons.
+	 * @param {Object} [stack] Tracks traversed `value` and `other` objects.
+	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+	 */
+	function baseIsEqual(value, other, bitmask, customizer, stack) {
+	  if (value === other) {
+	    return true;
+	  }
+	  if (value == null || other == null || (!isObjectLike(value) && !isObjectLike(other))) {
+	    return value !== value && other !== other;
+	  }
+	  return baseIsEqualDeep(value, other, bitmask, customizer, baseIsEqual, stack);
 	}
 
 	/**
@@ -8918,6 +9648,97 @@
 	  }, keysIn);
 	}
 
+	/** `Object#toString` result references. */
+	var stringTag = '[object String]';
+
+	/**
+	 * Checks if `value` is classified as a `String` primitive or object.
+	 *
+	 * @static
+	 * @since 0.1.0
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a string, else `false`.
+	 * @example
+	 *
+	 * _.isString('abc');
+	 * // => true
+	 *
+	 * _.isString(1);
+	 * // => false
+	 */
+	function isString(value) {
+	  return typeof value == 'string' ||
+	    (!isArray$1(value) && isObjectLike(value) && baseGetTag(value) == stringTag);
+	}
+
+	/**
+	 * Performs a deep comparison between two values to determine if they are
+	 * equivalent.
+	 *
+	 * **Note:** This method supports comparing arrays, array buffers, booleans,
+	 * date objects, error objects, maps, numbers, `Object` objects, regexes,
+	 * sets, strings, symbols, and typed arrays. `Object` objects are compared
+	 * by their own, not inherited, enumerable properties. Functions and DOM
+	 * nodes are compared by strict equality, i.e. `===`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to compare.
+	 * @param {*} other The other value to compare.
+	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+	 * @example
+	 *
+	 * var object = { 'a': 1 };
+	 * var other = { 'a': 1 };
+	 *
+	 * _.isEqual(object, other);
+	 * // => true
+	 *
+	 * object === other;
+	 * // => false
+	 */
+	function isEqual(value, other) {
+	  return baseIsEqual(value, other);
+	}
+
+	/** `Object#toString` result references. */
+	var numberTag = '[object Number]';
+
+	/**
+	 * Checks if `value` is classified as a `Number` primitive or object.
+	 *
+	 * **Note:** To exclude `Infinity`, `-Infinity`, and `NaN`, which are
+	 * classified as numbers, use the `_.isFinite` method.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a number, else `false`.
+	 * @example
+	 *
+	 * _.isNumber(3);
+	 * // => true
+	 *
+	 * _.isNumber(Number.MIN_VALUE);
+	 * // => true
+	 *
+	 * _.isNumber(Infinity);
+	 * // => true
+	 *
+	 * _.isNumber('3');
+	 * // => false
+	 */
+	function isNumber(value) {
+	  return typeof value == 'number' ||
+	    (isObjectLike(value) && baseGetTag(value) == numberTag);
+	}
+
 	/**
 	 * This method is like `_.assign` except that it recursively merges own and
 	 * inherited enumerable string keyed properties of source objects into the
@@ -8954,51 +9775,6 @@
 	});
 
 	var merge$1 = merge;
-
-	/**
-	 * Validate that a queryString is valid
-	 *
-	 * @param  {Element|string|bool} selector   The queryString to test
-	 * @param  {bool}  canBeFalse  Whether false is an accepted and valid value
-	 * @param  {string} name    Name of the tested selector
-	 * @throws {Error}        If the selector is not valid
-	 * @return {bool}        True if the selector is a valid queryString
-	 */
-	function validateSelector(selector, canBeFalse, name) {
-	  if (
-	    ((canBeFalse && selector === false) ||
-	      selector instanceof Element ||
-	      typeof selector === 'string') &&
-	    selector !== ''
-	  ) {
-	    return true;
-	  }
-	  throw new Error(`The ${name} is not valid`);
-	}
-
-	/**
-	 * Ensure that the domain and subdomain are valid
-	 *
-	 * @throw {Error} when domain or subdomain are not valid
-	 * @return {bool} True if domain and subdomain are valid and compatible
-	 */
-	function validateDomainType(subDomainTemplate, { domain, subDomain }) {
-	  if (!subDomainTemplate.has(domain) || domain === 'minute') {
-	    throw new Error(`The domain '${domain}' is not valid`);
-	  }
-
-	  if (!subDomainTemplate.has(subDomain) || subDomain === 'year') {
-	    throw new Error(`The subDomain '${subDomain}' is not valid`);
-	  }
-
-	  if (
-	    subDomainTemplate.at(domain).level <= subDomainTemplate.at(subDomain).level
-	  ) {
-	    throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
-	  }
-
-	  return true;
-	}
 
 	var momentTimezone$1 = {exports: {}};
 
@@ -16276,8 +17052,8 @@
 	  /**
 	   * Return the week number, relative to its month
 	   *
-	   * @param  int|Date d Date or timestamp in milliseconds
-	   * @return int Week number, relative to the month [0-5]
+	   * @param  {number|Date} d Date or timestamp in milliseconds
+	   * @returns {number} Thw week number, relative to the month [0-5]
 	   */
 	  getMonthWeekNumber(d) {
 	    const date = this.date(d).startOf('day');
@@ -16304,16 +17080,16 @@
 	  /**
 	   * Return an array of time interval
 	   *
-	   * @param  int|Date date A random date included in the wanted domain
-	   * @param  int|Date range Number of dates to get, or a stop date
-	   * @return Array of dates
+	   * @param  {number|Date} date A random date included in the wanted interval
+	   * @param  {number|Date} range Length of the wanted interval, or a stop date
+	   * @returns {Array<number>} Array of unix timestamp, in milliseconds
 	   */
 	  intervals(interval, date, range) {
 	    return this.#generateInterval(interval, date, range);
 	  }
 
 	  /**
-	   * Returns wether or not dateA is less than or equal to dateB.
+	   * Returns whether dateA is less than or equal to dateB.
 	   * This function is subdomain aware.
 	   * Performs automatic conversion of values.
 	   * @param dateA may be a number or a Date
@@ -16325,11 +17101,11 @@
 	  }
 
 	  /**
-	   * Return whether 2 dates belongs to the same domain
+	   * Return whether 2 dates belongs to the same time interval
 	   *
 	   * @param  Date dateA First date to compare
-	   * @param  Date dateB Secon date to compare
-	   * @return bool true if the 2 dates belongs to the same domain
+	   * @param  Date dateB Second date to compare
+	   * @returns {boolean} true if the 2 dates belongs to the same time interval
 	   */
 	  datesFromSameInterval(interval, dateA, dateB) {
 	    return this.date(dateA).isSame(this.date(dateB), interval);
@@ -16364,29 +17140,92 @@
 	const DEFAULT_LEGEND_MARGIN = 10;
 
 	/**
-	 * Convert a string to an array like [singular-form, plural-form]
+	 * Ensure that the domain and subdomain are valid
 	 *
-	 * @param  {string|array} value Date to convert
-	 * @return {array}       An array like [singular-form, plural-form]
+	 * @throw {Error} when domain or subdomain are not valid
+	 * @return {bool} True if domain and subdomain are valid and compatible
 	 */
-	function expandItemName(value) {
-	  if (typeof value === 'string') {
-	    return [value, value + (value !== '' ? 's' : '')];
+	function validateDomainType(subDomainTemplate, { domain, subDomain }) {
+	  if (!subDomainTemplate.has(domain) || domain === 'minute') {
+	    throw new Error(`The domain '${domain}' is not valid`);
 	  }
 
-	  if (Array.isArray(value)) {
-	    if (value.length === 1) {
-	      return [value[0], `${value[0]}s`];
+	  if (!subDomainTemplate.has(subDomain) || subDomain === 'year') {
+	    throw new Error(`The subDomain '${subDomain}' is not valid`);
+	  }
+
+	  if (
+	    subDomainTemplate.at(domain).level <= subDomainTemplate.at(subDomain).level
+	  ) {
+	    throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
+	  }
+
+	  return true;
+	}
+
+	const preProcessors = {
+	  highlight: (args) => castArray(args),
+	  itemName: (name) => {
+	    if (isString(name)) {
+	      return [name, name + (name !== '' ? 's' : '')];
 	    }
-	    if (value.length > 2) {
-	      return value.slice(0, 2);
+
+	    if (Array.isArray(name)) {
+	      if (name.length === 1) {
+	        return [name[0], `${name[0]}s`];
+	      }
+	      if (name.length > 2) {
+	        return name.slice(0, 2);
+	      }
+	    }
+	    return name;
+	  },
+	  cellSize: (value) => {
+	    if (isNumber(value)) {
+	      return [value, value];
 	    }
 
 	    return value;
-	  }
+	  },
+	  domainMargin: (args) => preProcessors.margins(args),
+	  legendMargin: (args) => preProcessors.margins(args),
+	  margins: (settings) => {
+	    let value = settings;
+	    if (isNumber(value)) {
+	      value = [value];
+	    }
 
-	  return ['item', 'items'];
-	}
+	    if (!Array.isArray(value) || !value.every((d) => isNumber(d))) {
+	      // eslint-disable-next-line no-console
+	      console.log('Margin only accepts an integer or an array of integers');
+	      value = [0];
+	    }
+
+	    switch (value.length) {
+	      case 1:
+	        return [value[0], value[0], value[0], value[0]];
+	      case 2:
+	        return [value[0], value[1], value[0], value[1]];
+	      case 3:
+	        return [value[0], value[1], value[2], value[1]];
+	      default:
+	        return value.slice(0, 4);
+	    }
+	  },
+	  subDomainDateFormat: (value, calendar, options) =>
+	    // eslint-disable-next-line
+	    (isString(value) || isFunction(value) ?
+	      value :
+	      calendar.subDomainTemplate.at(options.subDomain).format.date),
+	  domainLabelFormat: (value, calendar, options) =>
+	    // eslint-disable-next-line
+	    (isString(value) || isFunction(value) ?
+	      value :
+	      calendar.subDomainTemplate.at(options.domain).format.legend),
+	  subDomainTextFormat: (value) =>
+	    // eslint-disable-next-line
+	    ((isString(value) && value !== '') || isFunction(value) ? value : null),
+	};
 
 	class Options {
 	  constructor(calendar) {
@@ -16407,8 +17246,8 @@
 
 	      // Size of each cell, in pixel
 	      // Accepts either:
-	      // - a number, representing the width and height of each cell
-	      // - an array of 2 numbers, such as [width, height]
+	      // - a number, representing the width and height of each square cell
+	      // - an array of 2 numbers, in the format [width, height]
 	      cellSize: 10,
 
 	      // Padding between each cell, in pixel
@@ -16551,7 +17390,6 @@
 	      // List of dates to highlight
 	      // Valid values:
 	      // - []: don't highlight anything
-	      // - "now": highlight the current date
 	      // - an array of Date objects: highlight the specified dates
 	      highlight: [],
 
@@ -16612,8 +17450,6 @@
 
 	      previousSelector: false,
 
-	      itemNamespace: 'cal-heatmap',
-
 	      tooltip: false,
 
 	      // Format the content of the tooltip
@@ -16628,12 +17464,23 @@
 	    };
 	  }
 
+	  /**
+	   * Set a new value for an option, only if unchanged
+	   * @param {string} key   Name of the option
+	   * @param {any} value Value of the option
+	   * @return {boolean} Whether the option have been changed
+	   */
 	  set(key, value) {
-	    if (!this.options.hasOwnProperty(key) || this.options[key] === value) {
+	    if (
+	      !this.options.hasOwnProperty(key) ||
+	      isEqual(this.options[key], value)
+	    ) {
 	      return false;
 	    }
 
-	    this.options[key] = value;
+	    this.options[key] = preProcessors.hasOwnProperty(key) ?
+	      preProcessors[key](value) :
+	      value;
 
 	    return true;
 	  }
@@ -16644,7 +17491,6 @@
 	    // Fatal errors
 	    // Stop script execution on error
 	    validateDomainType(this.calendar.subDomainTemplate, this.options);
-	    validateSelector(options.itemSelector, false, 'itemSelector');
 
 	    if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
 	      throw new Error(
@@ -16652,37 +17498,8 @@
 	      );
 	    }
 
-	    if (select(options.itemSelector).empty()) {
-	      throw new Error(
-	        `The node '${options.itemSelector}' specified in itemSelector ` +
-	          'does not exist',
-	      );
-	    }
-
-	    try {
-	      validateSelector(options.nextSelector, true, 'nextSelector');
-	      validateSelector(options.previousSelector, true, 'previousSelector');
-	    } catch (error) {
-	      // eslint-disable-next-line no-console
-	      console.log(error.message);
-	      return false;
-	    }
-
 	    if (!options.hasOwnProperty('subDomain')) {
 	      throw new Error('The subDomain options is missing');
-	    }
-
-	    // If other settings contains error, will fallback to default
-
-	    if (
-	      typeof options.itemNamespace !== 'string' ||
-	      options.itemNamespace === ''
-	    ) {
-	      // eslint-disable-next-line no-console
-	      console.log(
-	        'itemNamespace can not be empty, falling back to cal-heatmap',
-	      );
-	      options.itemNamespace = 'cal-heatmap';
 	    }
 
 	    return true;
@@ -16736,7 +17553,7 @@
 	  }
 
 	  init(settings) {
-	    this.options = merge$1(this.options, settings);
+	    this.options = merge$1(this.options, settings, { x: {} });
 
 	    const { options } = this;
 
@@ -16747,46 +17564,29 @@
 	    this.calendar.subDomainTemplate.init(options.subDomainTemplates);
 	    this.#validate();
 
-	    options.subDomainDateFormat =
-	      typeof options.subDomainDateFormat === 'string' ||
-	      typeof options.subDomainDateFormat === 'function' ?
-	        options.subDomainDateFormat :
-	        this.calendar.subDomainTemplate.at(options.subDomain).format.date;
-	    options.domainLabelFormat =
-	      typeof options.domainLabelFormat === 'string' ||
-	      typeof options.domainLabelFormat === 'function' ?
-	        options.domainLabelFormat :
-	        this.calendar.subDomainTemplate.at(options.domain).format.legend;
-	    options.subDomainTextFormat =
-	      (typeof options.subDomainTextFormat === 'string' &&
-	        options.subDomainTextFormat !== '') ||
-	      typeof options.subDomainTextFormat === 'function' ?
-	        options.subDomainTextFormat :
-	        null;
-	    options.domainMargin = expandMarginSetting(options.domainMargin);
-	    options.legendMargin = expandMarginSetting(options.legendMargin);
-	    options.itemName = expandItemName(options.itemName);
+	    Object.keys(preProcessors).forEach((key) => {
+	      if (!options.hasOwnProperty(key)) {
+	        return;
+	      }
+	      options[key] = preProcessors[key](options[key], this.calendar, options);
+	    });
 
 	    this.#autoAlignLabel();
 
-	    options.verticalDomainLabel =
+	    options.x.verticalDomainLabel =
 	      options.label.position === 'top' || options.label.position === 'bottom';
 
-	    if (typeof options.cellSize === 'number') {
-	      options.cellSize = [options.cellSize, options.cellSize];
-	    }
-
-	    options.domainVerticalLabelHeight =
+	    options.x.domainVerticalLabelHeight =
 	      options.label.height ?? Math.max(25, options.cellSize[X] * 2);
-	    options.domainHorizontalLabelWidth = 0;
+	    options.x.domainHorizontalLabelWidth = 0;
 
 	    if (options.domainLabelFormat === '' && options.label.height === null) {
-	      options.domainVerticalLabelHeight = 0;
+	      options.x.domainVerticalLabelHeight = 0;
 	    }
 
-	    if (!options.verticalDomainLabel) {
-	      options.domainVerticalLabelHeight = 0;
-	      options.domainHorizontalLabelWidth = options.label.width;
+	    if (!options.x.verticalDomainLabel) {
+	      options.x.domainVerticalLabelHeight = 0;
+	      options.x.domainHorizontalLabelWidth = options.label.width;
 	    }
 
 	    if (options.legendMargin === [0, 0, 0, 0]) {
@@ -17312,9 +18112,7 @@
 
 	    if (interval && start && range) {
 	      this.collection = new Map(
-	        dateHelper
-	          .intervals(interval, start, range)
-	          .map((d) => (Array.isArray(d) ? d : [d])),
+	        dateHelper.intervals(interval, start, range).map((d) => castArray(d)),
 	      );
 	    }
 

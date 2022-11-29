@@ -53,36 +53,6 @@ export function getHighlightClassName(calendar, timestamp, options) {
   return classname;
 }
 
-/**
- * Expand a number of an array of numbers to an usable 4 values array
- *
- * @param  {integer|array} value
- * @return {array}        array
- */
-export function expandMarginSetting(settings) {
-  let value = settings;
-  if (typeof value === 'number') {
-    value = [value];
-  }
-
-  if (!Array.isArray(value) || !value.every((d) => typeof d === 'number')) {
-    // eslint-disable-next-line no-console
-    console.log('Margin only accepts an integer or an array of integers');
-    value = [0];
-  }
-
-  switch (value.length) {
-    case 1:
-      return [value[0], value[0], value[0], value[0]];
-    case 2:
-      return [value[0], value[1], value[0], value[1]];
-    case 3:
-      return [value[0], value[1], value[2], value[1]];
-    default:
-      return value.slice(0, 4);
-  }
-}
-
 export function getSubDomainTitle(calendar, d, options, connector) {
   if (d.v === null && !options.considerMissingDataAsZero) {
     return formatStringWithObject(options.subDomainTitleFormat.empty, {

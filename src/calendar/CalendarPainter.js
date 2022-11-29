@@ -11,6 +11,8 @@ import SubDomainPainter from '../subDomain/SubDomainPainter';
 import Tooltip from '../tooltip/Tooltip';
 import LegendPainter from '../legend/LegendPainter';
 
+const EVENT_NAMESPACE = 'cal-heatmap';
+
 export default class CalendarPainter {
   constructor(calendar) {
     this.calendar = calendar;
@@ -49,26 +51,32 @@ export default class CalendarPainter {
   }
 
   #attachNavigationEvents() {
-    const { options } = this.calendar;
+    const { nextSelector, previousSelector } = this.calendar.options.options;
 
-    if (options.nextSelector !== false) {
-      select(options.nextSelector).on(
-        `click.${options.itemNamespace}`,
-        (ev) => {
-          ev.preventDefault();
-          return this.calendar.next(1);
-        },
-      );
+    if (nextSelector) {
+      select(nextSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
+        ev.preventDefault();
+        return this.calendar.next(1);
+      });
     }
 
-    if (options.previousSelector !== false) {
-      select(options.previousSelector).on(
-        `click.${options.itemNamespace}`,
-        (ev) => {
-          ev.preventDefault();
-          return this.calendar.previous(1);
-        },
-      );
+    if (previousSelector) {
+      select(previousSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
+        ev.preventDefault();
+        return this.calendar.previous(1);
+      });
+    }
+  }
+
+  #removeNavigationEvents() {
+    const { nextSelector, previousSelector } = this.calendar.options.options;
+
+    if (nextSelector !== false) {
+      select(nextSelector).on(`.${EVENT_NAMESPACE}`, null);
+    }
+
+    if (previousSelector !== false) {
+      select(previousSelector).on(`.${EVENT_NAMESPACE}`, null);
     }
   }
 
@@ -145,54 +153,22 @@ export default class CalendarPainter {
       this.getHeight(),
       this.getWidth(),
     ]);
-
-    // this.root
-    //   .select('.graph')
-    //   .transition()
-    //   .duration(options.animationDuration)
-    //   .attr('y', () => {
-    //     if (options.legendVerticalPosition === 'top') {
-    //       return legendHeight;
-    //     }
-    //     return 0;
-    //   })
-    //   .attr('x', () => {
-    //     let xPosition = 0;
-    //     if (
-    //       options.dayLabel &&
-    //       options.domain === 'month' &&
-    //       options.subDomain === 'day'
-    //     ) {
-    //       xPosition = options.cellSize + options.cellPadding;
-    //     }
-    //     if (
-    //       (options.legendVerticalPosition === 'middle' ||
-    //         options.legendVerticalPosition === 'center') &&
-    //       options.legendHorizontalPosition === 'left'
-    //     ) {
-    //       return legendWidth + xPosition;
-    //     }
-    //     return xPosition;
-    //   });
   }
 
   destroy(callback) {
+    this.#removeNavigationEvents();
+
     this.root
       .transition()
       .duration(this.calendar.options.options.animationDuration)
       .attr('width', 0)
       .attr('height', 0)
       .remove()
-      .each(() => {
+      .call(() => {
         if (typeof callback === 'function') {
           callback();
-        } else if (typeof callback !== 'undefined') {
-          // eslint-disable-next-line no-console
-          console.log('Provided callback for destroy() is not a function.');
         }
       });
-
-    callback();
   }
 
   /**

@@ -86,7 +86,7 @@ export default class DomainCoordinates {
 
     return (
       options.domainMargin[LEFT] +
-      options.domainHorizontalLabelWidth +
+      options.x.domainHorizontalLabelWidth +
       options.domainGutter +
       subDomainWidth +
       options.domainMargin[RIGHT]
@@ -113,7 +113,7 @@ export default class DomainCoordinates {
       options.domainMargin[TOP] +
       subDomainHeight +
       options.domainGutter +
-      options.domainVerticalLabelHeight +
+      options.x.domainVerticalLabelHeight +
       options.domainMargin[BOTTOM]
     );
   }

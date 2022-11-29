@@ -27,7 +27,8 @@ export default class DomainLabelPainter {
         .attr('class', DEFAULT_CLASSNAME)
         .attr('y', (d) => {
           let y =
-              options.domainMargin[TOP] + options.domainVerticalLabelHeight / 2;
+              options.domainMargin[TOP] +
+              options.x.domainVerticalLabelHeight / 2;
 
           if (options.label.position !== 'top') {
             y += this.#getDomainInsideHeight(d);
@@ -61,7 +62,7 @@ export default class DomainLabelPainter {
           if (options.label.align === 'right') {
             return (
               x +
-                options.domainHorizontalLabelWidth -
+                options.x.domainHorizontalLabelWidth -
                 options.label.offset.x *
                   (options.label.rotate === 'right' ? -1 : 1)
             );
@@ -82,7 +83,7 @@ export default class DomainLabelPainter {
         })
         .attr('dominant-baseline', () =>
         // eslint-disable-next-line implicit-arrow-linebreak
-          (options.verticalDomainLabel ? 'middle' : 'top'))
+          (options.x.verticalDomainLabel ? 'middle' : 'top'))
         .text((d) =>
         // eslint-disable-next-line implicit-arrow-linebreak
           this.calendar.helpers.DateHelper.format(
@@ -96,7 +97,7 @@ export default class DomainLabelPainter {
     const { options } = this.calendar.options;
     return (
       this.calendar.calendarPainter.domainPainter.coordinates.at(d).width -
-      options.domainHorizontalLabelWidth +
+      options.x.domainHorizontalLabelWidth +
       options.domainGutter +
       options.domainMargin[RIGHT] +
       options.domainMargin[LEFT]
@@ -107,7 +108,7 @@ export default class DomainLabelPainter {
     const { options } = this.calendar.options;
     return (
       this.calendar.calendarPainter.domainPainter.coordinates.at(d).height -
-      options.domainVerticalLabelHeight +
+      options.x.domainVerticalLabelHeight +
       options.domainGutter +
       options.domainMargin[TOP] +
       options.domainMargin[BOTTOM]
@@ -127,7 +128,7 @@ export default class DomainLabelPainter {
               s += `translate(-${width} , -${width})`;
               break;
             case 'left':
-              s += `translate(0, -${options.domainHorizontalLabelWidth})`;
+              s += `translate(0, -${options.x.domainHorizontalLabelWidth})`;
               break;
             default:
           }
@@ -142,13 +143,13 @@ export default class DomainLabelPainter {
           switch (options.label.position) {
             case 'right':
               s += `translate(-${
-                width + options.domainHorizontalLabelWidth
+                width + options.x.domainHorizontalLabelWidth
               } , ${width})`;
               break;
             case 'left':
               s += `translate(-${
-                options.domainHorizontalLabelWidth
-              }, ${options`${options.domainHorizontalLabelWidth})`}`;
+                options.x.domainHorizontalLabelWidth
+              }, ${options`${options.x.domainHorizontalLabelWidth})`}`;
               break;
             default:
           }
