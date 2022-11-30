@@ -51,10 +51,18 @@ export default class DomainPainter {
             .transition(t)
             .attr('x', (d) => coor.at(d).x)
             .attr('y', (d) => coor.at(d).y)),
-        (update) => update.call((updateSelection) => updateSelection
-          .transition(t)
-          .attr('x', (d) => coor.at(d).x)
-          .attr('y', (d) => coor.at(d).y)),
+        (update) => update
+          .call((updateSelection) => updateSelection
+            .transition(t)
+            .attr('x', (d) => coor.at(d).x)
+            .attr('y', (d) => coor.at(d).y)
+            .attr('width', (d) => coor.at(d).width)
+            .attr('height', (d) => coor.at(d).height))
+          .call((updateSelection) => updateSelection
+            .selectAll('.domain-background')
+            .transition(t)
+            .attr('width', (d) => coor.at(d).width - domainGutter)
+            .attr('height', (d) => coor.at(d).height - domainGutter)),
         (exit) => exit.call((exitSelection) => exitSelection
           .transition(t)
           .attr('x', (d) => coor.at(d).x)

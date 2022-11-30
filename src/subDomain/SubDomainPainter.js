@@ -22,23 +22,41 @@ export default class subDomainPainter {
         (d) => [d],
         (d) => d,
       )
-      .join((enter) => enter
-        .append('svg')
-        .attr('x', () => {
-          let pos = options.domainMargin[LEFT];
-          if (options.label.position === 'left') {
-            pos += options.x.domainHorizontalLabelWidth;
-          }
-          return pos;
-        })
-        .attr('y', () => {
-          let pos = options.domainMargin[TOP];
-          if (options.label.position === 'top') {
-            pos += options.x.domainVerticalLabelHeight;
-          }
-          return pos;
-        })
-        .attr('class', BASE_CLASSNAME));
+      .join(
+        (enter) => enter
+          .append('svg')
+          .attr('x', () => {
+            let pos = options.domainMargin[LEFT];
+            if (options.label.position === 'left') {
+              pos += options.x.domainHorizontalLabelWidth;
+            }
+            return pos;
+          })
+          .attr('y', () => {
+            let pos = options.domainMargin[TOP];
+            if (options.label.position === 'top') {
+              pos += options.x.domainVerticalLabelHeight;
+            }
+            return pos;
+          })
+          .attr('class', BASE_CLASSNAME),
+
+        (update) => update
+          .attr('x', () => {
+            let pos = options.domainMargin[LEFT];
+            if (options.label.position === 'left') {
+              pos += options.x.domainHorizontalLabelWidth;
+            }
+            return pos;
+          })
+          .attr('y', () => {
+            let pos = options.domainMargin[TOP];
+            if (options.label.position === 'top') {
+              pos += options.x.domainVerticalLabelHeight;
+            }
+            return pos;
+          }),
+      );
 
     const { eventEmitter } = this.calendar;
 

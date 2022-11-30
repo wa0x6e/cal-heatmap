@@ -197,9 +197,8 @@ export default class Options {
         // valid: top, right, bottom, left
         position: 'bottom',
 
-        // Valid: left, center, right
-        // Also valid are the direct svg values: start, middle, end
-        align: 'center',
+        // Valid are the direct svg values: start, middle, end
+        textAlign: 'middle',
 
         // By default, there is no margin/padding around the label
         offset: {
@@ -381,53 +380,6 @@ export default class Options {
     return true;
   }
 
-  /**
-   * Fine-tune the label alignement depending on its position
-   *
-   * @return void
-   */
-  #autoAlignLabel() {
-    // Auto-align label, depending on it's position
-    if (
-      !this.options.hasOwnProperty('label') ||
-      (this.options.hasOwnProperty('label') &&
-        !this.options.label.hasOwnProperty('align'))
-    ) {
-      switch (this.options.label.position) {
-        case 'left':
-          this.options.label.align = 'right';
-          break;
-        case 'right':
-          this.options.label.align = 'left';
-          break;
-        default:
-          this.options.label.align = 'center';
-      }
-
-      if (this.options.label.rotate === 'left') {
-        this.options.label.align = 'right';
-      } else if (this.options.label.rotate === 'right') {
-        this.options.label.align = 'left';
-      }
-    }
-
-    if (
-      !this.options.hasOwnProperty('label') ||
-      (this.options.hasOwnProperty('label') &&
-        !this.options.label.hasOwnProperty('offset'))
-    ) {
-      if (
-        this.options.label.position === 'left' ||
-        this.options.label.position === 'right'
-      ) {
-        this.options.label.offset = {
-          x: 10,
-          y: 15,
-        };
-      }
-    }
-  }
-
   init(settings) {
     this.options = merge(this.options, settings, { x: {} });
 
@@ -447,22 +399,23 @@ export default class Options {
       options[key] = preProcessors[key](options[key], this.calendar, options);
     });
 
-    this.#autoAlignLabel();
-
-    options.x.verticalDomainLabel =
-      options.label.position === 'top' || options.label.position === 'bottom';
-
     options.x.domainVerticalLabelHeight =
-      options.label.height ?? Math.max(25, options.cellSize[X] * 2);
-    options.x.domainHorizontalLabelWidth = 0;
+      options.label.height ?? options.cellSize[X] * 2;
 
-    if (options.domainLabelFormat === '' && options.label.height === null) {
-      options.x.domainVerticalLabelHeight = 0;
-    }
-
-    if (!options.x.verticalDomainLabel) {
+    // When the label is affecting the height
+    if (
+      options.label.position === 'top' ||
+      options.label.position === 'bottom'
+    ) {
+      options.x.domainHorizontalLabelWidth = 0;
+    } else {
       options.x.domainVerticalLabelHeight = 0;
       options.x.domainHorizontalLabelWidth = options.label.width;
+    }
+
+    if (!options.domainLabelFormat) {
+      options.x.domainVerticalLabelHeight = 0;
+      options.x.domainHorizontalLabelWidth = 0;
     }
 
     if (options.legendMargin === [0, 0, 0, 0]) {
