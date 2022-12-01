@@ -24,31 +24,33 @@ export default class Populator {
         options.hasOwnProperty('considerMissingDataAsZero') &&
         !options.considerMissingDataAsZero
       ) {
-        if (options.legendColors.hasOwnProperty('base')) {
-          return options.legendColors.base;
+        if (options.legend.colors.hasOwnProperty('base')) {
+          return options.legend.colors.base;
         }
       }
 
       if (
-        options.legendColors?.hasOwnProperty('empty') &&
+        options.legend.colors?.hasOwnProperty('empty') &&
         (d.v === 0 ||
           (d.v === null &&
             options.hasOwnProperty('considerMissingDataAsZero') &&
             options.considerMissingDataAsZero))
       ) {
-        return options.legendColors.empty;
+        return options.legend.colors.empty;
       }
+
+      const { steps } = options.legend;
 
       if (
         d.v < 0 &&
-        options.legend[0] > 0 &&
-        options.legendColors?.hasOwnProperty('overflow')
+        steps[0] > 0 &&
+        options.legend.colors?.hasOwnProperty('overflow')
       ) {
-        return options.legendColors.overflow;
+        return options.legend.colors.overflow;
       }
 
       return this.calendar.colorizer.scale(
-        Math.min(d.v, options.legend[options.legend.length - 1]),
+        Math.min(d.v, steps[steps.length - 1]),
       );
     });
   }
@@ -71,7 +73,7 @@ export default class Populator {
       (d.v === null &&
         options.hasOwnProperty('considerMissingDataAsZero') &&
         !options.considerMissingDataAsZero &&
-        !options.legendColors.hasOwnProperty('base'))
+        !options.legend.colors.hasOwnProperty('base'))
     ) {
       htmlClass.push('graph-rect');
     }

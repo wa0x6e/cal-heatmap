@@ -1464,7 +1464,7 @@
 
 	    // If no callback was specified, return the callback of the given type and name.
 	    if (arguments.length < 2) {
-	      while (++i < n) if ((t = (typename = T[i]).type) && (t = get$1(_[t], typename.name))) return t;
+	      while (++i < n) if ((t = (typename = T[i]).type) && (t = get$2(_[t], typename.name))) return t;
 	      return;
 	    }
 
@@ -1472,8 +1472,8 @@
 	    // Otherwise, if a null callback was specified, remove callbacks of the given name.
 	    if (callback != null && typeof callback !== "function") throw new Error("invalid callback: " + callback);
 	    while (++i < n) {
-	      if (t = (typename = T[i]).type) _[t] = set$1(_[t], typename.name, callback);
-	      else if (callback == null) for (t in _) _[t] = set$1(_[t], typename.name, null);
+	      if (t = (typename = T[i]).type) _[t] = set$2(_[t], typename.name, callback);
+	      else if (callback == null) for (t in _) _[t] = set$2(_[t], typename.name, null);
 	    }
 
 	    return this;
@@ -1494,7 +1494,7 @@
 	  }
 	};
 
-	function get$1(type, name) {
+	function get$2(type, name) {
 	  for (var i = 0, n = type.length, c; i < n; ++i) {
 	    if ((c = type[i]).name === name) {
 	      return c.value;
@@ -1502,7 +1502,7 @@
 	  }
 	}
 
-	function set$1(type, name, callback) {
+	function set$2(type, name, callback) {
 	  for (var i = 0, n = type.length; i < n; ++i) {
 	    if (type[i].name === name) {
 	      type[i] = noop, type = type.slice(0, i).concat(type.slice(i + 1));
@@ -1665,18 +1665,18 @@
 	}
 
 	function init(node, id) {
-	  var schedule = get(node, id);
+	  var schedule = get$1(node, id);
 	  if (schedule.state > CREATED) throw new Error("too late; already scheduled");
 	  return schedule;
 	}
 
-	function set(node, id) {
-	  var schedule = get(node, id);
+	function set$1(node, id) {
+	  var schedule = get$1(node, id);
 	  if (schedule.state > STARTED) throw new Error("too late; already running");
 	  return schedule;
 	}
 
-	function get(node, id) {
+	function get$1(node, id) {
 	  var schedule = node.__transition;
 	  if (!schedule || !(schedule = schedule[id])) throw new Error("transition not found");
 	  return schedule;
@@ -2661,7 +2661,7 @@
 	function tweenRemove(id, name) {
 	  var tween0, tween1;
 	  return function() {
-	    var schedule = set(this, id),
+	    var schedule = set$1(this, id),
 	        tween = schedule.tween;
 
 	    // If this node shared tween with the previous node,
@@ -2686,7 +2686,7 @@
 	  var tween0, tween1;
 	  if (typeof value !== "function") throw new Error;
 	  return function() {
-	    var schedule = set(this, id),
+	    var schedule = set$1(this, id),
 	        tween = schedule.tween;
 
 	    // If this node shared tween with the previous node,
@@ -2713,7 +2713,7 @@
 	  name += "";
 
 	  if (arguments.length < 2) {
-	    var tween = get(this.node(), id).tween;
+	    var tween = get$1(this.node(), id).tween;
 	    for (var i = 0, n = tween.length, t; i < n; ++i) {
 	      if ((t = tween[i]).name === name) {
 	        return t.value;
@@ -2729,12 +2729,12 @@
 	  var id = transition._id;
 
 	  transition.each(function() {
-	    var schedule = set(this, id);
+	    var schedule = set$1(this, id);
 	    (schedule.value || (schedule.value = {}))[name] = value.apply(this, arguments);
 	  });
 
 	  return function(node) {
-	    return get(node, id).value[name];
+	    return get$1(node, id).value[name];
 	  };
 	}
 
@@ -2882,18 +2882,18 @@
 	      ? this.each((typeof value === "function"
 	          ? delayFunction
 	          : delayConstant)(id, value))
-	      : get(this.node(), id).delay;
+	      : get$1(this.node(), id).delay;
 	}
 
 	function durationFunction(id, value) {
 	  return function() {
-	    set(this, id).duration = +value.apply(this, arguments);
+	    set$1(this, id).duration = +value.apply(this, arguments);
 	  };
 	}
 
 	function durationConstant(id, value) {
 	  return value = +value, function() {
-	    set(this, id).duration = value;
+	    set$1(this, id).duration = value;
 	  };
 	}
 
@@ -2904,13 +2904,13 @@
 	      ? this.each((typeof value === "function"
 	          ? durationFunction
 	          : durationConstant)(id, value))
-	      : get(this.node(), id).duration;
+	      : get$1(this.node(), id).duration;
 	}
 
 	function easeConstant(id, value) {
 	  if (typeof value !== "function") throw new Error;
 	  return function() {
-	    set(this, id).ease = value;
+	    set$1(this, id).ease = value;
 	  };
 	}
 
@@ -2919,14 +2919,14 @@
 
 	  return arguments.length
 	      ? this.each(easeConstant(id, value))
-	      : get(this.node(), id).ease;
+	      : get$1(this.node(), id).ease;
 	}
 
 	function easeVarying(id, value) {
 	  return function() {
 	    var v = value.apply(this, arguments);
 	    if (typeof v !== "function") throw new Error;
-	    set(this, id).ease = v;
+	    set$1(this, id).ease = v;
 	  };
 	}
 
@@ -2976,7 +2976,7 @@
 	}
 
 	function onFunction(id, name, listener) {
-	  var on0, on1, sit = start$1(name) ? init : set;
+	  var on0, on1, sit = start$1(name) ? init : set$1;
 	  return function() {
 	    var schedule = sit(this, id),
 	        on = schedule.on;
@@ -2994,7 +2994,7 @@
 	  var id = this._id;
 
 	  return arguments.length < 2
-	      ? get(this.node(), id).on.on(name)
+	      ? get$1(this.node(), id).on.on(name)
 	      : this.each(onFunction(id, name, listener));
 	}
 
@@ -3021,7 +3021,7 @@
 	      if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
 	        if ("__data__" in node) subnode.__data__ = node.__data__;
 	        subgroup[i] = subnode;
-	        schedule(subgroup[i], name, id, i, subgroup, get(node, id));
+	        schedule(subgroup[i], name, id, i, subgroup, get$1(node, id));
 	      }
 	    }
 	  }
@@ -3038,7 +3038,7 @@
 	  for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
 	    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
 	      if (node = group[i]) {
-	        for (var children = select.call(node, node.__data__, i, group), child, inherit = get(node, id), k = 0, l = children.length; k < l; ++k) {
+	        for (var children = select.call(node, node.__data__, i, group), child, inherit = get$1(node, id), k = 0, l = children.length; k < l; ++k) {
 	          if (child = children[k]) {
 	            schedule(child, name, id, k, children, inherit);
 	          }
@@ -3107,7 +3107,7 @@
 	function styleMaybeRemove(id, name) {
 	  var on0, on1, listener0, key = "style." + name, event = "end." + key, remove;
 	  return function() {
-	    var schedule = set(this, id),
+	    var schedule = set$1(this, id),
 	        on = schedule.on,
 	        listener = schedule.value[key] == null ? remove || (remove = styleRemove(name)) : undefined;
 
@@ -3210,7 +3210,7 @@
 	  for (var groups = this._groups, m = groups.length, j = 0; j < m; ++j) {
 	    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
 	      if (node = group[i]) {
-	        var inherit = get(node, id0);
+	        var inherit = get$1(node, id0);
 	        schedule(node, name, id1, i, group, {
 	          time: inherit.time + inherit.delay + inherit.duration,
 	          delay: 0,
@@ -3231,7 +3231,7 @@
 	        end = {value: function() { if (--size === 0) resolve(); }};
 
 	    that.each(function() {
-	      var schedule = set(this, id),
+	      var schedule = set$1(this, id),
 	          on = schedule.on;
 
 	      // If this node shared a dispatch with the previous node,
@@ -5945,48 +5945,44 @@
 	      width: 0,
 	      height: 0,
 	    };
-	    this.shown = calendar.options.options.displayLegend;
+	    this.shown = calendar.options.options.legend.show;
 	  }
 
 	  #getX(width) {
-	    const { options } = this.calendar.options;
+	    const { horizontalPosition, verticalPosition, margin } =
+	      this.calendar.options.options.legend;
 
-	    switch (options.legendHorizontalPosition) {
+	    switch (horizontalPosition) {
 	      case 'right':
-	        if (
-	          options.legendVerticalPosition === 'center' ||
-	          options.legendVerticalPosition === 'middle'
-	        ) {
-	          return width + options.legendMargin[LEFT];
+	        if (verticalPosition === 'center' || verticalPosition === 'middle') {
+	          return width + margin[LEFT];
 	        }
-	        return width - this.getWidth() - options.legendMargin[RIGHT];
+	        return width - this.getWidth() - margin[RIGHT];
 	      case 'middle':
 	      case 'center':
 	        return Math.round(width / 2 - this.getWidth() / 2);
 	      default:
-	        return options.legendMargin[BOTTOM];
+	        return margin[BOTTOM];
 	    }
 	  }
 
 	  #getY() {
-	    const { legendVerticalPosition, legendMargin } =
-	      this.calendar.options.options;
-	    let pos = legendMargin[TOP];
+	    const { margin, verticalPosition } = this.calendar.options.options.legend;
+	    let pos = margin[TOP];
 
-	    if (legendVerticalPosition === 'bottom') {
+	    if (verticalPosition === 'bottom') {
 	      pos += this.calendar.calendarPainter.domainPainter.dimensions.height;
 	    }
 	    return pos;
 	  }
 
 	  #computeDimensions() {
-	    const { options } = this.calendar.options;
+	    const { cellSize, cellPadding, steps } =
+	      this.calendar.options.options.legend;
 
 	    this.dimensions = {
-	      width:
-	        options.legendCellSize * (options.legend.length + 1) +
-	        options.legendCellPadding * options.legend.length,
-	      height: options.legendCellSize,
+	      width: cellSize * (steps.length + 1) + cellPadding * steps.length,
+	      height: cellSize,
 	    };
 	  }
 
@@ -6008,7 +6004,7 @@
 
 	  paint() {
 	    const { options } = this.calendar.options;
-	    if (!options.displayLegend) {
+	    if (!options.legend.show) {
 	      return false;
 	    }
 
@@ -6041,9 +6037,9 @@
 	      .attr('width', this.getWidth())
 	      .attr('height', this.getHeight())
 	      .attr('transform', () => {
-	        if (options.legendOrientation === 'vertical') {
-	          return `rotate(90 ${options.legendCellSize / 2} ${
-            options.legendCellSize / 2
+	        if (options.legend.verticalOrientation) {
+	          return `rotate(90 ${options.legend.cellSize / 2} ${
+            options.legend.cellSize / 2
           })`;
 	        }
 	        return null;
@@ -6055,9 +6051,11 @@
 	  }
 
 	  #populate(legendNode) {
-	    const { options } = this.calendar.options;
+	    const { steps, cellSize, cellPadding } =
+	      this.calendar.options.options.legend;
+	    const { colorizer } = this.calendar;
 
-	    const items = options.legend.slice(0);
+	    const items = steps.slice(0);
 	    items.push(items[items.length - 1] + 1);
 
 	    legendNode
@@ -6066,40 +6064,34 @@
 	      .join(
 	        (enter) => enter
 	          .append('rect')
-	          .attr('width', options.legendCellSize)
-	          .attr('height', options.legendCellSize)
-	          .attr(
-	            'x',
-	            (d, i) => i * (options.legendCellSize + options.legendCellPadding),
-	          )
-	          .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+	          .attr('width', cellSize)
+	          .attr('height', cellSize)
+	          .attr('x', (d, i) => i * (cellSize + cellPadding))
+	          .attr('class', (d) => colorizer.getClassName(d))
 	          .attr('fill', (d, i) => {
-	            if (this.calendar.colorizer.scale === null) {
-	              return this.calendar.colorizer.getCustomColor('base');
+	            if (colorizer.scale === null) {
+	              return colorizer.getCustomColor('base');
 	            }
 
 	            if (i === 0) {
-	              return this.calendar.colorizer.scale(d - 1);
+	              return colorizer.scale(d - 1);
 	            }
-	            return this.calendar.colorizer.scale(options.legend[i - 1]);
+	            return colorizer.scale(steps[i - 1]);
 	          })
 	          .append('title')
 	          .text((d, i) => this.#getLegendTitle(d, i, items)),
 	        (update) => update
-	          .attr(
-	            'x',
-	            (d, i) => i * (options.legendCellSize + options.legendCellPadding),
-	          )
-	          .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+	          .attr('x', (d, i) => i * (cellSize + cellPadding))
+	          .attr('class', (d) => colorizer.getClassName(d))
 	          .attr('fill', (d, i) => {
-	            if (this.calendar.colorizer.scale === null) {
-	              return this.calendar.colorizer.getCustomColor('base');
+	            if (colorizer.scale === null) {
+	              return colorizer.getCustomColor('base');
 	            }
 
 	            if (i === 0) {
-	              return this.calendar.colorizer.scale(d - 1);
+	              return colorizer.scale(d - 1);
 	            }
-	            return this.calendar.colorizer.scale(options.legend[i - 1]);
+	            return colorizer.scale(steps[i - 1]);
 	          })
 	          .append('title')
 	          .text((d, i) => this.#getLegendTitle(d, i, items)),
@@ -6108,22 +6100,23 @@
 
 	  #getLegendTitle(d, i, legendItems) {
 	    const { options } = this.calendar.options;
+	    const { steps } = options.legend;
 
 	    if (i === 0) {
 	      return formatStringWithObject(options.legendTitleFormat.lower, {
-	        min: options.legend[i],
+	        min: steps[i],
 	        name: options.itemName[1],
 	      });
 	    }
 	    if (i === legendItems.length - 1) {
 	      return formatStringWithObject(options.legendTitleFormat.upper, {
-	        max: options.legend[i - 1],
+	        max: steps[i - 1],
 	        name: options.itemName[1],
 	      });
 	    }
 	    return formatStringWithObject(options.legendTitleFormat.inner, {
-	      down: options.legend[i - 1],
-	      up: options.legend[i],
+	      down: steps[i - 1],
+	      up: steps[i],
 	      name: options.itemName[1],
 	    });
 	  }
@@ -6138,7 +6131,7 @@
 	   */
 	  #getDimensions(axis) {
 	    const isHorizontal =
-	      this.calendar.options.options.legendOrientation === 'horizontal';
+	      !this.calendar.options.options.legend.verticalOrientation;
 
 	    switch (axis) {
 	      case 'height':
@@ -6216,15 +6209,15 @@
 	  getHeight() {
 	    const { options } = this.calendar.options;
 
-	    const legendHeight = options.displayLegend ?
+	    const legendHeight = options.legend.show ?
 	      this.legendPainter.getHeight() +
-	        options.legendMargin[TOP] +
-	        options.legendMargin[BOTTOM] :
+	        options.legend.margin[TOP] +
+	        options.legend.margin[BOTTOM] :
 	      0;
 
 	    if (
-	      options.legendVerticalPosition === 'middle' ||
-	      options.legendVerticalPosition === 'center'
+	      options.legend.verticalPosition === 'middle' ||
+	      options.legend.verticalPosition === 'center'
 	    ) {
 	      return Math.max(this.domainPainter.dimensions.height, legendHeight);
 	    }
@@ -6234,17 +6227,17 @@
 	  getWidth() {
 	    const { options } = this.calendar.options;
 
-	    const legendWidth = options.displayLegend ?
+	    const legendWidth = options.legend.show ?
 	      this.legendPainter.getWidth() +
-	        options.legendMargin[RIGHT] +
-	        options.legendMargin[LEFT] :
+	        options.legend.margin[RIGHT] +
+	        options.legend.margin[LEFT] :
 	      0;
 	    const domainsWidth =
 	      this.domainPainter.dimensions.width - options.domainGutter;
 
 	    if (
-	      options.legendVerticalPosition === 'middle' ||
-	      options.legendVerticalPosition === 'center'
+	      options.legend.verticalPosition === 'middle' ||
+	      options.legend.verticalPosition === 'center'
 	    ) {
 	      return domainsWidth + legendWidth;
 	    }
@@ -6325,31 +6318,33 @@
 	        options.hasOwnProperty('considerMissingDataAsZero') &&
 	        !options.considerMissingDataAsZero
 	      ) {
-	        if (options.legendColors.hasOwnProperty('base')) {
-	          return options.legendColors.base;
+	        if (options.legend.colors.hasOwnProperty('base')) {
+	          return options.legend.colors.base;
 	        }
 	      }
 
 	      if (
-	        options.legendColors?.hasOwnProperty('empty') &&
+	        options.legend.colors?.hasOwnProperty('empty') &&
 	        (d.v === 0 ||
 	          (d.v === null &&
 	            options.hasOwnProperty('considerMissingDataAsZero') &&
 	            options.considerMissingDataAsZero))
 	      ) {
-	        return options.legendColors.empty;
+	        return options.legend.colors.empty;
 	      }
+
+	      const { steps } = options.legend;
 
 	      if (
 	        d.v < 0 &&
-	        options.legend[0] > 0 &&
-	        options.legendColors?.hasOwnProperty('overflow')
+	        steps[0] > 0 &&
+	        options.legend.colors?.hasOwnProperty('overflow')
 	      ) {
-	        return options.legendColors.overflow;
+	        return options.legend.colors.overflow;
 	      }
 
 	      return this.calendar.colorizer.scale(
-	        Math.min(d.v, options.legend[options.legend.length - 1]),
+	        Math.min(d.v, steps[steps.length - 1]),
 	      );
 	    });
 	  }
@@ -6372,7 +6367,7 @@
 	      (d.v === null &&
 	        options.hasOwnProperty('considerMissingDataAsZero') &&
 	        !options.considerMissingDataAsZero &&
-	        !options.legendColors.hasOwnProperty('base'))
+	        !options.legend.colors.hasOwnProperty('base'))
 	    ) {
 	      htmlClass.push('graph-rect');
 	    }
@@ -6455,17 +6450,17 @@
 	var Symbol$2 = Symbol$1;
 
 	/** Used for built-in method references. */
-	var objectProto$e = Object.prototype;
+	var objectProto$f = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$b = objectProto$e.hasOwnProperty;
+	var hasOwnProperty$c = objectProto$f.hasOwnProperty;
 
 	/**
 	 * Used to resolve the
 	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
-	var nativeObjectToString$1 = objectProto$e.toString;
+	var nativeObjectToString$1 = objectProto$f.toString;
 
 	/** Built-in value references. */
 	var symToStringTag$1 = Symbol$2 ? Symbol$2.toStringTag : undefined;
@@ -6478,7 +6473,7 @@
 	 * @returns {string} Returns the raw `toStringTag`.
 	 */
 	function getRawTag(value) {
-	  var isOwn = hasOwnProperty$b.call(value, symToStringTag$1),
+	  var isOwn = hasOwnProperty$c.call(value, symToStringTag$1),
 	      tag = value[symToStringTag$1];
 
 	  try {
@@ -6498,14 +6493,14 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$d = Object.prototype;
+	var objectProto$e = Object.prototype;
 
 	/**
 	 * Used to resolve the
 	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
-	var nativeObjectToString = objectProto$d.toString;
+	var nativeObjectToString = objectProto$e.toString;
 
 	/**
 	 * Converts `value` to a string using `Object.prototype.toString`.
@@ -6569,6 +6564,51 @@
 	  return value != null && typeof value == 'object';
 	}
 
+	/** `Object#toString` result references. */
+	var symbolTag$1 = '[object Symbol]';
+
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && baseGetTag(value) == symbolTag$1);
+	}
+
+	/**
+	 * A specialized version of `_.map` for arrays without support for iteratee
+	 * shorthands.
+	 *
+	 * @private
+	 * @param {Array} [array] The array to iterate over.
+	 * @param {Function} iteratee The function invoked per iteration.
+	 * @returns {Array} Returns the new mapped array.
+	 */
+	function arrayMap(array, iteratee) {
+	  var index = -1,
+	      length = array == null ? 0 : array.length,
+	      result = Array(length);
+
+	  while (++index < length) {
+	    result[index] = iteratee(array[index], index, array);
+	  }
+	  return result;
+	}
+
 	/**
 	 * Checks if `value` is classified as an `Array` object.
 	 *
@@ -6595,6 +6635,37 @@
 	var isArray = Array.isArray;
 
 	var isArray$1 = isArray;
+
+	/** Used as references for various `Number` constants. */
+	var INFINITY$1 = 1 / 0;
+
+	/** Used to convert symbols to primitives and strings. */
+	var symbolProto$1 = Symbol$2 ? Symbol$2.prototype : undefined,
+	    symbolToString = symbolProto$1 ? symbolProto$1.toString : undefined;
+
+	/**
+	 * The base implementation of `_.toString` which doesn't convert nullish
+	 * values to empty strings.
+	 *
+	 * @private
+	 * @param {*} value The value to process.
+	 * @returns {string} Returns the string.
+	 */
+	function baseToString(value) {
+	  // Exit early for strings to avoid a performance hit in some environments.
+	  if (typeof value == 'string') {
+	    return value;
+	  }
+	  if (isArray$1(value)) {
+	    // Recursively convert values (susceptible to call stack limits).
+	    return arrayMap(value, baseToString) + '';
+	  }
+	  if (isSymbol(value)) {
+	    return symbolToString ? symbolToString.call(value) : '';
+	  }
+	  var result = (value + '');
+	  return (result == '0' && (1 / value) == -INFINITY$1) ? '-0' : result;
+	}
 
 	/**
 	 * Checks if `value` is the
@@ -6737,17 +6808,17 @@
 
 	/** Used for built-in method references. */
 	var funcProto$1 = Function.prototype,
-	    objectProto$c = Object.prototype;
+	    objectProto$d = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
 	var funcToString$1 = funcProto$1.toString;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$a = objectProto$c.hasOwnProperty;
+	var hasOwnProperty$b = objectProto$d.hasOwnProperty;
 
 	/** Used to detect if a method is native. */
 	var reIsNative = RegExp('^' +
-	  funcToString$1.call(hasOwnProperty$a).replace(reRegExpChar, '\\$&')
+	  funcToString$1.call(hasOwnProperty$b).replace(reRegExpChar, '\\$&')
 	  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
 	);
 
@@ -7050,10 +7121,10 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$b = Object.prototype;
+	var objectProto$c = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$9 = objectProto$b.hasOwnProperty;
+	var hasOwnProperty$a = objectProto$c.hasOwnProperty;
 
 	/**
 	 * Assigns `value` to `key` of `object` if the existing value is not equivalent
@@ -7067,7 +7138,7 @@
 	 */
 	function assignValue(object, key, value) {
 	  var objValue = object[key];
-	  if (!(hasOwnProperty$9.call(object, key) && eq(objValue, value)) ||
+	  if (!(hasOwnProperty$a.call(object, key) && eq(objValue, value)) ||
 	      (value === undefined && !(key in object))) {
 	    baseAssignValue(object, key, value);
 	  }
@@ -7275,7 +7346,7 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$a = Object.prototype;
+	var objectProto$b = Object.prototype;
 
 	/**
 	 * Checks if `value` is likely a prototype object.
@@ -7286,7 +7357,7 @@
 	 */
 	function isPrototype(value) {
 	  var Ctor = value && value.constructor,
-	      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto$a;
+	      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto$b;
 
 	  return value === proto;
 	}
@@ -7325,13 +7396,13 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$9 = Object.prototype;
+	var objectProto$a = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$8 = objectProto$9.hasOwnProperty;
+	var hasOwnProperty$9 = objectProto$a.hasOwnProperty;
 
 	/** Built-in value references. */
-	var propertyIsEnumerable$1 = objectProto$9.propertyIsEnumerable;
+	var propertyIsEnumerable$1 = objectProto$a.propertyIsEnumerable;
 
 	/**
 	 * Checks if `value` is likely an `arguments` object.
@@ -7352,7 +7423,7 @@
 	 * // => false
 	 */
 	var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsArguments : function(value) {
-	  return isObjectLike(value) && hasOwnProperty$8.call(value, 'callee') &&
+	  return isObjectLike(value) && hasOwnProperty$9.call(value, 'callee') &&
 	    !propertyIsEnumerable$1.call(value, 'callee');
 	};
 
@@ -7533,10 +7604,10 @@
 	var isTypedArray$1 = isTypedArray;
 
 	/** Used for built-in method references. */
-	var objectProto$8 = Object.prototype;
+	var objectProto$9 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
+	var hasOwnProperty$8 = objectProto$9.hasOwnProperty;
 
 	/**
 	 * Creates an array of the enumerable property names of the array-like `value`.
@@ -7556,7 +7627,7 @@
 	      length = result.length;
 
 	  for (var key in value) {
-	    if ((inherited || hasOwnProperty$7.call(value, key)) &&
+	    if ((inherited || hasOwnProperty$8.call(value, key)) &&
 	        !(skipIndexes && (
 	           // Safari 9 has enumerable `arguments.length` in strict mode.
 	           key == 'length' ||
@@ -7593,10 +7664,10 @@
 	var nativeKeys$1 = nativeKeys;
 
 	/** Used for built-in method references. */
-	var objectProto$7 = Object.prototype;
+	var objectProto$8 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$6 = objectProto$7.hasOwnProperty;
+	var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
 
 	/**
 	 * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
@@ -7611,7 +7682,7 @@
 	  }
 	  var result = [];
 	  for (var key in Object(object)) {
-	    if (hasOwnProperty$6.call(object, key) && key != 'constructor') {
+	    if (hasOwnProperty$7.call(object, key) && key != 'constructor') {
 	      result.push(key);
 	    }
 	  }
@@ -7670,10 +7741,10 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$6 = Object.prototype;
+	var objectProto$7 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$5 = objectProto$6.hasOwnProperty;
+	var hasOwnProperty$6 = objectProto$7.hasOwnProperty;
 
 	/**
 	 * The base implementation of `_.keysIn` which doesn't treat sparse arrays as dense.
@@ -7690,7 +7761,7 @@
 	      result = [];
 
 	  for (var key in object) {
-	    if (!(key == 'constructor' && (isProto || !hasOwnProperty$5.call(object, key)))) {
+	    if (!(key == 'constructor' && (isProto || !hasOwnProperty$6.call(object, key)))) {
 	      result.push(key);
 	    }
 	  }
@@ -7722,6 +7793,31 @@
 	 */
 	function keysIn(object) {
 	  return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
+	}
+
+	/** Used to match property names within property paths. */
+	var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
+	    reIsPlainProp = /^\w*$/;
+
+	/**
+	 * Checks if `value` is a property name and not a property path.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @param {Object} [object] The object to query keys on.
+	 * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
+	 */
+	function isKey(value, object) {
+	  if (isArray$1(value)) {
+	    return false;
+	  }
+	  var type = typeof value;
+	  if (type == 'number' || type == 'symbol' || type == 'boolean' ||
+	      value == null || isSymbol(value)) {
+	    return true;
+	  }
+	  return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
+	    (object != null && value in Object(object));
 	}
 
 	/* Built-in method references that are verified to be native. */
@@ -7761,10 +7857,10 @@
 	var HASH_UNDEFINED$2 = '__lodash_hash_undefined__';
 
 	/** Used for built-in method references. */
-	var objectProto$5 = Object.prototype;
+	var objectProto$6 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
+	var hasOwnProperty$5 = objectProto$6.hasOwnProperty;
 
 	/**
 	 * Gets the hash value for `key`.
@@ -7781,14 +7877,14 @@
 	    var result = data[key];
 	    return result === HASH_UNDEFINED$2 ? undefined : result;
 	  }
-	  return hasOwnProperty$4.call(data, key) ? data[key] : undefined;
+	  return hasOwnProperty$5.call(data, key) ? data[key] : undefined;
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$4 = Object.prototype;
+	var objectProto$5 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$3 = objectProto$4.hasOwnProperty;
+	var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
 
 	/**
 	 * Checks if a hash value for `key` exists.
@@ -7801,7 +7897,7 @@
 	 */
 	function hashHas(key) {
 	  var data = this.__data__;
-	  return nativeCreate$1 ? (data[key] !== undefined) : hasOwnProperty$3.call(data, key);
+	  return nativeCreate$1 ? (data[key] !== undefined) : hasOwnProperty$4.call(data, key);
 	}
 
 	/** Used to stand-in for `undefined` hash values. */
@@ -8123,6 +8219,233 @@
 	MapCache.prototype.has = mapCacheHas;
 	MapCache.prototype.set = mapCacheSet;
 
+	/** Error message constants. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/**
+	 * Creates a function that memoizes the result of `func`. If `resolver` is
+	 * provided, it determines the cache key for storing the result based on the
+	 * arguments provided to the memoized function. By default, the first argument
+	 * provided to the memoized function is used as the map cache key. The `func`
+	 * is invoked with the `this` binding of the memoized function.
+	 *
+	 * **Note:** The cache is exposed as the `cache` property on the memoized
+	 * function. Its creation may be customized by replacing the `_.memoize.Cache`
+	 * constructor with one whose instances implement the
+	 * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
+	 * method interface of `clear`, `delete`, `get`, `has`, and `set`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to have its output memoized.
+	 * @param {Function} [resolver] The function to resolve the cache key.
+	 * @returns {Function} Returns the new memoized function.
+	 * @example
+	 *
+	 * var object = { 'a': 1, 'b': 2 };
+	 * var other = { 'c': 3, 'd': 4 };
+	 *
+	 * var values = _.memoize(_.values);
+	 * values(object);
+	 * // => [1, 2]
+	 *
+	 * values(other);
+	 * // => [3, 4]
+	 *
+	 * object.a = 2;
+	 * values(object);
+	 * // => [1, 2]
+	 *
+	 * // Modify the result cache.
+	 * values.cache.set(object, ['a', 'b']);
+	 * values(object);
+	 * // => ['a', 'b']
+	 *
+	 * // Replace `_.memoize.Cache`.
+	 * _.memoize.Cache = WeakMap;
+	 */
+	function memoize(func, resolver) {
+	  if (typeof func != 'function' || (resolver != null && typeof resolver != 'function')) {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  var memoized = function() {
+	    var args = arguments,
+	        key = resolver ? resolver.apply(this, args) : args[0],
+	        cache = memoized.cache;
+
+	    if (cache.has(key)) {
+	      return cache.get(key);
+	    }
+	    var result = func.apply(this, args);
+	    memoized.cache = cache.set(key, result) || cache;
+	    return result;
+	  };
+	  memoized.cache = new (memoize.Cache || MapCache);
+	  return memoized;
+	}
+
+	// Expose `MapCache`.
+	memoize.Cache = MapCache;
+
+	/** Used as the maximum memoize cache size. */
+	var MAX_MEMOIZE_SIZE = 500;
+
+	/**
+	 * A specialized version of `_.memoize` which clears the memoized function's
+	 * cache when it exceeds `MAX_MEMOIZE_SIZE`.
+	 *
+	 * @private
+	 * @param {Function} func The function to have its output memoized.
+	 * @returns {Function} Returns the new memoized function.
+	 */
+	function memoizeCapped(func) {
+	  var result = memoize(func, function(key) {
+	    if (cache.size === MAX_MEMOIZE_SIZE) {
+	      cache.clear();
+	    }
+	    return key;
+	  });
+
+	  var cache = result.cache;
+	  return result;
+	}
+
+	/** Used to match property names within property paths. */
+	var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+
+	/** Used to match backslashes in property paths. */
+	var reEscapeChar = /\\(\\)?/g;
+
+	/**
+	 * Converts `string` to a property path array.
+	 *
+	 * @private
+	 * @param {string} string The string to convert.
+	 * @returns {Array} Returns the property path array.
+	 */
+	var stringToPath = memoizeCapped(function(string) {
+	  var result = [];
+	  if (string.charCodeAt(0) === 46 /* . */) {
+	    result.push('');
+	  }
+	  string.replace(rePropName, function(match, number, quote, subString) {
+	    result.push(quote ? subString.replace(reEscapeChar, '$1') : (number || match));
+	  });
+	  return result;
+	});
+
+	var stringToPath$1 = stringToPath;
+
+	/**
+	 * Converts `value` to a string. An empty string is returned for `null`
+	 * and `undefined` values. The sign of `-0` is preserved.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to convert.
+	 * @returns {string} Returns the converted string.
+	 * @example
+	 *
+	 * _.toString(null);
+	 * // => ''
+	 *
+	 * _.toString(-0);
+	 * // => '-0'
+	 *
+	 * _.toString([1, 2, 3]);
+	 * // => '1,2,3'
+	 */
+	function toString(value) {
+	  return value == null ? '' : baseToString(value);
+	}
+
+	/**
+	 * Casts `value` to a path array if it's not one.
+	 *
+	 * @private
+	 * @param {*} value The value to inspect.
+	 * @param {Object} [object] The object to query keys on.
+	 * @returns {Array} Returns the cast property path array.
+	 */
+	function castPath(value, object) {
+	  if (isArray$1(value)) {
+	    return value;
+	  }
+	  return isKey(value, object) ? [value] : stringToPath$1(toString(value));
+	}
+
+	/** Used as references for various `Number` constants. */
+	var INFINITY = 1 / 0;
+
+	/**
+	 * Converts `value` to a string key if it's not a string or symbol.
+	 *
+	 * @private
+	 * @param {*} value The value to inspect.
+	 * @returns {string|symbol} Returns the key.
+	 */
+	function toKey(value) {
+	  if (typeof value == 'string' || isSymbol(value)) {
+	    return value;
+	  }
+	  var result = (value + '');
+	  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+	}
+
+	/**
+	 * The base implementation of `_.get` without support for default values.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path of the property to get.
+	 * @returns {*} Returns the resolved value.
+	 */
+	function baseGet(object, path) {
+	  path = castPath(path, object);
+
+	  var index = 0,
+	      length = path.length;
+
+	  while (object != null && index < length) {
+	    object = object[toKey(path[index++])];
+	  }
+	  return (index && index == length) ? object : undefined;
+	}
+
+	/**
+	 * Gets the value at `path` of `object`. If the resolved value is
+	 * `undefined`, the `defaultValue` is returned in its place.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 3.7.0
+	 * @category Object
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path of the property to get.
+	 * @param {*} [defaultValue] The value returned for `undefined` resolved values.
+	 * @returns {*} Returns the resolved value.
+	 * @example
+	 *
+	 * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+	 *
+	 * _.get(object, 'a[0].b.c');
+	 * // => 3
+	 *
+	 * _.get(object, ['a', '0', 'b', 'c']);
+	 * // => 3
+	 *
+	 * _.get(object, 'a.b.c', 'default');
+	 * // => 'default'
+	 */
+	function get(object, path, defaultValue) {
+	  var result = object == null ? undefined : baseGet(object, path);
+	  return result === undefined ? defaultValue : result;
+	}
+
 	/**
 	 * Appends the elements of `values` to `array`.
 	 *
@@ -8152,13 +8475,13 @@
 
 	/** Used for built-in method references. */
 	var funcProto = Function.prototype,
-	    objectProto$3 = Object.prototype;
+	    objectProto$4 = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
 	var funcToString = funcProto.toString;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$2 = objectProto$3.hasOwnProperty;
+	var hasOwnProperty$3 = objectProto$4.hasOwnProperty;
 
 	/** Used to infer the `Object` constructor. */
 	var objectCtorString = funcToString.call(Object);
@@ -8199,7 +8522,7 @@
 	  if (proto === null) {
 	    return true;
 	  }
-	  var Ctor = hasOwnProperty$2.call(proto, 'constructor') && proto.constructor;
+	  var Ctor = hasOwnProperty$3.call(proto, 'constructor') && proto.constructor;
 	  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
 	    funcToString.call(Ctor) == objectCtorString;
 	}
@@ -8427,10 +8750,10 @@
 	}
 
 	/** Used for built-in method references. */
-	var objectProto$2 = Object.prototype;
+	var objectProto$3 = Object.prototype;
 
 	/** Built-in value references. */
-	var propertyIsEnumerable = objectProto$2.propertyIsEnumerable;
+	var propertyIsEnumerable = objectProto$3.propertyIsEnumerable;
 
 	/* Built-in method references for those with the same name as other `lodash` methods. */
 	var nativeGetSymbols = Object.getOwnPropertySymbols;
@@ -8899,10 +9222,10 @@
 	var COMPARE_PARTIAL_FLAG$1 = 1;
 
 	/** Used for built-in method references. */
-	var objectProto$1 = Object.prototype;
+	var objectProto$2 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
+	var hasOwnProperty$2 = objectProto$2.hasOwnProperty;
 
 	/**
 	 * A specialized version of `baseIsEqualDeep` for objects with support for
@@ -8930,7 +9253,7 @@
 	  var index = objLength;
 	  while (index--) {
 	    var key = objProps[index];
-	    if (!(isPartial ? key in other : hasOwnProperty$1.call(other, key))) {
+	    if (!(isPartial ? key in other : hasOwnProperty$2.call(other, key))) {
 	      return false;
 	    }
 	  }
@@ -8991,10 +9314,10 @@
 	    objectTag = '[object Object]';
 
 	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
+	var objectProto$1 = Object.prototype;
 
 	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
+	var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
 
 	/**
 	 * A specialized version of `baseIsEqual` for arrays and objects which performs
@@ -9037,8 +9360,8 @@
 	      : equalByTag(object, other, objTag, bitmask, customizer, equalFunc, stack);
 	  }
 	  if (!(bitmask & COMPARE_PARTIAL_FLAG)) {
-	    var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
-	        othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+	    var objIsWrapped = objIsObj && hasOwnProperty$1.call(object, '__wrapped__'),
+	        othIsWrapped = othIsObj && hasOwnProperty$1.call(other, '__wrapped__');
 
 	    if (objIsWrapped || othIsWrapped) {
 	      var objUnwrapped = objIsWrapped ? object.value() : object,
@@ -9077,6 +9400,37 @@
 	    return value !== value && other !== other;
 	  }
 	  return baseIsEqualDeep(value, other, bitmask, customizer, baseIsEqual, stack);
+	}
+
+	/**
+	 * Checks if `path` exists on `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path to check.
+	 * @param {Function} hasFunc The function to check properties.
+	 * @returns {boolean} Returns `true` if `path` exists, else `false`.
+	 */
+	function hasPath(object, path, hasFunc) {
+	  path = castPath(path, object);
+
+	  var index = -1,
+	      length = path.length,
+	      result = false;
+
+	  while (++index < length) {
+	    var key = toKey(path[index]);
+	    if (!(result = object != null && hasFunc(object, key))) {
+	      break;
+	    }
+	    object = object[key];
+	  }
+	  if (result || ++index != length) {
+	    return result;
+	  }
+	  length = object == null ? 0 : object.length;
+	  return !!length && isLength(length) && isIndex(key, length) &&
+	    (isArray$1(object) || isArguments$1(object));
 	}
 
 	/**
@@ -9321,6 +9675,55 @@
 	  }, keysIn);
 	}
 
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * The base implementation of `_.has` without support for deep paths.
+	 *
+	 * @private
+	 * @param {Object} [object] The object to query.
+	 * @param {Array|string} key The key to check.
+	 * @returns {boolean} Returns `true` if `key` exists, else `false`.
+	 */
+	function baseHas(object, key) {
+	  return object != null && hasOwnProperty.call(object, key);
+	}
+
+	/**
+	 * Checks if `path` is a direct property of `object`.
+	 *
+	 * @static
+	 * @since 0.1.0
+	 * @memberOf _
+	 * @category Object
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path to check.
+	 * @returns {boolean} Returns `true` if `path` exists, else `false`.
+	 * @example
+	 *
+	 * var object = { 'a': { 'b': 2 } };
+	 * var other = _.create({ 'a': _.create({ 'b': 2 }) });
+	 *
+	 * _.has(object, 'a');
+	 * // => true
+	 *
+	 * _.has(object, 'a.b');
+	 * // => true
+	 *
+	 * _.has(object, ['a', 'b']);
+	 * // => true
+	 *
+	 * _.has(other, 'a');
+	 * // => false
+	 */
+	function has(object, path) {
+	  return object != null && hasPath(object, path, baseHas);
+	}
+
 	/** `Object#toString` result references. */
 	var stringTag = '[object String]';
 
@@ -9448,6 +9851,82 @@
 	});
 
 	var merge$1 = merge;
+
+	/**
+	 * The base implementation of `_.set`.
+	 *
+	 * @private
+	 * @param {Object} object The object to modify.
+	 * @param {Array|string} path The path of the property to set.
+	 * @param {*} value The value to set.
+	 * @param {Function} [customizer] The function to customize path creation.
+	 * @returns {Object} Returns `object`.
+	 */
+	function baseSet(object, path, value, customizer) {
+	  if (!isObject(object)) {
+	    return object;
+	  }
+	  path = castPath(path, object);
+
+	  var index = -1,
+	      length = path.length,
+	      lastIndex = length - 1,
+	      nested = object;
+
+	  while (nested != null && ++index < length) {
+	    var key = toKey(path[index]),
+	        newValue = value;
+
+	    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+	      return object;
+	    }
+
+	    if (index != lastIndex) {
+	      var objValue = nested[key];
+	      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+	      if (newValue === undefined) {
+	        newValue = isObject(objValue)
+	          ? objValue
+	          : (isIndex(path[index + 1]) ? [] : {});
+	      }
+	    }
+	    assignValue(nested, key, newValue);
+	    nested = nested[key];
+	  }
+	  return object;
+	}
+
+	/**
+	 * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
+	 * it's created. Arrays are created for missing index properties while objects
+	 * are created for all other missing properties. Use `_.setWith` to customize
+	 * `path` creation.
+	 *
+	 * **Note:** This method mutates `object`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 3.7.0
+	 * @category Object
+	 * @param {Object} object The object to modify.
+	 * @param {Array|string} path The path of the property to set.
+	 * @param {*} value The value to set.
+	 * @returns {Object} Returns `object`.
+	 * @example
+	 *
+	 * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+	 *
+	 * _.set(object, 'a[0].b.c', 4);
+	 * console.log(object.a[0].b.c);
+	 * // => 4
+	 *
+	 * _.set(object, ['x', '0', 'y', 'z'], 5);
+	 * console.log(object.x[0].y.z);
+	 * // => 5
+	 */
+	function set(object, path, value) {
+	  return object == null ? object : baseSet(object, path, value);
+	}
 
 	var momentTimezone$1 = {exports: {}};
 
@@ -16865,7 +17344,7 @@
 	    return value;
 	  },
 	  domainMargin: (args) => preProcessors.margins(args),
-	  legendMargin: (args) => preProcessors.margins(args),
+	  'legend.margin': (args) => preProcessors.margins(args),
 	  margins: (settings) => {
 	    let value = settings;
 	    if (isNumber(value)) {
@@ -16938,7 +17417,7 @@
 
 	      subDomainTemplate: null,
 
-	      // Show week name when showing full month
+	      // Show weekday's name when showing full month
 	      dayLabel: false,
 
 	      // Start date of the graph
@@ -17016,43 +17495,46 @@
 	      // ================================================
 
 	      // Threshold for the legend
-	      legend: [10, 20, 30, 40],
+	      legend: {
+	        steps: [10, 20, 30, 40],
 
-	      // Whether to display the legend
-	      displayLegend: true,
+	        // Whether to display the legend
+	        show: true,
 
-	      legendCellSize: 10,
+	        cellSize: 10,
 
-	      legendCellPadding: 2,
+	        cellPadding: 2,
 
-	      legendMargin: [0, 0, 0, 0],
+	        // Legend rotation
+	        // false: display the legend from left to right
+	        // true : display the legend from top to bottom
+	        verticalOrientation: false,
 
-	      // Legend vertical position
-	      // top: place legend above calendar
-	      // bottom: place legend below the calendar
-	      legendVerticalPosition: 'bottom',
+	        margin: [0, 0, 0, 0],
 
-	      // Legend horizontal position
-	      // accepted values: left, center, right
-	      legendHorizontalPosition: 'left',
+	        // Legend vertical position
+	        // top: place legend above calendar
+	        // bottom: place legend below the calendar
+	        verticalPosition: 'bottom',
 
-	      // Legend rotation
-	      // accepted values: horizontal, vertical
-	      legendOrientation: 'horizontal',
+	        // Legend horizontal position
+	        // accepted values: left, center, right
+	        horizontalPosition: 'left',
 
-	      // Objects holding all the heatmap different colors
-	      // null to disable, and use the default css styles
-	      //
-	      // Examples:
-	      // legendColors: {
-	      //    min: "green",
-	      //    middle: "blue",
-	      //    max: "red",
-	      //    empty: "#ffffff",
-	      //    base: "grey",
-	      //    overflow: "red"
-	      // }
-	      legendColors: null,
+	        // Objects holding all the heatmap different colors
+	        // null to disable, and use the default css styles
+	        //
+	        // Examples:
+	        // colors: {
+	        //    min: "green",
+	        //    middle: "blue",
+	        //    max: "red",
+	        //    empty: "#ffffff",
+	        //    base: "grey",
+	        //    overflow: "red"
+	        // }
+	        colors: null,
+	      },
 
 	      // ================================================
 	      // HIGHLIGHT
@@ -17129,16 +17611,15 @@
 	   * @return {boolean} Whether the option have been changed
 	   */
 	  set(key, value) {
-	    if (
-	      !this.options.hasOwnProperty(key) ||
-	      isEqual(this.options[key], value)
-	    ) {
+	    if (!has(this.options, key) || isEqual(get(this.options, key), value)) {
 	      return false;
 	    }
 
-	    this.options[key] = preProcessors.hasOwnProperty(key) ?
-	      preProcessors[key](value) :
-	      value;
+	    set(
+	      this.options,
+	      key,
+	      has(preProcessors, key) ? get(preProcessors, key)(value) : value,
+	    );
 
 	    return true;
 	  }
@@ -17176,10 +17657,14 @@
 	    this.#validate();
 
 	    Object.keys(preProcessors).forEach((key) => {
-	      if (!options.hasOwnProperty(key)) {
+	      if (!has(options, key)) {
 	        return;
 	      }
-	      options[key] = preProcessors[key](options[key], this.calendar, options);
+	      set(
+	        options,
+	        key,
+	        get(preProcessors, key)(get(options, key), this.calendar, options),
+	      );
 	    });
 
 	    options.x.domainVerticalLabelHeight =
@@ -17201,18 +17686,18 @@
 	      options.x.domainHorizontalLabelWidth = 0;
 	    }
 
-	    if (options.legendMargin === [0, 0, 0, 0]) {
-	      switch (options.legendVerticalPosition) {
+	    if (options.legend.margin === [0, 0, 0, 0]) {
+	      switch (options.legend.verticalPosition) {
 	        case 'top':
-	          options.legendMargin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
+	          options.legend.margin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
 	          break;
 	        case 'bottom':
-	          options.legendMargin[TOP] = DEFAULT_LEGEND_MARGIN;
+	          options.legend.margin[TOP] = DEFAULT_LEGEND_MARGIN;
 	          break;
 	        case 'middle':
 	        case 'center':
-	          options.legendMargin[
-	            options.legendHorizontalPosition === 'right' ? LEFT : RIGHT
+	          options.legend.margin[
+	            options.legend.horizontalPosition === 'right' ? LEFT : RIGHT
 	          ] = DEFAULT_LEGEND_MARGIN;
 	          break;
 	      }
@@ -17954,27 +18439,24 @@
 	  }
 
 	  build() {
-	    const { legendColors } = this.calendar.options.options;
+	    const { colors } = this.calendar.options.options.legend;
 
-	    if (legendColors === null) {
+	    if (colors === null) {
 	      this.scale = null;
 	      return false;
 	    }
 
 	    let colorRange = [];
 
-	    if (Array.isArray(legendColors)) {
-	      colorRange = legendColors;
-	    } else if (
-	      legendColors.hasOwnProperty('min') &&
-	      legendColors.hasOwnProperty('max')
-	    ) {
-	      colorRange = [legendColors.min, legendColors.max];
+	    if (Array.isArray(colors)) {
+	      colorRange = colors;
+	    } else if (colors.hasOwnProperty('min') && colors.hasOwnProperty('max')) {
+	      colorRange = [colors.min, colors.max];
 	    } else {
 	      return false;
 	    }
 
-	    const legend = this.calendar.options.options.legend.slice(0);
+	    const legend = this.calendar.options.options.legend.steps.slice(0);
 
 	    if (legend[0] > 0) {
 	      legend.unshift(0);
@@ -17990,19 +18472,19 @@
 	      .interpolate(interpolateHcl)
 	      .domain([Math.min(...legend), Math.max(...legend)]);
 
-	    const colors = legend.map((element) => colorScale(element));
+	    const colorsRange = legend.map((element) => colorScale(element));
 	    this.scale = threshold()
-	      .domain(this.calendar.options.options.legend)
-	      .range(colors);
+	      .domain(this.calendar.options.options.legend.steps)
+	      .range(colorsRange);
 
 	    return true;
 	  }
 
 	  getCustomColor(colorKey) {
-	    const { legendColors } = this.calendar.options.options;
+	    const { colors } = this.calendar.options.options.legend;
 
-	    if (this.scale !== null && legendColors?.hasOwnProperty(colorKey)) {
-	      return legendColors[colorKey];
+	    if (this.scale !== null && colors?.hasOwnProperty(colorKey)) {
+	      return colors[colorKey];
 	    }
 
 	    return null;
@@ -18019,16 +18501,16 @@
 	      return '';
 	    }
 
-	    const { legend } = this.calendar.options.options;
-	    let index = [legend.length + 1];
+	    const { steps } = this.calendar.options.options.legend;
+	    let index = [steps.length + 1];
 
-	    for (let i = 0, total = legend.length - 1; i <= total; i += 1) {
-	      if (legend[0] > 0 && n < 0) {
+	    for (let i = 0, total = steps.length - 1; i <= total; i += 1) {
+	      if (steps[0] > 0 && n < 0) {
 	        index = ['1', 'i'];
 	        break;
 	      }
 
-	      if (n <= legend[i]) {
+	      if (n <= steps[i]) {
 	        index = [i + 1];
 	        break;
 	      }
@@ -19237,11 +19719,10 @@
 	   * @param array colorRange an array of 2 hex colors, for the
 	   * minimum and maximum colors
 	   */
-	  setLegend(legend, legendColors) {
+	  setLegend(legendOptions) {
 	    const changeResults = [];
 
-	    changeResults.push(this.options.set('legend', legend));
-	    changeResults.push(this.options.set('legendColors', legendColors));
+	    changeResults.push(this.options.set('legend', legendOptions));
 
 	    // Trigger repaint only if legend options have changed
 	    if (!changeResults.includes(true)) {
@@ -19259,7 +19740,7 @@
 	   * @return bool False if there is no legend to remove
 	   */
 	  removeLegend() {
-	    if (!this.options.set('displayLegend', false)) {
+	    if (!this.options.set('legend.show', false)) {
 	      return false;
 	    }
 	    return this.calendarPainter.removeLegend();
@@ -19271,7 +19752,7 @@
 	   * @return bool False if the legend was already displayed
 	   */
 	  showLegend() {
-	    if (!this.options.set('displayLegend', true)) {
+	    if (!this.options.set('legend.show', true)) {
 	      return false;
 	    }
 

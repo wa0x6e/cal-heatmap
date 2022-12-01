@@ -169,11 +169,10 @@ export default class CalHeatmap {
    * @param array colorRange an array of 2 hex colors, for the
    * minimum and maximum colors
    */
-  setLegend(legend, legendColors) {
+  setLegend(legendOptions) {
     const changeResults = [];
 
-    changeResults.push(this.options.set('legend', legend));
-    changeResults.push(this.options.set('legendColors', legendColors));
+    changeResults.push(this.options.set('legend', legendOptions));
 
     // Trigger repaint only if legend options have changed
     if (!changeResults.includes(true)) {
@@ -191,7 +190,7 @@ export default class CalHeatmap {
    * @return bool False if there is no legend to remove
    */
   removeLegend() {
-    if (!this.options.set('displayLegend', false)) {
+    if (!this.options.set('legend.show', false)) {
       return false;
     }
     return this.calendarPainter.removeLegend();
@@ -203,7 +202,7 @@ export default class CalHeatmap {
    * @return bool False if the legend was already displayed
    */
   showLegend() {
-    if (!this.options.set('displayLegend', true)) {
+    if (!this.options.set('legend.show', true)) {
       return false;
     }
 

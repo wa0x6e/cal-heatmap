@@ -5,6 +5,9 @@ import {
   isFunction,
   isString,
   isNumber,
+  has,
+  get,
+  set,
 } from 'lodash-es';
 
 import {
@@ -64,7 +67,7 @@ const preProcessors = {
     return value;
   },
   domainMargin: (args) => preProcessors.margins(args),
-  legendMargin: (args) => preProcessors.margins(args),
+  'legend.margin': (args) => preProcessors.margins(args),
   margins: (settings) => {
     let value = settings;
     if (isNumber(value)) {
@@ -137,7 +140,7 @@ export default class Options {
 
       subDomainTemplate: null,
 
-      // Show week name when showing full month
+      // Show weekday's name when showing full month
       dayLabel: false,
 
       // Start date of the graph
@@ -215,43 +218,46 @@ export default class Options {
       // ================================================
 
       // Threshold for the legend
-      legend: [10, 20, 30, 40],
+      legend: {
+        steps: [10, 20, 30, 40],
 
-      // Whether to display the legend
-      displayLegend: true,
+        // Whether to display the legend
+        show: true,
 
-      legendCellSize: 10,
+        cellSize: 10,
 
-      legendCellPadding: 2,
+        cellPadding: 2,
 
-      legendMargin: [0, 0, 0, 0],
+        // Legend rotation
+        // false: display the legend from left to right
+        // true : display the legend from top to bottom
+        verticalOrientation: false,
 
-      // Legend vertical position
-      // top: place legend above calendar
-      // bottom: place legend below the calendar
-      legendVerticalPosition: 'bottom',
+        margin: [0, 0, 0, 0],
 
-      // Legend horizontal position
-      // accepted values: left, center, right
-      legendHorizontalPosition: 'left',
+        // Legend vertical position
+        // top: place legend above calendar
+        // bottom: place legend below the calendar
+        verticalPosition: 'bottom',
 
-      // Legend rotation
-      // accepted values: horizontal, vertical
-      legendOrientation: 'horizontal',
+        // Legend horizontal position
+        // accepted values: left, center, right
+        horizontalPosition: 'left',
 
-      // Objects holding all the heatmap different colors
-      // null to disable, and use the default css styles
-      //
-      // Examples:
-      // legendColors: {
-      //    min: "green",
-      //    middle: "blue",
-      //    max: "red",
-      //    empty: "#ffffff",
-      //    base: "grey",
-      //    overflow: "red"
-      // }
-      legendColors: null,
+        // Objects holding all the heatmap different colors
+        // null to disable, and use the default css styles
+        //
+        // Examples:
+        // colors: {
+        //    min: "green",
+        //    middle: "blue",
+        //    max: "red",
+        //    empty: "#ffffff",
+        //    base: "grey",
+        //    overflow: "red"
+        // }
+        colors: null,
+      },
 
       // ================================================
       // HIGHLIGHT
@@ -328,16 +334,15 @@ export default class Options {
    * @return {boolean} Whether the option have been changed
    */
   set(key, value) {
-    if (
-      !this.options.hasOwnProperty(key) ||
-      isEqual(this.options[key], value)
-    ) {
+    if (!has(this.options, key) || isEqual(get(this.options, key), value)) {
       return false;
     }
 
-    this.options[key] = preProcessors.hasOwnProperty(key) ?
-      preProcessors[key](value) :
-      value;
+    set(
+      this.options,
+      key,
+      has(preProcessors, key) ? get(preProcessors, key)(value) : value,
+    );
 
     return true;
   }
@@ -375,10 +380,14 @@ export default class Options {
     this.#validate();
 
     Object.keys(preProcessors).forEach((key) => {
-      if (!options.hasOwnProperty(key)) {
+      if (!has(options, key)) {
         return;
       }
-      options[key] = preProcessors[key](options[key], this.calendar, options);
+      set(
+        options,
+        key,
+        get(preProcessors, key)(get(options, key), this.calendar, options),
+      );
     });
 
     options.x.domainVerticalLabelHeight =
@@ -400,18 +409,18 @@ export default class Options {
       options.x.domainHorizontalLabelWidth = 0;
     }
 
-    if (options.legendMargin === [0, 0, 0, 0]) {
-      switch (options.legendVerticalPosition) {
+    if (options.legend.margin === [0, 0, 0, 0]) {
+      switch (options.legend.verticalPosition) {
         case 'top':
-          options.legendMargin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
+          options.legend.margin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
           break;
         case 'bottom':
-          options.legendMargin[TOP] = DEFAULT_LEGEND_MARGIN;
+          options.legend.margin[TOP] = DEFAULT_LEGEND_MARGIN;
           break;
         case 'middle':
         case 'center':
-          options.legendMargin[
-            options.legendHorizontalPosition === 'right' ? LEFT : RIGHT
+          options.legend.margin[
+            options.legend.horizontalPosition === 'right' ? LEFT : RIGHT
           ] = DEFAULT_LEGEND_MARGIN;
           break;
         default:

@@ -68,15 +68,15 @@ export default class CalendarPainter {
   getHeight() {
     const { options } = this.calendar.options;
 
-    const legendHeight = options.displayLegend ?
+    const legendHeight = options.legend.show ?
       this.legendPainter.getHeight() +
-        options.legendMargin[TOP] +
-        options.legendMargin[BOTTOM] :
+        options.legend.margin[TOP] +
+        options.legend.margin[BOTTOM] :
       0;
 
     if (
-      options.legendVerticalPosition === 'middle' ||
-      options.legendVerticalPosition === 'center'
+      options.legend.verticalPosition === 'middle' ||
+      options.legend.verticalPosition === 'center'
     ) {
       return Math.max(this.domainPainter.dimensions.height, legendHeight);
     }
@@ -86,17 +86,17 @@ export default class CalendarPainter {
   getWidth() {
     const { options } = this.calendar.options;
 
-    const legendWidth = options.displayLegend ?
+    const legendWidth = options.legend.show ?
       this.legendPainter.getWidth() +
-        options.legendMargin[RIGHT] +
-        options.legendMargin[LEFT] :
+        options.legend.margin[RIGHT] +
+        options.legend.margin[LEFT] :
       0;
     const domainsWidth =
       this.domainPainter.dimensions.width - options.domainGutter;
 
     if (
-      options.legendVerticalPosition === 'middle' ||
-      options.legendVerticalPosition === 'center'
+      options.legend.verticalPosition === 'middle' ||
+      options.legend.verticalPosition === 'center'
     ) {
       return domainsWidth + legendWidth;
     }

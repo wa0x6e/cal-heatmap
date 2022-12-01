@@ -13,48 +13,44 @@ export default class LegendPainter {
       width: 0,
       height: 0,
     };
-    this.shown = calendar.options.options.displayLegend;
+    this.shown = calendar.options.options.legend.show;
   }
 
   #getX(width) {
-    const { options } = this.calendar.options;
+    const { horizontalPosition, verticalPosition, margin } =
+      this.calendar.options.options.legend;
 
-    switch (options.legendHorizontalPosition) {
+    switch (horizontalPosition) {
       case 'right':
-        if (
-          options.legendVerticalPosition === 'center' ||
-          options.legendVerticalPosition === 'middle'
-        ) {
-          return width + options.legendMargin[LEFT];
+        if (verticalPosition === 'center' || verticalPosition === 'middle') {
+          return width + margin[LEFT];
         }
-        return width - this.getWidth() - options.legendMargin[RIGHT];
+        return width - this.getWidth() - margin[RIGHT];
       case 'middle':
       case 'center':
         return Math.round(width / 2 - this.getWidth() / 2);
       default:
-        return options.legendMargin[BOTTOM];
+        return margin[BOTTOM];
     }
   }
 
   #getY() {
-    const { legendVerticalPosition, legendMargin } =
-      this.calendar.options.options;
-    let pos = legendMargin[TOP];
+    const { margin, verticalPosition } = this.calendar.options.options.legend;
+    let pos = margin[TOP];
 
-    if (legendVerticalPosition === 'bottom') {
+    if (verticalPosition === 'bottom') {
       pos += this.calendar.calendarPainter.domainPainter.dimensions.height;
     }
     return pos;
   }
 
   #computeDimensions() {
-    const { options } = this.calendar.options;
+    const { cellSize, cellPadding, steps } =
+      this.calendar.options.options.legend;
 
     this.dimensions = {
-      width:
-        options.legendCellSize * (options.legend.length + 1) +
-        options.legendCellPadding * options.legend.length,
-      height: options.legendCellSize,
+      width: cellSize * (steps.length + 1) + cellPadding * steps.length,
+      height: cellSize,
     };
   }
 
@@ -76,7 +72,7 @@ export default class LegendPainter {
 
   paint() {
     const { options } = this.calendar.options;
-    if (!options.displayLegend) {
+    if (!options.legend.show) {
       return false;
     }
 
@@ -109,9 +105,9 @@ export default class LegendPainter {
       .attr('width', this.getWidth())
       .attr('height', this.getHeight())
       .attr('transform', () => {
-        if (options.legendOrientation === 'vertical') {
-          return `rotate(90 ${options.legendCellSize / 2} ${
-            options.legendCellSize / 2
+        if (options.legend.verticalOrientation) {
+          return `rotate(90 ${options.legend.cellSize / 2} ${
+            options.legend.cellSize / 2
           })`;
         }
         return null;
@@ -123,9 +119,11 @@ export default class LegendPainter {
   }
 
   #populate(legendNode) {
-    const { options } = this.calendar.options;
+    const { steps, cellSize, cellPadding } =
+      this.calendar.options.options.legend;
+    const { colorizer } = this.calendar;
 
-    const items = options.legend.slice(0);
+    const items = steps.slice(0);
     items.push(items[items.length - 1] + 1);
 
     legendNode
@@ -134,40 +132,34 @@ export default class LegendPainter {
       .join(
         (enter) => enter
           .append('rect')
-          .attr('width', options.legendCellSize)
-          .attr('height', options.legendCellSize)
-          .attr(
-            'x',
-            (d, i) => i * (options.legendCellSize + options.legendCellPadding),
-          )
-          .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+          .attr('width', cellSize)
+          .attr('height', cellSize)
+          .attr('x', (d, i) => i * (cellSize + cellPadding))
+          .attr('class', (d) => colorizer.getClassName(d))
           .attr('fill', (d, i) => {
-            if (this.calendar.colorizer.scale === null) {
-              return this.calendar.colorizer.getCustomColor('base');
+            if (colorizer.scale === null) {
+              return colorizer.getCustomColor('base');
             }
 
             if (i === 0) {
-              return this.calendar.colorizer.scale(d - 1);
+              return colorizer.scale(d - 1);
             }
-            return this.calendar.colorizer.scale(options.legend[i - 1]);
+            return colorizer.scale(steps[i - 1]);
           })
           .append('title')
           .text((d, i) => this.#getLegendTitle(d, i, items)),
         (update) => update
-          .attr(
-            'x',
-            (d, i) => i * (options.legendCellSize + options.legendCellPadding),
-          )
-          .attr('class', (d) => this.calendar.colorizer.getClassName(d))
+          .attr('x', (d, i) => i * (cellSize + cellPadding))
+          .attr('class', (d) => colorizer.getClassName(d))
           .attr('fill', (d, i) => {
-            if (this.calendar.colorizer.scale === null) {
-              return this.calendar.colorizer.getCustomColor('base');
+            if (colorizer.scale === null) {
+              return colorizer.getCustomColor('base');
             }
 
             if (i === 0) {
-              return this.calendar.colorizer.scale(d - 1);
+              return colorizer.scale(d - 1);
             }
-            return this.calendar.colorizer.scale(options.legend[i - 1]);
+            return colorizer.scale(steps[i - 1]);
           })
           .append('title')
           .text((d, i) => this.#getLegendTitle(d, i, items)),
@@ -176,22 +168,23 @@ export default class LegendPainter {
 
   #getLegendTitle(d, i, legendItems) {
     const { options } = this.calendar.options;
+    const { steps } = options.legend;
 
     if (i === 0) {
       return formatStringWithObject(options.legendTitleFormat.lower, {
-        min: options.legend[i],
+        min: steps[i],
         name: options.itemName[1],
       });
     }
     if (i === legendItems.length - 1) {
       return formatStringWithObject(options.legendTitleFormat.upper, {
-        max: options.legend[i - 1],
+        max: steps[i - 1],
         name: options.itemName[1],
       });
     }
     return formatStringWithObject(options.legendTitleFormat.inner, {
-      down: options.legend[i - 1],
-      up: options.legend[i],
+      down: steps[i - 1],
+      up: steps[i],
       name: options.itemName[1],
     });
   }
@@ -206,7 +199,7 @@ export default class LegendPainter {
    */
   #getDimensions(axis) {
     const isHorizontal =
-      this.calendar.options.options.legendOrientation === 'horizontal';
+      !this.calendar.options.options.legend.verticalOrientation;
 
     switch (axis) {
       case 'height':

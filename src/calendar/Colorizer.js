@@ -8,27 +8,24 @@ export default class Colorizer {
   }
 
   build() {
-    const { legendColors } = this.calendar.options.options;
+    const { colors } = this.calendar.options.options.legend;
 
-    if (legendColors === null) {
+    if (colors === null) {
       this.scale = null;
       return false;
     }
 
     let colorRange = [];
 
-    if (Array.isArray(legendColors)) {
-      colorRange = legendColors;
-    } else if (
-      legendColors.hasOwnProperty('min') &&
-      legendColors.hasOwnProperty('max')
-    ) {
-      colorRange = [legendColors.min, legendColors.max];
+    if (Array.isArray(colors)) {
+      colorRange = colors;
+    } else if (colors.hasOwnProperty('min') && colors.hasOwnProperty('max')) {
+      colorRange = [colors.min, colors.max];
     } else {
       return false;
     }
 
-    const legend = this.calendar.options.options.legend.slice(0);
+    const legend = this.calendar.options.options.legend.steps.slice(0);
 
     if (legend[0] > 0) {
       legend.unshift(0);
@@ -44,19 +41,19 @@ export default class Colorizer {
       .interpolate(interpolateHcl)
       .domain([Math.min(...legend), Math.max(...legend)]);
 
-    const colors = legend.map((element) => colorScale(element));
+    const colorsRange = legend.map((element) => colorScale(element));
     this.scale = scaleThreshold()
-      .domain(this.calendar.options.options.legend)
-      .range(colors);
+      .domain(this.calendar.options.options.legend.steps)
+      .range(colorsRange);
 
     return true;
   }
 
   getCustomColor(colorKey) {
-    const { legendColors } = this.calendar.options.options;
+    const { colors } = this.calendar.options.options.legend;
 
-    if (this.scale !== null && legendColors?.hasOwnProperty(colorKey)) {
-      return legendColors[colorKey];
+    if (this.scale !== null && colors?.hasOwnProperty(colorKey)) {
+      return colors[colorKey];
     }
 
     return null;
@@ -73,16 +70,16 @@ export default class Colorizer {
       return '';
     }
 
-    const { legend } = this.calendar.options.options;
-    let index = [legend.length + 1];
+    const { steps } = this.calendar.options.options.legend;
+    let index = [steps.length + 1];
 
-    for (let i = 0, total = legend.length - 1; i <= total; i += 1) {
-      if (legend[0] > 0 && n < 0) {
+    for (let i = 0, total = steps.length - 1; i <= total; i += 1) {
+      if (steps[0] > 0 && n < 0) {
         index = ['1', 'i'];
         break;
       }
 
-      if (n <= legend[i]) {
+      if (n <= steps[i]) {
         index = [i + 1];
         break;
       }
