@@ -18983,7 +18983,7 @@
 	          53;
 	      case 'month':
 	        return domainDynamicDimension ?
-	          DateHelper.date(d).endOf('month').week() :
+	          DateHelper.getMonthWeekNumber(DateHelper.date(d).endOf('month')) :
 	          5;
 	      default:
 	        return 1;
@@ -19002,24 +19002,12 @@
 	    mapping: (startDate, endDate, defaultValues) =>
 	      // eslint-disable-next-line implicit-arrow-linebreak
 	      DateHelper.intervals('week', startDate, DateHelper.date(endDate)).map(
-	        (d) => {
-	          let x = 0;
-	          switch (domain) {
-	            case 'year':
-	              x = DateHelper.date(d).week() - 1;
-	              break;
-	            case 'month':
-	              x = Math.floor(DateHelper.getMonthWeekNumber(d));
-	              break;
-	          }
-
-	          return {
-	            t: d,
-	            x,
-	            y: 0,
-	            ...defaultValues,
-	          };
-	        },
+	        (d, i) => ({
+	          t: d,
+	          x: i,
+	          y: 0,
+	          ...defaultValues,
+	        }),
 	      ),
 	    position: {
 	      x() {},
