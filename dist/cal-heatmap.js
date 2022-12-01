@@ -3777,7 +3777,7 @@
 	  }
 	}
 
-	const BASE_CLASSNAME$1 = 'weekday-label';
+	const BASE_CLASSNAME$2 = 'weekday-label';
 
 	class DomainSecondaryLabel {
 	  constructor(calendar) {
@@ -3808,11 +3808,11 @@
 	          1,
 	      };
 
-	      let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME$1}`);
+	      let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME$2}`);
 	      if (dayLabelSvgGroup.empty()) {
 	        dayLabelSvgGroup = root
 	          .append('svg')
-	          .attr('class', BASE_CLASSNAME$1)
+	          .attr('class', BASE_CLASSNAME$2)
 	          .attr('x', 0)
 	          .attr('y', 0);
 	      }
@@ -3825,7 +3825,7 @@
 
 	      dayLabelSvg
 	        .append('rect')
-	        .attr('class', `${BASE_CLASSNAME$1}-rect`)
+	        .attr('class', `${BASE_CLASSNAME$2}-rect`)
 	        .attr('width', options.cellSize[X])
 	        .attr('height', options.cellSize[Y])
 	        .attr('x', 0)
@@ -3836,7 +3836,7 @@
 
 	      dayLabelSvg
 	        .append('text')
-	        .attr('class', `${BASE_CLASSNAME$1}-text`)
+	        .attr('class', `${BASE_CLASSNAME$2}-text`)
 	        .attr('dominant-baseline', 'central')
 	        .attr('text-anchor', 'middle')
 	        .attr('x', options.cellSize[X] / 2)
@@ -3852,7 +3852,7 @@
 	        width: 0,
 	        height: 0,
 	      };
-	      root.select(`.${BASE_CLASSNAME$1}`).remove();
+	      root.select(`.${BASE_CLASSNAME$2}`).remove();
 	    }
 	  }
 	}
@@ -4260,7 +4260,7 @@
 	  });
 	}
 
-	const BASE_CLASSNAME = 'graph-subdomain-group';
+	const BASE_CLASSNAME$1 = 'graph-subdomain-group';
 
 	class subDomainPainter {
 	  constructor(calendar) {
@@ -4273,7 +4273,7 @@
 	    this.root = root || this.root;
 
 	    const subDomainSvgGroup = this.root
-	      .selectAll(`.${BASE_CLASSNAME}`)
+	      .selectAll(`.${BASE_CLASSNAME$1}`)
 	      .data(
 	        (d) => [d],
 	        (d) => d,
@@ -4295,7 +4295,7 @@
 	            }
 	            return pos;
 	          })
-	          .attr('class', BASE_CLASSNAME),
+	          .attr('class', BASE_CLASSNAME$1),
 
 	        (update) => update
 	          .attr('x', () => {
@@ -6215,6 +6215,8 @@
 	  defaultModifiers: defaultModifiers
 	}); // eslint-disable-next-line import/no-unused-modules
 
+	const BASE_CLASSNAME = 'ch-tooltip';
+
 	class Tooltip {
 	  constructor(calendar) {
 	    this.calendar = calendar;
@@ -6237,15 +6239,19 @@
 	  }
 
 	  init() {
-	    this.root = select('body')
-	      .append('div')
-	      .attr('id', 'ch-tooltip')
-	      .attr('role', 'tooltip');
-	    this.root
-	      .append('div')
-	      .attr('id', 'ch-tooltip-arrow')
-	      .attr('data-popper-arrow', true);
-	    this.root.append('span').attr('id', 'ch-tooltip-body');
+	    this.root = select(`#${BASE_CLASSNAME}`);
+
+	    if (this.root.empty()) {
+	      this.root = select('body')
+	        .append('div')
+	        .attr('id', BASE_CLASSNAME)
+	        .attr('role', 'tooltip');
+	      this.root
+	        .append('div')
+	        .attr('id', `${BASE_CLASSNAME}-arrow`)
+	        .attr('data-popper-arrow', true);
+	      this.root.append('span').attr('id', `${BASE_CLASSNAME}-body`);
+	    }
 
 	    this.popperInstance = createPopper(
 	      this.virtualElement,
@@ -6295,7 +6301,7 @@
 	  }
 
 	  #setTitle(title) {
-	    this.root.select('#ch-tooltip-body').html(title);
+	    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
 	  }
 	}
 

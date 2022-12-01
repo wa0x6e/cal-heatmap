@@ -3,6 +3,8 @@ import { createPopper } from '@popperjs/core';
 
 import { getSubDomainTitle } from '../function';
 
+const BASE_CLASSNAME = 'ch-tooltip';
+
 export default class Tooltip {
   constructor(calendar) {
     this.calendar = calendar;
@@ -25,15 +27,19 @@ export default class Tooltip {
   }
 
   init() {
-    this.root = select('body')
-      .append('div')
-      .attr('id', 'ch-tooltip')
-      .attr('role', 'tooltip');
-    this.root
-      .append('div')
-      .attr('id', 'ch-tooltip-arrow')
-      .attr('data-popper-arrow', true);
-    this.root.append('span').attr('id', 'ch-tooltip-body');
+    this.root = select(`#${BASE_CLASSNAME}`);
+
+    if (this.root.empty()) {
+      this.root = select('body')
+        .append('div')
+        .attr('id', BASE_CLASSNAME)
+        .attr('role', 'tooltip');
+      this.root
+        .append('div')
+        .attr('id', `${BASE_CLASSNAME}-arrow`)
+        .attr('data-popper-arrow', true);
+      this.root.append('span').attr('id', `${BASE_CLASSNAME}-body`);
+    }
 
     this.popperInstance = createPopper(
       this.virtualElement,
@@ -83,6 +89,6 @@ export default class Tooltip {
   }
 
   #setTitle(title) {
-    this.root.select('#ch-tooltip-body').html(title);
+    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
   }
 }
