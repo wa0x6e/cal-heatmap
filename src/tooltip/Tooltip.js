@@ -1,8 +1,6 @@
 import { select } from 'd3-selection';
 import { createPopper } from '@popperjs/core';
 
-import { getSubDomainTitle } from '../function';
-
 const BASE_CLASSNAME = 'ch-tooltip';
 
 export default class Tooltip {
@@ -48,8 +46,15 @@ export default class Tooltip {
     );
   }
 
-  show(e, d) {
-    this.#update(e, d);
+  show(e) {
+    const title = e.getAttribute('title');
+
+    if (!title) {
+      return;
+    }
+
+    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
+    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
 
     this.popperInstance.setOptions(() => ({
       ...this.popperOptions,
@@ -74,21 +79,5 @@ export default class Tooltip {
         { name: 'eventListeners', enabled: false },
       ],
     }));
-  }
-
-  #update(e, d) {
-    const { options } = this.calendar.options;
-
-    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
-
-    if (options.tooltipFormat) {
-      this.#setTitle(options.tooltipFormat(new Date(d.t), d.v));
-    } else {
-      this.#setTitle(getSubDomainTitle(this.calendar, d, options));
-    }
-  }
-
-  #setTitle(title) {
-    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
   }
 }

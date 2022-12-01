@@ -3577,9 +3577,14 @@
 
 	  paint(root) {
 	    const { options } = this.calendar.options;
+	    let format = options.formatter.domainLabel;
 
-	    if (options.domainLabelFormat === '') {
+	    if ([false, ''].includes(format)) {
 	      return;
+	    }
+
+	    if (typeof format === 'undefined') {
+	      format = this.calendar.subDomainTemplate.at(options.domain).format.date;
 	    }
 
 	    root
@@ -3596,12 +3601,9 @@
 	          .attr('y', (d) => this.#getY(d))
 	          .attr('text-anchor', options.label.textAlign)
 	          .attr('dominant-baseline', () => this.#textVerticalAlign())
-	          .text((d) =>
+	          .text((d, i, nodes) =>
 	          // eslint-disable-next-line implicit-arrow-linebreak
-	            this.calendar.helpers.DateHelper.format(
-	              d,
-	              options.domainLabelFormat,
-	            ))
+	            this.calendar.helpers.DateHelper.format(d, format, nodes[i]))
 	          .call((s) => this.#domainRotate(s)),
 	        (update) => {
 	          update
@@ -3609,12 +3611,9 @@
 	            .attr('y', (d) => this.#getY(d))
 	            .attr('text-anchor', options.label.textAlign)
 	            .attr('dominant-baseline', () => this.#textVerticalAlign())
-	            .text((d) =>
+	            .text((d, i, nodes) =>
 	              // eslint-disable-next-line implicit-arrow-linebreak
-	              this.calendar.helpers.DateHelper.format(
-	                d,
-	                options.domainLabelFormat,
-	              ))
+	              this.calendar.helpers.DateHelper.format(d, format, nodes[i]))
 	            .call((s) => this.#domainRotate(s));
 	        },
 	      );
@@ -3857,333 +3856,6 @@
 	  }
 	}
 
-	function formatDecimal(x) {
-	  return Math.abs(x = Math.round(x)) >= 1e21
-	      ? x.toLocaleString("en").replace(/,/g, "")
-	      : x.toString(10);
-	}
-
-	// Computes the decimal coefficient and exponent of the specified number x with
-	// significant digits p, where x is positive and p is in [1, 21] or undefined.
-	// For example, formatDecimalParts(1.23) returns ["123", 0].
-	function formatDecimalParts(x, p) {
-	  if ((i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e")) < 0) return null; // NaN, ±Infinity
-	  var i, coefficient = x.slice(0, i);
-
-	  // The string returned by toExponential either has the form \d\.\d+e[-+]\d+
-	  // (e.g., 1.2e+3) or the form \de[-+]\d+ (e.g., 1e+3).
-	  return [
-	    coefficient.length > 1 ? coefficient[0] + coefficient.slice(2) : coefficient,
-	    +x.slice(i + 1)
-	  ];
-	}
-
-	function exponent(x) {
-	  return x = formatDecimalParts(Math.abs(x)), x ? x[1] : NaN;
-	}
-
-	function formatGroup(grouping, thousands) {
-	  return function(value, width) {
-	    var i = value.length,
-	        t = [],
-	        j = 0,
-	        g = grouping[0],
-	        length = 0;
-
-	    while (i > 0 && g > 0) {
-	      if (length + g + 1 > width) g = Math.max(1, width - length);
-	      t.push(value.substring(i -= g, i + g));
-	      if ((length += g + 1) > width) break;
-	      g = grouping[j = (j + 1) % grouping.length];
-	    }
-
-	    return t.reverse().join(thousands);
-	  };
-	}
-
-	function formatNumerals(numerals) {
-	  return function(value) {
-	    return value.replace(/[0-9]/g, function(i) {
-	      return numerals[+i];
-	    });
-	  };
-	}
-
-	// [[fill]align][sign][symbol][0][width][,][.precision][~][type]
-	var re = /^(?:(.)?([<>=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i;
-
-	function formatSpecifier(specifier) {
-	  if (!(match = re.exec(specifier))) throw new Error("invalid format: " + specifier);
-	  var match;
-	  return new FormatSpecifier({
-	    fill: match[1],
-	    align: match[2],
-	    sign: match[3],
-	    symbol: match[4],
-	    zero: match[5],
-	    width: match[6],
-	    comma: match[7],
-	    precision: match[8] && match[8].slice(1),
-	    trim: match[9],
-	    type: match[10]
-	  });
-	}
-
-	formatSpecifier.prototype = FormatSpecifier.prototype; // instanceof
-
-	function FormatSpecifier(specifier) {
-	  this.fill = specifier.fill === undefined ? " " : specifier.fill + "";
-	  this.align = specifier.align === undefined ? ">" : specifier.align + "";
-	  this.sign = specifier.sign === undefined ? "-" : specifier.sign + "";
-	  this.symbol = specifier.symbol === undefined ? "" : specifier.symbol + "";
-	  this.zero = !!specifier.zero;
-	  this.width = specifier.width === undefined ? undefined : +specifier.width;
-	  this.comma = !!specifier.comma;
-	  this.precision = specifier.precision === undefined ? undefined : +specifier.precision;
-	  this.trim = !!specifier.trim;
-	  this.type = specifier.type === undefined ? "" : specifier.type + "";
-	}
-
-	FormatSpecifier.prototype.toString = function() {
-	  return this.fill
-	      + this.align
-	      + this.sign
-	      + this.symbol
-	      + (this.zero ? "0" : "")
-	      + (this.width === undefined ? "" : Math.max(1, this.width | 0))
-	      + (this.comma ? "," : "")
-	      + (this.precision === undefined ? "" : "." + Math.max(0, this.precision | 0))
-	      + (this.trim ? "~" : "")
-	      + this.type;
-	};
-
-	// Trims insignificant zeros, e.g., replaces 1.2000k with 1.2k.
-	function formatTrim(s) {
-	  out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
-	    switch (s[i]) {
-	      case ".": i0 = i1 = i; break;
-	      case "0": if (i0 === 0) i0 = i; i1 = i; break;
-	      default: if (!+s[i]) break out; if (i0 > 0) i0 = 0; break;
-	    }
-	  }
-	  return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
-	}
-
-	var prefixExponent;
-
-	function formatPrefixAuto(x, p) {
-	  var d = formatDecimalParts(x, p);
-	  if (!d) return x + "";
-	  var coefficient = d[0],
-	      exponent = d[1],
-	      i = exponent - (prefixExponent = Math.max(-8, Math.min(8, Math.floor(exponent / 3))) * 3) + 1,
-	      n = coefficient.length;
-	  return i === n ? coefficient
-	      : i > n ? coefficient + new Array(i - n + 1).join("0")
-	      : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i)
-	      : "0." + new Array(1 - i).join("0") + formatDecimalParts(x, Math.max(0, p + i - 1))[0]; // less than 1y!
-	}
-
-	function formatRounded(x, p) {
-	  var d = formatDecimalParts(x, p);
-	  if (!d) return x + "";
-	  var coefficient = d[0],
-	      exponent = d[1];
-	  return exponent < 0 ? "0." + new Array(-exponent).join("0") + coefficient
-	      : coefficient.length > exponent + 1 ? coefficient.slice(0, exponent + 1) + "." + coefficient.slice(exponent + 1)
-	      : coefficient + new Array(exponent - coefficient.length + 2).join("0");
-	}
-
-	var formatTypes = {
-	  "%": (x, p) => (x * 100).toFixed(p),
-	  "b": (x) => Math.round(x).toString(2),
-	  "c": (x) => x + "",
-	  "d": formatDecimal,
-	  "e": (x, p) => x.toExponential(p),
-	  "f": (x, p) => x.toFixed(p),
-	  "g": (x, p) => x.toPrecision(p),
-	  "o": (x) => Math.round(x).toString(8),
-	  "p": (x, p) => formatRounded(x * 100, p),
-	  "r": formatRounded,
-	  "s": formatPrefixAuto,
-	  "X": (x) => Math.round(x).toString(16).toUpperCase(),
-	  "x": (x) => Math.round(x).toString(16)
-	};
-
-	function identity$2(x) {
-	  return x;
-	}
-
-	var map = Array.prototype.map,
-	    prefixes = ["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];
-
-	function formatLocale(locale) {
-	  var group = locale.grouping === undefined || locale.thousands === undefined ? identity$2 : formatGroup(map.call(locale.grouping, Number), locale.thousands + ""),
-	      currencyPrefix = locale.currency === undefined ? "" : locale.currency[0] + "",
-	      currencySuffix = locale.currency === undefined ? "" : locale.currency[1] + "",
-	      decimal = locale.decimal === undefined ? "." : locale.decimal + "",
-	      numerals = locale.numerals === undefined ? identity$2 : formatNumerals(map.call(locale.numerals, String)),
-	      percent = locale.percent === undefined ? "%" : locale.percent + "",
-	      minus = locale.minus === undefined ? "−" : locale.minus + "",
-	      nan = locale.nan === undefined ? "NaN" : locale.nan + "";
-
-	  function newFormat(specifier) {
-	    specifier = formatSpecifier(specifier);
-
-	    var fill = specifier.fill,
-	        align = specifier.align,
-	        sign = specifier.sign,
-	        symbol = specifier.symbol,
-	        zero = specifier.zero,
-	        width = specifier.width,
-	        comma = specifier.comma,
-	        precision = specifier.precision,
-	        trim = specifier.trim,
-	        type = specifier.type;
-
-	    // The "n" type is an alias for ",g".
-	    if (type === "n") comma = true, type = "g";
-
-	    // The "" type, and any invalid type, is an alias for ".12~g".
-	    else if (!formatTypes[type]) precision === undefined && (precision = 12), trim = true, type = "g";
-
-	    // If zero fill is specified, padding goes after sign and before digits.
-	    if (zero || (fill === "0" && align === "=")) zero = true, fill = "0", align = "=";
-
-	    // Compute the prefix and suffix.
-	    // For SI-prefix, the suffix is lazily computed.
-	    var prefix = symbol === "$" ? currencyPrefix : symbol === "#" && /[boxX]/.test(type) ? "0" + type.toLowerCase() : "",
-	        suffix = symbol === "$" ? currencySuffix : /[%p]/.test(type) ? percent : "";
-
-	    // What format function should we use?
-	    // Is this an integer type?
-	    // Can this type generate exponential notation?
-	    var formatType = formatTypes[type],
-	        maybeSuffix = /[defgprs%]/.test(type);
-
-	    // Set the default precision if not specified,
-	    // or clamp the specified precision to the supported range.
-	    // For significant precision, it must be in [1, 21].
-	    // For fixed precision, it must be in [0, 20].
-	    precision = precision === undefined ? 6
-	        : /[gprs]/.test(type) ? Math.max(1, Math.min(21, precision))
-	        : Math.max(0, Math.min(20, precision));
-
-	    function format(value) {
-	      var valuePrefix = prefix,
-	          valueSuffix = suffix,
-	          i, n, c;
-
-	      if (type === "c") {
-	        valueSuffix = formatType(value) + valueSuffix;
-	        value = "";
-	      } else {
-	        value = +value;
-
-	        // Determine the sign. -0 is not less than 0, but 1 / -0 is!
-	        var valueNegative = value < 0 || 1 / value < 0;
-
-	        // Perform the initial formatting.
-	        value = isNaN(value) ? nan : formatType(Math.abs(value), precision);
-
-	        // Trim insignificant zeros.
-	        if (trim) value = formatTrim(value);
-
-	        // If a negative value rounds to zero after formatting, and no explicit positive sign is requested, hide the sign.
-	        if (valueNegative && +value === 0 && sign !== "+") valueNegative = false;
-
-	        // Compute the prefix and suffix.
-	        valuePrefix = (valueNegative ? (sign === "(" ? sign : minus) : sign === "-" || sign === "(" ? "" : sign) + valuePrefix;
-	        valueSuffix = (type === "s" ? prefixes[8 + prefixExponent / 3] : "") + valueSuffix + (valueNegative && sign === "(" ? ")" : "");
-
-	        // Break the formatted value into the integer “value” part that can be
-	        // grouped, and fractional or exponential “suffix” part that is not.
-	        if (maybeSuffix) {
-	          i = -1, n = value.length;
-	          while (++i < n) {
-	            if (c = value.charCodeAt(i), 48 > c || c > 57) {
-	              valueSuffix = (c === 46 ? decimal + value.slice(i + 1) : value.slice(i)) + valueSuffix;
-	              value = value.slice(0, i);
-	              break;
-	            }
-	          }
-	        }
-	      }
-
-	      // If the fill character is not "0", grouping is applied before padding.
-	      if (comma && !zero) value = group(value, Infinity);
-
-	      // Compute the padding.
-	      var length = valuePrefix.length + value.length + valueSuffix.length,
-	          padding = length < width ? new Array(width - length + 1).join(fill) : "";
-
-	      // If the fill character is "0", grouping is applied after padding.
-	      if (comma && zero) value = group(padding + value, padding.length ? width - valueSuffix.length : Infinity), padding = "";
-
-	      // Reconstruct the final output based on the desired alignment.
-	      switch (align) {
-	        case "<": value = valuePrefix + value + valueSuffix + padding; break;
-	        case "=": value = valuePrefix + padding + value + valueSuffix; break;
-	        case "^": value = padding.slice(0, length = padding.length >> 1) + valuePrefix + value + valueSuffix + padding.slice(length); break;
-	        default: value = padding + valuePrefix + value + valueSuffix; break;
-	      }
-
-	      return numerals(value);
-	    }
-
-	    format.toString = function() {
-	      return specifier + "";
-	    };
-
-	    return format;
-	  }
-
-	  function formatPrefix(specifier, value) {
-	    var f = newFormat((specifier = formatSpecifier(specifier), specifier.type = "f", specifier)),
-	        e = Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3,
-	        k = Math.pow(10, -e),
-	        prefix = prefixes[8 + e / 3];
-	    return function(value) {
-	      return f(k * value) + prefix;
-	    };
-	  }
-
-	  return {
-	    format: newFormat,
-	    formatPrefix: formatPrefix
-	  };
-	}
-
-	var locale;
-	var format;
-	var formatPrefix;
-
-	defaultLocale({
-	  thousands: ",",
-	  grouping: [3],
-	  currency: ["$", ""]
-	});
-
-	function defaultLocale(definition) {
-	  locale = formatLocale(definition);
-	  format = locale.format;
-	  formatPrefix = locale.formatPrefix;
-	  return locale;
-	}
-
-	function precisionFixed(step) {
-	  return Math.max(0, -exponent(Math.abs(step)));
-	}
-
-	function precisionPrefix(step, value) {
-	  return Math.max(0, Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3 - exponent(Math.abs(step)));
-	}
-
-	function precisionRound(step, max) {
-	  step = Math.abs(step), max = Math.abs(max) - step;
-	  return Math.max(0, exponent(max) - exponent(step)) + 1;
-	}
-
 	/**
 	 * Sprintf like function.
 	 * Replaces placeholders {0} in string with values from provided object.
@@ -4235,29 +3907,6 @@
 	  }
 
 	  return classname;
-	}
-
-	function getSubDomainTitle(calendar, d, options, connector) {
-	  if (d.v === null && !options.considerMissingDataAsZero) {
-	    return formatStringWithObject(options.subDomainTitleFormat.empty, {
-	      date: calendar.helpers.DateHelper.format(
-	        d.t,
-	        options.subDomainDateFormat,
-	      ),
-	    });
-	  }
-	  let value = d.v;
-	  // Consider null as 0
-	  if (value === null && options.considerMissingDataAsZero) {
-	    value = 0;
-	  }
-
-	  return formatStringWithObject(options.subDomainTitleFormat.filled, {
-	    count: format(',d')(value),
-	    name: options.itemName[value !== 1 ? 1 : 0],
-	    connector,
-	    date: calendar.helpers.DateHelper.format(d.t, options.subDomainDateFormat),
-	  });
 	}
 
 	const BASE_CLASSNAME$1 = 'graph-subdomain-group';
@@ -4334,7 +3983,7 @@
 	        eventEmitter.emit('onClick', ev, new Date(d.t), d.v))
 	      .on('mouseover', (ev, d) => {
 	        if (options.tooltip) {
-	          this.calendar.calendarPainter.tooltip.show(ev.target, d);
+	          this.calendar.calendarPainter.tooltip.show(ev.target);
 	        }
 	        return eventEmitter.emit('onMouseOver', ev, new Date(d.t), d.v);
 	      })
@@ -4355,13 +4004,7 @@
 	        selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
 	      });
 
-	    if (!options.tooltip) {
-	      this.#appendTitle(rect);
-	    }
-
-	    if (options.subDomainTextFormat !== null) {
-	      this.#appendText(rect);
-	    }
+	    this.#appendText(rect);
 	  }
 
 	  #getClassName(d) {
@@ -4374,8 +4017,13 @@
 
 	  #appendText(elem) {
 	    const { options } = this.calendar.options;
+	    const formatter = options.formatter.subDomainLabel;
 
-	    elem
+	    if (!formatter) {
+	      return null;
+	    }
+
+	    return elem
 	      .append('text')
 	      .attr(
 	        'class',
@@ -4386,20 +4034,11 @@
 	      .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
 	      .attr('text-anchor', 'middle')
 	      .attr('dominant-baseline', 'central')
-	      .text((d) => this.calendar.helpers.DateHelper.format(
+	      .text((d, i, nodes) => this.calendar.helpers.DateHelper.format(
 	        d.t,
-	        options.subDomainTextFormat,
-	      ));
-	  }
-
-	  #appendTitle(elem) {
-	    const { options } = this.calendar.options;
-
-	    elem
-	      .append('title')
-	      .text((d) => this.calendar.helpers.DateHelper.format(
-	        d.t,
-	        options.subDomainDateFormat,
+	        formatter,
+	        d.v,
+	        nodes[i],
 	      ));
 	  }
 
@@ -6260,8 +5899,15 @@
 	    );
 	  }
 
-	  show(e, d) {
-	    this.#update(e, d);
+	  show(e) {
+	    const title = e.getAttribute('title');
+
+	    if (!title) {
+	      return;
+	    }
+
+	    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
+	    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
 
 	    this.popperInstance.setOptions(() => ({
 	      ...this.popperOptions,
@@ -6286,22 +5932,6 @@
 	        { name: 'eventListeners', enabled: false },
 	      ],
 	    }));
-	  }
-
-	  #update(e, d) {
-	    const { options } = this.calendar.options;
-
-	    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
-
-	    if (options.tooltipFormat) {
-	      this.#setTitle(options.tooltipFormat(new Date(d.t), d.v));
-	    } else {
-	      this.#setTitle(getSubDomainTitle(this.calendar, d, options));
-	    }
-	  }
-
-	  #setTitle(title) {
-	    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
 	  }
 	}
 
@@ -6796,17 +6426,10 @@
 	    return htmlClass.join(' ').trim();
 	  }
 
-	  #formatSubDomainText(element) {
-	    const formatter = this.calendar.options.options.subDomainTextFormat;
-	    if (typeof formatter === 'function') {
-	      element.text((d) => formatter(d.t, d.v));
-	    }
-	  }
-
 	  populate() {
 	    const { calendar } = this;
 	    const { options } = calendar.options;
-	    const svg = this.calendar.calendarPainter.root.selectAll('.graph-domain');
+	    const svg = calendar.calendarPainter.root.selectAll('.graph-domain');
 
 	    const rect = svg
 	      .selectAll('svg')
@@ -6818,21 +6441,15 @@
 	      .duration(options.animationDuration)
 	      .select('rect')
 	      .attr('class', (d) => this.#getClassName(d))
-	      .call((d) => this.#addStyle(d));
+	      .call((d) => this.#addStyle(d))
+	      .attr('title', (d) => {
+	        const { subDomainTitleFn } = options.formatter;
 
-	    rect
-	      .transition()
-	      .duration(options.animationDuration)
-	      .select('title')
-	      .text((d) => getSubDomainTitle(
-	        calendar,
-	        d,
-	        options,
-	        calendar.subDomainTemplate.at(options.subDomain).format.connector,
-	      ));
+	        return subDomainTitleFn ? subDomainTitleFn(new Date(d.t), d.v) : null;
+	      });
 
 	    /**
-	     * Change the subDomainText class if necessary
+	     * Change the subDomainLabel class if necessary
 	     * Also change the text, e.g when text is representing the value
 	     * instead of the date
 	     */
@@ -6844,7 +6461,14 @@
 	        'class',
 	        (d) => `subdomain-text${getHighlightClassName(calendar, d.t, options)}`,
 	      )
-	      .call((e) => this.#formatSubDomainText(e));
+	      .call((element) => {
+	        element.text((d, i, nodes) => calendar.helpers.DateHelper.format(
+	          d.t,
+	          options.formatter.subDomainLabel,
+	          d.v,
+	          nodes[i],
+	        ));
+	      });
 	  }
 	}
 
@@ -7054,7 +6678,7 @@
 	 * console.log(_.identity(object) === object);
 	 * // => true
 	 */
-	function identity$1(value) {
+	function identity$2(value) {
 	  return value;
 	}
 
@@ -7356,7 +6980,7 @@
 	 * @param {Function} string The `toString` result.
 	 * @returns {Function} Returns `func`.
 	 */
-	var baseSetToString = !defineProperty$1 ? identity$1 : function(func, string) {
+	var baseSetToString = !defineProperty$1 ? identity$2 : function(func, string) {
 	  return defineProperty$1(func, 'toString', {
 	    'configurable': true,
 	    'enumerable': false,
@@ -7563,7 +7187,7 @@
 	 * @returns {Function} Returns the new function.
 	 */
 	function baseRest(func, start) {
-	  return setToString$1(overRest(func, start, identity$1), func + '');
+	  return setToString$1(overRest(func, start, identity$2), func + '');
 	}
 
 	/** Used as references for various `Number` constants. */
@@ -17154,12 +16778,16 @@
 	    return this.momentInstance.tz(d, this.timezone);
 	  }
 
-	  format(d, formatter) {
+	  format(date, formatter, ...args) {
 	    if (typeof formatter === 'function') {
-	      return formatter(new Date(d));
+	      return formatter(new Date(date), ...args);
 	    }
 
-	    return this.date(d).format(formatter);
+	    if (formatter) {
+	      return this.date(date).format(formatter);
+	    }
+
+	    return null;
 	  }
 
 	  /**
@@ -17297,19 +16925,14 @@
 	        return value.slice(0, 4);
 	    }
 	  },
-	  subDomainDateFormat: (value, calendar, options) =>
+	  'formatter.subDomainLabel': (value) =>
 	    // eslint-disable-next-line
-	    (isString(value) || isFunction(value) ?
-	      value :
-	      calendar.subDomainTemplate.at(options.subDomain).format.date),
-	  domainLabelFormat: (value, calendar, options) =>
+	    ((isString(value) && value !== '') || isFunction(value) ? value : null),
+	  'formatter.domainLabel': (value, calendar, options) =>
 	    // eslint-disable-next-line
 	    (isString(value) || isFunction(value) ?
 	      value :
 	      calendar.subDomainTemplate.at(options.domain).format.legend),
-	  subDomainTextFormat: (value) =>
-	    // eslint-disable-next-line
-	    ((isString(value) && value !== '') || isFunction(value) ? value : null),
 	};
 
 	class Options {
@@ -17487,38 +17110,30 @@
 	      // Name of the items to represent in the calendar
 	      itemName: ['item', 'items'],
 
-	      // Formatting of the domain label
-	      // @default: null, will use the formatting according to domain type
-	      // Accept a string used as specifier by moment().format()
-	      // or a function
-	      //
-	      // Refer to https://momentjs.com/docs/#/displaying/
-	      // for accepted date formatting used by moment().format()
-	      domainLabelFormat: null,
+	      formatter: {
+	        // Formatting of the domain label
+	        // @default: undefined, will use the formatting according to domain type
+	        // Accept a string used as specifier by moment().format()
+	        // or a function
+	        //
+	        // Refer to https://momentjs.com/docs/#/displaying/
+	        // for accepted date formatting used by moment().format()
+	        domainLabel: undefined,
 
-	      // Formatting of the title displayed when hovering a subDomain cell
-	      subDomainTitleFormat: {
-	        empty: '{date}',
-	        filled: '{count} {name} {connector} {date}',
+	        // Formatting of the text inside each subDomain cell
+	        // @default: null, no text
+	        // Accept a string used as specifier by moment().format()
+	        // or a function
+	        //
+	        // Refer to https://momentjs.com/docs/#/displaying/
+	        // for accepted date formatting used by moment().format()
+	        subDomainLabel: null,
+
+	        // Formatting of the title displayed when hovering a subDomain cell
+	        // This will also be the tooltip's text when enabled
+	        // Expecting a function, which is returning the title's text
+	        subDomainTitleFn: (date, value) => `${value} - ${date}`,
 	      },
-
-	      // Formatting of the {date} used in subDomainTitleFormat
-	      // @default: null, will use the formatting according to subDomain type
-	      // Accept a string used as specifier by moment().format()
-	      // or a function
-	      //
-	      // Refer to https://momentjs.com/docs/#/displaying/
-	      // for accepted date formatting used by moment().format()
-	      subDomainDateFormat: null,
-
-	      // Formatting of the text inside each subDomain cell
-	      // @default: null, no text
-	      // Accept a string used as specifier by moment().format()
-	      // or a function
-	      //
-	      // Refer to https://momentjs.com/docs/#/displaying/
-	      // for accepted date formatting used by moment().format()
-	      subDomainTextFormat: null,
 
 	      // Formatting of the title displayed when hovering a legend cell
 	      legendTitleFormat: {
@@ -17535,9 +17150,6 @@
 	      previousSelector: false,
 
 	      tooltip: false,
-
-	      // Format the content of the tooltip
-	      tooltipFormat: (title) => title,
 
 	      // Callback after fetching the datas,
 	      // but before applying them to the calendar
@@ -17622,7 +17234,7 @@
 	      options.x.domainHorizontalLabelWidth = options.label.width;
 	    }
 
-	    if (!options.domainLabelFormat) {
+	    if ([false, '', null].includes(options.formatter.domainLabel)) {
 	      options.x.domainVerticalLabelHeight = 0;
 	      options.x.domainHorizontalLabelWidth = 0;
 	    }
@@ -17797,7 +17409,7 @@
 
 	var unit = [0, 1];
 
-	function identity(x) {
+	function identity$1(x) {
 	  return x;
 	}
 
@@ -17861,14 +17473,14 @@
 	      transform,
 	      untransform,
 	      unknown,
-	      clamp = identity,
+	      clamp = identity$1,
 	      piecewise,
 	      output,
 	      input;
 
 	  function rescale() {
 	    var n = Math.min(domain.length, range.length);
-	    if (clamp !== identity) clamp = clamper(domain[0], domain[n - 1]);
+	    if (clamp !== identity$1) clamp = clamper(domain[0], domain[n - 1]);
 	    piecewise = n > 2 ? polymap : bimap;
 	    output = input = null;
 	    return scale;
@@ -17895,7 +17507,7 @@
 	  };
 
 	  scale.clamp = function(_) {
-	    return arguments.length ? (clamp = _ ? true : identity, rescale()) : clamp !== identity;
+	    return arguments.length ? (clamp = _ ? true : identity$1, rescale()) : clamp !== identity$1;
 	  };
 
 	  scale.interpolate = function(_) {
@@ -17913,7 +17525,334 @@
 	}
 
 	function continuous() {
-	  return transformer()(identity, identity);
+	  return transformer()(identity$1, identity$1);
+	}
+
+	function formatDecimal(x) {
+	  return Math.abs(x = Math.round(x)) >= 1e21
+	      ? x.toLocaleString("en").replace(/,/g, "")
+	      : x.toString(10);
+	}
+
+	// Computes the decimal coefficient and exponent of the specified number x with
+	// significant digits p, where x is positive and p is in [1, 21] or undefined.
+	// For example, formatDecimalParts(1.23) returns ["123", 0].
+	function formatDecimalParts(x, p) {
+	  if ((i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e")) < 0) return null; // NaN, ±Infinity
+	  var i, coefficient = x.slice(0, i);
+
+	  // The string returned by toExponential either has the form \d\.\d+e[-+]\d+
+	  // (e.g., 1.2e+3) or the form \de[-+]\d+ (e.g., 1e+3).
+	  return [
+	    coefficient.length > 1 ? coefficient[0] + coefficient.slice(2) : coefficient,
+	    +x.slice(i + 1)
+	  ];
+	}
+
+	function exponent(x) {
+	  return x = formatDecimalParts(Math.abs(x)), x ? x[1] : NaN;
+	}
+
+	function formatGroup(grouping, thousands) {
+	  return function(value, width) {
+	    var i = value.length,
+	        t = [],
+	        j = 0,
+	        g = grouping[0],
+	        length = 0;
+
+	    while (i > 0 && g > 0) {
+	      if (length + g + 1 > width) g = Math.max(1, width - length);
+	      t.push(value.substring(i -= g, i + g));
+	      if ((length += g + 1) > width) break;
+	      g = grouping[j = (j + 1) % grouping.length];
+	    }
+
+	    return t.reverse().join(thousands);
+	  };
+	}
+
+	function formatNumerals(numerals) {
+	  return function(value) {
+	    return value.replace(/[0-9]/g, function(i) {
+	      return numerals[+i];
+	    });
+	  };
+	}
+
+	// [[fill]align][sign][symbol][0][width][,][.precision][~][type]
+	var re = /^(?:(.)?([<>=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i;
+
+	function formatSpecifier(specifier) {
+	  if (!(match = re.exec(specifier))) throw new Error("invalid format: " + specifier);
+	  var match;
+	  return new FormatSpecifier({
+	    fill: match[1],
+	    align: match[2],
+	    sign: match[3],
+	    symbol: match[4],
+	    zero: match[5],
+	    width: match[6],
+	    comma: match[7],
+	    precision: match[8] && match[8].slice(1),
+	    trim: match[9],
+	    type: match[10]
+	  });
+	}
+
+	formatSpecifier.prototype = FormatSpecifier.prototype; // instanceof
+
+	function FormatSpecifier(specifier) {
+	  this.fill = specifier.fill === undefined ? " " : specifier.fill + "";
+	  this.align = specifier.align === undefined ? ">" : specifier.align + "";
+	  this.sign = specifier.sign === undefined ? "-" : specifier.sign + "";
+	  this.symbol = specifier.symbol === undefined ? "" : specifier.symbol + "";
+	  this.zero = !!specifier.zero;
+	  this.width = specifier.width === undefined ? undefined : +specifier.width;
+	  this.comma = !!specifier.comma;
+	  this.precision = specifier.precision === undefined ? undefined : +specifier.precision;
+	  this.trim = !!specifier.trim;
+	  this.type = specifier.type === undefined ? "" : specifier.type + "";
+	}
+
+	FormatSpecifier.prototype.toString = function() {
+	  return this.fill
+	      + this.align
+	      + this.sign
+	      + this.symbol
+	      + (this.zero ? "0" : "")
+	      + (this.width === undefined ? "" : Math.max(1, this.width | 0))
+	      + (this.comma ? "," : "")
+	      + (this.precision === undefined ? "" : "." + Math.max(0, this.precision | 0))
+	      + (this.trim ? "~" : "")
+	      + this.type;
+	};
+
+	// Trims insignificant zeros, e.g., replaces 1.2000k with 1.2k.
+	function formatTrim(s) {
+	  out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
+	    switch (s[i]) {
+	      case ".": i0 = i1 = i; break;
+	      case "0": if (i0 === 0) i0 = i; i1 = i; break;
+	      default: if (!+s[i]) break out; if (i0 > 0) i0 = 0; break;
+	    }
+	  }
+	  return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
+	}
+
+	var prefixExponent;
+
+	function formatPrefixAuto(x, p) {
+	  var d = formatDecimalParts(x, p);
+	  if (!d) return x + "";
+	  var coefficient = d[0],
+	      exponent = d[1],
+	      i = exponent - (prefixExponent = Math.max(-8, Math.min(8, Math.floor(exponent / 3))) * 3) + 1,
+	      n = coefficient.length;
+	  return i === n ? coefficient
+	      : i > n ? coefficient + new Array(i - n + 1).join("0")
+	      : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i)
+	      : "0." + new Array(1 - i).join("0") + formatDecimalParts(x, Math.max(0, p + i - 1))[0]; // less than 1y!
+	}
+
+	function formatRounded(x, p) {
+	  var d = formatDecimalParts(x, p);
+	  if (!d) return x + "";
+	  var coefficient = d[0],
+	      exponent = d[1];
+	  return exponent < 0 ? "0." + new Array(-exponent).join("0") + coefficient
+	      : coefficient.length > exponent + 1 ? coefficient.slice(0, exponent + 1) + "." + coefficient.slice(exponent + 1)
+	      : coefficient + new Array(exponent - coefficient.length + 2).join("0");
+	}
+
+	var formatTypes = {
+	  "%": (x, p) => (x * 100).toFixed(p),
+	  "b": (x) => Math.round(x).toString(2),
+	  "c": (x) => x + "",
+	  "d": formatDecimal,
+	  "e": (x, p) => x.toExponential(p),
+	  "f": (x, p) => x.toFixed(p),
+	  "g": (x, p) => x.toPrecision(p),
+	  "o": (x) => Math.round(x).toString(8),
+	  "p": (x, p) => formatRounded(x * 100, p),
+	  "r": formatRounded,
+	  "s": formatPrefixAuto,
+	  "X": (x) => Math.round(x).toString(16).toUpperCase(),
+	  "x": (x) => Math.round(x).toString(16)
+	};
+
+	function identity(x) {
+	  return x;
+	}
+
+	var map = Array.prototype.map,
+	    prefixes = ["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];
+
+	function formatLocale(locale) {
+	  var group = locale.grouping === undefined || locale.thousands === undefined ? identity : formatGroup(map.call(locale.grouping, Number), locale.thousands + ""),
+	      currencyPrefix = locale.currency === undefined ? "" : locale.currency[0] + "",
+	      currencySuffix = locale.currency === undefined ? "" : locale.currency[1] + "",
+	      decimal = locale.decimal === undefined ? "." : locale.decimal + "",
+	      numerals = locale.numerals === undefined ? identity : formatNumerals(map.call(locale.numerals, String)),
+	      percent = locale.percent === undefined ? "%" : locale.percent + "",
+	      minus = locale.minus === undefined ? "−" : locale.minus + "",
+	      nan = locale.nan === undefined ? "NaN" : locale.nan + "";
+
+	  function newFormat(specifier) {
+	    specifier = formatSpecifier(specifier);
+
+	    var fill = specifier.fill,
+	        align = specifier.align,
+	        sign = specifier.sign,
+	        symbol = specifier.symbol,
+	        zero = specifier.zero,
+	        width = specifier.width,
+	        comma = specifier.comma,
+	        precision = specifier.precision,
+	        trim = specifier.trim,
+	        type = specifier.type;
+
+	    // The "n" type is an alias for ",g".
+	    if (type === "n") comma = true, type = "g";
+
+	    // The "" type, and any invalid type, is an alias for ".12~g".
+	    else if (!formatTypes[type]) precision === undefined && (precision = 12), trim = true, type = "g";
+
+	    // If zero fill is specified, padding goes after sign and before digits.
+	    if (zero || (fill === "0" && align === "=")) zero = true, fill = "0", align = "=";
+
+	    // Compute the prefix and suffix.
+	    // For SI-prefix, the suffix is lazily computed.
+	    var prefix = symbol === "$" ? currencyPrefix : symbol === "#" && /[boxX]/.test(type) ? "0" + type.toLowerCase() : "",
+	        suffix = symbol === "$" ? currencySuffix : /[%p]/.test(type) ? percent : "";
+
+	    // What format function should we use?
+	    // Is this an integer type?
+	    // Can this type generate exponential notation?
+	    var formatType = formatTypes[type],
+	        maybeSuffix = /[defgprs%]/.test(type);
+
+	    // Set the default precision if not specified,
+	    // or clamp the specified precision to the supported range.
+	    // For significant precision, it must be in [1, 21].
+	    // For fixed precision, it must be in [0, 20].
+	    precision = precision === undefined ? 6
+	        : /[gprs]/.test(type) ? Math.max(1, Math.min(21, precision))
+	        : Math.max(0, Math.min(20, precision));
+
+	    function format(value) {
+	      var valuePrefix = prefix,
+	          valueSuffix = suffix,
+	          i, n, c;
+
+	      if (type === "c") {
+	        valueSuffix = formatType(value) + valueSuffix;
+	        value = "";
+	      } else {
+	        value = +value;
+
+	        // Determine the sign. -0 is not less than 0, but 1 / -0 is!
+	        var valueNegative = value < 0 || 1 / value < 0;
+
+	        // Perform the initial formatting.
+	        value = isNaN(value) ? nan : formatType(Math.abs(value), precision);
+
+	        // Trim insignificant zeros.
+	        if (trim) value = formatTrim(value);
+
+	        // If a negative value rounds to zero after formatting, and no explicit positive sign is requested, hide the sign.
+	        if (valueNegative && +value === 0 && sign !== "+") valueNegative = false;
+
+	        // Compute the prefix and suffix.
+	        valuePrefix = (valueNegative ? (sign === "(" ? sign : minus) : sign === "-" || sign === "(" ? "" : sign) + valuePrefix;
+	        valueSuffix = (type === "s" ? prefixes[8 + prefixExponent / 3] : "") + valueSuffix + (valueNegative && sign === "(" ? ")" : "");
+
+	        // Break the formatted value into the integer “value” part that can be
+	        // grouped, and fractional or exponential “suffix” part that is not.
+	        if (maybeSuffix) {
+	          i = -1, n = value.length;
+	          while (++i < n) {
+	            if (c = value.charCodeAt(i), 48 > c || c > 57) {
+	              valueSuffix = (c === 46 ? decimal + value.slice(i + 1) : value.slice(i)) + valueSuffix;
+	              value = value.slice(0, i);
+	              break;
+	            }
+	          }
+	        }
+	      }
+
+	      // If the fill character is not "0", grouping is applied before padding.
+	      if (comma && !zero) value = group(value, Infinity);
+
+	      // Compute the padding.
+	      var length = valuePrefix.length + value.length + valueSuffix.length,
+	          padding = length < width ? new Array(width - length + 1).join(fill) : "";
+
+	      // If the fill character is "0", grouping is applied after padding.
+	      if (comma && zero) value = group(padding + value, padding.length ? width - valueSuffix.length : Infinity), padding = "";
+
+	      // Reconstruct the final output based on the desired alignment.
+	      switch (align) {
+	        case "<": value = valuePrefix + value + valueSuffix + padding; break;
+	        case "=": value = valuePrefix + padding + value + valueSuffix; break;
+	        case "^": value = padding.slice(0, length = padding.length >> 1) + valuePrefix + value + valueSuffix + padding.slice(length); break;
+	        default: value = padding + valuePrefix + value + valueSuffix; break;
+	      }
+
+	      return numerals(value);
+	    }
+
+	    format.toString = function() {
+	      return specifier + "";
+	    };
+
+	    return format;
+	  }
+
+	  function formatPrefix(specifier, value) {
+	    var f = newFormat((specifier = formatSpecifier(specifier), specifier.type = "f", specifier)),
+	        e = Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3,
+	        k = Math.pow(10, -e),
+	        prefix = prefixes[8 + e / 3];
+	    return function(value) {
+	      return f(k * value) + prefix;
+	    };
+	  }
+
+	  return {
+	    format: newFormat,
+	    formatPrefix: formatPrefix
+	  };
+	}
+
+	var locale;
+	var format;
+	var formatPrefix;
+
+	defaultLocale({
+	  thousands: ",",
+	  grouping: [3],
+	  currency: ["$", ""]
+	});
+
+	function defaultLocale(definition) {
+	  locale = formatLocale(definition);
+	  format = locale.format;
+	  formatPrefix = locale.formatPrefix;
+	  return locale;
+	}
+
+	function precisionFixed(step) {
+	  return Math.max(0, -exponent(Math.abs(step)));
+	}
+
+	function precisionPrefix(step, value) {
+	  return Math.max(0, Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3 - exponent(Math.abs(step)));
+	}
+
+	function precisionRound(step, max) {
+	  step = Math.abs(step), max = Math.abs(max) - step;
+	  return Math.max(0, exponent(max) - exponent(step)) + 1;
 	}
 
 	function tickFormat(start, stop, count, specifier) {
@@ -18812,7 +18751,6 @@
 	    format: {
 	      date: 'LT, dddd MMMM D, Y',
 	      legend: '',
-	      connector: 'at',
 	    },
 	    extractUnit(d) {
 	      return DateHelper.date(d).startOf('minute').valueOf();
@@ -18877,7 +18815,6 @@
 	    format: {
 	      date: 'HH[h], dddd MMMM D, Y',
 	      legend: 'HH:00',
-	      connector: 'at',
 	    },
 	    extractUnit(d) {
 	      return DateHelper.date(d).startOf('hour').valueOf();
@@ -18954,7 +18891,6 @@
 	    format: {
 	      date: 'dddd MMMM D, Y',
 	      legend: 'Do MMM',
-	      connector: 'on',
 	    },
 	    extractUnit(d) {
 	      return DateHelper.date(d).startOf('day').valueOf();
@@ -19031,7 +18967,6 @@
 	    format: {
 	      date: 'dddd MMMM D, Y',
 	      legend: 'Do MMM',
-	      connector: 'on',
 	    },
 	    extractUnit(d) {
 	      return DateHelper.date(d).startOf('day').valueOf();
@@ -19095,7 +19030,6 @@
 	    format: {
 	      date: 'wo [week] Y',
 	      legend: 'wo [week] Y',
-	      connector: 'at',
 	    },
 	    extractUnit(d) {
 	      return DateHelper.date(d).startOf('week').valueOf();
@@ -19124,9 +19058,8 @@
 	    ),
 
 	  format: {
-	    date: 'MMMM Y',
+	    date: 'MMMM',
 	    legend: 'MMMM',
-	    connector: 'in',
 	  },
 	  extractUnit(d) {
 	    return DateHelper.date(d).startOf('month').valueOf();
@@ -19156,7 +19089,6 @@
 	  format: {
 	    date: 'Y',
 	    legend: 'Y',
-	    connector: 'in',
 	  },
 	  extractUnit(d) {
 	    return DateHelper.date(d).startOf('year').valueOf();

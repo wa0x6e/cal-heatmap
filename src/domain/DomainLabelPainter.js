@@ -11,9 +11,14 @@ export default class DomainLabelPainter {
 
   paint(root) {
     const { options } = this.calendar.options;
+    let format = options.formatter.domainLabel;
 
-    if (options.domainLabelFormat === '') {
+    if ([false, ''].includes(format)) {
       return;
+    }
+
+    if (typeof format === 'undefined') {
+      format = this.calendar.subDomainTemplate.at(options.domain).format.date;
     }
 
     root
@@ -30,12 +35,9 @@ export default class DomainLabelPainter {
           .attr('y', (d) => this.#getY(d))
           .attr('text-anchor', options.label.textAlign)
           .attr('dominant-baseline', () => this.#textVerticalAlign())
-          .text((d) =>
+          .text((d, i, nodes) =>
           // eslint-disable-next-line implicit-arrow-linebreak
-            this.calendar.helpers.DateHelper.format(
-              d,
-              options.domainLabelFormat,
-            ))
+            this.calendar.helpers.DateHelper.format(d, format, nodes[i]))
           .call((s) => this.#domainRotate(s)),
         (update) => {
           update
@@ -43,12 +45,9 @@ export default class DomainLabelPainter {
             .attr('y', (d) => this.#getY(d))
             .attr('text-anchor', options.label.textAlign)
             .attr('dominant-baseline', () => this.#textVerticalAlign())
-            .text((d) =>
+            .text((d, i, nodes) =>
               // eslint-disable-next-line implicit-arrow-linebreak
-              this.calendar.helpers.DateHelper.format(
-                d,
-                options.domainLabelFormat,
-              ))
+              this.calendar.helpers.DateHelper.format(d, format, nodes[i]))
             .call((s) => this.#domainRotate(s));
         },
       );

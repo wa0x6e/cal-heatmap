@@ -28,7 +28,6 @@ const minuteTemplate = (DateHelper) => {
     format: {
       date: 'LT, dddd MMMM D, Y',
       legend: '',
-      connector: 'at',
     },
     extractUnit(d) {
       return DateHelper.date(d).startOf('minute').valueOf();

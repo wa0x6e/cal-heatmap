@@ -68,7 +68,6 @@ const dayTemplate = (
     format: {
       date: 'dddd MMMM D, Y',
       legend: 'Do MMM',
-      connector: 'on',
     },
     extractUnit(d) {
       return DateHelper.date(d).startOf('day').valueOf();

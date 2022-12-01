@@ -19,9 +19,8 @@ const monthTemplate = (DateHelper) => ({
     ),
 
   format: {
-    date: 'MMMM Y',
+    date: 'MMMM',
     legend: 'MMMM',
-    connector: 'in',
   },
   extractUnit(d) {
     return DateHelper.date(d).startOf('month').valueOf();

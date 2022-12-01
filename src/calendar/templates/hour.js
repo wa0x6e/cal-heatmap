@@ -55,7 +55,6 @@ const hourTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     format: {
       date: 'HH[h], dddd MMMM D, Y',
       legend: 'HH:00',
-      connector: 'at',
     },
     extractUnit(d) {
       return DateHelper.date(d).startOf('hour').valueOf();

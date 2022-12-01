@@ -31,12 +31,16 @@ export default class DateHelper {
     return this.momentInstance.tz(d, this.timezone);
   }
 
-  format(d, formatter) {
+  format(date, formatter, ...args) {
     if (typeof formatter === 'function') {
-      return formatter(new Date(d));
+      return formatter(new Date(date), ...args);
     }
 
-    return this.date(d).format(formatter);
+    if (formatter) {
+      return this.date(date).format(formatter);
+    }
+
+    return null;
   }
 
   /**

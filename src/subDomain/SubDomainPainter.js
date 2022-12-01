@@ -78,7 +78,7 @@ export default class subDomainPainter {
         eventEmitter.emit('onClick', ev, new Date(d.t), d.v))
       .on('mouseover', (ev, d) => {
         if (options.tooltip) {
-          this.calendar.calendarPainter.tooltip.show(ev.target, d);
+          this.calendar.calendarPainter.tooltip.show(ev.target);
         }
         return eventEmitter.emit('onMouseOver', ev, new Date(d.t), d.v);
       })
@@ -99,13 +99,7 @@ export default class subDomainPainter {
         selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
       });
 
-    if (!options.tooltip) {
-      this.#appendTitle(rect);
-    }
-
-    if (options.subDomainTextFormat !== null) {
-      this.#appendText(rect);
-    }
+    this.#appendText(rect);
   }
 
   #getClassName(d) {
@@ -118,8 +112,13 @@ export default class subDomainPainter {
 
   #appendText(elem) {
     const { options } = this.calendar.options;
+    const formatter = options.formatter.subDomainLabel;
 
-    elem
+    if (!formatter) {
+      return null;
+    }
+
+    return elem
       .append('text')
       .attr(
         'class',
@@ -130,20 +129,11 @@ export default class subDomainPainter {
       .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d) => this.calendar.helpers.DateHelper.format(
+      .text((d, i, nodes) => this.calendar.helpers.DateHelper.format(
         d.t,
-        options.subDomainTextFormat,
-      ));
-  }
-
-  #appendTitle(elem) {
-    const { options } = this.calendar.options;
-
-    elem
-      .append('title')
-      .text((d) => this.calendar.helpers.DateHelper.format(
-        d.t,
-        options.subDomainDateFormat,
+        formatter,
+        d.v,
+        nodes[i],
       ));
   }
 

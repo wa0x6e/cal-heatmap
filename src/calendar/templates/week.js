@@ -55,7 +55,6 @@ const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
     format: {
       date: 'wo [week] Y',
       legend: 'wo [week] Y',
-      connector: 'at',
     },
     extractUnit(d) {
       return DateHelper.date(d).startOf('week').valueOf();

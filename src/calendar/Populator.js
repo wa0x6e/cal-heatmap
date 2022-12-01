@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { selectAll } from 'd3-selection';
 
-import { getHighlightClassName, getSubDomainTitle } from '../function';
+import { getHighlightClassName } from '../function';
 
 export default class Populator {
   constructor(calendar) {
@@ -89,17 +89,10 @@ export default class Populator {
     return htmlClass.join(' ').trim();
   }
 
-  #formatSubDomainText(element) {
-    const formatter = this.calendar.options.options.subDomainTextFormat;
-    if (typeof formatter === 'function') {
-      element.text((d) => formatter(d.t, d.v));
-    }
-  }
-
   populate() {
     const { calendar } = this;
     const { options } = calendar.options;
-    const svg = this.calendar.calendarPainter.root.selectAll('.graph-domain');
+    const svg = calendar.calendarPainter.root.selectAll('.graph-domain');
 
     const rect = svg
       .selectAll('svg')
@@ -111,21 +104,15 @@ export default class Populator {
       .duration(options.animationDuration)
       .select('rect')
       .attr('class', (d) => this.#getClassName(d))
-      .call((d) => this.#addStyle(d));
+      .call((d) => this.#addStyle(d))
+      .attr('title', (d) => {
+        const { subDomainTitleFn } = options.formatter;
 
-    rect
-      .transition()
-      .duration(options.animationDuration)
-      .select('title')
-      .text((d) => getSubDomainTitle(
-        calendar,
-        d,
-        options,
-        calendar.subDomainTemplate.at(options.subDomain).format.connector,
-      ));
+        return subDomainTitleFn ? subDomainTitleFn(new Date(d.t), d.v) : null;
+      });
 
     /**
-     * Change the subDomainText class if necessary
+     * Change the subDomainLabel class if necessary
      * Also change the text, e.g when text is representing the value
      * instead of the date
      */
@@ -137,6 +124,13 @@ export default class Populator {
         'class',
         (d) => `subdomain-text${getHighlightClassName(calendar, d.t, options)}`,
       )
-      .call((e) => this.#formatSubDomainText(e));
+      .call((element) => {
+        element.text((d, i, nodes) => calendar.helpers.DateHelper.format(
+          d.t,
+          options.formatter.subDomainLabel,
+          d.v,
+          nodes[i],
+        ));
+      });
   }
 }

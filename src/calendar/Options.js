@@ -88,19 +88,14 @@ const preProcessors = {
         return value.slice(0, 4);
     }
   },
-  subDomainDateFormat: (value, calendar, options) =>
+  'formatter.subDomainLabel': (value) =>
     // eslint-disable-next-line
-    (isString(value) || isFunction(value) ?
-      value :
-      calendar.subDomainTemplate.at(options.subDomain).format.date),
-  domainLabelFormat: (value, calendar, options) =>
+    ((isString(value) && value !== '') || isFunction(value) ? value : null),
+  'formatter.domainLabel': (value, calendar, options) =>
     // eslint-disable-next-line
     (isString(value) || isFunction(value) ?
       value :
       calendar.subDomainTemplate.at(options.domain).format.legend),
-  subDomainTextFormat: (value) =>
-    // eslint-disable-next-line
-    ((isString(value) && value !== '') || isFunction(value) ? value : null),
 };
 
 export default class Options {
@@ -278,38 +273,30 @@ export default class Options {
       // Name of the items to represent in the calendar
       itemName: ['item', 'items'],
 
-      // Formatting of the domain label
-      // @default: null, will use the formatting according to domain type
-      // Accept a string used as specifier by moment().format()
-      // or a function
-      //
-      // Refer to https://momentjs.com/docs/#/displaying/
-      // for accepted date formatting used by moment().format()
-      domainLabelFormat: null,
+      formatter: {
+        // Formatting of the domain label
+        // @default: undefined, will use the formatting according to domain type
+        // Accept a string used as specifier by moment().format()
+        // or a function
+        //
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
+        domainLabel: undefined,
 
-      // Formatting of the title displayed when hovering a subDomain cell
-      subDomainTitleFormat: {
-        empty: '{date}',
-        filled: '{count} {name} {connector} {date}',
+        // Formatting of the text inside each subDomain cell
+        // @default: null, no text
+        // Accept a string used as specifier by moment().format()
+        // or a function
+        //
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
+        subDomainLabel: null,
+
+        // Formatting of the title displayed when hovering a subDomain cell
+        // This will also be the tooltip's text when enabled
+        // Expecting a function, which is returning the title's text
+        subDomainTitleFn: (date, value) => `${value} - ${date}`,
       },
-
-      // Formatting of the {date} used in subDomainTitleFormat
-      // @default: null, will use the formatting according to subDomain type
-      // Accept a string used as specifier by moment().format()
-      // or a function
-      //
-      // Refer to https://momentjs.com/docs/#/displaying/
-      // for accepted date formatting used by moment().format()
-      subDomainDateFormat: null,
-
-      // Formatting of the text inside each subDomain cell
-      // @default: null, no text
-      // Accept a string used as specifier by moment().format()
-      // or a function
-      //
-      // Refer to https://momentjs.com/docs/#/displaying/
-      // for accepted date formatting used by moment().format()
-      subDomainTextFormat: null,
 
       // Formatting of the title displayed when hovering a legend cell
       legendTitleFormat: {
@@ -326,9 +313,6 @@ export default class Options {
       previousSelector: false,
 
       tooltip: false,
-
-      // Format the content of the tooltip
-      tooltipFormat: (title) => title,
 
       // Callback after fetching the datas,
       // but before applying them to the calendar
@@ -413,7 +397,7 @@ export default class Options {
       options.x.domainHorizontalLabelWidth = options.label.width;
     }
 
-    if (!options.domainLabelFormat) {
+    if ([false, '', null].includes(options.formatter.domainLabel)) {
       options.x.domainVerticalLabelHeight = 0;
       options.x.domainHorizontalLabelWidth = 0;
     }

@@ -21,7 +21,6 @@ const yearTemplate = (DateHelper) => ({
   format: {
     date: 'Y',
     legend: 'Y',
-    connector: 'in',
   },
   extractUnit(d) {
     return DateHelper.date(d).startOf('year').valueOf();
