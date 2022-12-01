@@ -1,5 +1,5 @@
 import {
-  merge,
+  mergeWith,
   isEqual,
   castArray,
   isFunction,
@@ -369,7 +369,13 @@ export default class Options {
   }
 
   init(settings) {
-    this.options = merge(this.options, settings, { x: {} });
+    this.options = {
+      // eslint-disable-next-line arrow-body-style
+      ...mergeWith(this.options, settings, (objValue, srcValue) => {
+        return Array.isArray(srcValue) ? srcValue : undefined;
+      }),
+      x: {},
+    };
 
     const { options } = this;
 

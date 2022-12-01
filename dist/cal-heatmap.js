@@ -9675,6 +9675,43 @@
 	  }, keysIn);
 	}
 
+	/**
+	 * This method is like `_.merge` except that it accepts `customizer` which
+	 * is invoked to produce the merged values of the destination and source
+	 * properties. If `customizer` returns `undefined`, merging is handled by the
+	 * method instead. The `customizer` is invoked with six arguments:
+	 * (objValue, srcValue, key, object, source, stack).
+	 *
+	 * **Note:** This method mutates `object`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Object
+	 * @param {Object} object The destination object.
+	 * @param {...Object} sources The source objects.
+	 * @param {Function} customizer The function to customize assigned values.
+	 * @returns {Object} Returns `object`.
+	 * @example
+	 *
+	 * function customizer(objValue, srcValue) {
+	 *   if (_.isArray(objValue)) {
+	 *     return objValue.concat(srcValue);
+	 *   }
+	 * }
+	 *
+	 * var object = { 'a': [1], 'b': [2] };
+	 * var other = { 'a': [3], 'b': [4] };
+	 *
+	 * _.mergeWith(object, other, customizer);
+	 * // => { 'a': [1, 3], 'b': [2, 4] }
+	 */
+	var mergeWith = createAssigner(function(object, source, srcIndex, customizer) {
+	  baseMerge(object, source, srcIndex, customizer);
+	});
+
+	var mergeWith$1 = mergeWith;
+
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
 
@@ -9814,43 +9851,6 @@
 	  return typeof value == 'number' ||
 	    (isObjectLike(value) && baseGetTag(value) == numberTag);
 	}
-
-	/**
-	 * This method is like `_.assign` except that it recursively merges own and
-	 * inherited enumerable string keyed properties of source objects into the
-	 * destination object. Source properties that resolve to `undefined` are
-	 * skipped if a destination value exists. Array and plain object properties
-	 * are merged recursively. Other objects and value types are overridden by
-	 * assignment. Source objects are applied from left to right. Subsequent
-	 * sources overwrite property assignments of previous sources.
-	 *
-	 * **Note:** This method mutates `object`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 0.5.0
-	 * @category Object
-	 * @param {Object} object The destination object.
-	 * @param {...Object} [sources] The source objects.
-	 * @returns {Object} Returns `object`.
-	 * @example
-	 *
-	 * var object = {
-	 *   'a': [{ 'b': 2 }, { 'd': 4 }]
-	 * };
-	 *
-	 * var other = {
-	 *   'a': [{ 'c': 3 }, { 'e': 5 }]
-	 * };
-	 *
-	 * _.merge(object, other);
-	 * // => { 'a': [{ 'b': 2, 'c': 3 }, { 'd': 4, 'e': 5 }] }
-	 */
-	var merge = createAssigner(function(object, source, srcIndex) {
-	  baseMerge(object, source, srcIndex);
-	});
-
-	var merge$1 = merge;
 
 	/**
 	 * The base implementation of `_.set`.
@@ -17646,7 +17646,13 @@
 	  }
 
 	  init(settings) {
-	    this.options = merge$1(this.options, settings, { x: {} });
+	    this.options = {
+	      // eslint-disable-next-line arrow-body-style
+	      ...mergeWith$1(this.options, settings, (objValue, srcValue) => {
+	        return Array.isArray(srcValue) ? srcValue : undefined;
+	      }),
+	      x: {},
+	    };
 
 	    const { options } = this;
 
