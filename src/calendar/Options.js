@@ -308,10 +308,8 @@ export default class Options {
       // Animation duration, in ms
       animationDuration: 200,
 
-      nextSelector: false,
-
-      previousSelector: false,
-
+      // Whether to show tooltip on subDomain hover
+      // To format its content, see formatter/subDomainTitleFn option
       tooltip: false,
 
       // Callback after fetching the datas,

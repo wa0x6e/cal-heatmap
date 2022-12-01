@@ -6159,8 +6159,6 @@
 	  }
 	}
 
-	const EVENT_NAMESPACE = 'cal-heatmap';
-
 	class CalendarPainter {
 	  constructor(calendar) {
 	    this.calendar = calendar;
@@ -6193,39 +6191,7 @@
 	      this.tooltip.init();
 	    }
 
-	    this.#attachNavigationEvents();
-
 	    return true;
-	  }
-
-	  #attachNavigationEvents() {
-	    const { nextSelector, previousSelector } = this.calendar.options.options;
-
-	    if (nextSelector) {
-	      select(nextSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
-	        ev.preventDefault();
-	        return this.calendar.next(1);
-	      });
-	    }
-
-	    if (previousSelector) {
-	      select(previousSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
-	        ev.preventDefault();
-	        return this.calendar.previous(1);
-	      });
-	    }
-	  }
-
-	  #removeNavigationEvents() {
-	    const { nextSelector, previousSelector } = this.calendar.options.options;
-
-	    if (nextSelector !== false) {
-	      select(nextSelector).on(`.${EVENT_NAMESPACE}`, null);
-	    }
-
-	    if (previousSelector !== false) {
-	      select(previousSelector).on(`.${EVENT_NAMESPACE}`, null);
-	    }
 	  }
 
 	  paint(navigationDir = false) {
@@ -6304,8 +6270,6 @@
 	  }
 
 	  destroy(callback) {
-	    this.#removeNavigationEvents();
-
 	    this.root
 	      .transition()
 	      .duration(this.calendar.options.options.animationDuration)
@@ -17145,10 +17109,8 @@
 	      // Animation duration, in ms
 	      animationDuration: 200,
 
-	      nextSelector: false,
-
-	      previousSelector: false,
-
+	      // Whether to show tooltip on subDomain hover
+	      // To format its content, see formatter/subDomainTitleFn option
 	      tooltip: false,
 
 	      // Callback after fetching the datas,

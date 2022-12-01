@@ -11,8 +11,6 @@ import SubDomainPainter from '../subDomain/SubDomainPainter';
 import Tooltip from '../tooltip/Tooltip';
 import LegendPainter from '../legend/LegendPainter';
 
-const EVENT_NAMESPACE = 'cal-heatmap';
-
 export default class CalendarPainter {
   constructor(calendar) {
     this.calendar = calendar;
@@ -45,39 +43,7 @@ export default class CalendarPainter {
       this.tooltip.init();
     }
 
-    this.#attachNavigationEvents();
-
     return true;
-  }
-
-  #attachNavigationEvents() {
-    const { nextSelector, previousSelector } = this.calendar.options.options;
-
-    if (nextSelector) {
-      select(nextSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
-        ev.preventDefault();
-        return this.calendar.next(1);
-      });
-    }
-
-    if (previousSelector) {
-      select(previousSelector).on(`click.${EVENT_NAMESPACE}`, (ev) => {
-        ev.preventDefault();
-        return this.calendar.previous(1);
-      });
-    }
-  }
-
-  #removeNavigationEvents() {
-    const { nextSelector, previousSelector } = this.calendar.options.options;
-
-    if (nextSelector !== false) {
-      select(nextSelector).on(`.${EVENT_NAMESPACE}`, null);
-    }
-
-    if (previousSelector !== false) {
-      select(previousSelector).on(`.${EVENT_NAMESPACE}`, null);
-    }
   }
 
   paint(navigationDir = false) {
@@ -156,8 +122,6 @@ export default class CalendarPainter {
   }
 
   destroy(callback) {
-    this.#removeNavigationEvents();
-
     this.root
       .transition()
       .duration(this.calendar.options.options.animationDuration)
