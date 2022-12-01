@@ -5981,8 +5981,8 @@
 	      this.calendar.options.options.legend;
 
 	    this.dimensions = {
-	      width: cellSize * (steps.length + 1) + cellPadding * steps.length,
-	      height: cellSize,
+	      width: cellSize[X] * (steps.length + 1) + cellPadding * steps.length,
+	      height: cellSize[Y],
 	    };
 	  }
 
@@ -6038,8 +6038,8 @@
 	      .attr('height', this.getHeight())
 	      .attr('transform', () => {
 	        if (options.legend.verticalOrientation) {
-	          return `rotate(90 ${options.legend.cellSize / 2} ${
-            options.legend.cellSize / 2
+	          return `rotate(90 ${options.legend.cellSize[X] / 2} ${
+            options.legend.cellSize[Y] / 2
           })`;
 	        }
 	        return null;
@@ -6064,9 +6064,9 @@
 	      .join(
 	        (enter) => enter
 	          .append('rect')
-	          .attr('width', cellSize)
-	          .attr('height', cellSize)
-	          .attr('x', (d, i) => i * (cellSize + cellPadding))
+	          .attr('width', cellSize[X])
+	          .attr('height', cellSize[Y])
+	          .attr('x', (d, i) => i * (cellSize[X] + cellPadding))
 	          .attr('class', (d) => colorizer.getClassName(d))
 	          .attr('fill', (d, i) => {
 	            if (colorizer.scale === null) {
@@ -6081,7 +6081,7 @@
 	          .append('title')
 	          .text((d, i) => this.#getLegendTitle(d, i, items)),
 	        (update) => update
-	          .attr('x', (d, i) => i * (cellSize + cellPadding))
+	          .attr('x', (d, i) => i * (cellSize[X] + cellPadding))
 	          .attr('class', (d) => colorizer.getClassName(d))
 	          .attr('fill', (d, i) => {
 	            if (colorizer.scale === null) {
@@ -17343,6 +17343,7 @@
 
 	    return value;
 	  },
+	  'legend.cellSize': (args) => preProcessors.cellSize(args),
 	  domainMargin: (args) => preProcessors.margins(args),
 	  'legend.margin': (args) => preProcessors.margins(args),
 	  margins: (settings) => {
