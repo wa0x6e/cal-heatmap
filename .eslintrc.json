@@ -12,5 +12,6 @@
     "operator-linebreak": ["error", "after"],
     "max-len": ["error", { "code": 80 }]
   },
-  "plugins": ["jest"]
+  "plugins": ["jest"],
+  "ignorePatterns": ["src/legend/Legend.js"]
 }

@@ -48,13 +48,19 @@ export default class CalHeatmap {
   // PUBLIC API
   // =========================================================================
 
+  /**
+   * Setup and paint the calendar with the given options
+   *
+   * @param  {Object} settings Options
+   * @return void
+   */
   init(settings) {
     const { options } = this.options;
 
     this.options.init(settings);
 
-    this.calendarPainter.setup();
     this.colorizer.build();
+    this.calendarPainter.setup();
 
     // Record all the valid domains
     // Each domain value is a timestamp in milliseconds
@@ -72,6 +78,8 @@ export default class CalHeatmap {
 
   /**
    * Shift the calendar by n domains forward
+   *
+   * @param {number} Number of domain interval to shift
    */
   next(n = 1) {
     const loadDirection = this.navigator.loadNewDomains(
@@ -85,6 +93,8 @@ export default class CalHeatmap {
 
   /**
    * Shift the calendar by n domains backward
+   *
+   * @param {number} Number of domain interval to shift
    */
   previous(n = 1) {
     const loadDirection = this.navigator.loadNewDomains(
@@ -104,9 +114,9 @@ export default class CalHeatmap {
    * will not necessarily be the first (leftmost) domain of the calendar.
    *
    * @param Date date Jump to the domain containing that date
-   * @param bool reset Whether the wanted domain
+   * @param {boolean} reset Whether the wanted domain
    * should be the first domain of the calendar
-   * @param bool True of the calendar was scrolled
+   * @param {boolean} True of the calendar was scrolled
    */
   jumpTo(date, reset = false) {
     const loadDirection = this.navigator.jumpTo(date, reset);
@@ -164,10 +174,8 @@ export default class CalHeatmap {
   /**
    * Set the legend
    *
-   * @param array legend an array of integer,
-   * representing the different threshold value
-   * @param array colorRange an array of 2 hex colors, for the
-   * minimum and maximum colors
+   * @since 3.3.0
+   * @param {Object} Same object as the legend option
    */
   setLegend(legendOptions) {
     const changeResults = [];
@@ -187,7 +195,8 @@ export default class CalHeatmap {
   /**
    * Remove the legend
    *
-   * @return bool False if there is no legend to remove
+   * @since 3.3.0
+   * @return {boolean} False if there is no legend to remove
    */
   removeLegend() {
     if (!this.options.set('legend.show', false)) {
@@ -199,7 +208,8 @@ export default class CalHeatmap {
   /**
    * Display the legend
    *
-   * @return bool False if the legend was already displayed
+   * @since 3.3.0
+   * @return {boolean} False if the legend was already displayed
    */
   showLegend() {
     if (!this.options.set('legend.show', true)) {
@@ -216,7 +226,7 @@ export default class CalHeatmap {
    *
    * @since  3.3.5
    * @param  array Array of dates to highlight
-   * @return bool True if dates were highlighted
+   * @return {boolean} True if dates were highlighted
    */
   highlight(dates) {
     if (
@@ -227,24 +237,28 @@ export default class CalHeatmap {
     }
   }
 
+  /**
+   * Listener for all events
+   *
+   * @since 4.0.0
+   * @param  {string} eventName Name of the event to listen to
+   * @param  {function} Callback function to execute on event trigger
+   * @return void
+   */
   on(...args) {
-    return this.eventEmitter.on(...args);
+    this.eventEmitter.on(...args);
   }
 
   /**
    * Destroy the calendar
    *
-   * Usage: cal = cal.destroy();
-   *
    * @since  3.3.6
-   * @param function A callback function to trigger
+   * @param {function} A callback function to trigger
    * after destroying the calendar
-   * @return null
+   * @return void
    */
   destroy(callback) {
     this.calendarPainter.destroy(callback);
-
-    return null;
   }
 
   getSVG() {

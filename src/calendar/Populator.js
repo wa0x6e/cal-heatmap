@@ -8,53 +8,6 @@ export default class Populator {
     this.calendar = calendar;
   }
 
-  /**
-   * Colorize the cell via a style attribute if enabled
-   */
-  #addStyle(element) {
-    const { options } = this.calendar.options;
-
-    if (!this.calendar.colorizer.scale) {
-      return;
-    }
-
-    element.attr('fill', (d) => {
-      if (
-        d.v === null &&
-        options.hasOwnProperty('considerMissingDataAsZero') &&
-        !options.considerMissingDataAsZero
-      ) {
-        if (options.legend.colors.hasOwnProperty('base')) {
-          return options.legend.colors.base;
-        }
-      }
-
-      if (
-        options.legend.colors?.hasOwnProperty('empty') &&
-        (d.v === 0 ||
-          (d.v === null &&
-            options.hasOwnProperty('considerMissingDataAsZero') &&
-            options.considerMissingDataAsZero))
-      ) {
-        return options.legend.colors.empty;
-      }
-
-      const { steps } = options.legend;
-
-      if (
-        d.v < 0 &&
-        steps[0] > 0 &&
-        options.legend.colors?.hasOwnProperty('overflow')
-      ) {
-        return options.legend.colors.overflow;
-      }
-
-      return this.calendar.colorizer.scale(
-        Math.min(d.v, steps[steps.length - 1]),
-      );
-    });
-  }
-
   #getClassName(d) {
     const { calendar } = this;
     const { options } = calendar.options;
@@ -62,31 +15,9 @@ export default class Populator {
     const htmlClass = getHighlightClassName(calendar, d.t, options)
       .trim()
       .split(' ');
-    const pastDate = calendar.helpers.DateHelper.dateFromPreviousInterval(
-      options.subDomain,
-      d.t,
-      new Date(),
-    );
 
-    if (
-      calendar.colorizer.scale === null ||
-      (d.v === null &&
-        options.hasOwnProperty('considerMissingDataAsZero') &&
-        !options.considerMissingDataAsZero &&
-        !options.legend.colors.hasOwnProperty('base'))
-    ) {
-      htmlClass.push('graph-rect');
-    }
-
-    if (d.v !== null) {
-      htmlClass.push(calendar.colorizer.getClassName(d.v));
-    } else if (options.considerMissingDataAsZero && pastDate) {
-      htmlClass.push(calendar.colorizer.getClassName(0));
-    }
-
-    if (options.onClick !== null) {
-      htmlClass.push('hover_cursor');
-    }
+    htmlClass.push('graph-rect');
+    htmlClass.push('hover_cursor');
 
     return htmlClass.join(' ').trim();
   }
@@ -94,6 +25,7 @@ export default class Populator {
   populate() {
     const { calendar } = this;
     const { options } = calendar.options;
+    const { scale } = this.calendar.colorizer;
     const svg = calendar.calendarPainter.root.selectAll('.graph-domain');
 
     const rect = svg
@@ -106,7 +38,7 @@ export default class Populator {
       .duration(options.animationDuration)
       .select('rect')
       .attr('class', (d) => this.#getClassName(d))
-      .call((d) => this.#addStyle(d))
+      .call((e) => e.style('fill', (d) => scale && scale(d.v)))
       .attr('title', (d) => {
         const { subDomainTitleFn } = options.formatter;
 

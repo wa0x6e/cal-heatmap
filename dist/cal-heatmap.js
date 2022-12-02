@@ -2220,124 +2220,9 @@
 	      : m1) * 255;
 	}
 
-	const radians = Math.PI / 180;
-	const degrees$1 = 180 / Math.PI;
-
-	// https://observablehq.com/@mbostock/lab-and-rgb
-	const K = 18,
-	    Xn = 0.96422,
-	    Yn = 1,
-	    Zn = 0.82521,
-	    t0 = 4 / 29,
-	    t1 = 6 / 29,
-	    t2 = 3 * t1 * t1,
-	    t3 = t1 * t1 * t1;
-
-	function labConvert(o) {
-	  if (o instanceof Lab) return new Lab(o.l, o.a, o.b, o.opacity);
-	  if (o instanceof Hcl) return hcl2lab(o);
-	  if (!(o instanceof Rgb)) o = rgbConvert(o);
-	  var r = rgb2lrgb(o.r),
-	      g = rgb2lrgb(o.g),
-	      b = rgb2lrgb(o.b),
-	      y = xyz2lab((0.2225045 * r + 0.7168786 * g + 0.0606169 * b) / Yn), x, z;
-	  if (r === g && g === b) x = z = y; else {
-	    x = xyz2lab((0.4360747 * r + 0.3850649 * g + 0.1430804 * b) / Xn);
-	    z = xyz2lab((0.0139322 * r + 0.0971045 * g + 0.7141733 * b) / Zn);
-	  }
-	  return new Lab(116 * y - 16, 500 * (x - y), 200 * (y - z), o.opacity);
-	}
-
-	function lab(l, a, b, opacity) {
-	  return arguments.length === 1 ? labConvert(l) : new Lab(l, a, b, opacity == null ? 1 : opacity);
-	}
-
-	function Lab(l, a, b, opacity) {
-	  this.l = +l;
-	  this.a = +a;
-	  this.b = +b;
-	  this.opacity = +opacity;
-	}
-
-	define(Lab, lab, extend(Color, {
-	  brighter(k) {
-	    return new Lab(this.l + K * (k == null ? 1 : k), this.a, this.b, this.opacity);
-	  },
-	  darker(k) {
-	    return new Lab(this.l - K * (k == null ? 1 : k), this.a, this.b, this.opacity);
-	  },
-	  rgb() {
-	    var y = (this.l + 16) / 116,
-	        x = isNaN(this.a) ? y : y + this.a / 500,
-	        z = isNaN(this.b) ? y : y - this.b / 200;
-	    x = Xn * lab2xyz(x);
-	    y = Yn * lab2xyz(y);
-	    z = Zn * lab2xyz(z);
-	    return new Rgb(
-	      lrgb2rgb( 3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
-	      lrgb2rgb(-0.9787684 * x + 1.9161415 * y + 0.0334540 * z),
-	      lrgb2rgb( 0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
-	      this.opacity
-	    );
-	  }
-	}));
-
-	function xyz2lab(t) {
-	  return t > t3 ? Math.pow(t, 1 / 3) : t / t2 + t0;
-	}
-
-	function lab2xyz(t) {
-	  return t > t1 ? t * t * t : t2 * (t - t0);
-	}
-
-	function lrgb2rgb(x) {
-	  return 255 * (x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055);
-	}
-
-	function rgb2lrgb(x) {
-	  return (x /= 255) <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-	}
-
-	function hclConvert(o) {
-	  if (o instanceof Hcl) return new Hcl(o.h, o.c, o.l, o.opacity);
-	  if (!(o instanceof Lab)) o = labConvert(o);
-	  if (o.a === 0 && o.b === 0) return new Hcl(NaN, 0 < o.l && o.l < 100 ? 0 : NaN, o.l, o.opacity);
-	  var h = Math.atan2(o.b, o.a) * degrees$1;
-	  return new Hcl(h < 0 ? h + 360 : h, Math.sqrt(o.a * o.a + o.b * o.b), o.l, o.opacity);
-	}
-
-	function hcl$1(h, c, l, opacity) {
-	  return arguments.length === 1 ? hclConvert(h) : new Hcl(h, c, l, opacity == null ? 1 : opacity);
-	}
-
-	function Hcl(h, c, l, opacity) {
-	  this.h = +h;
-	  this.c = +c;
-	  this.l = +l;
-	  this.opacity = +opacity;
-	}
-
-	function hcl2lab(o) {
-	  if (isNaN(o.h)) return new Lab(o.l, 0, 0, o.opacity);
-	  var h = o.h * radians;
-	  return new Lab(o.l, Math.cos(h) * o.c, Math.sin(h) * o.c, o.opacity);
-	}
-
-	define(Hcl, hcl$1, extend(Color, {
-	  brighter(k) {
-	    return new Hcl(this.h, this.c, this.l + K * (k == null ? 1 : k), this.opacity);
-	  },
-	  darker(k) {
-	    return new Hcl(this.h, this.c, this.l - K * (k == null ? 1 : k), this.opacity);
-	  },
-	  rgb() {
-	    return hcl2lab(this).rgb();
-	  }
-	}));
-
 	var constant$1 = x => () => x;
 
-	function linear$1(a, d) {
+	function linear(a, d) {
 	  return function(t) {
 	    return a + t * d;
 	  };
@@ -2349,11 +2234,6 @@
 	  };
 	}
 
-	function hue(a, b) {
-	  var d = b - a;
-	  return d ? linear$1(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : constant$1(isNaN(a) ? b : a);
-	}
-
 	function gamma(y) {
 	  return (y = +y) === 1 ? nogamma : function(a, b) {
 	    return b - a ? exponential(a, b, y) : constant$1(isNaN(a) ? b : a);
@@ -2362,7 +2242,7 @@
 
 	function nogamma(a, b) {
 	  var d = b - a;
-	  return d ? linear$1(a, d) : constant$1(isNaN(a) ? b : a);
+	  return d ? linear(a, d) : constant$1(isNaN(a) ? b : a);
 	}
 
 	var interpolateRgb = (function rgbGamma(y) {
@@ -2387,69 +2267,9 @@
 	  return rgb$1;
 	})(1);
 
-	function numberArray(a, b) {
-	  if (!b) b = [];
-	  var n = a ? Math.min(b.length, a.length) : 0,
-	      c = b.slice(),
-	      i;
-	  return function(t) {
-	    for (i = 0; i < n; ++i) c[i] = a[i] * (1 - t) + b[i] * t;
-	    return c;
-	  };
-	}
-
-	function isNumberArray(x) {
-	  return ArrayBuffer.isView(x) && !(x instanceof DataView);
-	}
-
-	function genericArray(a, b) {
-	  var nb = b ? b.length : 0,
-	      na = a ? Math.min(nb, a.length) : 0,
-	      x = new Array(na),
-	      c = new Array(nb),
-	      i;
-
-	  for (i = 0; i < na; ++i) x[i] = interpolate$1(a[i], b[i]);
-	  for (; i < nb; ++i) c[i] = b[i];
-
-	  return function(t) {
-	    for (i = 0; i < na; ++i) c[i] = x[i](t);
-	    return c;
-	  };
-	}
-
-	function date(a, b) {
-	  var d = new Date;
-	  return a = +a, b = +b, function(t) {
-	    return d.setTime(a * (1 - t) + b * t), d;
-	  };
-	}
-
 	function interpolateNumber(a, b) {
 	  return a = +a, b = +b, function(t) {
 	    return a * (1 - t) + b * t;
-	  };
-	}
-
-	function object(a, b) {
-	  var i = {},
-	      c = {},
-	      k;
-
-	  if (a === null || typeof a !== "object") a = {};
-	  if (b === null || typeof b !== "object") b = {};
-
-	  for (k in b) {
-	    if (k in a) {
-	      i[k] = interpolate$1(a[k], b[k]);
-	    } else {
-	      c[k] = b[k];
-	    }
-	  }
-
-	  return function(t) {
-	    for (k in i) c[k] = i[k](t);
-	    return c;
 	  };
 	}
 
@@ -2516,28 +2336,9 @@
 	        });
 	}
 
-	function interpolate$1(a, b) {
-	  var t = typeof b, c;
-	  return b == null || t === "boolean" ? constant$1(b)
-	      : (t === "number" ? interpolateNumber
-	      : t === "string" ? ((c = color(b)) ? (b = c, interpolateRgb) : interpolateString)
-	      : b instanceof color ? interpolateRgb
-	      : b instanceof Date ? date
-	      : isNumberArray(b) ? numberArray
-	      : Array.isArray(b) ? genericArray
-	      : typeof b.valueOf !== "function" && typeof b.toString !== "function" || isNaN(b) ? object
-	      : interpolateNumber)(a, b);
-	}
-
-	function interpolateRound(a, b) {
-	  return a = +a, b = +b, function(t) {
-	    return Math.round(a * (1 - t) + b * t);
-	  };
-	}
-
 	var degrees = 180 / Math.PI;
 
-	var identity$3 = {
+	var identity$1 = {
 	  translateX: 0,
 	  translateY: 0,
 	  rotate: 0,
@@ -2567,14 +2368,14 @@
 	/* eslint-disable no-undef */
 	function parseCss(value) {
 	  const m = new (typeof DOMMatrix === "function" ? DOMMatrix : WebKitCSSMatrix)(value + "");
-	  return m.isIdentity ? identity$3 : decompose(m.a, m.b, m.c, m.d, m.e, m.f);
+	  return m.isIdentity ? identity$1 : decompose(m.a, m.b, m.c, m.d, m.e, m.f);
 	}
 
 	function parseSvg(value) {
-	  if (value == null) return identity$3;
+	  if (value == null) return identity$1;
 	  if (!svgNode) svgNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
 	  svgNode.setAttribute("transform", value);
-	  if (!(value = svgNode.transform.baseVal.consolidate())) return identity$3;
+	  if (!(value = svgNode.transform.baseVal.consolidate())) return identity$1;
 	  value = value.matrix;
 	  return decompose(value.a, value.b, value.c, value.d, value.e, value.f);
 	}
@@ -2639,24 +2440,6 @@
 
 	var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
 	var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
-
-	function hcl(hue) {
-	  return function(start, end) {
-	    var h = hue((start = hcl$1(start)).h, (end = hcl$1(end)).h),
-	        c = nogamma(start.c, end.c),
-	        l = nogamma(start.l, end.l),
-	        opacity = nogamma(start.opacity, end.opacity);
-	    return function(t) {
-	      start.h = h(t);
-	      start.c = c(t);
-	      start.l = l(t);
-	      start.opacity = opacity(t);
-	      return start + "";
-	    };
-	  }
-	}
-
-	var interpolateHcl = hcl(hue);
 
 	function tweenRemove(id, name) {
 	  var tween0, tween1;
@@ -3865,17 +3648,6 @@
 	 *
 	 * @return String
 	 */
-	function formatStringWithObject(string, args) {
-	  let formattedString = string;
-
-	  Object.entries(args).forEach(([key, value]) => {
-	    formattedString = formattedString.replace(
-	      new RegExp(`\\{${key}\\}`, 'gi'),
-	      value,
-	    );
-	  });
-	  return formattedString;
-	}
 
 	/**
 	 * Return a classname if the specified date should be highlighted
@@ -4000,8 +3772,6 @@
 	            .attr('rx', options.cellRadius)
 	            .attr('ry', options.cellRadius);
 	        }
-
-	        selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
 	      });
 
 	    this.#appendText(rect);
@@ -4010,9 +3780,11 @@
 	  #getClassName(d) {
 	    const { options } = this.calendar.options;
 
-	    return `graph-rect${getHighlightClassName(this.calendar, d.t, options)}${
-      options.onClick !== null ? ' hover_cursor' : ''
-    }`;
+	    return `graph-rect${getHighlightClassName(
+      this.calendar,
+      d.t,
+      options,
+    )}${' hover_cursor'}`;
 	  }
 
 	  #appendText(elem) {
@@ -4034,12 +3806,9 @@
 	      .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
 	      .attr('text-anchor', 'middle')
 	      .attr('dominant-baseline', 'central')
-	      .text((d, i, nodes) => this.calendar.helpers.DateHelper.format(
-	        d.t,
-	        formatter,
-	        d.v,
-	        nodes[i],
-	      ));
+	      .text((d, i, nodes) =>
+	        // eslint-disable-next-line implicit-arrow-linebreak
+	        this.calendar.helpers.DateHelper.format(d.t, formatter, d.v, nodes[i]));
 	  }
 
 	  #getCoordinates(axis, d) {
@@ -5935,220 +5704,245 @@
 	  }
 	}
 
+	// Copyright 2021, Observable Inc.
+	// Released under the ISC license.
+	// https://observablehq.com/@d3/color-legend
+	function Legend(
+	  color,
+	  {
+	    title,
+	    tickSize = 6,
+	    width = 320,
+	    height = 44 + tickSize,
+	    marginTop = 18,
+	    marginRight = 0,
+	    marginBottom = 16 + tickSize,
+	    marginLeft = 0,
+	    ticks = width / 64,
+	    tickFormat,
+	    tickValues,
+	  } = {},
+	) {
+	  function ramp(color, n = 256) {
+	    const canvas = document.createElement('canvas');
+	    canvas.width = n;
+	    canvas.height = 1;
+	    const context = canvas.getContext('2d');
+	    for (let i = 0; i < n; ++i) {
+	      context.fillStyle = color(i / (n - 1));
+	      context.fillRect(i, 0, 1, 1);
+	    }
+	    return canvas;
+	  }
+
+	  const svg = d3
+	    .create('svg')
+	    .attr('width', width)
+	    .attr('height', height)
+	    .attr('viewBox', [0, 0, width, height])
+	    .style('overflow', 'visible')
+	    .style('display', 'block');
+
+	  let tickAdjust = (g) => g.selectAll('.tick line').attr('y1', marginTop + marginBottom - height);
+	  let x;
+
+	  // Continuous
+	  if (color.interpolate) {
+	    const n = Math.min(color.domain().length, color.range().length);
+
+	    x = color
+	      .copy()
+	      .rangeRound(
+	        d3.quantize(d3.interpolate(marginLeft, width - marginRight), n),
+	      );
+
+	    svg
+	      .append('image')
+	      .attr('x', marginLeft)
+	      .attr('y', marginTop)
+	      .attr('width', width - marginLeft - marginRight)
+	      .attr('height', height - marginTop - marginBottom)
+	      .attr('preserveAspectRatio', 'none')
+	      .attr(
+	        'xlink:href',
+	        ramp(
+	          color.copy().domain(d3.quantize(d3.interpolate(0, 1), n)),
+	        ).toDataURL(),
+	      );
+	  }
+
+	  // Sequential
+	  else if (color.interpolator) {
+	    x = Object.assign(
+	      color
+	        .copy()
+	        .interpolator(d3.interpolateRound(marginLeft, width - marginRight)),
+	      {
+	        range() {
+	          return [marginLeft, width - marginRight];
+	        },
+	      },
+	    );
+
+	    svg
+	      .append('image')
+	      .attr('x', marginLeft)
+	      .attr('y', marginTop)
+	      .attr('width', width - marginLeft - marginRight)
+	      .attr('height', height - marginTop - marginBottom)
+	      .attr('preserveAspectRatio', 'none')
+	      .attr('xlink:href', ramp(color.interpolator()).toDataURL());
+
+	    // scaleSequentialQuantile doesn’t implement ticks or tickFormat.
+	    if (!x.ticks) {
+	      if (tickValues === undefined) {
+	        const n = Math.round(ticks + 1);
+	        tickValues = d3
+	          .range(n)
+	          .map((i) => d3.quantile(color.domain(), i / (n - 1)));
+	      }
+	      if (typeof tickFormat !== 'function') {
+	        tickFormat = d3.format(tickFormat === undefined ? ',f' : tickFormat);
+	      }
+	    }
+	  }
+
+	  // Threshold
+	  else if (color.invertExtent) {
+	    const thresholds = color.thresholds ?
+	      color.thresholds() : // scaleQuantize
+	      color.quantiles ?
+	        color.quantiles() : // scaleQuantile
+	        color.domain(); // scaleThreshold
+
+	    const thresholdFormat =
+	      tickFormat === undefined ?
+	        (d) => d :
+	        typeof tickFormat === 'string' ?
+	          d3.format(tickFormat) :
+	          tickFormat;
+
+	    x = d3
+	      .scaleLinear()
+	      .domain([-1, color.range().length - 1])
+	      .rangeRound([marginLeft, width - marginRight]);
+
+	    svg
+	      .append('g')
+	      .selectAll('rect')
+	      .data(color.range())
+	      .join('rect')
+	      .attr('x', (d, i) => x(i - 1))
+	      .attr('y', marginTop)
+	      .attr('width', (d, i) => x(i) - x(i - 1))
+	      .attr('height', height - marginTop - marginBottom)
+	      .attr('fill', (d) => d);
+
+	    tickValues = d3.range(thresholds.length);
+	    tickFormat = (i) => thresholdFormat(thresholds[i], i);
+	  }
+
+	  // Ordinal
+	  else {
+	    x = d3
+	      .scaleBand()
+	      .domain(color.domain())
+	      .rangeRound([marginLeft, width - marginRight]);
+
+	    svg
+	      .append('g')
+	      .selectAll('rect')
+	      .data(color.domain())
+	      .join('rect')
+	      .attr('x', x)
+	      .attr('y', marginTop)
+	      .attr('width', Math.max(0, x.bandwidth() - 1))
+	      .attr('height', height - marginTop - marginBottom)
+	      .attr('fill', color);
+
+	    tickAdjust = () => {};
+	  }
+
+	  svg
+	    .append('g')
+	    .attr('transform', `translate(0,${height - marginBottom})`)
+	    .call(
+	      d3
+	        .axisBottom(x)
+	        .ticks(ticks, typeof tickFormat === 'string' ? tickFormat : undefined)
+	        .tickFormat(typeof tickFormat === 'function' ? tickFormat : undefined)
+	        .tickSize(tickSize)
+	        .tickValues(tickValues),
+	    )
+	    .call(tickAdjust)
+	    .call((g) => g.select('.domain').remove())
+	    .call((g) => g
+	      .append('text')
+	      .attr('x', marginLeft)
+	      .attr('y', marginTop + marginBottom - height - 6)
+	      .attr('fill', 'currentColor')
+	      .attr('text-anchor', 'start')
+	      .attr('font-weight', 'bold')
+	      .attr('class', 'title')
+	      .text(title));
+
+	  return svg.node();
+	}
+
 	const DEFAULT_CLASSNAME = '.graph-legend';
 
 	class LegendPainter {
 	  constructor(calendar) {
 	    this.calendar = calendar;
-
-	    this.dimensions = {
-	      width: 0,
-	      height: 0,
-	    };
-	    this.shown = calendar.options.options.legend.show;
-	  }
-
-	  #getX(width) {
-	    const { horizontalPosition, verticalPosition, margin } =
-	      this.calendar.options.options.legend;
-
-	    switch (horizontalPosition) {
-	      case 'right':
-	        if (verticalPosition === 'center' || verticalPosition === 'middle') {
-	          return width + margin[LEFT];
-	        }
-	        return width - this.getWidth() - margin[RIGHT];
-	      case 'middle':
-	      case 'center':
-	        return Math.round(width / 2 - this.getWidth() / 2);
-	      default:
-	        return margin[BOTTOM];
-	    }
-	  }
-
-	  #getY() {
-	    const { margin, verticalPosition } = this.calendar.options.options.legend;
-	    let pos = margin[TOP];
-
-	    if (verticalPosition === 'bottom') {
-	      pos += this.calendar.calendarPainter.domainPainter.dimensions.height;
-	    }
-	    return pos;
-	  }
-
-	  #computeDimensions() {
-	    const { cellSize, cellPadding, steps } =
-	      this.calendar.options.options.legend;
-
-	    this.dimensions = {
-	      width: cellSize[X] * (steps.length + 1) + cellPadding * steps.length,
-	      height: cellSize[Y],
-	    };
-	  }
-
-	  destroy() {
-	    if (!this.shown) {
-	      return false;
-	    }
-
-	    this.shown = false;
-	    this.calendar.calendarPainter.root
-	      .select(DEFAULT_CLASSNAME)
-	      .transition()
-	      .duration(this.calendar.options.options.animationDuration)
-	      .attr('height', 0)
-	      .remove();
-
-	    return true;
+	    this.root = null;
 	  }
 
 	  paint() {
-	    const { options } = this.calendar.options;
-	    if (!options.legend.show) {
+	    const {
+	      show, itemSelector, cellSize, title,
+	    } =
+	      this.calendar.options.options.legend;
+	    if (!show || (itemSelector && select(itemSelector).empty())) {
 	      return false;
 	    }
 
-	    const width =
-	      this.calendar.calendarPainter.getWidth() -
-	      options.domainGutter -
-	      options.cellPadding;
-
 	    this.shown = true;
 
-	    this.#computeDimensions();
-
-	    let legendNode =
-	      this.calendar.calendarPainter.root.select(DEFAULT_CLASSNAME);
-	    if (legendNode.empty()) {
-	      legendNode = this.calendar.calendarPainter.root
-	        .append('svg')
-	        .attr('class', DEFAULT_CLASSNAME.slice(1));
+	    if (itemSelector) {
+	      this.root = select(itemSelector);
+	    } else {
+	      this.root = select(this.calendar.options.options.itemSelector);
 	    }
 
-	    legendNode
-	      .attr('x', this.#getX(width))
-	      .attr('y', this.#getY())
-	      .attr('width', this.getWidth())
-	      .attr('height', this.getHeight())
-	      .transition()
-	      .duration(options.animationDuration)
-	      .attr('x', this.#getX(width))
-	      .attr('y', this.#getY())
-	      .attr('width', this.getWidth())
-	      .attr('height', this.getHeight())
-	      .attr('transform', () => {
-	        if (options.legend.verticalOrientation) {
-	          return `rotate(90 ${options.legend.cellSize[X] / 2} ${
-            options.legend.cellSize[Y] / 2
-          })`;
-	        }
-	        return null;
-	      });
+	    if (this.root.select(DEFAULT_CLASSNAME).empty()) {
+	      this.root = this.root
+	        .append('svg')
+	        .attr('class', DEFAULT_CLASSNAME.slice(1));
+	    } else {
+	      this.root = this.root.select(DEFAULT_CLASSNAME);
+	    }
 
-	    this.#populate(legendNode);
+	    const node = Legend(this.calendar.colorizer.scale, {
+	      title,
+	      tickSize: 0,
+	      width: (this.calendar.colorizer.scale.domain().length + 1) * cellSize[X],
+	    });
+
+	    this.root.selectAll('*').remove();
+	    this.root.append(() => node);
 
 	    return true;
 	  }
 
-	  #populate(legendNode) {
-	    const { steps, cellSize, cellPadding } =
-	      this.calendar.options.options.legend;
-	    const { colorizer } = this.calendar;
-
-	    const items = steps.slice(0);
-	    items.push(items[items.length - 1] + 1);
-
-	    legendNode
-	      .selectAll('rect')
-	      .data(items, (d) => d)
-	      .join(
-	        (enter) => enter
-	          .append('rect')
-	          .attr('width', cellSize[X])
-	          .attr('height', cellSize[Y])
-	          .attr('x', (d, i) => i * (cellSize[X] + cellPadding))
-	          .attr('class', (d) => colorizer.getClassName(d))
-	          .attr('fill', (d, i) => {
-	            if (colorizer.scale === null) {
-	              return colorizer.getCustomColor('base');
-	            }
-
-	            if (i === 0) {
-	              return colorizer.scale(d - 1);
-	            }
-	            return colorizer.scale(steps[i - 1]);
-	          })
-	          .append('title')
-	          .text((d, i) => this.#getLegendTitle(d, i, items)),
-	        (update) => update
-	          .attr('x', (d, i) => i * (cellSize[X] + cellPadding))
-	          .attr('class', (d) => colorizer.getClassName(d))
-	          .attr('fill', (d, i) => {
-	            if (colorizer.scale === null) {
-	              return colorizer.getCustomColor('base');
-	            }
-
-	            if (i === 0) {
-	              return colorizer.scale(d - 1);
-	            }
-	            return colorizer.scale(steps[i - 1]);
-	          })
-	          .append('title')
-	          .text((d, i) => this.#getLegendTitle(d, i, items)),
-	      );
-	  }
-
-	  #getLegendTitle(d, i, legendItems) {
-	    const { options } = this.calendar.options;
-	    const { steps } = options.legend;
-
-	    if (i === 0) {
-	      return formatStringWithObject(options.legendTitleFormat.lower, {
-	        min: steps[i],
-	        name: options.itemName[1],
-	      });
+	  destroy() {
+	    if (this.root === null) {
+	      return false;
 	    }
-	    if (i === legendItems.length - 1) {
-	      return formatStringWithObject(options.legendTitleFormat.upper, {
-	        max: steps[i - 1],
-	        name: options.itemName[1],
-	      });
-	    }
-	    return formatStringWithObject(options.legendTitleFormat.inner, {
-	      down: steps[i - 1],
-	      up: steps[i],
-	      name: options.itemName[1],
-	    });
-	  }
 
-	  /**
-	   * Return the dimension of the legend
-	   *
-	   * Takes into account rotation
-	   *
-	   * @param  string axis Width or height
-	   * @return int height or width in pixels
-	   */
-	  #getDimensions(axis) {
-	    const isHorizontal =
-	      !this.calendar.options.options.legend.verticalOrientation;
+	    this.root.remove();
+	    this.root = null;
 
-	    switch (axis) {
-	      case 'height':
-	        return this.dimensions[isHorizontal ? 'height' : 'width'];
-	      case 'width':
-	        return this.dimensions[isHorizontal ? 'width' : 'height'];
-	      default:
-	        throw new Error('Invalid axis');
-	    }
-	  }
-
-	  getWidth() {
-	    return this.#getDimensions('width');
-	  }
-
-	  getHeight() {
-	    return this.#getDimensions('height');
+	    return true;
 	  }
 	}
 
@@ -6210,9 +6004,7 @@
 	    const { options } = this.calendar.options;
 
 	    const legendHeight = options.legend.show ?
-	      this.legendPainter.getHeight() +
-	        options.legend.margin[TOP] +
-	        options.legend.margin[BOTTOM] :
+	      options.legend.margin[TOP] + options.legend.margin[BOTTOM] :
 	      0;
 
 	    if (
@@ -6228,9 +6020,7 @@
 	    const { options } = this.calendar.options;
 
 	    const legendWidth = options.legend.show ?
-	      this.legendPainter.getWidth() +
-	        options.legend.margin[RIGHT] +
-	        options.legend.margin[LEFT] :
+	      options.legend.margin[RIGHT] + options.legend.margin[LEFT] :
 	      0;
 	    const domainsWidth =
 	      this.domainPainter.dimensions.width - options.domainGutter;
@@ -6302,53 +6092,6 @@
 	    this.calendar = calendar;
 	  }
 
-	  /**
-	   * Colorize the cell via a style attribute if enabled
-	   */
-	  #addStyle(element) {
-	    const { options } = this.calendar.options;
-
-	    if (!this.calendar.colorizer.scale) {
-	      return;
-	    }
-
-	    element.attr('fill', (d) => {
-	      if (
-	        d.v === null &&
-	        options.hasOwnProperty('considerMissingDataAsZero') &&
-	        !options.considerMissingDataAsZero
-	      ) {
-	        if (options.legend.colors.hasOwnProperty('base')) {
-	          return options.legend.colors.base;
-	        }
-	      }
-
-	      if (
-	        options.legend.colors?.hasOwnProperty('empty') &&
-	        (d.v === 0 ||
-	          (d.v === null &&
-	            options.hasOwnProperty('considerMissingDataAsZero') &&
-	            options.considerMissingDataAsZero))
-	      ) {
-	        return options.legend.colors.empty;
-	      }
-
-	      const { steps } = options.legend;
-
-	      if (
-	        d.v < 0 &&
-	        steps[0] > 0 &&
-	        options.legend.colors?.hasOwnProperty('overflow')
-	      ) {
-	        return options.legend.colors.overflow;
-	      }
-
-	      return this.calendar.colorizer.scale(
-	        Math.min(d.v, steps[steps.length - 1]),
-	      );
-	    });
-	  }
-
 	  #getClassName(d) {
 	    const { calendar } = this;
 	    const { options } = calendar.options;
@@ -6356,31 +6099,9 @@
 	    const htmlClass = getHighlightClassName(calendar, d.t, options)
 	      .trim()
 	      .split(' ');
-	    const pastDate = calendar.helpers.DateHelper.dateFromPreviousInterval(
-	      options.subDomain,
-	      d.t,
-	      new Date(),
-	    );
 
-	    if (
-	      calendar.colorizer.scale === null ||
-	      (d.v === null &&
-	        options.hasOwnProperty('considerMissingDataAsZero') &&
-	        !options.considerMissingDataAsZero &&
-	        !options.legend.colors.hasOwnProperty('base'))
-	    ) {
-	      htmlClass.push('graph-rect');
-	    }
-
-	    if (d.v !== null) {
-	      htmlClass.push(calendar.colorizer.getClassName(d.v));
-	    } else if (options.considerMissingDataAsZero && pastDate) {
-	      htmlClass.push(calendar.colorizer.getClassName(0));
-	    }
-
-	    if (options.onClick !== null) {
-	      htmlClass.push('hover_cursor');
-	    }
+	    htmlClass.push('graph-rect');
+	    htmlClass.push('hover_cursor');
 
 	    return htmlClass.join(' ').trim();
 	  }
@@ -6388,6 +6109,7 @@
 	  populate() {
 	    const { calendar } = this;
 	    const { options } = calendar.options;
+	    const { scale } = this.calendar.colorizer;
 	    const svg = calendar.calendarPainter.root.selectAll('.graph-domain');
 
 	    const rect = svg
@@ -6400,7 +6122,7 @@
 	      .duration(options.animationDuration)
 	      .select('rect')
 	      .attr('class', (d) => this.#getClassName(d))
-	      .call((d) => this.#addStyle(d))
+	      .call((e) => e.style('fill', (d) => scale && scale(d.v)))
 	      .attr('title', (d) => {
 	        const { subDomainTitleFn } = options.formatter;
 
@@ -6713,7 +6435,7 @@
 	 * console.log(_.identity(object) === object);
 	 * // => true
 	 */
-	function identity$2(value) {
+	function identity(value) {
 	  return value;
 	}
 
@@ -7015,7 +6737,7 @@
 	 * @param {Function} string The `toString` result.
 	 * @returns {Function} Returns `func`.
 	 */
-	var baseSetToString = !defineProperty$1 ? identity$2 : function(func, string) {
+	var baseSetToString = !defineProperty$1 ? identity : function(func, string) {
 	  return defineProperty$1(func, 'toString', {
 	    'configurable': true,
 	    'enumerable': false,
@@ -7222,7 +6944,7 @@
 	 * @returns {Function} Returns the new function.
 	 */
 	function baseRest(func, start) {
-	  return setToString$1(overRest(func, start, identity$2), func + '');
+	  return setToString$1(overRest(func, start, identity), func + '');
 	}
 
 	/** Used as references for various `Number` constants. */
@@ -8805,9 +8527,9 @@
 	}
 
 	/* Built-in method references that are verified to be native. */
-	var DataView$1 = getNative(root$1, 'DataView');
+	var DataView = getNative(root$1, 'DataView');
 
-	var DataView$2 = DataView$1;
+	var DataView$1 = DataView;
 
 	/* Built-in method references that are verified to be native. */
 	var Promise$1 = getNative(root$1, 'Promise');
@@ -8829,7 +8551,7 @@
 	var dataViewTag$1 = '[object DataView]';
 
 	/** Used to detect maps, sets, and weakmaps. */
-	var dataViewCtorString = toSource(DataView$2),
+	var dataViewCtorString = toSource(DataView$1),
 	    mapCtorString = toSource(Map$2),
 	    promiseCtorString = toSource(Promise$2),
 	    setCtorString = toSource(Set$2),
@@ -8845,7 +8567,7 @@
 	var getTag = baseGetTag;
 
 	// Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
-	if ((DataView$2 && getTag(new DataView$2(new ArrayBuffer(1))) != dataViewTag$1) ||
+	if ((DataView$1 && getTag(new DataView$1(new ArrayBuffer(1))) != dataViewTag$1) ||
 	    (Map$2 && getTag(new Map$2) != mapTag$1) ||
 	    (Promise$2 && getTag(Promise$2.resolve()) != promiseTag) ||
 	    (Set$2 && getTag(new Set$2) != setTag$1) ||
@@ -17506,6 +17228,10 @@
 
 	        cellPadding: 2,
 
+	        itemSelector: null,
+
+	        title: null,
+
 	        // Legend rotation
 	        // false: display the legend from left to right
 	        // true : display the legend from top to bottom
@@ -17522,19 +17248,10 @@
 	        // accepted values: left, center, right
 	        horizontalPosition: 'left',
 
-	        // Objects holding all the heatmap different colors
-	        // null to disable, and use the default css styles
-	        //
-	        // Examples:
-	        // colors: {
-	        //    min: "green",
-	        //    middle: "blue",
-	        //    max: "red",
-	        //    empty: "#ffffff",
-	        //    base: "grey",
-	        //    overflow: "red"
-	        // }
-	        colors: null,
+	        // Array of colors for the legend
+	        colors: ['#dae08e', '#3d632a'],
+
+	        scale: null,
 	      },
 
 	      // ================================================
@@ -17580,13 +17297,6 @@
 	        // This will also be the tooltip's text when enabled
 	        // Expecting a function, which is returning the title's text
 	        subDomainTitleFn: (date, value) => `${value} - ${date}`,
-	      },
-
-	      // Formatting of the title displayed when hovering a legend cell
-	      legendTitleFormat: {
-	        lower: 'less than {min} {name}',
-	        inner: 'between {down} and {up} {name}',
-	        upper: 'more than {max} {name}',
 	      },
 
 	      // Animation duration, in ms
@@ -17778,69 +17488,14 @@
 	  return 0;
 	}
 
-	function number$1(x) {
+	function number(x) {
 	  return x === null ? NaN : +x;
 	}
 
 	const ascendingBisect = bisector(ascending);
 	const bisectRight = ascendingBisect.right;
-	bisector(number$1).center;
+	bisector(number).center;
 	var bisect = bisectRight;
-
-	var e10 = Math.sqrt(50),
-	    e5 = Math.sqrt(10),
-	    e2 = Math.sqrt(2);
-
-	function ticks(start, stop, count) {
-	  var reverse,
-	      i = -1,
-	      n,
-	      ticks,
-	      step;
-
-	  stop = +stop, start = +start, count = +count;
-	  if (start === stop && count > 0) return [start];
-	  if (reverse = stop < start) n = start, start = stop, stop = n;
-	  if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
-
-	  if (step > 0) {
-	    let r0 = Math.round(start / step), r1 = Math.round(stop / step);
-	    if (r0 * step < start) ++r0;
-	    if (r1 * step > stop) --r1;
-	    ticks = new Array(n = r1 - r0 + 1);
-	    while (++i < n) ticks[i] = (r0 + i) * step;
-	  } else {
-	    step = -step;
-	    let r0 = Math.round(start * step), r1 = Math.round(stop * step);
-	    if (r0 / step < start) ++r0;
-	    if (r1 / step > stop) --r1;
-	    ticks = new Array(n = r1 - r0 + 1);
-	    while (++i < n) ticks[i] = (r0 + i) / step;
-	  }
-
-	  if (reverse) ticks.reverse();
-
-	  return ticks;
-	}
-
-	function tickIncrement(start, stop, count) {
-	  var step = (stop - start) / Math.max(0, count),
-	      power = Math.floor(Math.log(step) / Math.LN10),
-	      error = step / Math.pow(10, power);
-	  return power >= 0
-	      ? (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1) * Math.pow(10, power)
-	      : -Math.pow(10, -power) / (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1);
-	}
-
-	function tickStep(start, stop, count) {
-	  var step0 = Math.abs(stop - start) / Math.max(0, count),
-	      step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10)),
-	      error = step0 / step1;
-	  if (error >= e10) step1 *= 10;
-	  else if (error >= e5) step1 *= 5;
-	  else if (error >= e2) step1 *= 2;
-	  return stop < start ? -step1 : step1;
-	}
 
 	function initRange(domain, range) {
 	  switch (arguments.length) {
@@ -17849,557 +17504,6 @@
 	    default: this.range(range).domain(domain); break;
 	  }
 	  return this;
-	}
-
-	function constants(x) {
-	  return function() {
-	    return x;
-	  };
-	}
-
-	function number(x) {
-	  return +x;
-	}
-
-	var unit = [0, 1];
-
-	function identity$1(x) {
-	  return x;
-	}
-
-	function normalize(a, b) {
-	  return (b -= (a = +a))
-	      ? function(x) { return (x - a) / b; }
-	      : constants(isNaN(b) ? NaN : 0.5);
-	}
-
-	function clamper(a, b) {
-	  var t;
-	  if (a > b) t = a, a = b, b = t;
-	  return function(x) { return Math.max(a, Math.min(b, x)); };
-	}
-
-	// normalize(a, b)(x) takes a domain value x in [a,b] and returns the corresponding parameter t in [0,1].
-	// interpolate(a, b)(t) takes a parameter t in [0,1] and returns the corresponding range value x in [a,b].
-	function bimap(domain, range, interpolate) {
-	  var d0 = domain[0], d1 = domain[1], r0 = range[0], r1 = range[1];
-	  if (d1 < d0) d0 = normalize(d1, d0), r0 = interpolate(r1, r0);
-	  else d0 = normalize(d0, d1), r0 = interpolate(r0, r1);
-	  return function(x) { return r0(d0(x)); };
-	}
-
-	function polymap(domain, range, interpolate) {
-	  var j = Math.min(domain.length, range.length) - 1,
-	      d = new Array(j),
-	      r = new Array(j),
-	      i = -1;
-
-	  // Reverse descending domains.
-	  if (domain[j] < domain[0]) {
-	    domain = domain.slice().reverse();
-	    range = range.slice().reverse();
-	  }
-
-	  while (++i < j) {
-	    d[i] = normalize(domain[i], domain[i + 1]);
-	    r[i] = interpolate(range[i], range[i + 1]);
-	  }
-
-	  return function(x) {
-	    var i = bisect(domain, x, 1, j) - 1;
-	    return r[i](d[i](x));
-	  };
-	}
-
-	function copy(source, target) {
-	  return target
-	      .domain(source.domain())
-	      .range(source.range())
-	      .interpolate(source.interpolate())
-	      .clamp(source.clamp())
-	      .unknown(source.unknown());
-	}
-
-	function transformer() {
-	  var domain = unit,
-	      range = unit,
-	      interpolate = interpolate$1,
-	      transform,
-	      untransform,
-	      unknown,
-	      clamp = identity$1,
-	      piecewise,
-	      output,
-	      input;
-
-	  function rescale() {
-	    var n = Math.min(domain.length, range.length);
-	    if (clamp !== identity$1) clamp = clamper(domain[0], domain[n - 1]);
-	    piecewise = n > 2 ? polymap : bimap;
-	    output = input = null;
-	    return scale;
-	  }
-
-	  function scale(x) {
-	    return x == null || isNaN(x = +x) ? unknown : (output || (output = piecewise(domain.map(transform), range, interpolate)))(transform(clamp(x)));
-	  }
-
-	  scale.invert = function(y) {
-	    return clamp(untransform((input || (input = piecewise(range, domain.map(transform), interpolateNumber)))(y)));
-	  };
-
-	  scale.domain = function(_) {
-	    return arguments.length ? (domain = Array.from(_, number), rescale()) : domain.slice();
-	  };
-
-	  scale.range = function(_) {
-	    return arguments.length ? (range = Array.from(_), rescale()) : range.slice();
-	  };
-
-	  scale.rangeRound = function(_) {
-	    return range = Array.from(_), interpolate = interpolateRound, rescale();
-	  };
-
-	  scale.clamp = function(_) {
-	    return arguments.length ? (clamp = _ ? true : identity$1, rescale()) : clamp !== identity$1;
-	  };
-
-	  scale.interpolate = function(_) {
-	    return arguments.length ? (interpolate = _, rescale()) : interpolate;
-	  };
-
-	  scale.unknown = function(_) {
-	    return arguments.length ? (unknown = _, scale) : unknown;
-	  };
-
-	  return function(t, u) {
-	    transform = t, untransform = u;
-	    return rescale();
-	  };
-	}
-
-	function continuous() {
-	  return transformer()(identity$1, identity$1);
-	}
-
-	function formatDecimal(x) {
-	  return Math.abs(x = Math.round(x)) >= 1e21
-	      ? x.toLocaleString("en").replace(/,/g, "")
-	      : x.toString(10);
-	}
-
-	// Computes the decimal coefficient and exponent of the specified number x with
-	// significant digits p, where x is positive and p is in [1, 21] or undefined.
-	// For example, formatDecimalParts(1.23) returns ["123", 0].
-	function formatDecimalParts(x, p) {
-	  if ((i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e")) < 0) return null; // NaN, ±Infinity
-	  var i, coefficient = x.slice(0, i);
-
-	  // The string returned by toExponential either has the form \d\.\d+e[-+]\d+
-	  // (e.g., 1.2e+3) or the form \de[-+]\d+ (e.g., 1e+3).
-	  return [
-	    coefficient.length > 1 ? coefficient[0] + coefficient.slice(2) : coefficient,
-	    +x.slice(i + 1)
-	  ];
-	}
-
-	function exponent(x) {
-	  return x = formatDecimalParts(Math.abs(x)), x ? x[1] : NaN;
-	}
-
-	function formatGroup(grouping, thousands) {
-	  return function(value, width) {
-	    var i = value.length,
-	        t = [],
-	        j = 0,
-	        g = grouping[0],
-	        length = 0;
-
-	    while (i > 0 && g > 0) {
-	      if (length + g + 1 > width) g = Math.max(1, width - length);
-	      t.push(value.substring(i -= g, i + g));
-	      if ((length += g + 1) > width) break;
-	      g = grouping[j = (j + 1) % grouping.length];
-	    }
-
-	    return t.reverse().join(thousands);
-	  };
-	}
-
-	function formatNumerals(numerals) {
-	  return function(value) {
-	    return value.replace(/[0-9]/g, function(i) {
-	      return numerals[+i];
-	    });
-	  };
-	}
-
-	// [[fill]align][sign][symbol][0][width][,][.precision][~][type]
-	var re = /^(?:(.)?([<>=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i;
-
-	function formatSpecifier(specifier) {
-	  if (!(match = re.exec(specifier))) throw new Error("invalid format: " + specifier);
-	  var match;
-	  return new FormatSpecifier({
-	    fill: match[1],
-	    align: match[2],
-	    sign: match[3],
-	    symbol: match[4],
-	    zero: match[5],
-	    width: match[6],
-	    comma: match[7],
-	    precision: match[8] && match[8].slice(1),
-	    trim: match[9],
-	    type: match[10]
-	  });
-	}
-
-	formatSpecifier.prototype = FormatSpecifier.prototype; // instanceof
-
-	function FormatSpecifier(specifier) {
-	  this.fill = specifier.fill === undefined ? " " : specifier.fill + "";
-	  this.align = specifier.align === undefined ? ">" : specifier.align + "";
-	  this.sign = specifier.sign === undefined ? "-" : specifier.sign + "";
-	  this.symbol = specifier.symbol === undefined ? "" : specifier.symbol + "";
-	  this.zero = !!specifier.zero;
-	  this.width = specifier.width === undefined ? undefined : +specifier.width;
-	  this.comma = !!specifier.comma;
-	  this.precision = specifier.precision === undefined ? undefined : +specifier.precision;
-	  this.trim = !!specifier.trim;
-	  this.type = specifier.type === undefined ? "" : specifier.type + "";
-	}
-
-	FormatSpecifier.prototype.toString = function() {
-	  return this.fill
-	      + this.align
-	      + this.sign
-	      + this.symbol
-	      + (this.zero ? "0" : "")
-	      + (this.width === undefined ? "" : Math.max(1, this.width | 0))
-	      + (this.comma ? "," : "")
-	      + (this.precision === undefined ? "" : "." + Math.max(0, this.precision | 0))
-	      + (this.trim ? "~" : "")
-	      + this.type;
-	};
-
-	// Trims insignificant zeros, e.g., replaces 1.2000k with 1.2k.
-	function formatTrim(s) {
-	  out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
-	    switch (s[i]) {
-	      case ".": i0 = i1 = i; break;
-	      case "0": if (i0 === 0) i0 = i; i1 = i; break;
-	      default: if (!+s[i]) break out; if (i0 > 0) i0 = 0; break;
-	    }
-	  }
-	  return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
-	}
-
-	var prefixExponent;
-
-	function formatPrefixAuto(x, p) {
-	  var d = formatDecimalParts(x, p);
-	  if (!d) return x + "";
-	  var coefficient = d[0],
-	      exponent = d[1],
-	      i = exponent - (prefixExponent = Math.max(-8, Math.min(8, Math.floor(exponent / 3))) * 3) + 1,
-	      n = coefficient.length;
-	  return i === n ? coefficient
-	      : i > n ? coefficient + new Array(i - n + 1).join("0")
-	      : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i)
-	      : "0." + new Array(1 - i).join("0") + formatDecimalParts(x, Math.max(0, p + i - 1))[0]; // less than 1y!
-	}
-
-	function formatRounded(x, p) {
-	  var d = formatDecimalParts(x, p);
-	  if (!d) return x + "";
-	  var coefficient = d[0],
-	      exponent = d[1];
-	  return exponent < 0 ? "0." + new Array(-exponent).join("0") + coefficient
-	      : coefficient.length > exponent + 1 ? coefficient.slice(0, exponent + 1) + "." + coefficient.slice(exponent + 1)
-	      : coefficient + new Array(exponent - coefficient.length + 2).join("0");
-	}
-
-	var formatTypes = {
-	  "%": (x, p) => (x * 100).toFixed(p),
-	  "b": (x) => Math.round(x).toString(2),
-	  "c": (x) => x + "",
-	  "d": formatDecimal,
-	  "e": (x, p) => x.toExponential(p),
-	  "f": (x, p) => x.toFixed(p),
-	  "g": (x, p) => x.toPrecision(p),
-	  "o": (x) => Math.round(x).toString(8),
-	  "p": (x, p) => formatRounded(x * 100, p),
-	  "r": formatRounded,
-	  "s": formatPrefixAuto,
-	  "X": (x) => Math.round(x).toString(16).toUpperCase(),
-	  "x": (x) => Math.round(x).toString(16)
-	};
-
-	function identity(x) {
-	  return x;
-	}
-
-	var map = Array.prototype.map,
-	    prefixes = ["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];
-
-	function formatLocale(locale) {
-	  var group = locale.grouping === undefined || locale.thousands === undefined ? identity : formatGroup(map.call(locale.grouping, Number), locale.thousands + ""),
-	      currencyPrefix = locale.currency === undefined ? "" : locale.currency[0] + "",
-	      currencySuffix = locale.currency === undefined ? "" : locale.currency[1] + "",
-	      decimal = locale.decimal === undefined ? "." : locale.decimal + "",
-	      numerals = locale.numerals === undefined ? identity : formatNumerals(map.call(locale.numerals, String)),
-	      percent = locale.percent === undefined ? "%" : locale.percent + "",
-	      minus = locale.minus === undefined ? "−" : locale.minus + "",
-	      nan = locale.nan === undefined ? "NaN" : locale.nan + "";
-
-	  function newFormat(specifier) {
-	    specifier = formatSpecifier(specifier);
-
-	    var fill = specifier.fill,
-	        align = specifier.align,
-	        sign = specifier.sign,
-	        symbol = specifier.symbol,
-	        zero = specifier.zero,
-	        width = specifier.width,
-	        comma = specifier.comma,
-	        precision = specifier.precision,
-	        trim = specifier.trim,
-	        type = specifier.type;
-
-	    // The "n" type is an alias for ",g".
-	    if (type === "n") comma = true, type = "g";
-
-	    // The "" type, and any invalid type, is an alias for ".12~g".
-	    else if (!formatTypes[type]) precision === undefined && (precision = 12), trim = true, type = "g";
-
-	    // If zero fill is specified, padding goes after sign and before digits.
-	    if (zero || (fill === "0" && align === "=")) zero = true, fill = "0", align = "=";
-
-	    // Compute the prefix and suffix.
-	    // For SI-prefix, the suffix is lazily computed.
-	    var prefix = symbol === "$" ? currencyPrefix : symbol === "#" && /[boxX]/.test(type) ? "0" + type.toLowerCase() : "",
-	        suffix = symbol === "$" ? currencySuffix : /[%p]/.test(type) ? percent : "";
-
-	    // What format function should we use?
-	    // Is this an integer type?
-	    // Can this type generate exponential notation?
-	    var formatType = formatTypes[type],
-	        maybeSuffix = /[defgprs%]/.test(type);
-
-	    // Set the default precision if not specified,
-	    // or clamp the specified precision to the supported range.
-	    // For significant precision, it must be in [1, 21].
-	    // For fixed precision, it must be in [0, 20].
-	    precision = precision === undefined ? 6
-	        : /[gprs]/.test(type) ? Math.max(1, Math.min(21, precision))
-	        : Math.max(0, Math.min(20, precision));
-
-	    function format(value) {
-	      var valuePrefix = prefix,
-	          valueSuffix = suffix,
-	          i, n, c;
-
-	      if (type === "c") {
-	        valueSuffix = formatType(value) + valueSuffix;
-	        value = "";
-	      } else {
-	        value = +value;
-
-	        // Determine the sign. -0 is not less than 0, but 1 / -0 is!
-	        var valueNegative = value < 0 || 1 / value < 0;
-
-	        // Perform the initial formatting.
-	        value = isNaN(value) ? nan : formatType(Math.abs(value), precision);
-
-	        // Trim insignificant zeros.
-	        if (trim) value = formatTrim(value);
-
-	        // If a negative value rounds to zero after formatting, and no explicit positive sign is requested, hide the sign.
-	        if (valueNegative && +value === 0 && sign !== "+") valueNegative = false;
-
-	        // Compute the prefix and suffix.
-	        valuePrefix = (valueNegative ? (sign === "(" ? sign : minus) : sign === "-" || sign === "(" ? "" : sign) + valuePrefix;
-	        valueSuffix = (type === "s" ? prefixes[8 + prefixExponent / 3] : "") + valueSuffix + (valueNegative && sign === "(" ? ")" : "");
-
-	        // Break the formatted value into the integer “value” part that can be
-	        // grouped, and fractional or exponential “suffix” part that is not.
-	        if (maybeSuffix) {
-	          i = -1, n = value.length;
-	          while (++i < n) {
-	            if (c = value.charCodeAt(i), 48 > c || c > 57) {
-	              valueSuffix = (c === 46 ? decimal + value.slice(i + 1) : value.slice(i)) + valueSuffix;
-	              value = value.slice(0, i);
-	              break;
-	            }
-	          }
-	        }
-	      }
-
-	      // If the fill character is not "0", grouping is applied before padding.
-	      if (comma && !zero) value = group(value, Infinity);
-
-	      // Compute the padding.
-	      var length = valuePrefix.length + value.length + valueSuffix.length,
-	          padding = length < width ? new Array(width - length + 1).join(fill) : "";
-
-	      // If the fill character is "0", grouping is applied after padding.
-	      if (comma && zero) value = group(padding + value, padding.length ? width - valueSuffix.length : Infinity), padding = "";
-
-	      // Reconstruct the final output based on the desired alignment.
-	      switch (align) {
-	        case "<": value = valuePrefix + value + valueSuffix + padding; break;
-	        case "=": value = valuePrefix + padding + value + valueSuffix; break;
-	        case "^": value = padding.slice(0, length = padding.length >> 1) + valuePrefix + value + valueSuffix + padding.slice(length); break;
-	        default: value = padding + valuePrefix + value + valueSuffix; break;
-	      }
-
-	      return numerals(value);
-	    }
-
-	    format.toString = function() {
-	      return specifier + "";
-	    };
-
-	    return format;
-	  }
-
-	  function formatPrefix(specifier, value) {
-	    var f = newFormat((specifier = formatSpecifier(specifier), specifier.type = "f", specifier)),
-	        e = Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3,
-	        k = Math.pow(10, -e),
-	        prefix = prefixes[8 + e / 3];
-	    return function(value) {
-	      return f(k * value) + prefix;
-	    };
-	  }
-
-	  return {
-	    format: newFormat,
-	    formatPrefix: formatPrefix
-	  };
-	}
-
-	var locale;
-	var format;
-	var formatPrefix;
-
-	defaultLocale({
-	  thousands: ",",
-	  grouping: [3],
-	  currency: ["$", ""]
-	});
-
-	function defaultLocale(definition) {
-	  locale = formatLocale(definition);
-	  format = locale.format;
-	  formatPrefix = locale.formatPrefix;
-	  return locale;
-	}
-
-	function precisionFixed(step) {
-	  return Math.max(0, -exponent(Math.abs(step)));
-	}
-
-	function precisionPrefix(step, value) {
-	  return Math.max(0, Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3 - exponent(Math.abs(step)));
-	}
-
-	function precisionRound(step, max) {
-	  step = Math.abs(step), max = Math.abs(max) - step;
-	  return Math.max(0, exponent(max) - exponent(step)) + 1;
-	}
-
-	function tickFormat(start, stop, count, specifier) {
-	  var step = tickStep(start, stop, count),
-	      precision;
-	  specifier = formatSpecifier(specifier == null ? ",f" : specifier);
-	  switch (specifier.type) {
-	    case "s": {
-	      var value = Math.max(Math.abs(start), Math.abs(stop));
-	      if (specifier.precision == null && !isNaN(precision = precisionPrefix(step, value))) specifier.precision = precision;
-	      return formatPrefix(specifier, value);
-	    }
-	    case "":
-	    case "e":
-	    case "g":
-	    case "p":
-	    case "r": {
-	      if (specifier.precision == null && !isNaN(precision = precisionRound(step, Math.max(Math.abs(start), Math.abs(stop))))) specifier.precision = precision - (specifier.type === "e");
-	      break;
-	    }
-	    case "f":
-	    case "%": {
-	      if (specifier.precision == null && !isNaN(precision = precisionFixed(step))) specifier.precision = precision - (specifier.type === "%") * 2;
-	      break;
-	    }
-	  }
-	  return format(specifier);
-	}
-
-	function linearish(scale) {
-	  var domain = scale.domain;
-
-	  scale.ticks = function(count) {
-	    var d = domain();
-	    return ticks(d[0], d[d.length - 1], count == null ? 10 : count);
-	  };
-
-	  scale.tickFormat = function(count, specifier) {
-	    var d = domain();
-	    return tickFormat(d[0], d[d.length - 1], count == null ? 10 : count, specifier);
-	  };
-
-	  scale.nice = function(count) {
-	    if (count == null) count = 10;
-
-	    var d = domain();
-	    var i0 = 0;
-	    var i1 = d.length - 1;
-	    var start = d[i0];
-	    var stop = d[i1];
-	    var prestep;
-	    var step;
-	    var maxIter = 10;
-
-	    if (stop < start) {
-	      step = start, start = stop, stop = step;
-	      step = i0, i0 = i1, i1 = step;
-	    }
-	    
-	    while (maxIter-- > 0) {
-	      step = tickIncrement(start, stop, count);
-	      if (step === prestep) {
-	        d[i0] = start;
-	        d[i1] = stop;
-	        return domain(d);
-	      } else if (step > 0) {
-	        start = Math.floor(start / step) * step;
-	        stop = Math.ceil(stop / step) * step;
-	      } else if (step < 0) {
-	        start = Math.ceil(start * step) / step;
-	        stop = Math.floor(stop * step) / step;
-	      } else {
-	        break;
-	      }
-	      prestep = step;
-	    }
-
-	    return scale;
-	  };
-
-	  return scale;
-	}
-
-	function linear() {
-	  var scale = continuous();
-
-	  scale.copy = function() {
-	    return copy(scale, linear());
-	  };
-
-	  initRange.apply(scale, arguments);
-
-	  return linearish(scale);
 	}
 
 	function threshold() {
@@ -18446,91 +17550,11 @@
 	  }
 
 	  build() {
-	    const { colors } = this.calendar.options.options.legend;
+	    const { steps, colors, scale } = this.calendar.options.options.legend;
 
-	    if (colors === null) {
-	      this.scale = null;
-	      return false;
-	    }
-
-	    let colorRange = [];
-
-	    if (Array.isArray(colors)) {
-	      colorRange = colors;
-	    } else if (colors.hasOwnProperty('min') && colors.hasOwnProperty('max')) {
-	      colorRange = [colors.min, colors.max];
-	    } else {
-	      return false;
-	    }
-
-	    const legend = this.calendar.options.options.legend.steps.slice(0);
-
-	    if (legend[0] > 0) {
-	      legend.unshift(0);
-	    } else if (legend[0] <= 0) {
-	      // Let's guess the leftmost value, it we have to add one
-	      legend.unshift(
-	        legend[0] - (legend[legend.length - 1] - legend[0]) / legend.length,
-	      );
-	    }
-
-	    const colorScale = linear()
-	      .range(colorRange)
-	      .interpolate(interpolateHcl)
-	      .domain([Math.min(...legend), Math.max(...legend)]);
-
-	    const colorsRange = legend.map((element) => colorScale(element));
-	    this.scale = threshold()
-	      .domain(this.calendar.options.options.legend.steps)
-	      .range(colorsRange);
+	    this.scale = scale || threshold(steps, colors);
 
 	    return true;
-	  }
-
-	  getCustomColor(colorKey) {
-	    const { colors } = this.calendar.options.options.legend;
-
-	    if (this.scale !== null && colors?.hasOwnProperty(colorKey)) {
-	      return colors[colorKey];
-	    }
-
-	    return null;
-	  }
-
-	  /**
-	   * Return the classname of the cell for the specified value
-	   *
-	   * @param integer n Value associated to a date
-	   * @return string Classname according to the legend
-	   */
-	  getClassName(n) {
-	    if (n === null || Number.isNaN(n)) {
-	      return '';
-	    }
-
-	    const { steps } = this.calendar.options.options.legend;
-	    let index = [steps.length + 1];
-
-	    for (let i = 0, total = steps.length - 1; i <= total; i += 1) {
-	      if (steps[0] > 0 && n < 0) {
-	        index = ['1', 'i'];
-	        break;
-	      }
-
-	      if (n <= steps[i]) {
-	        index = [i + 1];
-	        break;
-	      }
-	    }
-
-	    if (n === 0) {
-	      index.push(0);
-	    }
-
-	    index.unshift('');
-	    return (
-	      index.join(' r') + (this.scale === null ? index.join(' q') : '')
-	    ).trim();
 	  }
 	}
 
@@ -19605,13 +18629,19 @@
 	  // PUBLIC API
 	  // =========================================================================
 
+	  /**
+	   * Setup and paint the calendar with the given options
+	   *
+	   * @param  {Object} settings Options
+	   * @return void
+	   */
 	  init(settings) {
 	    const { options } = this.options;
 
 	    this.options.init(settings);
 
-	    this.calendarPainter.setup();
 	    this.colorizer.build();
+	    this.calendarPainter.setup();
 
 	    // Record all the valid domains
 	    // Each domain value is a timestamp in milliseconds
@@ -19629,6 +18659,8 @@
 
 	  /**
 	   * Shift the calendar by n domains forward
+	   *
+	   * @param {number} Number of domain interval to shift
 	   */
 	  next(n = 1) {
 	    const loadDirection = this.navigator.loadNewDomains(
@@ -19642,6 +18674,8 @@
 
 	  /**
 	   * Shift the calendar by n domains backward
+	   *
+	   * @param {number} Number of domain interval to shift
 	   */
 	  previous(n = 1) {
 	    const loadDirection = this.navigator.loadNewDomains(
@@ -19661,9 +18695,9 @@
 	   * will not necessarily be the first (leftmost) domain of the calendar.
 	   *
 	   * @param Date date Jump to the domain containing that date
-	   * @param bool reset Whether the wanted domain
+	   * @param {boolean} reset Whether the wanted domain
 	   * should be the first domain of the calendar
-	   * @param bool True of the calendar was scrolled
+	   * @param {boolean} True of the calendar was scrolled
 	   */
 	  jumpTo(date, reset = false) {
 	    const loadDirection = this.navigator.jumpTo(date, reset);
@@ -19721,10 +18755,8 @@
 	  /**
 	   * Set the legend
 	   *
-	   * @param array legend an array of integer,
-	   * representing the different threshold value
-	   * @param array colorRange an array of 2 hex colors, for the
-	   * minimum and maximum colors
+	   * @since 3.3.0
+	   * @param {Object} Same object as the legend option
 	   */
 	  setLegend(legendOptions) {
 	    const changeResults = [];
@@ -19744,7 +18776,8 @@
 	  /**
 	   * Remove the legend
 	   *
-	   * @return bool False if there is no legend to remove
+	   * @since 3.3.0
+	   * @return {boolean} False if there is no legend to remove
 	   */
 	  removeLegend() {
 	    if (!this.options.set('legend.show', false)) {
@@ -19756,7 +18789,8 @@
 	  /**
 	   * Display the legend
 	   *
-	   * @return bool False if the legend was already displayed
+	   * @since 3.3.0
+	   * @return {boolean} False if the legend was already displayed
 	   */
 	  showLegend() {
 	    if (!this.options.set('legend.show', true)) {
@@ -19773,7 +18807,7 @@
 	   *
 	   * @since  3.3.5
 	   * @param  array Array of dates to highlight
-	   * @return bool True if dates were highlighted
+	   * @return {boolean} True if dates were highlighted
 	   */
 	  highlight(dates) {
 	    if (
@@ -19784,24 +18818,28 @@
 	    }
 	  }
 
+	  /**
+	   * Listener for all events
+	   *
+	   * @since 4.0.0
+	   * @param  {string} eventName Name of the event to listen to
+	   * @param  {function} Callback function to execute on event trigger
+	   * @return void
+	   */
 	  on(...args) {
-	    return this.eventEmitter.on(...args);
+	    this.eventEmitter.on(...args);
 	  }
 
 	  /**
 	   * Destroy the calendar
 	   *
-	   * Usage: cal = cal.destroy();
-	   *
 	   * @since  3.3.6
-	   * @param function A callback function to trigger
+	   * @param {function} A callback function to trigger
 	   * after destroying the calendar
-	   * @return null
+	   * @return void
 	   */
 	  destroy(callback) {
 	    this.calendarPainter.destroy(callback);
-
-	    return null;
 	  }
 
 	  getSVG() {

@@ -229,6 +229,10 @@ export default class Options {
 
         cellPadding: 2,
 
+        itemSelector: null,
+
+        title: null,
+
         // Legend rotation
         // false: display the legend from left to right
         // true : display the legend from top to bottom
@@ -245,19 +249,10 @@ export default class Options {
         // accepted values: left, center, right
         horizontalPosition: 'left',
 
-        // Objects holding all the heatmap different colors
-        // null to disable, and use the default css styles
-        //
-        // Examples:
-        // colors: {
-        //    min: "green",
-        //    middle: "blue",
-        //    max: "red",
-        //    empty: "#ffffff",
-        //    base: "grey",
-        //    overflow: "red"
-        // }
-        colors: null,
+        // Array of colors for the legend
+        colors: ['#dae08e', '#3d632a'],
+
+        scale: null,
       },
 
       // ================================================
@@ -303,13 +298,6 @@ export default class Options {
         // This will also be the tooltip's text when enabled
         // Expecting a function, which is returning the title's text
         subDomainTitleFn: (date, value) => `${value} - ${date}`,
-      },
-
-      // Formatting of the title displayed when hovering a legend cell
-      legendTitleFormat: {
-        lower: 'less than {min} {name}',
-        inner: 'between {down} and {up} {name}',
-        upper: 'more than {max} {name}',
       },
 
       // Animation duration, in ms

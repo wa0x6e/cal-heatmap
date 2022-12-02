@@ -95,8 +95,6 @@ export default class subDomainPainter {
             .attr('rx', options.cellRadius)
             .attr('ry', options.cellRadius);
         }
-
-        selection.attr('fill', this.calendar.colorizer.getCustomColor('base'));
       });
 
     this.#appendText(rect);
@@ -105,9 +103,11 @@ export default class subDomainPainter {
   #getClassName(d) {
     const { options } = this.calendar.options;
 
-    return `graph-rect${getHighlightClassName(this.calendar, d.t, options)}${
-      options.onClick !== null ? ' hover_cursor' : ''
-    }`;
+    return `graph-rect${getHighlightClassName(
+      this.calendar,
+      d.t,
+      options,
+    )}${' hover_cursor'}`;
   }
 
   #appendText(elem) {
@@ -129,12 +129,9 @@ export default class subDomainPainter {
       .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d, i, nodes) => this.calendar.helpers.DateHelper.format(
-        d.t,
-        formatter,
-        d.v,
-        nodes[i],
-      ));
+      .text((d, i, nodes) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        this.calendar.helpers.DateHelper.format(d.t, formatter, d.v, nodes[i]));
   }
 
   #getCoordinates(axis, d) {

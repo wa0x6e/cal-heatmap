@@ -69,9 +69,7 @@ export default class CalendarPainter {
     const { options } = this.calendar.options;
 
     const legendHeight = options.legend.show ?
-      this.legendPainter.getHeight() +
-        options.legend.margin[TOP] +
-        options.legend.margin[BOTTOM] :
+      options.legend.margin[TOP] + options.legend.margin[BOTTOM] :
       0;
 
     if (
@@ -87,9 +85,7 @@ export default class CalendarPainter {
     const { options } = this.calendar.options;
 
     const legendWidth = options.legend.show ?
-      this.legendPainter.getWidth() +
-        options.legend.margin[RIGHT] +
-        options.legend.margin[LEFT] :
+      options.legend.margin[RIGHT] + options.legend.margin[LEFT] :
       0;
     const domainsWidth =
       this.domainPainter.dimensions.width - options.domainGutter;
