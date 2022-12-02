@@ -152,6 +152,8 @@ export default class Options {
 
       maxDate: null,
 
+      reversedDirection: false,
+
       // ================================================
       // DATA
       // ================================================

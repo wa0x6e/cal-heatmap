@@ -14,7 +14,7 @@ import LegendPainter from '../legend/LegendPainter';
 export default class CalendarPainter {
   constructor(calendar) {
     this.calendar = calendar;
-    this.graphDimensions = {
+    this.dimensions = {
       width: 0,
       height: 0,
     };
@@ -104,17 +104,31 @@ export default class CalendarPainter {
 
   resize() {
     const { options } = this.calendar.options;
+    const newWidth = this.getWidth();
+    const newHeight = this.getHeight();
 
     this.root
       .transition()
       .duration(options.animationDuration)
-      .attr('width', this.getWidth())
-      .attr('height', this.getHeight());
+      .attr('width', newWidth)
+      .attr('height', newHeight);
 
-    this.calendar.eventEmitter.emit('onResize', [
-      this.getHeight(),
-      this.getWidth(),
-    ]);
+    if (
+      newWidth !== this.dimensions.width ||
+      newHeight !== this.dimensions.height
+    ) {
+      this.calendar.eventEmitter.emit('resize', [
+        newWidth,
+        newHeight,
+        this.dimensions.width,
+        this.dimensions.height,
+      ]);
+    }
+
+    this.dimensions = {
+      width: newWidth,
+      height: newHeight,
+    };
   }
 
   destroy(callback) {
