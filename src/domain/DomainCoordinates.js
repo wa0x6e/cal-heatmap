@@ -23,7 +23,12 @@ export default class DomainCoordinates {
       height: 0,
     };
     let exitingTotal = 0;
-    const scrollFactor = scrollDirection === SCROLL_FORWARD ? -1 : 1;
+    let scrollFactor = scrollDirection === SCROLL_FORWARD ? -1 : 1;
+    const { keys } = collection;
+    if (this.calendar.options.options.reversedDirection) {
+      keys.reverse();
+      scrollFactor *= -1;
+    }
 
     collection.yankedDomains.forEach((domainKey) => {
       exitingTotal +=
@@ -40,7 +45,7 @@ export default class DomainCoordinates {
       });
     });
 
-    collection.keys.forEach((domainKey) => {
+    keys.forEach((domainKey) => {
       const w = this.#getWidth(domainKey);
       const h = this.#getHeight(domainKey);
       if (verticalOrientation) {
