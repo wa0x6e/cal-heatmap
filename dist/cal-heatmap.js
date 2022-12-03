@@ -350,7 +350,7 @@
 		}
 	} (eventemitter3));
 
-	var EventEmmiter = eventemitter3.exports;
+	var EventEmitter = eventemitter3.exports;
 
 	const RESET_ALL_ON_UPDATE = 0;
 	const RESET_SINGLE_ON_UPDATE = 1;
@@ -18634,7 +18634,7 @@
 	    this.calendarPainter = new CalendarPainter(this);
 	    this.colorizer = new Colorizer(this);
 	    this.helpers = {};
-	    this.eventEmitter = new EventEmmiter();
+	    this.eventEmitter = new EventEmitter();
 	  }
 
 	  createDomainCollection(startDate, range) {

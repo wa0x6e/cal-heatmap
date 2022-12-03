@@ -9,15 +9,21 @@
     "heat map"
   ],
   "type": "module",
-  "main": "cal-heatmap.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/cal-heatmap.esm.js",
+      "require": "./dist/cal-heatmap.js"
+    },
+    "./package.json": "./package.json"
+  },
   "directories": {
     "test": "test"
   },
+  "node": ">=14.16",
   "dependencies": {
     "@popperjs/core": "^2.11.6",
     "d3-fetch": "^3.0.1",
     "d3-format": "^3.1.0",
-    "d3-interpolate": "^3.0.1",
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
@@ -31,26 +37,24 @@
     "@rollup/plugin-json": "^5.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-terser": "^0.1.0",
     "eslint": "^8.27.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-jest": "^27.1.5",
-    "grunt": "^1.5.3",
-    "grunt-contrib-concat": "^2.1.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-csslint": "^2.0.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-exec": "^3.0.0",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
     "prettier": "^2.7.1",
     "prettier-eslint-cli": "^7.1.0",
     "puppeteer": "^19.2.2",
-    "rollup": "^3.2.5"
+    "rollup": "^3.2.5",
+    "rollup-plugin-filesize": "^9.1.2",
+    "rollup-plugin-scss": "^3.0.0",
+    "sass": "^1.56.1"
   },
   "scripts": {
     "format": "npx prettier-eslint --write \"src/**/*.js\" \"test/**/*.js\"",
     "lint": "npx eslint src/ test/",
-    "build": "rollup --config",
+    "build": "rm -rf dist/* && rollup -c",
     "dev": "rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest"
   },

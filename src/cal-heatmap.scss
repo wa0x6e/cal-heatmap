@@ -1,0 +1,117 @@
+/* Cal-Heatmap CSS */
+
+.cal-heatmap-container {
+  display: block;
+
+  .graph-label {
+    fill: #999;
+    font-size: 10px;
+  }
+
+  .graph-rect {
+    fill: #ededed;
+  }
+
+  .graph-subdomain-group rect:hover {
+    stroke: #000;
+    stroke-width: 1px;
+  }
+
+  .subdomain-text {
+    font-size: 8px;
+    fill: #999;
+    pointer-events: none;
+  }
+
+  rect.highlight {
+    stroke: #444;
+    stroke-width: 1;
+  }
+
+  text.highlight {
+    fill: #444;
+  }
+
+  rect.highlight-now {
+    stroke: red;
+  }
+
+  text.highlight-now {
+    fill: red;
+    font-weight: 800;
+  }
+
+  .domain-background {
+    fill: none;
+    shape-rendering: crispedges;
+  }
+
+  .weekday-label-rect {
+    fill: transparent;
+  }
+
+  .weekday-label-text {
+    font-size: 10px;
+    fill: #999;
+  }
+
+  .graph,
+  .graph-legend rect {
+    shape-rendering: crispedges;
+  }
+}
+
+#ch-tooltip {
+  $arrow-size: 8px;
+
+  padding: 5px 10px;
+  background: #222;
+  color: #bbb;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  border-radius: 2px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+  display: none;
+  box-sizing: border-box;
+
+  &[data-show] {
+    display: block;
+  }
+
+  &-arrow,
+  &-arrow::before {
+    background: inherit;
+    width: $arrow-size;
+    height: $arrow-size;
+    position: absolute;
+  }
+
+  &-arrow {
+    visibility: hidden;
+  }
+
+  &-arrow::before {
+    visibility: visible;
+    content: '';
+    transform: rotate(45deg);
+  }
+
+  &[data-popper-placement^='top'] > &-arrow {
+    bottom: calc($arrow-size / -2);
+    margin-left: calc($arrow-size / -2);
+  }
+
+  &[data-popper-placement^='bottom'] > &-arrow {
+    top: calc($arrow-size / -2);
+    margin-left: calc($arrow-size / -2);
+  }
+
+  &[data-popper-placement^='left'] > &-arrow {
+    right: calc($arrow-size / -2);
+  }
+
+  &[data-popper-placement^='right'] > &-arrow {
+    left: calc($arrow-size / -2);
+  }
+}

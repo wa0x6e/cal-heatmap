@@ -8,6 +8,8 @@ import Colorizer from './calendar/Colorizer';
 import DomainCollection from './calendar/DomainCollection';
 
 import extractSVG from './utils/extractSVG';
+// eslint-disable-next-line import/no-unresolved
+import './cal-heatmap.scss';
 
 import { getDatas } from './data';
 
