@@ -10,13 +10,10 @@ import {
   set,
 } from 'lodash-es';
 
-import {
-  TOP, RIGHT, BOTTOM, LEFT, X,
-} from '../constant';
+import { X } from '../constant';
 import DateHelper from '../helpers/DateHelper';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
-const DEFAULT_LEGEND_MARGIN = 10;
 
 /**
  * Ensure that the domain and subdomain are valid
@@ -222,39 +219,14 @@ export default class Options {
 
       // Threshold for the legend
       legend: {
-        steps: [10, 20, 30, 40],
-
         // Whether to display the legend
         show: true,
 
-        cellSize: 10,
-
-        cellPadding: 2,
-
         itemSelector: null,
 
-        title: null,
+        label: null,
 
-        // Legend rotation
-        // false: display the legend from left to right
-        // true : display the legend from top to bottom
-        verticalOrientation: false,
-
-        margin: [0, 0, 0, 0],
-
-        // Legend vertical position
-        // top: place legend above calendar
-        // bottom: place legend below the calendar
-        verticalPosition: 'bottom',
-
-        // Legend horizontal position
-        // accepted values: left, center, right
-        horizontalPosition: 'left',
-
-        // Array of colors for the legend
-        colors: ['#dae08e', '#3d632a'],
-
-        scale: null,
+        color: {},
       },
 
       // ================================================
@@ -404,24 +376,6 @@ export default class Options {
     if ([false, '', null].includes(options.formatter.domainLabel)) {
       options.x.domainVerticalLabelHeight = 0;
       options.x.domainHorizontalLabelWidth = 0;
-    }
-
-    if (options.legend.margin === [0, 0, 0, 0]) {
-      switch (options.legend.verticalPosition) {
-        case 'top':
-          options.legend.margin[BOTTOM] = DEFAULT_LEGEND_MARGIN;
-          break;
-        case 'bottom':
-          options.legend.margin[TOP] = DEFAULT_LEGEND_MARGIN;
-          break;
-        case 'middle':
-        case 'center':
-          options.legend.margin[
-            options.legend.horizontalPosition === 'right' ? LEFT : RIGHT
-          ] = DEFAULT_LEGEND_MARGIN;
-          break;
-        default:
-      }
     }
   }
 }

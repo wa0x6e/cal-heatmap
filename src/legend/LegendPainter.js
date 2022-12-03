@@ -10,8 +10,9 @@ export default class LegendPainter {
   }
 
   paint() {
-    const { show, itemSelector, scaleOptions } =
-      this.calendar.options.options.legend;
+    const legendOptions = this.calendar.options.options.legend;
+    const { show, itemSelector } = legendOptions;
+
     if (!show || (itemSelector && select(itemSelector).empty())) {
       return false;
     }
@@ -32,7 +33,7 @@ export default class LegendPainter {
       this.root = this.root.select(DEFAULT_CLASSNAME);
     }
 
-    const node = legend(scaleOptions);
+    const node = legend(legendOptions);
 
     this.root.selectAll('*').remove();
     this.root.append(() => node);

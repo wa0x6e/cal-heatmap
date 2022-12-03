@@ -1,9 +1,5 @@
 import { select } from 'd3-selection';
 
-import {
-  TOP, RIGHT, BOTTOM, LEFT,
-} from '../constant';
-
 import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
 import DomainSecondaryLabelPainter from '../domain/DomainSecondaryLabelPainter';
@@ -67,40 +63,16 @@ export default class CalendarPainter {
   }
 
   getHeight() {
-    const { options } = this.calendar.options;
-
-    const legendHeight = options.legend.show ?
-      options.legend.margin[TOP] + options.legend.margin[BOTTOM] :
-      0;
-
-    if (
-      options.legend.verticalPosition === 'middle' ||
-      options.legend.verticalPosition === 'center'
-    ) {
-      return Math.max(this.domainPainter.dimensions.height, legendHeight);
-    }
-    return this.domainPainter.dimensions.height + legendHeight;
+    return this.domainPainter.dimensions.height;
   }
 
   getWidth() {
     const { options } = this.calendar.options;
 
-    const legendWidth = options.legend.show ?
-      options.legend.margin[RIGHT] + options.legend.margin[LEFT] :
-      0;
     const domainsWidth =
       this.domainPainter.dimensions.width - options.domainGutter;
 
-    if (
-      options.legend.verticalPosition === 'middle' ||
-      options.legend.verticalPosition === 'center'
-    ) {
-      return domainsWidth + legendWidth;
-    }
-    return (
-      Math.max(domainsWidth, legendWidth) +
-      this.domainSecondaryLabelPainter.dimensions.width
-    );
+    return domainsWidth + this.domainSecondaryLabelPainter.dimensions.width;
   }
 
   resize() {

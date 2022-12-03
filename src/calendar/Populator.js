@@ -27,7 +27,7 @@ export default class Populator {
     const { calendar } = this;
     const { options } = calendar.options;
     const svg = calendar.calendarPainter.root.selectAll('.graph-domain');
-    const colorScale = scale(options.legend.scaleOptions);
+    const colorScale = scale(options.legend);
 
     const rect = svg
       .selectAll('svg')
