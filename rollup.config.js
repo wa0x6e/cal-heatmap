@@ -30,6 +30,13 @@ export default [
         file: `dist/${pkg.name}.esm.js`,
         format: 'esm',
       },
+    ],
+    plugins: basePlugins,
+  },
+  {
+    input: 'src/CalHeatmap.js',
+    watch: false,
+    output: [
       {
         file: `dist/${pkg.name}.js`,
         name: 'CalHeatmap',
@@ -40,6 +47,7 @@ export default [
   },
   {
     input: 'src/CalHeatmap.js',
+    watch: false,
     output: [
       {
         compact: true,
