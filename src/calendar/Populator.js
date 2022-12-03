@@ -66,5 +66,7 @@ export default class Populator {
           nodes[i],
         ));
       });
+
+    this.calendar.eventEmitter.emit('fill');
   }
 }

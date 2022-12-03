@@ -61,13 +61,9 @@ export default class Navigator {
     );
 
     if (direction === SCROLL_BACKWARD) {
-      this.calendar.eventEmitter.emit('afterLoadPreviousDomain', [
-        domainCollection.min,
-      ]);
+      this.calendar.eventEmitter.emit('domainsLoaded', [domainCollection.min]);
     } else if (direction === SCROLL_FORWARD) {
-      this.calendar.eventEmitter.emit('afterLoadNextDomain', [
-        domainCollection.max,
-      ]);
+      this.calendar.eventEmitter.emit('domainsLoaded', [domainCollection.max]);
     }
 
     return direction;
@@ -128,14 +124,14 @@ export default class Navigator {
     if (min) {
       const reached = lowerBound <= min;
       if (reached) {
-        this.calendar.eventEmitter.emit('onMinDomainReached');
+        this.calendar.eventEmitter.emit('minDateReached');
       }
       this.minDomainReached = reached;
     }
     if (max) {
       const reached = upperBound >= max;
       if (reached) {
-        this.calendar.eventEmitter.emit('onMaxDomainReached');
+        this.calendar.eventEmitter.emit('maxDateReached');
       }
       this.maxDomainReached = reached;
     }

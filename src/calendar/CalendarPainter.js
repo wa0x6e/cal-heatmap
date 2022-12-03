@@ -62,6 +62,7 @@ export default class CalendarPainter {
 
     this.resize();
 
+    this.calendar.eventEmitter.emit('paint');
     return true;
   }
 

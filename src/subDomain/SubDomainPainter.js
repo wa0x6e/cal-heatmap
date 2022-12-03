@@ -75,19 +75,19 @@ export default class subDomainPainter {
       .attr('y', (d) => this.#getY(d))
       .on('click', (ev, d) =>
         // eslint-disable-next-line implicit-arrow-linebreak
-        eventEmitter.emit('onClick', ev, new Date(d.t), d.v))
+        eventEmitter.emit('click', ev, new Date(d.t), d.v))
       .on('mouseover', (ev, d) => {
         if (options.tooltip) {
           this.calendar.calendarPainter.tooltip.show(ev.target);
         }
-        return eventEmitter.emit('onMouseOver', ev, new Date(d.t), d.v);
+        return eventEmitter.emit('mouseover', ev, new Date(d.t), d.v);
       })
       .on('mouseout', (ev, d) => {
         if (options.tooltip) {
           this.calendar.calendarPainter.tooltip.hide();
         }
 
-        return eventEmitter.emit('onMouseOut', ev, new Date(d.t), d.v);
+        return eventEmitter.emit('mouseout', ev, new Date(d.t), d.v);
       })
       .call((selection) => {
         if (options.cellRadius > 0) {

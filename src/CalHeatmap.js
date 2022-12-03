@@ -71,11 +71,8 @@ export default class CalHeatmap {
       this.createDomainCollection(options.start, options.range),
     );
     this.calendarPainter.paint();
-    this.eventEmitter.emit('afterLoad');
 
     this.update();
-
-    this.eventEmitter.emit('onComplete');
   }
 
   /**
@@ -166,7 +163,6 @@ export default class CalHeatmap {
       endDate,
       () => {
         this.populator.populate();
-        this.eventEmitter.emit('afterUpdate');
       },
       afterLoadDataCallback,
       updateMode,
