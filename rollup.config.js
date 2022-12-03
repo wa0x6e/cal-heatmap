@@ -27,8 +27,9 @@ export default [
     input: 'src/CalHeatmap.js',
     output: [
       {
-        file: `dist/${pkg.name}.esm.js`,
-        format: 'esm',
+        file: `dist/${pkg.name}.js`,
+        name: 'CalHeatmap',
+        format: 'umd',
       },
     ],
     plugins: basePlugins,
@@ -38,9 +39,8 @@ export default [
     watch: false,
     output: [
       {
-        file: `dist/${pkg.name}.js`,
-        name: 'CalHeatmap',
-        format: 'umd',
+        file: `dist/${pkg.name}.esm.js`,
+        format: 'esm',
       },
     ],
     plugins: basePlugins,

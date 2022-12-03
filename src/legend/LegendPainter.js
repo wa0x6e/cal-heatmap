@@ -1,6 +1,5 @@
 import { select } from 'd3-selection';
-import { X } from '../constant';
-import Legend from './Legend';
+import { legend } from '@observablehq/plot';
 
 const DEFAULT_CLASSNAME = '.graph-legend';
 
@@ -11,9 +10,7 @@ export default class LegendPainter {
   }
 
   paint() {
-    const {
-      show, itemSelector, cellSize, title,
-    } =
+    const { show, itemSelector, scaleOptions } =
       this.calendar.options.options.legend;
     if (!show || (itemSelector && select(itemSelector).empty())) {
       return false;
@@ -35,11 +32,7 @@ export default class LegendPainter {
       this.root = this.root.select(DEFAULT_CLASSNAME);
     }
 
-    const node = Legend(this.calendar.colorizer.scale, {
-      title,
-      tickSize: 0,
-      width: (this.calendar.colorizer.scale.domain().length + 1) * cellSize[X],
-    });
+    const node = legend(scaleOptions);
 
     this.root.selectAll('*').remove();
     this.root.append(() => node);

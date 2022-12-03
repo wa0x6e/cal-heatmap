@@ -4,7 +4,6 @@ import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
 import Options from './calendar/Options';
-import Colorizer from './calendar/Colorizer';
 import DomainCollection from './calendar/DomainCollection';
 
 import extractSVG from './utils/extractSVG';
@@ -32,7 +31,6 @@ export default class CalHeatmap {
     this.populator = new Populator(this);
 
     this.calendarPainter = new CalendarPainter(this);
-    this.colorizer = new Colorizer(this);
     this.helpers = {};
     this.eventEmitter = new EventEmmiter();
   }
@@ -61,7 +59,6 @@ export default class CalHeatmap {
 
     this.options.init(settings);
 
-    this.colorizer.build();
     this.calendarPainter.setup();
 
     // Record all the valid domains

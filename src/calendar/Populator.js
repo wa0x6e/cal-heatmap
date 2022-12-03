@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { selectAll } from 'd3-selection';
+import { scale } from '@observablehq/plot';
 
 import { getHighlightClassName } from '../function';
 
@@ -25,8 +26,8 @@ export default class Populator {
   populate() {
     const { calendar } = this;
     const { options } = calendar.options;
-    const { scale } = this.calendar.colorizer;
     const svg = calendar.calendarPainter.root.selectAll('.graph-domain');
+    const colorScale = scale(options.legend.scaleOptions);
 
     const rect = svg
       .selectAll('svg')
@@ -38,7 +39,7 @@ export default class Populator {
       .duration(options.animationDuration)
       .select('rect')
       .attr('class', (d) => this.#getClassName(d))
-      .call((e) => e.style('fill', (d) => scale && scale(d.v)))
+      .call((e) => e.style('fill', (d) => colorScale.apply(d.v)))
       .attr('title', (d) => {
         const { subDomainTitleFn } = options.formatter;
 
