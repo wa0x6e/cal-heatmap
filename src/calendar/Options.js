@@ -63,10 +63,7 @@ const preProcessors = {
 
     return value;
   },
-  'legend.cellSize': (args) => preProcessors.cellSize(args),
-  domainMargin: (args) => preProcessors.margins(args),
-  'legend.margin': (args) => preProcessors.margins(args),
-  margins: (settings) => {
+  domainMargin: (settings) => {
     let value = settings;
     if (isNumber(value)) {
       value = [value];
