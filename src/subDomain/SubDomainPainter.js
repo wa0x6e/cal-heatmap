@@ -1,5 +1,3 @@
-import { getHighlightClassName } from '../function';
-
 import {
   TOP, LEFT, X, Y,
 } from '../constant';
@@ -101,13 +99,33 @@ export default class subDomainPainter {
   }
 
   #getClassName(d) {
-    const { options } = this.calendar.options;
+    return ['graph-rect', 'hover_cursor', this.#getHighlightClassName(d.t)]
+      .join(' ')
+      .trim();
+  }
 
-    return `graph-rect${getHighlightClassName(
-      this.calendar,
-      d.t,
-      options,
-    )}${' hover_cursor'}`;
+  /**
+   * Return a classname if the specified date should be highlighted
+   *
+   * @param  {number} timestamp Unix timestamp of the current subDomain
+   * @return {String} the highlight class
+   */
+  #getHighlightClassName(timestamp) {
+    const { highlight, subDomain } = this.calendar.options.options;
+    const { DateHelper } = this.calendar.helpers;
+    let classname = '';
+
+    if (highlight.length > 0) {
+      highlight.forEach((d) => {
+        if (DateHelper.datesFromSameInterval(subDomain, +d, timestamp)) {
+          classname = DateHelper.datesFromSameInterval(subDomain, +d) ?
+            'highlight-now' :
+            'highlight';
+        }
+      });
+    }
+
+    return classname;
   }
 
   #appendText(elem) {
@@ -120,11 +138,9 @@ export default class subDomainPainter {
 
     return elem
       .append('text')
-      .attr(
-        'class',
-        (d) => 'subdomain-text' +
-          `${getHighlightClassName(this.calendar, d.t, options)}`,
-      )
+      .attr('class', (d) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        ['subdomain-text', this.#getHighlightClassName(d.t)].join(' ').trim())
       .attr('x', (d) => this.#getX(d) + options.cellSize[X] / 2)
       .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
       .attr('text-anchor', 'middle')
