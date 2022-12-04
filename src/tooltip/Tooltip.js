@@ -3,6 +3,18 @@ import { createPopper } from '@popperjs/core';
 
 const BASE_CLASSNAME = 'ch-tooltip';
 
+const DEFAULT_POPPER_OPTIONS = {
+  placement: 'top',
+  modifiers: [
+    {
+      name: 'offset',
+      options: {
+        offset: [0, 8],
+      },
+    },
+  ],
+};
+
 export default class Tooltip {
   constructor(calendar) {
     this.calendar = calendar;
@@ -11,20 +23,14 @@ export default class Tooltip {
       getBoundingClientRect: null,
     };
     this.popperInstance = null;
-    this.popperOptions = {
-      placement: 'top',
-      modifiers: [
-        {
-          name: 'offset',
-          options: {
-            offset: [0, 8],
-          },
-        },
-      ],
-    };
   }
 
   init() {
+    this.popperOptions =
+      typeof this.calendar.options.options.tooltip === 'object' ?
+        this.calendar.options.options.tooltip :
+        DEFAULT_POPPER_OPTIONS;
+
     this.root = select(`#${BASE_CLASSNAME}`);
 
     if (this.root.empty()) {
