@@ -122,16 +122,6 @@ export default class CalHeatmap {
   }
 
   /**
-   * Navigate back to the start date
-   *
-   * @since  3.3.8
-   * @return void
-   */
-  rewind() {
-    return this.jumpTo(this.options.options.start, true);
-  }
-
-  /**
    * Update the calendar with new data
    *
    * @param  object|string    dataSource    The calendar's datasource,
