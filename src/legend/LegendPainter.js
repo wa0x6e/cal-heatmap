@@ -14,6 +14,7 @@ export default class LegendPainter {
     const { show, itemSelector } = legendOptions;
 
     if (!show || (itemSelector && select(itemSelector).empty())) {
+      this.#destroy();
       return false;
     }
 
@@ -41,14 +42,12 @@ export default class LegendPainter {
     return true;
   }
 
-  destroy() {
+  #destroy() {
     if (this.root === null) {
-      return false;
+      return;
     }
 
     this.root.remove();
     this.root = null;
-
-    return true;
   }
 }

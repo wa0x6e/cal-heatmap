@@ -188,33 +188,6 @@ export default class CalHeatmap {
   }
 
   /**
-   * Remove the legend
-   *
-   * @since 3.3.0
-   * @return {boolean} False if there is no legend to remove
-   */
-  removeLegend() {
-    if (!this.options.set('legend.show', false)) {
-      return false;
-    }
-    return this.calendarPainter.removeLegend();
-  }
-
-  /**
-   * Display the legend
-   *
-   * @since 3.3.0
-   * @return {boolean} False if the legend was already displayed
-   */
-  showLegend() {
-    if (!this.options.set('legend.show', true)) {
-      return false;
-    }
-
-    return this.calendarPainter.showLegend();
-  }
-
-  /**
    * Highlight dates
    *
    * Add a highlight class to a set of dates

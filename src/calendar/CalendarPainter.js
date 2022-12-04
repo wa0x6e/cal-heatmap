@@ -127,12 +127,4 @@ export default class CalendarPainter {
   highlight() {
     this.subDomainPainter.paint();
   }
-
-  removeLegend() {
-    return this.legendPainter.destroy() && this.resize();
-  }
-
-  showLegend() {
-    return this.legendPainter.paint() && this.resize();
-  }
 }
