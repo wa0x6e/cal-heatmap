@@ -2,6 +2,7 @@
 import { jest } from '@jest/globals';
 
 import DomainCollection from '../../src/calendar/DomainCollection';
+import { RESET_ALL_ON_UPDATE } from '../../src/constant';
 
 describe('DomainCollection', () => {
   let d = null;
@@ -11,7 +12,13 @@ describe('DomainCollection', () => {
   };
 
   beforeEach(() => {
-    d = new DomainCollection(dateHelper, 'day', true, true, true);
+    d = new DomainCollection(
+      { DateHelper: dateHelper },
+      'day',
+      true,
+      true,
+      true,
+    );
   });
 
   it('get the specified key from the collection', () => {
@@ -112,8 +119,20 @@ describe('DomainCollection', () => {
     let g = null;
 
     beforeEach(() => {
-      h = new DomainCollection(dateHelperA, 'day', true, true, true);
-      g = new DomainCollection(dateHelperB, 'day', true, true, true);
+      h = new DomainCollection(
+        { DateHelper: dateHelperA },
+        'day',
+        true,
+        true,
+        true,
+      );
+      g = new DomainCollection(
+        { DateHelper: dateHelperB },
+        'day',
+        true,
+        true,
+        true,
+      );
     });
 
     it('prepends the new collection', () => {
@@ -129,6 +148,31 @@ describe('DomainCollection', () => {
     it('remembers the deleted domains', () => {
       d.merge(h, 6, () => {});
       expect(d.yankedDomains).toEqual([4, 5, 6]);
+    });
+  });
+
+  describe('when filling with data', () => {
+    it('resets all values when RESET_ALL strategy', () => {
+      const h = new DomainCollection({ DateHelper: {} });
+      h.collection = new Map([
+        [
+          1,
+          [
+            { t: 1, v: 100 },
+            { t: 3, v: 100 },
+          ],
+        ],
+        [2, [{ t: 4, v: 100 }]],
+      ]);
+      h.keys = [1, 2];
+
+      h.fill({}, RESET_ALL_ON_UPDATE);
+
+      expect(h.get(1)).toEqual([
+        { t: 1, v: null },
+        { t: 3, v: null },
+      ]);
+      expect(h.get(2)).toEqual([{ t: 4, v: null }]);
     });
   });
 });

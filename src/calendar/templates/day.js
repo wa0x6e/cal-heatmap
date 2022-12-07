@@ -1,5 +1,5 @@
 const dayTemplate = (
-  DateHelper,
+  { DateHelper },
   { domain, domainDynamicDimension, verticalOrientation },
 ) => {
   const ROWS_COUNT = 7;

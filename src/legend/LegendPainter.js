@@ -20,11 +20,9 @@ export default class LegendPainter {
 
     this.shown = true;
 
-    if (itemSelector) {
-      this.root = select(itemSelector);
-    } else {
-      this.root = select(this.calendar.options.options.itemSelector);
-    }
+    this.root = select(
+      itemSelector || this.calendar.options.options.itemSelector,
+    );
 
     if (this.root.select(DEFAULT_CLASSNAME).empty()) {
       this.root = this.root

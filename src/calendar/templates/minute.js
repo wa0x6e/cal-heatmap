@@ -1,4 +1,4 @@
-const minuteTemplate = (DateHelper) => {
+const minuteTemplate = ({ DateHelper }) => {
   const COLUMNS_COUNT = 10;
   const ROWS_COUNT = 6;
 

@@ -8,7 +8,12 @@ export default class Populator {
   populate() {
     const { calendar } = this;
     const { options } = calendar.options;
-    const colorScale = scale(options.legend);
+    let colorScale = null;
+    try {
+      colorScale = scale(options.legend);
+    } catch (error) {
+      // Do nothing
+    }
 
     calendar.calendarPainter.root
       .selectAll('.graph-domain')
@@ -20,7 +25,7 @@ export default class Populator {
       .call((element) => {
         element
           .select('rect')
-          .style('fill', (d) => colorScale.apply(d.v))
+          .style('fill', (d) => colorScale?.apply(d.v))
           .attr('title', (d) => {
             const { subDomainTitleFn } = options.formatter;
 

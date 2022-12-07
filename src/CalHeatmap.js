@@ -1,16 +1,17 @@
 import EventEmmiter from 'eventemitter3';
+import { isFunction } from 'lodash-es';
 
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
 import Options from './calendar/Options';
+import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
+import createHelpers from './helpers/HelperFactory';
 
 import extractSVG from './utils/extractSVG';
 // eslint-disable-next-line import/no-unresolved
 import './cal-heatmap.scss';
-
-import { getDatas } from './data';
 
 import SubDomainTemplate from './calendar/SubDomainTemplate';
 
@@ -26,18 +27,19 @@ export default class CalHeatmap {
     this.options = new Options(this);
 
     this.subDomainTemplate = new SubDomainTemplate(this);
+    this.dataFetcher = new DataFetcher(this);
 
     this.navigator = new Navigator(this);
     this.populator = new Populator(this);
+    this.helpers = {};
 
     this.calendarPainter = new CalendarPainter(this);
-    this.helpers = {};
     this.eventEmitter = new EventEmmiter();
   }
 
   createDomainCollection(startDate, range) {
     return new DomainCollection(
-      this.helpers.DateHelper,
+      this.helpers,
       this.options.options.domain,
       startDate,
       range,
@@ -52,24 +54,50 @@ export default class CalHeatmap {
    * Setup and paint the calendar with the given options
    *
    * @param  {Object} settings Options
-   * @return void
+   * @return {boolean} True, unless there's an error
    */
   init(settings) {
-    const { options } = this.options;
-
     this.options.init(settings);
+
+    this.helpers = createHelpers(this);
+    this.subDomainTemplate.init();
+
+    try {
+      this.options.validate();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return false;
+    }
 
     this.calendarPainter.setup();
 
     // Record all the valid domains
     // Each domain value is a timestamp in milliseconds
-    this.domainCollection = new DomainCollection(this.helpers.DateHelper);
+    this.domainCollection = new DomainCollection(this.helpers);
     this.navigator.loadNewDomains(
-      this.createDomainCollection(options.start, options.range),
+      this.createDomainCollection(
+        this.options.options.start,
+        this.options.options.range,
+      ),
     );
     this.calendarPainter.paint();
 
-    this.update();
+    this.fill();
+
+    return true;
+  }
+
+  /**
+   * Add a new subDomainTemplate
+   *
+   * @since 4.0.0
+   * @param  {Array<SubDomainTemplate> | SubDomainTemplate} templates
+   * A single, or an array of SubDomainTemplate object
+   * @return void
+   */
+  addTemplates(templates) {
+    this.subDomainTemplate.add(templates);
   }
 
   /**
@@ -84,7 +112,7 @@ export default class CalHeatmap {
     );
     this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
-    this.update();
+    this.fill();
   }
 
   /**
@@ -99,7 +127,7 @@ export default class CalHeatmap {
     );
     this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
-    this.update();
+    this.fill();
   }
 
   /**
@@ -118,42 +146,48 @@ export default class CalHeatmap {
     const loadDirection = this.navigator.jumpTo(date, reset);
     this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
-    this.update();
+    this.fill();
   }
 
   /**
-   * Update the calendar with new data
+   * Fill the calendar with some data
    *
-   * @param  object|string    dataSource    The calendar's datasource,
+   * @param  {object|string}    dataSource    The calendar's datasource,
    * same type as this.options.data
-   * @param  boolean|function    afterLoadDataCallback    Whether to
-   * execute afterLoadDataCallback() on the data. Pass directly a function
-   * if you don't want to use the afterLoadDataCallback() callback
+   * @param  {function}    dataProcessor  The dataProcessor function to
+   * execute before processing your data
    */
-  update(
+  fill(
     dataSource = this.options.options.data,
-    afterLoadDataCallback = this.options.options.afterLoadData,
+    dataProcessor = this.options.options.dataProcessor,
     updateMode = RESET_ALL_ON_UPDATE,
   ) {
     const { options } = this.options;
+    const template = this.subDomainTemplate;
     const endDate = this.helpers.DateHelper.intervals(
       options.domain,
       this.domainCollection.max,
       2,
     )[1];
 
-    getDatas(
-      this,
-      options,
+    const dataPromise = this.dataFetcher.getDatas(
       dataSource,
       this.domainCollection.min,
       endDate,
-      () => {
-        this.populator.populate();
-      },
-      afterLoadDataCallback,
-      updateMode,
+      dataProcessor,
     );
+
+    dataPromise.then((data) => {
+      this.domainCollection.fill(
+        isFunction(dataProcessor) ? dataProcessor(data) : data,
+        updateMode,
+        this.domainCollection.min,
+        endDate,
+        template.at(options.domain).extractUnit,
+        template.at(options.subDomain).extractUnit,
+      );
+      this.populator.populate();
+    });
   }
 
   /**

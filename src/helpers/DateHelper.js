@@ -36,7 +36,7 @@ export default class DateHelper {
       return formatter(new Date(date), ...args);
     }
 
-    if (formatter) {
+    if (typeof formatter === 'string') {
       return this.date(date).format(formatter);
     }
 

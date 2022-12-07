@@ -61,128 +61,154 @@ describe('DateHelper', () => {
       });
     }
   });
-});
 
-describe('intervals', () => {
-  const expectations = dates;
+  describe('format()', () => {
+    const h = new DateHelper();
 
-  const testRun = (interval, locale) => {
-    const toDates = (a) => a.map((k) => new Date(k));
+    it('returns the value returned by the given function', () => {
+      expect(h.format(date, (d, v) => `${d}-${v}`, 'hello')).toEqual(
+        `${date}-hello`,
+      );
+    });
 
-    describe(`With moment [${locale}] locale`, () => {
-      let helper = null;
+    it('returns the value given by the moment format', () => {
+      expect(h.format(date, 'YYYY', 'hello')).toEqual('2020');
+    });
 
-      beforeEach(() => {
-        helper = new DateHelper(locale, DEFAULT_TIMEZONE);
-      });
+    it('returns null when the formatter is not valid', () => {
+      expect(h.format(new Date(), true)).toBeNull();
+      expect(h.format(new Date(), false)).toBeNull();
+      expect(h.format(new Date(), undefined)).toBeNull();
+      expect(h.format(new Date(), {})).toBeNull();
+      expect(h.format(new Date())).toBeNull();
+    });
+  });
 
-      let intervalKey = interval;
-      if (locale !== DEFAULT_LOCALE) {
-        intervalKey = `${interval}_${locale}`;
-      }
+  describe('intervals', () => {
+    const expectations = dates;
 
-      describe(`on ${interval} interval`, () => {
-        describe('when date args is a Date object', () => {
-          it(`returns [date start of ${interval}]`, () => {
-            const intervals = helper.intervals(interval, date, 1);
-            expect(new Date(intervals[0])).toEqual(
-              expectations[intervalKey][0],
-            );
-          });
+    const testRun = (interval, locale) => {
+      const toDates = (a) => a.map((k) => new Date(k));
+
+      describe(`With moment [${locale}] locale`, () => {
+        let helper = null;
+
+        beforeEach(() => {
+          helper = new DateHelper(locale, DEFAULT_TIMEZONE);
         });
 
-        describe('when date args is a number', () => {
-          it(`returns [date first ${interval}]`, () => {
-            const intervals = helper.intervals(interval, +date, 1);
-            expect(new Date(intervals[0])).toEqual(
-              expectations[intervalKey][0],
-            );
-          });
-        });
+        let intervalKey = interval;
+        if (locale !== DEFAULT_LOCALE) {
+          intervalKey = `${interval}_${locale}`;
+        }
 
-        describe('when range args is a 1', () => {
-          it('returns [start of current interval]', () => {
-            const intervals = helper.intervals(interval, date, 1);
-            expect(toDates(intervals)).toEqual([expectations[intervalKey][0]]);
+        describe(`on ${interval} interval`, () => {
+          describe('when date args is a Date object', () => {
+            it(`returns [date start of ${interval}]`, () => {
+              const intervals = helper.intervals(interval, date, 1);
+              expect(new Date(intervals[0])).toEqual(
+                expectations[intervalKey][0],
+              );
+            });
           });
-        });
 
-        describe('when range args is -1', () => {
-          it('returns [start of previous interval]', () => {
-            const intervals = helper.intervals(
-              interval,
-              expectations[intervalKey][1],
-              -1,
-            );
-            expect(toDates(intervals)).toEqual([expectations[intervalKey][0]]);
+          describe('when date args is a number', () => {
+            it(`returns [date first ${interval}]`, () => {
+              const intervals = helper.intervals(interval, +date, 1);
+              expect(new Date(intervals[0])).toEqual(
+                expectations[intervalKey][0],
+              );
+            });
           });
-        });
 
-        describe('when range args is a positive number > 1', () => {
-          it(`returns [${interval}](x range)`, () => {
-            //
-            const intervals = helper.intervals(interval, date, 4);
-            expect(toDates(intervals)).toEqual(expectations[intervalKey]);
-            expect(intervals.length).toEqual(4);
+          describe('when range args is a 1', () => {
+            it('returns [start of current interval]', () => {
+              const intervals = helper.intervals(interval, date, 1);
+              expect(toDates(intervals)).toEqual([
+                expectations[intervalKey][0],
+              ]);
+            });
           });
-        });
 
-        describe('when range args is a negative number < -1', () => {
-          it(`returns [${interval}](x range)`, () => {
-            //
-            const intervals = helper.intervals(
-              interval,
-              expectations[intervalKey][3],
-              -3,
-            );
-            expect(toDates(intervals)).toEqual(
-              expectations[intervalKey].slice(0, 3),
-            );
-            expect(intervals.length).toEqual(3);
-          });
-        });
-
-        describe(
-          'when range args is a future date, ' +
-            //
-            '1 interval in the future',
-          () => {
-            it(`returns [${interval}]`, () => {
+          describe('when range args is -1', () => {
+            it('returns [start of previous interval]', () => {
               const intervals = helper.intervals(
                 interval,
-                date,
-                expectations[intervalKey][0],
+                expectations[intervalKey][1],
+                -1,
               );
               expect(toDates(intervals)).toEqual([
                 expectations[intervalKey][0],
               ]);
             });
-          },
-        );
+          });
 
-        describe(
-          'when range args is a future date, ' +
-            //
-            '4 intervals in the future',
-          () => {
-            it(`returns [${interval}](3)`, () => {
+          describe('when range args is a positive number > 1', () => {
+            it(`returns [${interval}](x range)`, () => {
+              //
+              const intervals = helper.intervals(interval, date, 4);
+              expect(toDates(intervals)).toEqual(expectations[intervalKey]);
+              expect(intervals.length).toEqual(4);
+            });
+          });
+
+          describe('when range args is a negative number < -1', () => {
+            it(`returns [${interval}](x range)`, () => {
+              //
               const intervals = helper.intervals(
                 interval,
-                date,
                 expectations[intervalKey][3],
+                -3,
               );
-
-              expect(toDates(intervals)).toEqual(expectations[intervalKey]);
+              expect(toDates(intervals)).toEqual(
+                expectations[intervalKey].slice(0, 3),
+              );
+              expect(intervals.length).toEqual(3);
             });
-          },
-        );
+          });
+
+          describe(
+            'when range args is a future date, ' +
+              //
+              '1 interval in the future',
+            () => {
+              it(`returns [${interval}]`, () => {
+                const intervals = helper.intervals(
+                  interval,
+                  date,
+                  expectations[intervalKey][0],
+                );
+                expect(toDates(intervals)).toEqual([
+                  expectations[intervalKey][0],
+                ]);
+              });
+            },
+          );
+
+          describe(
+            'when range args is a future date, ' +
+              //
+              '4 intervals in the future',
+            () => {
+              it(`returns [${interval}](3)`, () => {
+                const intervals = helper.intervals(
+                  interval,
+                  date,
+                  expectations[intervalKey][3],
+                );
+
+                expect(toDates(intervals)).toEqual(expectations[intervalKey]);
+              });
+            },
+          );
+        });
       });
+    };
+
+    Object.keys(expectations).forEach((key) => {
+      const [interval, locale] = key.split('_');
+
+      testRun(interval, locale || DEFAULT_LOCALE);
     });
-  };
-
-  Object.keys(expectations).forEach((key) => {
-    const [interval, locale] = key.split('_');
-
-    testRun(interval, locale || DEFAULT_LOCALE);
   });
 });

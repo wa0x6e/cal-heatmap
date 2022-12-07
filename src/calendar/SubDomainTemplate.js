@@ -1,3 +1,5 @@
+import { castArray } from 'lodash-es';
+
 import DefaultTemplates from './templates';
 
 export default class SubDomainTemplate {
@@ -14,19 +16,13 @@ export default class SubDomainTemplate {
     return this.settings.hasOwnProperty(domain);
   }
 
-  init(templates) {
-    const { options } = this.calendar.options;
-    let userTemplates = [];
-    if (templates) {
-      if (!Array.isArray(templates)) {
-        userTemplates.push(templates);
-      } else {
-        userTemplates = templates;
-      }
-    }
+  init() {
+    this.add(DefaultTemplates);
+  }
 
-    [...DefaultTemplates, ...userTemplates].forEach((f) => {
-      const template = f(this.calendar.helpers.DateHelper, options);
+  add(templates) {
+    castArray(templates).forEach((f) => {
+      const template = f(this.calendar.helpers, this.calendar.options.options);
       this.settings[template.name] = template;
     });
   }

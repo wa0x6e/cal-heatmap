@@ -1,4 +1,4 @@
-const hourTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
+const hourTemplate = ({ DateHelper }, { domain, domainDynamicDimension }) => {
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
 

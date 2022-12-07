@@ -1,19 +1,20 @@
 import { castArray } from 'lodash-es';
 
+import { RESET_ALL_ON_UPDATE, RESET_SINGLE_ON_UPDATE } from '../constant';
+
 export default class DomainCollection {
-  constructor(dateHelper, interval, start, range) {
+  constructor({ DateHelper }, interval, start, range) {
     this.collection = new Map();
 
     if (interval && start && range) {
       this.collection = new Map(
-        dateHelper.intervals(interval, start, range).map((d) => castArray(d)),
+        DateHelper.intervals(interval, start, range).map((d) => castArray(d)),
       );
     }
 
     this.min = null;
     this.max = null;
     this.keys = [];
-    this.dateHelper = dateHelper;
     this.yankedDomains = [];
 
     if (this.collection.size > 0) {
@@ -98,6 +99,59 @@ export default class DomainCollection {
     }
 
     return this;
+  }
+
+  fill(
+    data,
+    strategy,
+    startDate,
+    endDate,
+    domainKeyExtractor,
+    subDomainKeyExtractor,
+  ) {
+    if (strategy === RESET_ALL_ON_UPDATE) {
+      this.#resetAllValues();
+    }
+
+    Object.keys(data).forEach((date) => {
+      if (Number.isNaN(date)) {
+        return;
+      }
+
+      const timestamp = date * 1000;
+
+      const domainKey = domainKeyExtractor(timestamp);
+
+      // Skip if data is not relevant to current domain
+      if (
+        !this.has(domainKey) ||
+        !(domainKey >= +startDate && domainKey < +endDate)
+      ) {
+        return;
+      }
+
+      const existingSubDomainsData = this.get(domainKey);
+
+      const subDomainIndex = existingSubDomainsData
+        .map((d) => d.t)
+        .indexOf(subDomainKeyExtractor(timestamp));
+
+      if (strategy === RESET_SINGLE_ON_UPDATE) {
+        existingSubDomainsData[subDomainIndex].v = data[date];
+      } else if (typeof existingSubDomainsData[subDomainIndex].v === 'number') {
+        existingSubDomainsData[subDomainIndex].v += data[date];
+      } else {
+        existingSubDomainsData[subDomainIndex].v = data[date];
+      }
+    });
+  }
+
+  #resetAllValues() {
+    this.keys.forEach((domainKey) => {
+      this.get(domainKey).forEach((_, index) => {
+        this.collection.get(domainKey)[index].v = null;
+      });
+    });
   }
 
   #refreshKeys() {

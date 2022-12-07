@@ -11,7 +11,6 @@ import {
 } from 'lodash-es';
 
 import { X } from '../constant';
-import DateHelper from '../helpers/DateHelper';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 
@@ -19,15 +18,15 @@ const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
  * Ensure that the domain and subdomain are valid
  *
  * @throw {Error} when domain or subdomain are not valid
- * @return {bool} True if domain and subdomain are valid and compatible
+ * @return void
  */
 function validateDomainType(subDomainTemplate, { domain, subDomain }) {
-  if (!subDomainTemplate.has(domain) || domain === 'minute') {
-    throw new Error(`The domain '${domain}' is not valid`);
+  if (!subDomainTemplate.has(domain)) {
+    throw new Error(`'${domain}' is not a valid domain type'`);
   }
 
-  if (!subDomainTemplate.has(subDomain) || subDomain === 'year') {
-    throw new Error(`The subDomain '${subDomain}' is not valid`);
+  if (!subDomainTemplate.has(subDomain)) {
+    throw new Error(`'${subDomain}' is not a valid domain type'`);
   }
 
   if (
@@ -35,11 +34,10 @@ function validateDomainType(subDomainTemplate, { domain, subDomain }) {
   ) {
     throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
   }
-
-  return true;
 }
 
-const preProcessors = {
+const PREPROCESSORS = {
+  range: (value) => Math.max(+value, 1),
   highlight: (args) => castArray(args),
   itemName: (name) => {
     if (isString(name)) {
@@ -89,16 +87,12 @@ const preProcessors = {
   'formatter.subDomainLabel': (value) =>
     // eslint-disable-next-line
     ((isString(value) && value !== '') || isFunction(value) ? value : null),
-  'formatter.domainLabel': (value, calendar, options) =>
-    // eslint-disable-next-line
-    (isString(value) || isFunction(value) ?
-      value :
-      calendar.subDomainTemplate.at(options.domain).format.legend),
 };
 
 export default class Options {
-  constructor(calendar) {
+  constructor(calendar, preProcessors = PREPROCESSORS) {
     this.calendar = calendar;
+    this.preProcessors = preProcessors;
 
     this.options = {
       // selector string of the container to append the graph to
@@ -125,15 +119,13 @@ export default class Options {
       // For rounded subdomain rectangles, in pixels
       cellRadius: 0,
 
-      domainGutter: 2,
+      domainGutter: 4,
 
       domainMargin: [0, 0, 0, 0],
 
       domain: 'hour',
 
       subDomain: 'minute',
-
-      subDomainTemplate: null,
 
       // Show weekday's name when showing full month
       dayLabel: false,
@@ -169,10 +161,6 @@ export default class Options {
       // Expect an object formatted like:
       // { 'X-CSRF-TOKEN': 'token' }
       dataRequestHeaders: null,
-
-      // Whether to consider missing date:value from the datasource
-      // as equal to 0, or just leave them as missing
-      considerMissingDataAsZero: false,
 
       // Timezone of the calendar
       // When null, will default to browser local timezone
@@ -217,13 +205,16 @@ export default class Options {
       // Threshold for the legend
       legend: {
         // Whether to display the legend
-        show: true,
+        show: false,
 
         itemSelector: null,
 
         label: null,
 
-        color: {},
+        color: {
+          type: 'threshold',
+          domains: [0, 50, 100],
+        },
       },
 
       // ================================================
@@ -301,13 +292,15 @@ export default class Options {
     set(
       this.options,
       key,
-      has(preProcessors, key) ? get(preProcessors, key)(value) : value,
+      has(this.preProcessors, key) ?
+        get(this.preProcessors, key)(value) :
+        value,
     );
 
     return true;
   }
 
-  #validate() {
+  validate() {
     const { options } = this;
 
     // Fatal errors
@@ -318,10 +311,6 @@ export default class Options {
       throw new Error(
         `The data type '${options.dataType}' is not valid data type`,
       );
-    }
-
-    if (!options.hasOwnProperty('subDomain')) {
-      throw new Error('The subDomain options is missing');
     }
 
     return true;
@@ -338,22 +327,8 @@ export default class Options {
 
     const { options } = this;
 
-    this.calendar.helpers.DateHelper = new DateHelper(
-      options.locale,
-      options.timezone,
-    );
-    this.calendar.subDomainTemplate.init(options.subDomainTemplates);
-    this.#validate();
-
-    Object.keys(preProcessors).forEach((key) => {
-      if (!has(options, key)) {
-        return;
-      }
-      set(
-        options,
-        key,
-        get(preProcessors, key)(get(options, key), this.calendar, options),
-      );
+    Object.keys(this.preProcessors).forEach((key) => {
+      set(options, key, get(this.preProcessors, key)(get(options, key)));
     });
 
     options.x.domainVerticalLabelHeight =

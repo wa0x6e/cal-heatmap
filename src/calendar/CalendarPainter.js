@@ -62,11 +62,11 @@ export default class CalendarPainter {
     return true;
   }
 
-  getHeight() {
+  #getHeight() {
     return this.domainPainter.dimensions.height;
   }
 
-  getWidth() {
+  #getWidth() {
     const { options } = this.calendar.options;
 
     const domainsWidth =
@@ -77,8 +77,8 @@ export default class CalendarPainter {
 
   resize() {
     const { options } = this.calendar.options;
-    const newWidth = this.getWidth();
-    const newHeight = this.getHeight();
+    const newWidth = this.#getWidth();
+    const newHeight = this.#getHeight();
 
     this.root
       .transition()

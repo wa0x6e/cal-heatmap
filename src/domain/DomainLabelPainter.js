@@ -18,7 +18,7 @@ export default class DomainLabelPainter {
     }
 
     if (typeof format === 'undefined') {
-      format = this.calendar.subDomainTemplate.at(options.domain).format.date;
+      format = this.calendar.subDomainTemplate.at(options.domain).format.legend;
     }
 
     root
