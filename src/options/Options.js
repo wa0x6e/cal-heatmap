@@ -1,98 +1,16 @@
 import {
-  mergeWith,
-  isEqual,
-  castArray,
-  isFunction,
-  isString,
-  isNumber,
-  has,
-  get,
-  set,
+  mergeWith, isEqual, has, get, set,
 } from 'lodash-es';
+
+import preProcessors from './OptionsPreProcessors';
+import validate from './OptionsValidator';
 
 import { X } from '../constant';
 
-const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
-
-/**
- * Ensure that the domain and subdomain are valid
- *
- * @throw {Error} when domain or subdomain are not valid
- * @return void
- */
-function validateDomainType(subDomainTemplate, { domain, subDomain }) {
-  if (!subDomainTemplate.has(domain)) {
-    throw new Error(`'${domain}' is not a valid domain type'`);
-  }
-
-  if (!subDomainTemplate.has(subDomain)) {
-    throw new Error(`'${subDomain}' is not a valid domain type'`);
-  }
-
-  if (
-    subDomainTemplate.at(domain).level <= subDomainTemplate.at(subDomain).level
-  ) {
-    throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
-  }
-}
-
-const PREPROCESSORS = {
-  range: (value) => Math.max(+value, 1),
-  highlight: (args) => castArray(args),
-  itemName: (name) => {
-    if (isString(name)) {
-      return [name, name + (name !== '' ? 's' : '')];
-    }
-
-    if (Array.isArray(name)) {
-      if (name.length === 1) {
-        return [name[0], `${name[0]}s`];
-      }
-      if (name.length > 2) {
-        return name.slice(0, 2);
-      }
-    }
-    return name;
-  },
-  cellSize: (value) => {
-    if (isNumber(value)) {
-      return [value, value];
-    }
-
-    return value;
-  },
-  domainMargin: (settings) => {
-    let value = settings;
-    if (isNumber(value)) {
-      value = [value];
-    }
-
-    if (!Array.isArray(value) || !value.every((d) => isNumber(d))) {
-      // eslint-disable-next-line no-console
-      console.log('Margin only accepts an integer or an array of integers');
-      value = [0];
-    }
-
-    switch (value.length) {
-      case 1:
-        return [value[0], value[0], value[0], value[0]];
-      case 2:
-        return [value[0], value[1], value[0], value[1]];
-      case 3:
-        return [value[0], value[1], value[2], value[1]];
-      default:
-        return value.slice(0, 4);
-    }
-  },
-  'formatter.subDomainLabel': (value) =>
-    // eslint-disable-next-line
-    ((isString(value) && value !== '') || isFunction(value) ? value : null),
-};
-
 export default class Options {
-  constructor(calendar, preProcessors = PREPROCESSORS) {
+  constructor(calendar, processors = preProcessors) {
     this.calendar = calendar;
-    this.preProcessors = preProcessors;
+    this.preProcessors = processors;
 
     this.options = {
       // selector string of the container to append the graph to
@@ -150,7 +68,7 @@ export default class Options {
 
       // Data type
       // Default: json
-      dataType: ALLOWED_DATA_TYPES[0],
+      dataType: 'json',
 
       // Payload sent when using POST http method
       // Leave to null (default) for GET request
@@ -300,18 +218,12 @@ export default class Options {
     return true;
   }
 
+  /**
+   * Validate options, and throw Error when critical options are invalid
+   * @return {boolean} Returns true when there is no critical errors
+   */
   validate() {
-    const { options } = this;
-
-    // Fatal errors
-    // Stop script execution on error
-    validateDomainType(this.calendar.subDomainTemplate, this.options);
-
-    if (!ALLOWED_DATA_TYPES.includes(options.dataType)) {
-      throw new Error(
-        `The data type '${options.dataType}' is not valid data type`,
-      );
-    }
+    validate(this.calendar.subDomainTemplate, this.options);
 
     return true;
   }

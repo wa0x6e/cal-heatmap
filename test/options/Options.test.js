@@ -1,4 +1,4 @@
-import Options from '../../src/calendar/Options';
+import Options from '../../src/options/Options';
 import SubDomainTemplate from '../../src/calendar/SubDomainTemplate';
 
 describe('Options', () => {

@@ -4,7 +4,7 @@ import { isFunction } from 'lodash-es';
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
-import Options from './calendar/Options';
+import Options from './options/Options';
 import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
 import createHelpers from './helpers/HelperFactory';
