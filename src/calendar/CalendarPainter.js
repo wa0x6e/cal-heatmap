@@ -70,7 +70,7 @@ export default class CalendarPainter {
     const { options } = this.calendar.options;
 
     const domainsWidth =
-      this.domainPainter.dimensions.width - options.domainGutter;
+      this.domainPainter.dimensions.width - options.domain.gutter;
 
     return domainsWidth + this.domainSecondaryLabelPainter.dimensions.width;
   }

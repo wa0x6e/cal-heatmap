@@ -1,12 +1,14 @@
-const weekTemplate = (DateHelper, { domain, domainDynamicDimension }) => {
+const weekTemplate = ({ DateHelper }, { domain }) => {
+  const { dynamicDimension } = domain;
+
   function getTotalColNumber(d) {
-    switch (domain) {
+    switch (domain.type) {
       case 'year':
-        return domainDynamicDimension ?
+        return dynamicDimension ?
           DateHelper.date(d).endOf('year').weeksInYear() :
           53;
       case 'month':
-        return domainDynamicDimension ?
+        return dynamicDimension ?
           DateHelper.getMonthWeekNumber(DateHelper.date(d).endOf('month')) :
           5;
       default:

@@ -18,7 +18,8 @@ export default class DomainLabelPainter {
     }
 
     if (typeof format === 'undefined') {
-      format = this.calendar.subDomainTemplate.at(options.domain).format.legend;
+      format = this.calendar.subDomainTemplate.at(options.domain.type).format
+        .legend;
     }
 
     root
@@ -76,7 +77,7 @@ export default class DomainLabelPainter {
   #getX(d) {
     const { options } = this.calendar.options;
 
-    let x = options.domainMargin[LEFT];
+    let x = options.domain.padding[LEFT];
 
     if (options.label.position === 'right') {
       x += this.#getDomainInsideWidth(d);
@@ -104,7 +105,8 @@ export default class DomainLabelPainter {
   #getY(d) {
     const { options } = this.calendar.options;
 
-    let y = options.domainMargin[TOP] + options.x.domainVerticalLabelHeight / 2;
+    let y =
+      options.domain.padding[TOP] + options.x.domainVerticalLabelHeight / 2;
 
     if (options.label.position === 'bottom') {
       y += this.#getDomainInsideHeight(d);
@@ -118,9 +120,9 @@ export default class DomainLabelPainter {
     return (
       this.calendar.calendarPainter.domainPainter.coordinates.at(d).width -
       options.x.domainHorizontalLabelWidth -
-      options.domainGutter -
-      options.domainMargin[RIGHT] -
-      options.domainMargin[LEFT]
+      options.domain.gutter -
+      options.domain.padding[RIGHT] -
+      options.domain.padding[LEFT]
     );
   }
 
@@ -129,9 +131,9 @@ export default class DomainLabelPainter {
     return (
       this.calendar.calendarPainter.domainPainter.coordinates.at(d).height -
       options.x.domainVerticalLabelHeight -
-      options.domainGutter -
-      options.domainMargin[TOP] -
-      options.domainMargin[BOTTOM]
+      options.domain.gutter -
+      options.domain.padding[TOP] -
+      options.domain.padding[BOTTOM]
     );
   }
 

@@ -4,30 +4,8 @@ import {
 
 export default {
   range: (value) => Math.max(+value, 1),
-  highlight: (args) => castArray(args),
-  itemName: (name) => {
-    if (isString(name)) {
-      return [name, name + (name !== '' ? 's' : '')];
-    }
-
-    if (Array.isArray(name)) {
-      if (name.length === 1) {
-        return [name[0], `${name[0]}s`];
-      }
-      if (name.length > 2) {
-        return name.slice(0, 2);
-      }
-    }
-    return name;
-  },
-  cellSize: (value) => {
-    if (isNumber(value)) {
-      return [value, value];
-    }
-
-    return value;
-  },
-  domainMargin: (settings) => {
+  'date.highlight': (args) => castArray(args),
+  'domain.padding': (settings) => {
     let value = settings;
     if (isNumber(value)) {
       value = [value];

@@ -10,11 +10,11 @@ export default class Navigator {
   loadNewDomains(newDomainCollection, direction = SCROLL_FORWARD) {
     const { options } = this.calendar.options;
     const template = this.calendar.subDomainTemplate;
-    const minDate = options.minDate ?
-      template.at(options.domain).extractUnit(options.minDate) :
+    const minDate = options.date.min ?
+      template.at(options.domain.type).extractUnit(options.date.min) :
       null;
-    const maxDate = options.maxDate ?
-      template.at(options.domain).extractUnit(options.maxDate) :
+    const maxDate = options.date.max ?
+      template.at(options.domain.type).extractUnit(options.date.max) :
       null;
     const { domainCollection } = this.calendar;
 
@@ -36,20 +36,20 @@ export default class Navigator {
     domainCollection.merge(
       newDomainCollection,
       options.range,
-      (domain, index) => {
+      (domainKey, index) => {
         let subDomainEndDate = null;
         if (newDomainCollection.at(index + 1)) {
           subDomainEndDate = newDomainCollection.at(index + 1);
         } else {
           subDomainEndDate = this.calendar.helpers.DateHelper.intervals(
-            options.domain,
-            domain,
+            options.domain.type,
+            domainKey,
             2,
           ).pop();
         }
         return template
-          .at(options.subDomain)
-          .mapping(domain, subDomainEndDate - 1000, { v: null });
+          .at(options.subDomain.type)
+          .mapping(domainKey, subDomainEndDate - 1000, { v: null });
       },
     );
 

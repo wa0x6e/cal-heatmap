@@ -11,8 +11,8 @@ describe('OptionsPreProcessors', () => {
 
     it('always cast highlight as array', () => {
       const date = new Date();
-      expect(OptionsPreProcessors.highlight(date)).toEqual([date]);
-      expect(OptionsPreProcessors.highlight([date])).toEqual([date]);
+      expect(OptionsPreProcessors['date.highlight'](date)).toEqual([date]);
+      expect(OptionsPreProcessors['date.highlight']([date])).toEqual([date]);
     });
 
     it('only accepts valid values subDomainLabel formatter', () => {

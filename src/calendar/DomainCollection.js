@@ -63,15 +63,15 @@ export default class DomainCollection {
   merge(newCollection, limit, createValueCallback) {
     this.yankedDomains = [];
 
-    newCollection.keys.forEach((domain, index) => {
-      if (this.has(domain)) {
+    newCollection.keys.forEach((domainKey, index) => {
+      if (this.has(domainKey)) {
         return;
       }
 
       if (this.collection.size >= limit) {
         let keyToRemove = this.max;
 
-        if (domain > this.max) {
+        if (domainKey > this.max) {
           keyToRemove = this.min;
         }
 
@@ -79,7 +79,7 @@ export default class DomainCollection {
           this.yankedDomains.push(keyToRemove);
         }
       }
-      this.collection.set(domain, createValueCallback(domain, index));
+      this.collection.set(domainKey, createValueCallback(domainKey, index));
       this.#refreshKeys();
     });
     this.yankedDomains = this.yankedDomains.sort((a, b) => a - b);

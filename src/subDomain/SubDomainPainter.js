@@ -1,6 +1,4 @@
-import {
-  TOP, LEFT, X, Y,
-} from '../constant';
+import { TOP, LEFT } from '../constant';
 
 const BASE_CLASSNAME = 'graph-subdomain-group';
 
@@ -12,6 +10,8 @@ export default class subDomainPainter {
 
   paint(root) {
     const { options } = this.calendar.options;
+    const { padding } = options.domain;
+    const { position } = options.label.position;
     this.root = root || this.root;
 
     const subDomainSvgGroup = this.root
@@ -24,15 +24,15 @@ export default class subDomainPainter {
         (enter) => enter
           .append('svg')
           .attr('x', () => {
-            let pos = options.domainMargin[LEFT];
-            if (options.label.position === 'left') {
+            let pos = padding[LEFT];
+            if (position === 'left') {
               pos += options.x.domainHorizontalLabelWidth;
             }
             return pos;
           })
           .attr('y', () => {
-            let pos = options.domainMargin[TOP];
-            if (options.label.position === 'top') {
+            let pos = padding[TOP];
+            if (position === 'top') {
               pos += options.x.domainVerticalLabelHeight;
             }
             return pos;
@@ -41,15 +41,15 @@ export default class subDomainPainter {
 
         (update) => update
           .attr('x', () => {
-            let pos = options.domainMargin[LEFT];
-            if (options.label.position === 'left') {
+            let pos = padding[LEFT];
+            if (position === 'left') {
               pos += options.x.domainHorizontalLabelWidth;
             }
             return pos;
           })
           .attr('y', () => {
-            let pos = options.domainMargin[TOP];
-            if (options.label.position === 'top') {
+            let pos = padding[TOP];
+            if (position === 'top') {
               pos += options.x.domainVerticalLabelHeight;
             }
             return pos;
@@ -66,9 +66,11 @@ export default class subDomainPainter {
 
     rect
       .append('rect')
-      .attr('class', (d) => this.#getClassName(d))
-      .attr('width', options.cellSize[X])
-      .attr('height', options.cellSize[Y])
+      .attr('class', (d) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        this.#classname(d.t, ['graph-rect', 'hover_cursor']))
+      .attr('width', options.subDomain.width)
+      .attr('height', options.subDomain.height)
       .attr('x', (d) => this.#getX(d))
       .attr('y', (d) => this.#getY(d))
       .on('click', (ev, d) =>
@@ -88,20 +90,14 @@ export default class subDomainPainter {
         return eventEmitter.emit('mouseout', ev, new Date(d.t), d.v);
       })
       .call((selection) => {
-        if (options.cellRadius > 0) {
+        if (options.subDomain.radius > 0) {
           selection
-            .attr('rx', options.cellRadius)
-            .attr('ry', options.cellRadius);
+            .attr('rx', options.subDomain.radius)
+            .attr('ry', options.subDomain.radius);
         }
       });
 
     this.#appendText(rect);
-  }
-
-  #getClassName(d) {
-    return ['graph-rect', 'hover_cursor', this.#getHighlightClassName(d.t)]
-      .join(' ')
-      .trim();
   }
 
   /**
@@ -110,49 +106,49 @@ export default class subDomainPainter {
    * @param  {number} timestamp Unix timestamp of the current subDomain
    * @return {String} the highlight class
    */
-  #getHighlightClassName(timestamp) {
-    const { highlight, subDomain } = this.calendar.options.options;
+  #classname(timestamp, ...otherClasses) {
+    const { date, subDomain } = this.calendar.options.options;
     const { DateHelper } = this.calendar.helpers;
     let classname = '';
 
-    if (highlight.length > 0) {
-      highlight.forEach((d) => {
-        if (DateHelper.datesFromSameInterval(subDomain, +d, timestamp)) {
-          classname = DateHelper.datesFromSameInterval(subDomain, +d) ?
+    if (date.highlight.length > 0) {
+      date.highlight.forEach((d) => {
+        if (DateHelper.datesFromSameInterval(subDomain.type, +d, timestamp)) {
+          classname = DateHelper.datesFromSameInterval(subDomain.type, +d) ?
             'highlight-now' :
             'highlight';
         }
       });
     }
 
-    return classname;
+    return [classname, ...otherClasses].join(' ').trim();
   }
 
   #appendText(elem) {
     const { options } = this.calendar.options;
-    const formatter = options.formatter.subDomainLabel;
+    const fmt = options.formatter.subDomainLabel;
+    const dateFmt = this.calendar.helpers.DateHelper;
 
-    if (!formatter) {
+    if (!fmt) {
       return null;
     }
 
     return elem
       .append('text')
-      .attr('class', (d) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        ['subdomain-text', this.#getHighlightClassName(d.t)].join(' ').trim())
-      .attr('x', (d) => this.#getX(d) + options.cellSize[X] / 2)
-      .attr('y', (d) => this.#getY(d) + options.cellSize[Y] / 2)
+      .attr('class', (d) => this.#classname(d.t, 'subdomain-text'))
+      .attr('x', (d) => this.#getX(d) + options.subDomain.width / 2)
+      .attr('y', (d) => this.#getY(d) + options.subDomain.height / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d, i, nodes) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        this.calendar.helpers.DateHelper.format(d.t, formatter, d.v, nodes[i]));
+      .text((d, i, nodes) => dateFmt.format(d.t, fmt, d.v, nodes[i]));
   }
 
   #getCoordinates(axis, d) {
-    const { cellSize, cellPadding } = this.calendar.options.options;
-    return d[axis] * (cellSize[axis === 'x' ? X : Y] + cellPadding);
+    const { subDomain } = this.calendar.options.options;
+    return (
+      d[axis] *
+      (subDomain[axis === 'x' ? 'width' : 'height'] + subDomain.gutter)
+    );
   }
 
   #getX(d) {

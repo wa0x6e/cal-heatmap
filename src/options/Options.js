@@ -5,8 +5,6 @@ import {
 import preProcessors from './OptionsPreProcessors';
 import validate from './OptionsValidator';
 
-import { X } from '../constant';
-
 export default class Options {
   constructor(calendar, processors = preProcessors) {
     this.calendar = calendar;
@@ -18,49 +16,65 @@ export default class Options {
       // or an Element object
       itemSelector: '#cal-heatmap',
 
-      // ================================================
-      // DOMAIN
-      // ================================================
-
       // Number of domain to display on the graph
       range: 12,
 
-      // Size of each cell, in pixel
-      // Accepts either:
-      // - a number, representing the width and height of each square cell
-      // - an array of 2 numbers, in the format [width, height]
-      cellSize: 10,
+      domain: {
+        type: 'hour',
 
-      // Padding between each cell, in pixel
-      cellPadding: 2,
+        // Space between each domain, in pixel
+        gutter: 4,
 
-      // For rounded subdomain rectangles, in pixels
-      cellRadius: 0,
+        padding: [0, 0, 0, 0],
 
-      domainGutter: 4,
+        // Whether to enable dynamic domain size
+        // The width/height on a domain depends on the number of
+        // subDomains items count
+        dynamicDimension: true,
+      },
 
-      domainMargin: [0, 0, 0, 0],
+      subDomain: {
+        type: 'minute',
 
-      domain: 'hour',
+        // Width of each subDomain cell, in pixel
+        width: 10,
 
-      subDomain: 'minute',
+        // Height of each subDomain cell, in pixel
+        height: 10,
+
+        // Space between each subDomain cell, in pixel
+        gutter: 2,
+
+        // Radius of each subDomain cell, in pixel
+        radius: 0,
+      },
 
       // Show weekday's name when showing full month
       dayLabel: false,
 
-      // Start date of the graph
-      // @default now
-      start: new Date(),
+      date: {
+        // Start date of the graph
+        // @default now
+        start: new Date(),
 
-      minDate: null,
+        min: null,
 
-      maxDate: null,
+        max: null,
 
+        // List of dates to highlight
+        // Valid values:
+        // - []: don't highlight anything
+        // - an array of Date objects: highlight the specified dates
+        highlight: [],
+      },
+
+      // Calendar orientation
+      // false: display domains side by side
+      // true : display domains one under the other
+      verticalOrientation: false,
+
+      // Whether to show most recent date first
       reversedDirection: false,
-
-      // ================================================
-      // DATA
-      // ================================================
 
       // Data source
       // URL, where to fetch the original datas
@@ -84,14 +98,8 @@ export default class Options {
       // When null, will default to browser local timezone
       timezone: null,
 
-      // Calendar orientation
-      // false: display domains side by side
-      // true : display domains one under the other
-      verticalOrientation: false,
-
-      // Domain dynamic width/height
-      // The width on a domain depends on the number of
-      domainDynamicDimension: true,
+      // MomentJS locale
+      locale: 'en',
 
       // Domain Label properties
       label: {
@@ -116,11 +124,7 @@ export default class Options {
         height: null,
       },
 
-      // ================================================
-      // LEGEND
-      // ================================================
-
-      // Threshold for the legend
+      // Legend properties
       legend: {
         // Whether to display the legend
         show: false,
@@ -134,26 +138,6 @@ export default class Options {
           domains: [0, 50, 100],
         },
       },
-
-      // ================================================
-      // HIGHLIGHT
-      // ================================================
-
-      // List of dates to highlight
-      // Valid values:
-      // - []: don't highlight anything
-      // - an array of Date objects: highlight the specified dates
-      highlight: [],
-
-      // ================================================
-      // TEXT FORMATTING / i18n
-      // ================================================
-
-      // MomentJS locale
-      locale: 'en',
-
-      // Name of the items to represent in the calendar
-      itemName: ['item', 'items'],
 
       formatter: {
         // Formatting of the domain label
@@ -183,7 +167,7 @@ export default class Options {
       // Animation duration, in ms
       animationDuration: 200,
 
-      // Whether to show tooltip on subDomain hover
+      // Whether to show tooltip on subDomain cell hover
       // To format its content, see formatter/subDomainTitleFn option
       tooltip: false,
 
@@ -244,7 +228,7 @@ export default class Options {
     });
 
     options.x.domainVerticalLabelHeight =
-      options.label.height ?? options.cellSize[X] * 2;
+      options.label.height ?? options.subDomain.width * 2;
 
     // When the label is affecting the height
     if (

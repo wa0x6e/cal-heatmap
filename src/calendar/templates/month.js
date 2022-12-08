@@ -1,4 +1,4 @@
-const monthTemplate = (DateHelper) => ({
+const monthTemplate = ({ DateHelper }) => ({
   name: 'month',
   level: 50,
   rowsCount() {

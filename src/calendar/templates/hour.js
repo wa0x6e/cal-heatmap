@@ -1,15 +1,17 @@
-const hourTemplate = ({ DateHelper }, { domain, domainDynamicDimension }) => {
+const hourTemplate = ({ DateHelper }, { domain }) => {
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
 
+  const domainType = domain.type;
+
   function getTotalColNumber(d) {
-    switch (domain) {
+    switch (domainType) {
       case 'week':
         return (TOTAL_ITEMS / ROWS_COUNT) * 7;
       case 'month':
         return (
           (TOTAL_ITEMS / ROWS_COUNT) *
-          (domainDynamicDimension ? DateHelper.date(d).daysInMonth() : 31)
+          (domain.dynamicDimension ? DateHelper.date(d).daysInMonth() : 31)
         );
       case 'day':
       default:
@@ -36,10 +38,10 @@ const hourTemplate = ({ DateHelper }, { domain, domainDynamicDimension }) => {
           const baseX = Math.floor(hour / ROWS_COUNT);
           const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
-          if (domain === 'month') {
+          if (domainType === 'month') {
             return baseX + (monthDate - 1) * columnOffset;
           }
-          if (domain === 'week') {
+          if (domainType === 'week') {
             return baseX + (date.isoWeekday() - 1) * columnOffset;
           }
 

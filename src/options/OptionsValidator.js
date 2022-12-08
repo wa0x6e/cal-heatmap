@@ -10,18 +10,24 @@ export default function validate(
   subDomainTemplate,
   { domain, subDomain, dataType },
 ) {
-  if (!subDomainTemplate.has(domain)) {
-    throw new Error(`'${domain}' is not a valid domain type'`);
+  const domainType = domain.type;
+  const subDomainType = subDomain.type;
+
+  if (!subDomainTemplate.has(domainType)) {
+    throw new Error(`'${domainType}' is not a valid domain type'`);
   }
 
-  if (!subDomainTemplate.has(subDomain)) {
-    throw new Error(`'${subDomain}' is not a valid domain type'`);
+  if (!subDomainTemplate.has(subDomainType)) {
+    throw new Error(`'${subDomainType}' is not a valid domain type'`);
   }
 
   if (
-    subDomainTemplate.at(domain).level <= subDomainTemplate.at(subDomain).level
+    subDomainTemplate.at(domainType).level <=
+    subDomainTemplate.at(subDomainType).level
   ) {
-    throw new Error(`'${subDomain}' is not a valid subDomain to '${domain}'`);
+    throw new Error(
+      `'${subDomainType}' is not a valid subDomain to '${domainType}'`,
+    );
   }
 
   if (dataType && !ALLOWED_DATA_TYPES.includes(dataType)) {

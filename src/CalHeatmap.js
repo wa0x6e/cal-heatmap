@@ -40,7 +40,7 @@ export default class CalHeatmap {
   createDomainCollection(startDate, range) {
     return new DomainCollection(
       this.helpers,
-      this.options.options.domain,
+      this.options.options.domain.type,
       startDate,
       range,
     );
@@ -77,7 +77,7 @@ export default class CalHeatmap {
     this.domainCollection = new DomainCollection(this.helpers);
     this.navigator.loadNewDomains(
       this.createDomainCollection(
-        this.options.options.start,
+        this.options.options.date.start,
         this.options.options.range,
       ),
     );
@@ -165,7 +165,7 @@ export default class CalHeatmap {
     const { options } = this.options;
     const template = this.subDomainTemplate;
     const endDate = this.helpers.DateHelper.intervals(
-      options.domain,
+      options.domain.type,
       this.domainCollection.max,
       2,
     )[1];
@@ -183,8 +183,8 @@ export default class CalHeatmap {
         updateMode,
         this.domainCollection.min,
         endDate,
-        template.at(options.domain).extractUnit,
-        template.at(options.subDomain).extractUnit,
+        template.at(options.domain.type).extractUnit,
+        template.at(options.subDomain.type).extractUnit,
       );
       this.populator.populate();
     });
@@ -222,8 +222,8 @@ export default class CalHeatmap {
    */
   highlight(dates) {
     if (
-      this.options.set('highlight', dates) &&
-      this.options.options.highlight.length > 0
+      this.options.set('date.highlight', dates) &&
+      this.options.options.date.highlight.length > 0
     ) {
       this.calendarPainter.highlight();
     }

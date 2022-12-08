@@ -1,4 +1,4 @@
-const yearTemplate = (DateHelper) => ({
+const yearTemplate = ({ DateHelper }) => ({
   name: 'year',
   level: 60,
   row() {

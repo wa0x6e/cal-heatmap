@@ -21,7 +21,7 @@ export default class DomainPainter {
   }
 
   paint(scrollDirection, calendarNode) {
-    const { domainGutter, animationDuration } = this.calendar.options.options;
+    const { domain, animationDuration } = this.calendar.options.options;
     const t = calendarNode.transition().duration(animationDuration);
     const coor = this.coordinates;
 
@@ -44,8 +44,8 @@ export default class DomainPainter {
           .attr('class', (d) => this.#getClassName(d))
           .call((enterSelection) => enterSelection
             .append('rect')
-            .attr('width', (d) => coor.at(d).width - domainGutter)
-            .attr('height', (d) => coor.at(d).height - domainGutter)
+            .attr('width', (d) => coor.at(d).width - domain.gutter)
+            .attr('height', (d) => coor.at(d).height - domain.gutter)
             .attr('class', 'domain-background'))
           .call((enterSelection) => enterSelection
             .transition(t)
@@ -61,8 +61,8 @@ export default class DomainPainter {
           .call((updateSelection) => updateSelection
             .selectAll('.domain-background')
             .transition(t)
-            .attr('width', (d) => coor.at(d).width - domainGutter)
-            .attr('height', (d) => coor.at(d).height - domainGutter)),
+            .attr('width', (d) => coor.at(d).width - domain.gutter)
+            .attr('height', (d) => coor.at(d).height - domain.gutter)),
         (exit) => exit.call((exitSelection) => exitSelection
           .transition(t)
           .attr('x', (d) => coor.at(d).x)
@@ -75,7 +75,7 @@ export default class DomainPainter {
     let classname = DEFAULT_CLASSNAME;
     const helper = this.calendar.helpers.DateHelper.date(d);
 
-    switch (this.calendar.options.options.domain) {
+    switch (this.calendar.options.options.domain.type) {
       case 'hour':
         classname += ` h_${helper.hour()}`;
         break;

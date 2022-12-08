@@ -1,5 +1,3 @@
-import { X, Y } from '../constant';
-
 const BASE_CLASSNAME = 'weekday-label';
 
 export default class DomainSecondaryLabel {
@@ -13,22 +11,20 @@ export default class DomainSecondaryLabel {
 
   paint(root) {
     const { options } = this.calendar.options;
+    const { width, height, gutter } = options.subDomain;
 
     if (
       options.dayLabel === true &&
-      options.domain === 'month' &&
-      options.subDomain === 'day'
+      options.domain.type === 'month' &&
+      options.subDomain.type === 'day'
     ) {
       const dayNames = this.calendar.helpers.DateHelper.momentInstance
         .weekdays()
         .map((d) => d[0]);
 
       this.dimensions = {
-        width: options.cellSize[X] + options.cellPadding,
-        height:
-          options.cellSize[Y] +
-          dayNames.length * options.cellSize[Y] * dayNames.length -
-          1,
+        width: width + gutter,
+        height: height + dayNames.length * height * dayNames.length - 1,
       };
 
       let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME}`);
@@ -49,26 +45,18 @@ export default class DomainSecondaryLabel {
       dayLabelSvg
         .append('rect')
         .attr('class', `${BASE_CLASSNAME}-rect`)
-        .attr('width', options.cellSize[X])
-        .attr('height', options.cellSize[Y])
+        .attr('width', width)
+        .attr('height', height)
         .attr('x', 0)
-        .attr(
-          'y',
-          (data, i) => i * options.cellSize[Y] + i * options.cellPadding,
-        );
+        .attr('y', (data, i) => i * height + i * gutter);
 
       dayLabelSvg
         .append('text')
         .attr('class', `${BASE_CLASSNAME}-text`)
         .attr('dominant-baseline', 'central')
         .attr('text-anchor', 'middle')
-        .attr('x', options.cellSize[X] / 2)
-        .attr(
-          'y',
-          (data, i) => i * options.cellSize[Y] +
-            i * options.cellPadding +
-            options.cellSize[Y] / 2,
-        )
+        .attr('x', width / 2)
+        .attr('y', (data, i) => i * height + i * gutter + height / 2)
         .text((data) => data);
     } else {
       this.dimensions = {

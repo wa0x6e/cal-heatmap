@@ -1,6 +1,5 @@
-import {
-  SCROLL_FORWARD, TOP, RIGHT, BOTTOM, LEFT, X, Y,
-} from '../constant';
+// eslint-disable-next-line object-curly-newline
+import { SCROLL_FORWARD, TOP, RIGHT, BOTTOM, LEFT } from '../constant';
 
 export default class DomainCoordinates {
   constructor(calendar, domainPainter) {
@@ -82,19 +81,19 @@ export default class DomainCoordinates {
   #getWidth(d) {
     const { options } = this.calendar.options;
     const columnsCount = this.calendar.subDomainTemplate
-      .at(options.subDomain)
+      .at(options.subDomain.type)
       .columnsCount(d);
 
     const subDomainWidth =
-      (options.cellSize[X] + options.cellPadding) * columnsCount -
-      options.cellPadding;
+      (options.subDomain.width + options.subDomain.gutter) * columnsCount -
+      options.subDomain.gutter;
 
     return (
-      options.domainMargin[LEFT] +
+      options.domain.padding[LEFT] +
       options.x.domainHorizontalLabelWidth +
-      options.domainGutter +
+      options.domain.gutter +
       subDomainWidth +
-      options.domainMargin[RIGHT]
+      options.domain.padding[RIGHT]
     );
   }
 
@@ -107,19 +106,19 @@ export default class DomainCoordinates {
   #getHeight(d) {
     const { options } = this.calendar.options;
     const rowsCount = this.calendar.subDomainTemplate
-      .at(options.subDomain)
+      .at(options.subDomain.type)
       .rowsCount(d);
 
     const subDomainHeight =
-      (options.cellSize[Y] + options.cellPadding) * rowsCount -
-      options.cellPadding;
+      (options.subDomain.height + options.subDomain.gutter) * rowsCount -
+      options.subDomain.gutter;
 
     return (
-      options.domainMargin[TOP] +
+      options.domain.padding[TOP] +
       subDomainHeight +
-      options.domainGutter +
+      options.domain.gutter +
       options.x.domainVerticalLabelHeight +
-      options.domainMargin[BOTTOM]
+      options.domain.padding[BOTTOM]
     );
   }
 
