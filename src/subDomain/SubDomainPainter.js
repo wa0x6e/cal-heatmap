@@ -68,7 +68,7 @@ export default class subDomainPainter {
       .append('rect')
       .attr('class', (d) =>
         // eslint-disable-next-line implicit-arrow-linebreak
-        this.#classname(d.t, ['graph-rect', 'hover_cursor']))
+        this.#classname(d.t, 'graph-rect', 'hover_cursor'))
       .attr('width', options.subDomain.width)
       .attr('height', options.subDomain.height)
       .attr('x', (d) => this.#getX(d))
