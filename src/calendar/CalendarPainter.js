@@ -63,14 +63,20 @@ export default class CalendarPainter {
   }
 
   #getHeight() {
-    return this.domainPainter.dimensions.height;
+    const { options } = this.calendar.options;
+
+    return (
+      this.domainPainter.dimensions.height -
+      (!options.verticalOrientation ? 0 : options.domain.gutter)
+    );
   }
 
   #getWidth() {
     const { options } = this.calendar.options;
 
     const domainsWidth =
-      this.domainPainter.dimensions.width - options.domain.gutter;
+      this.domainPainter.dimensions.width -
+      (options.verticalOrientation ? 0 : options.domain.gutter);
 
     return domainsWidth + this.domainSecondaryLabelPainter.dimensions.width;
   }
@@ -111,7 +117,7 @@ export default class CalendarPainter {
       .attr('width', 0)
       .attr('height', 0)
       .remove()
-      .call(() => {
+      .on('end.remove', () => {
         if (typeof callback === 'function') {
           callback();
         }

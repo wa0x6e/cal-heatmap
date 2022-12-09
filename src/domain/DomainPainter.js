@@ -21,7 +21,7 @@ export default class DomainPainter {
   }
 
   paint(scrollDirection, calendarNode) {
-    const { domain, animationDuration } = this.calendar.options.options;
+    const { animationDuration } = this.calendar.options.options;
     const t = calendarNode.transition().duration(animationDuration);
     const coor = this.coordinates;
 
@@ -39,13 +39,13 @@ export default class DomainPainter {
           .append('svg')
           .attr('x', (d) => coor.at(d).pre_x)
           .attr('y', (d) => coor.at(d).pre_y)
-          .attr('width', (d) => coor.at(d).width)
-          .attr('height', (d) => coor.at(d).height)
+          .attr('width', (d) => coor.at(d).inner_width)
+          .attr('height', (d) => coor.at(d).inner_height)
           .attr('class', (d) => this.#getClassName(d))
           .call((enterSelection) => enterSelection
             .append('rect')
-            .attr('width', (d) => coor.at(d).width - domain.gutter)
-            .attr('height', (d) => coor.at(d).height - domain.gutter)
+            .attr('width', (d) => coor.at(d).inner_width)
+            .attr('height', (d) => coor.at(d).inner_height)
             .attr('class', 'domain-background'))
           .call((enterSelection) => enterSelection
             .transition(t)
@@ -56,13 +56,13 @@ export default class DomainPainter {
             .transition(t)
             .attr('x', (d) => coor.at(d).x)
             .attr('y', (d) => coor.at(d).y)
-            .attr('width', (d) => coor.at(d).width)
-            .attr('height', (d) => coor.at(d).height))
+            .attr('width', (d) => coor.at(d).inner_width)
+            .attr('height', (d) => coor.at(d).inner_height))
           .call((updateSelection) => updateSelection
             .selectAll('.domain-background')
             .transition(t)
-            .attr('width', (d) => coor.at(d).width - domain.gutter)
-            .attr('height', (d) => coor.at(d).height - domain.gutter)),
+            .attr('width', (d) => coor.at(d).inner_width)
+            .attr('height', (d) => coor.at(d).inner_height)),
         (exit) => exit.call((exitSelection) => exitSelection
           .transition(t)
           .attr('x', (d) => coor.at(d).x)

@@ -1,5 +1,6 @@
-// eslint-disable-next-line object-curly-newline
-import { SCROLL_FORWARD, TOP, RIGHT, BOTTOM, LEFT } from '../constant';
+import {
+  SCROLL_FORWARD, TOP, RIGHT, BOTTOM, LEFT,
+} from '../constant';
 
 export default class DomainCoordinates {
   constructor(calendar, domainPainter) {
@@ -14,7 +15,7 @@ export default class DomainCoordinates {
   }
 
   update(collection, scrollDirection) {
-    const { verticalOrientation } = this.calendar.options.options;
+    const { verticalOrientation, domain } = this.calendar.options.options;
 
     this.scrollDirection = scrollDirection;
     const dimensions = {
@@ -66,6 +67,8 @@ export default class DomainCoordinates {
         pre_y: verticalOrientation ? y - exitingTotal * scrollFactor : y,
         width: w,
         height: h,
+        inner_width: w - (verticalOrientation ? 0 : domain.gutter),
+        inner_height: h - (!verticalOrientation ? 0 : domain.gutter),
       });
     });
 
@@ -74,51 +77,57 @@ export default class DomainCoordinates {
 
   /**
    * Return the full width of the domain block
-   * @param int d Domain start timestamp
-   * @return int The full width of the domain, including all margins.
+   * @param {number} d Domain start timestamp
+   * @return {number} The full width of the domain,
+   * including all padding and gutter
    * Used to compute the x position of the domains on the x axis
    */
   #getWidth(d) {
-    const { options } = this.calendar.options;
+    const {
+      domain, subDomain, x, verticalOrientation,
+    } =
+      this.calendar.options.options;
     const columnsCount = this.calendar.subDomainTemplate
-      .at(options.subDomain.type)
+      .at(subDomain.type)
       .columnsCount(d);
 
     const subDomainWidth =
-      (options.subDomain.width + options.subDomain.gutter) * columnsCount -
-      options.subDomain.gutter;
+      (subDomain.width + subDomain.gutter) * columnsCount - subDomain.gutter;
 
     return (
-      options.domain.padding[LEFT] +
-      options.x.domainHorizontalLabelWidth +
-      options.domain.gutter +
+      domain.padding[LEFT] +
+      x.domainHorizontalLabelWidth +
+      (verticalOrientation ? 0 : domain.gutter) +
       subDomainWidth +
-      options.domain.padding[RIGHT]
+      domain.padding[RIGHT]
     );
   }
 
   /**
    * Return the full height of the domain block
-   * @param int d Domain start timestamp
-   * @return int The full height of the domain, including all margins.
+   * @param {number} d Domain start timestamp
+   * @return {number} The full height of the domain,
+   * including all paddings and gutter.
    * Used to compute the y position of the domains on the y axis
    */
   #getHeight(d) {
-    const { options } = this.calendar.options;
+    const {
+      domain, subDomain, x, verticalOrientation,
+    } =
+      this.calendar.options.options;
     const rowsCount = this.calendar.subDomainTemplate
-      .at(options.subDomain.type)
+      .at(subDomain.type)
       .rowsCount(d);
 
     const subDomainHeight =
-      (options.subDomain.height + options.subDomain.gutter) * rowsCount -
-      options.subDomain.gutter;
+      (subDomain.height + subDomain.gutter) * rowsCount - subDomain.gutter;
 
     return (
-      options.domain.padding[TOP] +
+      domain.padding[TOP] +
       subDomainHeight +
-      options.domain.gutter +
-      options.x.domainVerticalLabelHeight +
-      options.domain.padding[BOTTOM]
+      (verticalOrientation ? domain.gutter : 0) +
+      x.domainVerticalLabelHeight +
+      domain.padding[BOTTOM]
     );
   }
 

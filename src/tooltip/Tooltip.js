@@ -26,6 +26,10 @@ export default class Tooltip {
   }
 
   init() {
+    if (!this.calendar.options.options.tooltip) {
+      return;
+    }
+
     this.popperOptions =
       typeof this.calendar.options.options.tooltip === 'object' ?
         this.calendar.options.options.tooltip :
