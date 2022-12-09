@@ -66,6 +66,13 @@ export default class Options {
         // - []: don't highlight anything
         // - an array of Date objects: highlight the specified dates
         highlight: [],
+
+        // Timezone of the calendar
+        // When null, will default to browser local timezone
+        timezone: null,
+
+        // MomentJS locale
+        locale: 'en',
       },
 
       // Calendar orientation
@@ -93,13 +100,6 @@ export default class Options {
       // Expect an object formatted like:
       // { 'X-CSRF-TOKEN': 'token' }
       dataRequestHeaders: null,
-
-      // Timezone of the calendar
-      // When null, will default to browser local timezone
-      timezone: null,
-
-      // MomentJS locale
-      locale: 'en',
 
       // Domain Label properties
       label: {
