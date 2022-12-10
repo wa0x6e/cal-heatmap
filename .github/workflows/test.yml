@@ -23,3 +23,9 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
         run: npm run test
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./test/coverage/lcov.info
