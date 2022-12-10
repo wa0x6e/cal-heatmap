@@ -24,7 +24,9 @@ import CalHeatmap from '../../src/CalHeatmap';
           width: size[0],
           height: size[1],
         },
-        formatter: { domainLabel: null },
+        label: {
+          height: 20,
+        },
       });
     });
 
@@ -47,8 +49,14 @@ import CalHeatmap from '../../src/CalHeatmap';
       // eslint-disable-next-line no-restricted-syntax
       for (const elem of selection) {
         expect(select(elem).attr('width')).toBe(`${size[0] * 12}`);
-        expect(select(elem).attr('height')).toBe(`${size[1]}`);
+        expect(select(elem).attr('height')).toBe(`${size[1] + 20}`);
       }
+      expect(select('.graph-domain:nth-child(1)').attr('height')).toBe(
+        `${size[1] + 20}`,
+      );
+      expect(select('.graph-domain:nth-child(1)').attr('width')).toBe(
+        `${size[0] * 12}`,
+      );
     });
   });
 });

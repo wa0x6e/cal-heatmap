@@ -123,7 +123,7 @@ export default class Options {
         width: 100,
 
         // Used only on horizontal orientation
-        height: null,
+        height: 25,
       },
 
       // Legend properties
@@ -222,8 +222,7 @@ export default class Options {
       set(options, key, get(this.preProcessors, key)(get(options, key)));
     });
 
-    options.x.domainVerticalLabelHeight =
-      options.label.height ?? options.subDomain.width * 2;
+    options.x.domainVerticalLabelHeight = options.label.height;
 
     // When the label is affecting the height
     if (

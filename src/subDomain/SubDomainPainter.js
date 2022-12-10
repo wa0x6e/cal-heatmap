@@ -9,9 +9,6 @@ export default class subDomainPainter {
   }
 
   paint(root) {
-    const { options } = this.calendar.options;
-    const { padding } = options.domain;
-    const { position } = options.label.position;
     this.root = root || this.root;
 
     const subDomainSvgGroup = this.root
@@ -23,81 +20,90 @@ export default class subDomainPainter {
       .join(
         (enter) => enter
           .append('svg')
-          .attr('x', () => {
-            let pos = padding[LEFT];
-            if (position === 'left') {
-              pos += options.x.domainHorizontalLabelWidth;
-            }
-            return pos;
-          })
-          .attr('y', () => {
-            let pos = padding[TOP];
-            if (position === 'top') {
-              pos += options.x.domainVerticalLabelHeight;
-            }
-            return pos;
-          })
+          .call((selection) => this.#setPositions(selection))
           .attr('class', BASE_CLASSNAME),
 
-        (update) => update
-          .attr('x', () => {
-            let pos = padding[LEFT];
-            if (position === 'left') {
-              pos += options.x.domainHorizontalLabelWidth;
-            }
-            return pos;
-          })
-          .attr('y', () => {
-            let pos = padding[TOP];
-            if (position === 'top') {
-              pos += options.x.domainVerticalLabelHeight;
-            }
-            return pos;
-          }),
+        (update) => update.call((selection) => this.#setPositions(selection)),
       );
 
+    const {
+      tooltip,
+      subDomain: { radius, width, height },
+    } = this.calendar.options.options;
     const { eventEmitter } = this.calendar;
 
-    const rect = subDomainSvgGroup
+    subDomainSvgGroup
       .selectAll('g')
       .data((d) => this.calendar.domainCollection.get(d))
-      .enter()
-      .append('g');
+      .join(
+        (enter) => enter
+          .append('g')
+          .call((selection) => selection
+            .insert('rect')
+            .attr('class', (d) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+              this.#classname(d.t, 'graph-rect', 'hover_cursor'))
+            .attr('width', width)
+            .attr('height', height)
+            .attr('x', (d) => this.#getX(d))
+            .attr('y', (d) => this.#getY(d))
+            .on('click', (ev, d) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+              eventEmitter.emit('click', ev, new Date(d.t), d.v))
+            .on('mouseover', (ev, d) => {
+              if (tooltip) {
+                this.calendar.calendarPainter.tooltip.show(ev.target);
+              }
+              return eventEmitter.emit('mouseover', ev, new Date(d.t), d.v);
+            })
+            .on('mouseout', (ev, d) => {
+              if (tooltip) {
+                this.calendar.calendarPainter.tooltip.hide();
+              }
 
-    rect
-      .append('rect')
-      .attr('class', (d) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        this.#classname(d.t, 'graph-rect', 'hover_cursor'))
-      .attr('width', options.subDomain.width)
-      .attr('height', options.subDomain.height)
-      .attr('x', (d) => this.#getX(d))
-      .attr('y', (d) => this.#getY(d))
-      .on('click', (ev, d) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        eventEmitter.emit('click', ev, new Date(d.t), d.v))
-      .on('mouseover', (ev, d) => {
-        if (options.tooltip) {
-          this.calendar.calendarPainter.tooltip.show(ev.target);
-        }
-        return eventEmitter.emit('mouseover', ev, new Date(d.t), d.v);
-      })
-      .on('mouseout', (ev, d) => {
-        if (options.tooltip) {
-          this.calendar.calendarPainter.tooltip.hide();
-        }
+              return eventEmitter.emit('mouseout', ev, new Date(d.t), d.v);
+            })
+            .attr('rx', radius > 0 ? radius : null)
+            .attr('ry', radius > 0 ? radius : null))
+          .call((selection) => this.#appendText(selection)),
+        (update) => update
+          .selectAll('rect')
+          .attr('class', (d) =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+            this.#classname(d.t, 'graph-rect', 'hover_cursor'))
+          .attr('width', width)
+          .attr('height', height)
+          .attr('x', (d) => this.#getX(d))
+          .attr('y', (d) => this.#getY(d))
+          .attr('rx', radius)
+          .attr('ry', radius),
+      );
+  }
 
-        return eventEmitter.emit('mouseout', ev, new Date(d.t), d.v);
-      })
-      .call((selection) => {
-        if (options.subDomain.radius > 0) {
-          selection
-            .attr('rx', options.subDomain.radius)
-            .attr('ry', options.subDomain.radius);
+  /**
+   * Set the subDomain group X and Y position
+   * @param {d3-selection} selection A d3-selection object
+   */
+  #setPositions(selection) {
+    const { options } = this.calendar.options;
+    const { padding } = options.domain;
+    const { position } = options.label.position;
+
+    selection
+      .attr('x', () => {
+        let pos = padding[LEFT];
+        if (position === 'left') {
+          pos += options.x.domainHorizontalLabelWidth;
         }
+        return pos;
+      })
+      .attr('y', () => {
+        let pos = padding[TOP];
+        if (position === 'top') {
+          pos += options.x.domainVerticalLabelHeight;
+        }
+        return pos;
       });
-
-    this.#appendText(rect);
   }
 
   /**

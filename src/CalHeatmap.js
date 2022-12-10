@@ -174,7 +174,6 @@ export default class CalHeatmap {
       dataSource,
       this.domainCollection.min,
       endDate,
-      dataProcessor,
     );
 
     dataPromise.then((data) => {

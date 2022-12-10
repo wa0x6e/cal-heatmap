@@ -13,7 +13,7 @@ export default class DomainLabelPainter {
     const { options } = this.calendar.options;
     let format = options.formatter.domainLabel;
 
-    if ([false, ''].includes(format)) {
+    if ([false, null, ''].includes(format)) {
       return;
     }
 
