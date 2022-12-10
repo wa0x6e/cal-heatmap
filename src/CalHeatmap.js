@@ -190,27 +190,6 @@ export default class CalHeatmap {
   }
 
   /**
-   * Set the legend
-   *
-   * @since 3.3.0
-   * @param {Object} Same object as the legend option
-   */
-  setLegend(legendOptions) {
-    const changeResults = [];
-
-    changeResults.push(this.options.set('legend', legendOptions));
-
-    // Trigger repaint only if legend options have changed
-    if (!changeResults.includes(true)) {
-      return;
-    }
-
-    this.colorizer.build();
-    this.calendarPainter.legendPainter.paint();
-    this.populator.populate();
-  }
-
-  /**
    * Listener for all events
    *
    * @since 4.0.0
