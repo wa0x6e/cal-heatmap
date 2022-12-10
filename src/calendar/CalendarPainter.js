@@ -123,14 +123,4 @@ export default class CalendarPainter {
         }
       });
   }
-
-  /**
-   * Highlight a set of dates
-   *
-   * @param  {[type]} dates [description]
-   * @return {[type]}       [description]
-   */
-  highlight() {
-    this.subDomainPainter.paint();
-  }
 }

@@ -212,24 +212,6 @@ export default class CalHeatmap {
   }
 
   /**
-   * Highlight dates
-   *
-   * Add a highlight class to a set of dates
-   *
-   * @since  3.3.5
-   * @param  array Array of dates to highlight
-   * @return {boolean} True if dates were highlighted
-   */
-  highlight(dates) {
-    if (
-      this.options.set('date.highlight', dates) &&
-      this.options.options.date.highlight.length > 0
-    ) {
-      this.calendarPainter.highlight();
-    }
-  }
-
-  /**
    * Listener for all events
    *
    * @since 4.0.0
