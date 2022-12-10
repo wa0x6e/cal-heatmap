@@ -8,8 +8,9 @@ import CalHeatmap from '../../src/CalHeatmap';
 
 [0, 10].forEach((gutter) => {
   describe(`on subdomain gutter = ${gutter}`, () => {
+    let cal = null;
     beforeEach(() => {
-      const cal = new CalHeatmap();
+      cal = new CalHeatmap();
       select('body').append('div').attr('id', 'cal-heatmap');
 
       cal.init({
@@ -23,6 +24,8 @@ import CalHeatmap from '../../src/CalHeatmap';
     });
 
     afterEach(() => {
+      cal.destroy();
+      cal = null;
       document.getElementsByTagName('html')[0].innerHTML = '';
     });
 

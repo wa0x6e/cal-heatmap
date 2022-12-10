@@ -7,8 +7,9 @@ import { select } from 'd3-selection';
 import CalHeatmap from '../../src/CalHeatmap';
 
 describe('on horizontal orientation', () => {
+  let cal = null;
   beforeEach(() => {
-    const cal = new CalHeatmap();
+    cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
     cal.init({
@@ -17,6 +18,8 @@ describe('on horizontal orientation', () => {
   });
 
   afterEach(() => {
+    cal.destroy();
+    cal = null;
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
 
@@ -34,8 +37,9 @@ describe('on horizontal orientation', () => {
 });
 
 describe('on vertical orientation', () => {
+  let cal = null;
   beforeEach(() => {
-    const cal = new CalHeatmap();
+    cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
     cal.init({
@@ -45,6 +49,8 @@ describe('on vertical orientation', () => {
   });
 
   afterEach(() => {
+    cal.destroy();
+    cal = null;
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
 

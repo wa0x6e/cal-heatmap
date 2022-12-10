@@ -14,6 +14,8 @@ describe('Domain padding', () => {
   });
 
   afterEach(() => {
+    cal.destroy();
+    cal = null;
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
 

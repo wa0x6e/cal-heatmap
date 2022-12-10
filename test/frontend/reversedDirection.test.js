@@ -7,8 +7,9 @@ import { select } from 'd3-selection';
 import CalHeatmap from '../../src/CalHeatmap';
 
 describe('on non reversed direction', () => {
+  let cal = null;
   beforeEach(() => {
-    const cal = new CalHeatmap();
+    cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
     cal.init({
@@ -20,6 +21,8 @@ describe('on non reversed direction', () => {
   });
 
   afterEach(() => {
+    cal.destroy();
+    cal = null;
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
 
@@ -41,8 +44,9 @@ describe('on non reversed direction', () => {
 });
 
 describe('on reversed direction', () => {
+  let cal = null;
   beforeEach(() => {
-    const cal = new CalHeatmap();
+    cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
     cal.init({
@@ -55,6 +59,8 @@ describe('on reversed direction', () => {
   });
 
   afterEach(() => {
+    cal.destroy();
+    cal = null;
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
 

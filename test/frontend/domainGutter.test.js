@@ -7,16 +7,22 @@ import { select } from 'd3-selection';
 import CalHeatmap from '../../src/CalHeatmap';
 
 describe('on horizontal scroll', () => {
+  let cal = null;
+  beforeEach(() => {
+    cal = new CalHeatmap();
+    select('body').append('div').attr('id', 'cal-heatmap');
+  });
+
+  afterEach(() => {
+    cal.destroy();
+    cal = null;
+    document.getElementsByTagName('html')[0].innerHTML = '';
+  });
+
   [0, 50].forEach((gutter) => {
     describe(`on domain gutter = ${gutter}`, () => {
-      afterEach(() => {
-        document.getElementsByTagName('html')[0].innerHTML = '';
-      });
-
       it('renders the given domain gutter', () => {
-        const cal = new CalHeatmap();
         const baseWidth = 120;
-        select('body').append('div').attr('id', 'cal-heatmap');
 
         cal.init({
           range: 2,
@@ -54,9 +60,7 @@ describe('on horizontal scroll', () => {
       });
 
       it('does not affect the domain height', () => {
-        const cal = new CalHeatmap();
         const baseHeight = 10;
-        select('body').append('div').attr('id', 'cal-heatmap');
 
         cal.init({
           range: 2,
@@ -92,6 +96,18 @@ describe('on horizontal scroll', () => {
 });
 
 describe('on vertical scroll', () => {
+  let cal = null;
+  beforeEach(() => {
+    cal = new CalHeatmap();
+    select('body').append('div').attr('id', 'cal-heatmap');
+  });
+
+  afterEach(() => {
+    cal.destroy();
+    cal = null;
+    document.getElementsByTagName('html')[0].innerHTML = '';
+  });
+
   [0, 10].forEach((gutter) => {
     describe(`on domain gutter = ${gutter}`, () => {
       afterEach(() => {
@@ -99,9 +115,7 @@ describe('on vertical scroll', () => {
       });
 
       it('renders the given domain gutter', () => {
-        const cal = new CalHeatmap();
         const baseHeight = 10;
-        select('body').append('div').attr('id', 'cal-heatmap');
 
         cal.init({
           range: 2,
@@ -129,9 +143,7 @@ describe('on vertical scroll', () => {
       });
 
       it('does not affect the domain width', () => {
-        const cal = new CalHeatmap();
         const baseWidth = 120;
-        select('body').append('div').attr('id', 'cal-heatmap');
 
         cal.init({
           range: 2,
