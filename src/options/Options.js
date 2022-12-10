@@ -83,24 +83,26 @@ export default class Options {
       // Whether to show most recent date first
       reversedDirection: false,
 
-      // Data source
-      // URL, where to fetch the original datas
-      data: '',
+      data: {
+        // Data source
+        // URL, where to fetch the original datas
+        source: '',
 
-      // Data type
-      // Default: json
-      dataType: 'json',
+        // Data type
+        // Default: json
+        type: 'json',
 
-      // Payload sent when using POST http method
-      // Leave to null (default) for GET request
-      // Expect a string, formatted like "a=b;c=d"
-      dataPostPayload: null,
+        requestInit: {},
 
-      // Additional headers sent when requesting data
-      // Expect an object formatted like:
-      // { 'X-CSRF-TOKEN': 'token' }
-      dataRequestHeaders: null,
-
+        // Callback after fetching the datas,
+        // but before applying them to the calendar
+        // Used mainly to convert the datas if they're not formatted
+        // like expected
+        // Takes the fetched "data" object as argument,
+        // must return a json object
+        // formatted like {timestamp:count, timestamp2:count2},
+        processor: (data) => data,
+      },
       // Domain Label properties
       label: {
         // valid: top, right, bottom, left
@@ -170,13 +172,6 @@ export default class Options {
       // Whether to show tooltip on subDomain cell hover
       // To format its content, see formatter/subDomainTitleFn option
       tooltip: false,
-
-      // Callback after fetching the datas,
-      // but before applying them to the calendar
-      // Used mainly to convert the datas if they're not formatted like expected
-      // Takes the fetched "data" object as argument, must return a json object
-      // formatted like {timestamp:count, timestamp2:count2},
-      dataProcessor: (data) => data,
     };
   }
 

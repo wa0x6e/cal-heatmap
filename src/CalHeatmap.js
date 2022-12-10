@@ -153,13 +153,13 @@ export default class CalHeatmap {
    * Fill the calendar with some data
    *
    * @param  {object|string}    dataSource    The calendar's datasource,
-   * same type as this.options.data
+   * same type as this.options.data.source
    * @param  {function}    dataProcessor  The dataProcessor function to
    * execute before processing your data
    */
   fill(
-    dataSource = this.options.options.data,
-    dataProcessor = this.options.options.dataProcessor,
+    dataSource = this.options.options.data.source,
+    dataProcessor = this.options.options.data.processor,
     updateMode = RESET_ALL_ON_UPDATE,
   ) {
     const { options } = this.options;

@@ -8,7 +8,7 @@ const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
  */
 export default function validate(
   subDomainTemplate,
-  { domain, subDomain, dataType },
+  { domain, subDomain, data },
 ) {
   const domainType = domain.type;
   const subDomainType = subDomain.type;
@@ -30,8 +30,8 @@ export default function validate(
     );
   }
 
-  if (dataType && !ALLOWED_DATA_TYPES.includes(dataType)) {
-    throw new Error(`The data type '${dataType}' is not valid data type`);
+  if (data.type && !ALLOWED_DATA_TYPES.includes(data.type)) {
+    throw new Error(`The data type '${data.type}' is not valid data type`);
   }
 
   return true;

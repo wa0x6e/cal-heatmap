@@ -32,39 +32,19 @@ export default class DataFetcher {
   }
 
   #fetch(source, startTimestamp, endTimestamp) {
-    const { options } = this.calendar.options;
+    const { type, requestInit } = this.calendar.options.options;
 
     const url = this.#parseURI(source, startTimestamp, endTimestamp);
 
-    const reqInit = { method: 'GET' };
-    if (options.dataPostPayload !== null) {
-      reqInit.method = 'POST';
-    }
-    if (options.dataPostPayload !== null) {
-      reqInit.body = this.#parseURI(
-        options.dataPostPayload,
-        startTimestamp,
-        endTimestamp,
-      );
-    }
-    if (options.dataRequestHeaders !== null) {
-      const myheaders = new Headers();
-      Object(options.dataRequestHeaders).forEach(([key, value]) => {
-        myheaders.append(key, value);
-      });
-
-      reqInit.headers = myheaders;
-    }
-
-    switch (options.dataType) {
+    switch (type) {
       case 'json':
-        return json(url, reqInit);
+        return json(url, requestInit);
       case 'csv':
-        return csv(url, reqInit);
+        return csv(url, requestInit);
       case 'tsv':
-        return dsv('\t', url, reqInit);
+        return dsv('\t', url, requestInit);
       case 'txt':
-        return text(url, reqInit);
+        return text(url, requestInit);
       default:
         return new Promise();
     }

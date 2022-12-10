@@ -13,24 +13,28 @@ describe('OptionsValidator', () => {
     subDomainTemplate.settings = {
       day: { level: 10 },
       month: { level: 100 },
+      data: { type: 'json' },
     };
 
     expect(() => {
       validate(subDomainTemplate, {
         domain: { type: 'day' },
         subDomain: { type: 'month' },
+        data: { type: 'json' },
       });
     }).toThrow();
 
     subDomainTemplate.settings = {
       day: { level: 100 },
       month: { level: 100 },
+      data: { type: 'json' },
     };
 
     expect(() => {
       validate(subDomainTemplate, {
         domain: { type: 'day' },
         subDomain: { type: 'month' },
+        data: { type: 'json' },
       });
     }).toThrow();
   });
@@ -39,6 +43,7 @@ describe('OptionsValidator', () => {
       validate(validSubDomainTemplate, {
         domain: { type: 'month' },
         subDomain: { type: 'day' },
+        data: { type: 'json' },
       }),
     ).toBe(true);
   });
@@ -47,12 +52,14 @@ describe('OptionsValidator', () => {
     subDomainTemplate.settings = {
       day: { level: 10 },
       month: { level: 100 },
+      data: { type: 'json' },
     };
 
     expect(() => {
       validate(subDomainTemplate, {
         domain: { type: 'test' },
         subDomain: { type: 'month' },
+        data: { type: 'json' },
       });
     }).toThrow();
   });
@@ -61,26 +68,28 @@ describe('OptionsValidator', () => {
     subDomainTemplate.settings = {
       day: { level: 10 },
       month: { level: 100 },
+      data: { type: 'json' },
     };
 
     expect(() => {
       validate(subDomainTemplate, {
         domain: { type: 'month' },
         subDomain: { type: 'test' },
+        data: { type: 'json' },
       });
     }).toThrow();
   });
 
   it('only accepts dataType from the whitelist', () => {
     expect(() => {
-      validate(validSubDomainTemplate, { dataType: 'hello' });
+      validate(validSubDomainTemplate, { data: { type: 'hello' } });
     }).toThrow();
 
     expect(
       validate(validSubDomainTemplate, {
         domain: { type: 'month' },
         subDomain: { type: 'day' },
-        dataType: 'json',
+        data: { type: 'json' },
       }),
     ).toBe(true);
   });
