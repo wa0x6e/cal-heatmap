@@ -2,6 +2,24 @@ import {
   json, csv, dsv, text,
 } from 'd3-fetch';
 
+const parseURI = (str, startTimestamp, endTimestamp) => {
+  // Use a timestamp in seconds
+  let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
+  newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
+
+  // Use a string date, following the ISO-8601
+  newUri = newUri.replace(
+    /\{\{d:start\}\}/g,
+    new Date(startTimestamp).toISOString(),
+  );
+  newUri = newUri.replace(
+    /\{\{d:end\}\}/g,
+    new Date(endTimestamp).toISOString(),
+  );
+
+  return newUri;
+};
+
 export default class DataFetcher {
   constructor(calendar) {
     this.calendar = calendar;
@@ -34,7 +52,7 @@ export default class DataFetcher {
   #fetch(source, startTimestamp, endTimestamp) {
     const { type, requestInit } = this.calendar.options.options;
 
-    const url = this.#parseURI(source, startTimestamp, endTimestamp);
+    const url = parseURI(source, startTimestamp, endTimestamp);
 
     switch (type) {
       case 'json':
@@ -48,25 +66,5 @@ export default class DataFetcher {
       default:
         return new Promise();
     }
-  }
-
-  #parseURI(str, startTimestamp, endTimestamp) {
-    const { DateHelper } = this.calendar.helpers;
-
-    // Use a timestamp in seconds
-    let newUri = str.replace(/\{\{t:start\}\}/g, startTimestamp / 1000);
-    newUri = newUri.replace(/\{\{t:end\}\}/g, endTimestamp / 1000);
-
-    // Use a string date, following the ISO-8601
-    newUri = newUri.replace(
-      /\{\{d:start\}\}/g,
-      DateHelper.date(startTimestamp).toISOString(),
-    );
-    newUri = newUri.replace(
-      /\{\{d:end\}\}/g,
-      DateHelper.date(endTimestamp).toISOString(),
-    );
-
-    return newUri;
   }
 }
