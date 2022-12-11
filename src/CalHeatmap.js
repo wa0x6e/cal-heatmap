@@ -26,12 +26,13 @@ export default class CalHeatmap {
     // Default settings
     this.options = new Options(this);
 
+    // Init the helpers with the default settings
+    this.helpers = createHelpers(this);
     this.subDomainTemplate = new SubDomainTemplate(this);
     this.dataFetcher = new DataFetcher(this);
 
     this.navigator = new Navigator(this);
     this.populator = new Populator(this);
-    this.helpers = {};
 
     this.calendarPainter = new CalendarPainter(this);
     this.eventEmitter = new EventEmmiter();
@@ -59,6 +60,7 @@ export default class CalHeatmap {
   init(settings) {
     this.options.init(settings);
 
+    // Refreseh the helpers with the correct options
     this.helpers = createHelpers(this);
     this.subDomainTemplate.init();
 

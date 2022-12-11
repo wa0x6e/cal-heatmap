@@ -1,6 +1,6 @@
 import DateHelper from '../../src/helpers/DateHelper';
-import weekData from '../data/weekNumberDates';
-import dates from '../data/dates';
+import weekData from '../fixtures/weekNumberDates';
+import dates from '../fixtures/dates';
 
 const date = new Date('2020-01-02T04:24:25.256+00:00');
 const DEFAULT_LOCALE = 'en';

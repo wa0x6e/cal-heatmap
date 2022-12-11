@@ -6,6 +6,14 @@
 
 // import CalHeatmap from '../../src/CalHeatmap';
 
-describe('Add templates', () => {
-  it.todo('adds the given templates');
+describe('navigation', () => {
+  it.todo('scrolls back by one steps');
+  it.todo('scrolls back by n steps');
+
+  it.todo('scrolls forward by one steps');
+  it.todo('scrolls forward by n steps');
+
+  it.todo('jumpsTo a past date');
+  it.todo('jumpsTo a future date');
+  it.todo('jumpsTo a date inside the current calendar range');
 });

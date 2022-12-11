@@ -1,10 +1,10 @@
 const yearTemplate = ({ DateHelper }) => ({
   name: 'year',
   level: 60,
-  row() {
+  rowsCount() {
     return 1;
   },
-  column() {
+  columnsCount() {
     return 1;
   },
   mapping: (startDate, endDate, defaultValues) =>

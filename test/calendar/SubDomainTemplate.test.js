@@ -5,7 +5,7 @@ describe('SubDomainTemplate', () => {
   let t = null;
   const template = { name: 'test_day' };
   const calendarDummy = {
-    options: { options: { domain: '', domainDynamicDimemsion: false } },
+    options: { options: { domain: '', domainDynamicDimension: false } },
     helpers: { DateHelper: new DateHelper() },
   };
 
@@ -57,5 +57,46 @@ describe('SubDomainTemplate', () => {
       test_year: { name },
       test_year2: { name: nameB },
     });
+  });
+
+  it('keeps the existing templates', () => {
+    const name = 'test_year';
+    const nameB = 'test_year2';
+
+    t.init();
+
+    const count = Object.keys(t.settings).length;
+    t.add([() => ({ name }), () => ({ name: nameB })]);
+
+    expect(Object.keys(t.settings).length).toBe(count + 2);
+  });
+
+  it('lazy load the helpers', () => {
+    const dummy = {
+      helpers: {
+        DateHelper: {
+          value: () => '1',
+        },
+      },
+      options: {
+        options: {},
+      },
+    };
+    const y = new SubDomainTemplate(dummy);
+
+    y.add([
+      (helpers) => ({
+        name: 'A',
+        value: () => helpers.DateHelper.value(),
+      }),
+    ]);
+
+    expect(y.at('A').value()).toBe('1');
+
+    dummy.helpers.DateHelper = {
+      value: () => '2',
+    };
+
+    expect(y.at('A').value()).toBe('2');
   });
 });
