@@ -7,23 +7,22 @@ const dayTemplate = ({ DateHelper }, { domain, verticalOrientation }) => {
     name: 'day',
     level: 30,
     rowsCount() {
-      if (domainType === 'week') {
-        return 1;
-      }
-      return ROWS_COUNT;
+      return domainType === 'week' ? 1 : ROWS_COUNT;
     },
-    columnsCount(d) {
+    columnsCount(ts) {
       switch (domainType) {
         case 'month':
           return Math.ceil(
             dynamicDimension && !verticalOrientation ?
-              DateHelper.getMonthWeekNumber(DateHelper.date(d).endOf('month')) :
+              DateHelper.getMonthWeekNumber(
+                DateHelper.date(ts).endOf('month'),
+              ) :
               6, // In rare case, when the first week contains less than 3 days
           );
         case 'year':
           return Math.ceil(
             dynamicDimension ?
-              DateHelper.date(d).endOf('year').dayOfYear() / ROWS_COUNT :
+              DateHelper.date(ts).endOf('year').dayOfYear() / ROWS_COUNT :
               54,
           );
         case 'week':
@@ -31,45 +30,46 @@ const dayTemplate = ({ DateHelper }, { domain, verticalOrientation }) => {
           return ROWS_COUNT;
       }
     },
-    mapping: (startDate, endDate, defaultValues) =>
+    mapping: (startTimestamp, endTimestamp, defaultValues) =>
       // eslint-disable-next-line implicit-arrow-linebreak
-      DateHelper.intervals('day', startDate, DateHelper.date(endDate)).map(
-        (d) => {
-          const date = DateHelper.date(d);
-          const endWeekNumber = DateHelper.date(d).endOf('year').week();
-          let x = 0;
+      DateHelper.intervals(
+        'day',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((ts) => {
+        const date = DateHelper.date(ts);
+        const endWeekNumber = DateHelper.date(ts).endOf('year').week();
+        let x = 0;
 
-          switch (domainType) {
-            case 'month':
-              x = DateHelper.getMonthWeekNumber(d) - 1;
-              break;
-            case 'year':
-              if (endWeekNumber === 1 && date.week() === endWeekNumber) {
-                x = DateHelper.date(d).subtract(1, 'week').week() + 1;
-              }
+        switch (domainType) {
+          case 'month':
+            x = DateHelper.getMonthWeekNumber(ts) - 1;
+            break;
+          case 'year':
+            if (endWeekNumber === 1 && date.week() === endWeekNumber) {
+              x = DateHelper.date(ts).subtract(1, 'week').week() + 1;
+            }
 
-              x = date.week() - 1;
-              break;
-            case 'week':
-              x = date.weekday();
-              break;
-            default:
-          }
+            x = date.week() - 1;
+            break;
+          case 'week':
+            x = date.weekday();
+            break;
+          default:
+        }
 
-          return {
-            t: d,
-            x,
-            y: domainType === 'week' ? 0 : date.weekday(),
-            ...defaultValues,
-          };
-        },
-      ),
+        return {
+          t: ts,
+          x,
+          y: domainType === 'week' ? 0 : date.weekday(),
+          ...defaultValues,
+        };
+      }),
     format: {
-      date: 'dddd MMMM D, Y',
-      legend: 'Do MMM',
+      domainLabel: 'Do MMM',
     },
-    extractUnit(d) {
-      return DateHelper.date(d).startOf('day').valueOf();
+    extractUnit(ts) {
+      return DateHelper.date(ts).startOf('day').valueOf();
     },
   };
 };

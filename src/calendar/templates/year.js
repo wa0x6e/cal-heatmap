@@ -7,23 +7,24 @@ const yearTemplate = ({ DateHelper }) => ({
   columnsCount() {
     return 1;
   },
-  mapping: (startDate, endDate, defaultValues) =>
+  mapping: (startTimestamp, endTimestamp, defaultValues) =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    DateHelper.intervals('year', startDate, DateHelper.date(endDate)).map(
-      (d, index) => ({
-        t: d,
-        x: index,
-        y: 0,
-        ...defaultValues,
-      }),
-    ),
+    DateHelper.intervals(
+      'year',
+      startTimestamp,
+      DateHelper.date(endTimestamp),
+    ).map((ts, index) => ({
+      t: ts,
+      x: index,
+      y: 0,
+      ...defaultValues,
+    })),
 
   format: {
-    date: 'Y',
-    legend: 'Y',
+    domainLabel: 'Y',
   },
-  extractUnit(d) {
-    return DateHelper.date(d).startOf('year').valueOf();
+  extractUnit(ts) {
+    return DateHelper.date(ts).startOf('year').valueOf();
   },
 });
 

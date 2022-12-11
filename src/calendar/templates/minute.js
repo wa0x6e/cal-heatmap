@@ -11,26 +11,27 @@ const minuteTemplate = ({ DateHelper }) => {
     columnsCount() {
       return ROWS_COUNT;
     },
-    mapping: (startDate, endDate, defaultValues = {}) =>
+    mapping: (startTimestamp, endTimestamp, defaultValues = {}) =>
       // eslint-disable-next-line implicit-arrow-linebreak
-      DateHelper.intervals('minute', startDate, DateHelper.date(endDate)).map(
-        (d) => {
-          const minute = DateHelper.date(d).minute();
+      DateHelper.intervals(
+        'minute',
+        startTimestamp,
+        DateHelper.date(endTimestamp),
+      ).map((ts) => {
+        const minute = DateHelper.date(ts).minute();
 
-          return {
-            t: d,
-            x: Math.floor(minute / COLUMNS_COUNT),
-            y: minute % COLUMNS_COUNT,
-            ...defaultValues,
-          };
-        },
-      ),
+        return {
+          t: ts,
+          x: Math.floor(minute / COLUMNS_COUNT),
+          y: minute % COLUMNS_COUNT,
+          ...defaultValues,
+        };
+      }),
     format: {
-      date: 'LT, dddd MMMM D, Y',
-      legend: '',
+      domainLabel: '',
     },
-    extractUnit(d) {
-      return DateHelper.date(d).startOf('minute').valueOf();
+    extractUnit(ts) {
+      return DateHelper.date(ts).startOf('minute').valueOf();
     },
   };
 };

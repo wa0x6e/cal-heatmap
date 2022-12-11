@@ -7,23 +7,24 @@ const monthTemplate = ({ DateHelper }) => ({
   columnsCount() {
     return 12;
   },
-  mapping: (startDate, endDate, defaultValues) =>
+  mapping: (startTimestamp, endTimestamp, defaultValues) =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    DateHelper.intervals('month', startDate, DateHelper.date(endDate)).map(
-      (d) => ({
-        t: d,
-        x: DateHelper.date(d).month(),
-        y: 0,
-        ...defaultValues,
-      }),
-    ),
+    DateHelper.intervals(
+      'month',
+      startTimestamp,
+      DateHelper.date(endTimestamp),
+    ).map((ts) => ({
+      t: ts,
+      x: DateHelper.date(ts).month(),
+      y: 0,
+      ...defaultValues,
+    })),
 
   format: {
-    date: 'MMMM',
-    legend: 'MMMM',
+    domainLabel: 'MMMM',
   },
-  extractUnit(d) {
-    return DateHelper.date(d).startOf('month').valueOf();
+  extractUnit(ts) {
+    return DateHelper.date(ts).startOf('month').valueOf();
   },
 });
 

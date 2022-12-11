@@ -1,11 +1,11 @@
-import { select } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 
 /**
  * @jest-environment jsdom
  */
 
 import CalHeatmap from '../../src/CalHeatmap';
-// import quarterTemplate from '../fixtures/quarterTemplate';
+import quarterTemplate from '../fixtures/quarterTemplate';
 
 describe('SubDomainTemplate', () => {
   let cal = new CalHeatmap();
@@ -21,26 +21,28 @@ describe('SubDomainTemplate', () => {
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
 
-  it.todo(
-    'adds the given template',
-    //   , () => {
-    //   const date = new Date(2020, 3, 5, 3, 6);
+  it('adds the given template', () => {
+    const date = new Date(2020, 3, 5, 3, 6);
 
-    //   cal.addTemplates(quarterTemplate);
-    //   cal.init({
-    //     date: { start: date },
-    //     domain: { type: 'year' },
-    //     subDomain: { type: 'quarter' },
-    //     formatter: { subDomainLabel: 'x' },
-    //   });
+    cal.addTemplates(quarterTemplate);
+    cal.init({
+      range: 1,
+      date: { start: date },
+      domain: { type: 'year' },
+      subDomain: { type: 'quarter' },
+      formatter: { subDomainLabel: 'x' },
+    });
 
-    //   const s = selectAll('.graph-subdomain-group g text').nodes();
+    const s = selectAll('.graph-subdomain-group g text').nodes();
 
-    //   expect(s.length).toBe(4);
-    //   expect(+s[0].html()).toBe(+new Date(2020, 0, 1, 0, 0));
-    //   expect(+s[1].html()).toBe(+new Date(2020, 3, 1, 0, 0));
-    //   expect(+s[2].html()).toBe(+new Date(2020, 6, 1, 0, 0));
-    //   expect(+s[3].html()).toBe(+new Date(2020, 9, 1, 0, 0));
-    // }
-  );
+    expect(s.length).toBe(4);
+    // eslint-disable-next-line no-underscore-dangle
+    expect(s[0].__data__.t).toBe(+new Date(2020, 0, 1, 0, 0));
+    // eslint-disable-next-line no-underscore-dangle
+    expect(s[1].__data__.t).toBe(+new Date(2020, 3, 1, 0, 0));
+    // eslint-disable-next-line no-underscore-dangle
+    expect(s[2].__data__.t).toBe(+new Date(2020, 6, 1, 0, 0));
+    // eslint-disable-next-line no-underscore-dangle
+    expect(s[3].__data__.t).toBe(+new Date(2020, 9, 1, 0, 0));
+  });
 });
