@@ -6,7 +6,7 @@ import { select, selectAll } from 'd3-selection';
 
 import CalHeatmap from '../../src/CalHeatmap';
 
-describe('DomainLabelPainter', () => {
+describe('domainlabel', () => {
   let cal = null;
   beforeEach(() => {
     cal = new CalHeatmap();
@@ -21,7 +21,7 @@ describe('DomainLabelPainter', () => {
 
   [false, null, ''].forEach((formatter) => {
     it('does not render a label when formatter is disabled', () => {
-      cal.init({ range: 1, formatter: { domainLabel: formatter } });
+      cal.init({ range: 1, domain: { label: formatter } });
 
       expect(selectAll('.graph-label').nodes().length).toBe(0);
     });
@@ -30,9 +30,8 @@ describe('DomainLabelPainter', () => {
   it('renders the default label when formatter is undefined', () => {
     cal.init({
       range: 1,
-      domain: { type: 'month' },
+      domain: { type: 'month', label: undefined },
       date: { start: new Date(2020, 0, 15) },
-      formatter: { domainLabel: undefined },
     });
 
     expect(selectAll('.graph-label').html()).toBe('January');
@@ -41,11 +40,8 @@ describe('DomainLabelPainter', () => {
   it('renders the return value of the given function', () => {
     cal.init({
       range: 1,
-      domain: { type: 'month' },
+      domain: { type: 'month', label: (date) => `${date.getMonth()};` },
       date: { start: new Date(2020, 0, 15) },
-      formatter: {
-        domainLabel: (date) => `${date.getMonth()};`,
-      },
     });
 
     expect(selectAll('.graph-label').html()).toBe('0;');
@@ -53,11 +49,8 @@ describe('DomainLabelPainter', () => {
   it('renders the format output of the given string format', () => {
     cal.init({
       range: 1,
-      domain: { type: 'month' },
+      domain: { type: 'month', label: 'MMM' },
       date: { start: new Date(2020, 0, 15) },
-      formatter: {
-        domainLabel: 'MMM',
-      },
     });
 
     expect(selectAll('.graph-label').html()).toBe('Jan');

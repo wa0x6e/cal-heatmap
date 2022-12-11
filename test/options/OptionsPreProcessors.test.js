@@ -15,8 +15,8 @@ describe('OptionsPreProcessors', () => {
       expect(OptionsPreProcessors['date.highlight']([date])).toEqual([date]);
     });
 
-    it('only accepts valid values subDomainLabel formatter', () => {
-      const key = 'formatter.subDomainLabel';
+    it('only accepts valid values subDomain label formatter', () => {
+      const key = 'subDomain.label';
       const fn = () => {};
 
       expect(OptionsPreProcessors[key]('')).toBe(null);

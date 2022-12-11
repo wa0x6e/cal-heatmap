@@ -11,7 +11,7 @@ export default class DomainLabelPainter {
 
   paint(root) {
     const { options } = this.calendar.options;
-    let format = options.formatter.domainLabel;
+    let format = options.domain.label;
 
     if ([false, null, ''].includes(format)) {
       return;

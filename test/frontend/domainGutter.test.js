@@ -26,9 +26,8 @@ describe('on horizontal scroll', () => {
 
         cal.init({
           range: 2,
-          domain: { type: 'year', gutter },
+          domain: { type: 'year', gutter, label: null },
           subDomain: { type: 'month', gutter: 0, width: 10 },
-          formatter: { domainLabel: null },
         });
         expect(
           select('#cal-heatmap').select('.graph-domain:nth-child(1)').attr('x'),
@@ -64,11 +63,8 @@ describe('on horizontal scroll', () => {
 
         cal.init({
           range: 2,
-          domain: { type: 'year', gutter },
+          domain: { type: 'year', gutter, label: null },
           subDomain: { type: 'month', gutter: 0, width: 10 },
-          formatter: {
-            domainLabel: null,
-          },
         });
         expect(
           select('#cal-heatmap')
@@ -120,9 +116,8 @@ describe('on vertical scroll', () => {
         cal.init({
           range: 2,
           verticalOrientation: true,
-          domain: { type: 'year', gutter },
+          domain: { type: 'year', gutter, label: null },
           subDomain: { type: 'month', gutter: 0, width: 10 },
-          formatter: { domainLabel: null },
         });
         expect(
           select('#cal-heatmap').select('.graph-domain:nth-child(1)').attr('y'),
@@ -148,11 +143,8 @@ describe('on vertical scroll', () => {
         cal.init({
           range: 2,
           verticalOrientation: true,
-          domain: { type: 'year', gutter },
+          domain: { type: 'year', gutter, label: null },
           subDomain: { type: 'month', gutter: 0, width: 10 },
-          formatter: {
-            domainLabel: null,
-          },
         });
         expect(
           select('#cal-heatmap')

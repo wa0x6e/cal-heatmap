@@ -132,7 +132,7 @@ export default class subDomainPainter {
 
   #appendText(elem) {
     const { options } = this.calendar.options;
-    const fmt = options.formatter.subDomainLabel;
+    const fmt = options.subDomain.label;
     const dateFmt = this.calendar.helpers.DateHelper;
 
     if (!fmt) {

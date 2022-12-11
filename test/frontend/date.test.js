@@ -24,11 +24,8 @@ describe('Date', () => {
 
     cal.init({
       domain: { type: 'month' },
-      subDomain: { type: 'day' },
+      subDomain: { type: 'day', label: (date) => date.toISOString() },
       date: { start: startDate },
-      formatter: {
-        subDomainLabel: (date) => date.toISOString(),
-      },
     });
 
     expect(select(select('.subdomain-text').nodes()[0]).html()).toBe(

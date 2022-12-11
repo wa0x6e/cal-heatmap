@@ -27,11 +27,9 @@ export default class Populator {
           .select('rect')
           .style('fill', (d) => colorScale?.apply(d.v))
           .attr('title', (d) => {
-            const { subDomainTitleFn } = options.formatter;
+            const { title } = options.subDomain;
 
-            return subDomainTitleFn ?
-              subDomainTitleFn(new Date(d.t), d.v) :
-              null;
+            return title ? title(new Date(d.t), d.v) : null;
           });
       })
       .call((element) => {
@@ -39,7 +37,7 @@ export default class Populator {
           .select('text')
           .text((d, i, nodes) => calendar.helpers.DateHelper.format(
             d.t,
-            options.formatter.subDomainLabel,
+            options.subDomain.label,
             d.v,
             nodes[i],
           ));

@@ -29,8 +29,7 @@ describe('SubDomainTemplate', () => {
       range: 1,
       date: { start: date },
       domain: { type: 'year' },
-      subDomain: { type: 'quarter' },
-      formatter: { subDomainLabel: 'x' },
+      subDomain: { type: 'quarter', label: 'x' },
     });
 
     const s = selectAll('.graph-subdomain-group g text').nodes();

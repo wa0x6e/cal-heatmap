@@ -31,6 +31,15 @@ export default class Options {
         // The width/height on a domain depends on the number of
         // subDomains items count
         dynamicDimension: true,
+
+        // Formatting of the domain label
+        // @default: undefined, will use the formatting according to domain type
+        // Accept a string used as specifier by moment().format()
+        // or a function
+        //
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
+        label: undefined,
       },
 
       subDomain: {
@@ -47,6 +56,20 @@ export default class Options {
 
         // Radius of each subDomain cell, in pixel
         radius: 0,
+
+        // Formatting of the text inside each subDomain cell
+        // @default: null, no text
+        // Accept a string used as specifier by moment().format()
+        // or a function
+        //
+        // Refer to https://momentjs.com/docs/#/displaying/
+        // for accepted date formatting used by moment().format()
+        label: null,
+
+        // Formatting of the title displayed when hovering a subDomain cell
+        // This will also be the tooltip's text when enabled
+        // Expecting a function, which is returning the title's text
+        title: (date, value) => `${value} - ${date}`,
       },
 
       // Show weekday's name when showing full month
@@ -141,36 +164,11 @@ export default class Options {
         },
       },
 
-      formatter: {
-        // Formatting of the domain label
-        // @default: undefined, will use the formatting according to domain type
-        // Accept a string used as specifier by moment().format()
-        // or a function
-        //
-        // Refer to https://momentjs.com/docs/#/displaying/
-        // for accepted date formatting used by moment().format()
-        domainLabel: undefined,
-
-        // Formatting of the text inside each subDomain cell
-        // @default: null, no text
-        // Accept a string used as specifier by moment().format()
-        // or a function
-        //
-        // Refer to https://momentjs.com/docs/#/displaying/
-        // for accepted date formatting used by moment().format()
-        subDomainLabel: null,
-
-        // Formatting of the title displayed when hovering a subDomain cell
-        // This will also be the tooltip's text when enabled
-        // Expecting a function, which is returning the title's text
-        subDomainTitleFn: (date, value) => `${value} - ${date}`,
-      },
-
       // Animation duration, in ms
       animationDuration: 200,
 
       // Whether to show tooltip on subDomain cell hover
-      // To format its content, see formatter/subDomainTitleFn option
+      // To format its content, see subDomain.title option
       tooltip: false,
     };
   }
@@ -235,7 +233,7 @@ export default class Options {
       options.x.domainHorizontalLabelWidth = options.label.width;
     }
 
-    if ([false, '', null].includes(options.formatter.domainLabel)) {
+    if ([false, '', null].includes(options.domain.label)) {
       options.x.domainVerticalLabelHeight = 0;
       options.x.domainHorizontalLabelWidth = 0;
     }
