@@ -27,10 +27,9 @@ export default class subDomainPainter {
       );
 
     const {
-      tooltip,
       subDomain: { radius, width, height },
     } = this.calendar.options.options;
-    const { eventEmitter } = this.calendar;
+    const evt = this.calendar.eventEmitter;
 
     subDomainSvgGroup
       .selectAll('g')
@@ -40,37 +39,20 @@ export default class subDomainPainter {
           .append('g')
           .call((selection) => selection
             .insert('rect')
-            .attr('class', (d) =>
-            // eslint-disable-next-line implicit-arrow-linebreak
-              this.#classname(d.t, 'graph-rect', 'hover_cursor'))
+            .attr('class', (d) => this.#classname(d.t, 'graph-rect'))
             .attr('width', width)
             .attr('height', height)
             .attr('x', (d) => this.#getX(d))
             .attr('y', (d) => this.#getY(d))
-            .on('click', (ev, d) =>
-            // eslint-disable-next-line implicit-arrow-linebreak
-              eventEmitter.emit('click', ev, new Date(d.t), d.v))
-            .on('mouseover', (ev, d) => {
-              if (tooltip) {
-                this.calendar.calendarPainter.tooltip.show(ev.target);
-              }
-              return eventEmitter.emit('mouseover', ev, new Date(d.t), d.v);
-            })
-            .on('mouseout', (ev, d) => {
-              if (tooltip) {
-                this.calendar.calendarPainter.tooltip.hide();
-              }
-
-              return eventEmitter.emit('mouseout', ev, new Date(d.t), d.v);
-            })
+            .on('click', (ev, d) => evt.emit('click', ev, d.t, d.v))
+            .on('mouseover', (ev, d) => evt.emit('mouseover', ev, d.t, d.v))
+            .on('mouseout', (ev, d) => evt.emit('mouseout', ev, d.t, d.v))
             .attr('rx', radius > 0 ? radius : null)
             .attr('ry', radius > 0 ? radius : null))
           .call((selection) => this.#appendText(selection)),
         (update) => update
           .selectAll('rect')
-          .attr('class', (d) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-            this.#classname(d.t, 'graph-rect', 'hover_cursor'))
+          .attr('class', (d) => this.#classname(d.t, 'graph-rect'))
           .attr('width', width)
           .attr('height', height)
           .attr('x', (d) => this.#getX(d))

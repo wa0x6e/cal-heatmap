@@ -54,6 +54,14 @@ export default class Tooltip {
       this.root.node(),
       this.popperOptions,
     );
+
+    this.calendar.eventEmitter.on('mouseover', (e) => {
+      this.show(e.target);
+    });
+
+    this.calendar.eventEmitter.on('mouseout', () => {
+      this.hide();
+    });
   }
 
   show(e) {
