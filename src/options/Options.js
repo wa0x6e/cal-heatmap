@@ -69,7 +69,7 @@ export default class Options {
         // Formatting of the title displayed when hovering a subDomain cell
         // This will also be the tooltip's text when enabled
         // Expecting a function, which is returning the title's text
-        title: (date, value) => `${value} - ${date}`,
+        title: (date, value) => `${value} - ${date.toISOString()}`,
       },
 
       // Show weekday's name when showing full month

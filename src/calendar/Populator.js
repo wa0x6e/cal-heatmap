@@ -20,13 +20,11 @@ export default class Populator {
       .selectAll('svg')
       .selectAll('g')
       .data((d) => calendar.domainCollection.get(d) || [])
-      .transition()
-      .duration(options.animationDuration)
       .call((element) => {
         element
           .select('rect')
           .style('fill', (d) => colorScale?.apply(d.v))
-          .attr('title', (d) => {
+          .attr('aria-labelledby', (d) => {
             const { title } = options.subDomain;
 
             return title ? title(new Date(d.t), d.v) : null;
@@ -41,8 +39,9 @@ export default class Populator {
             d.v,
             nodes[i],
           ));
+      })
+      .call(() => {
+        this.calendar.eventEmitter.emit('fill');
       });
-
-    this.calendar.eventEmitter.emit('fill');
   }
 }

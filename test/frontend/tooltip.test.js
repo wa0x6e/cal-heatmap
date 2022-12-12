@@ -8,4 +8,5 @@
 
 describe('Tooltip', () => {
   it.todo('enable the tooltip');
+  it.todo('disable the tooltip');
 });

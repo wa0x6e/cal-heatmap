@@ -103,10 +103,14 @@ describe('DomainLabelPainter', () => {
     it.todo('aligns the text on the left');
     it.todo('aligns the text on the middle');
     it.todo('aligns the text on the right');
+    it.todo('rotate the text left');
+    it.todo('rotate the text right');
   });
   describe('when positionned on the right', () => {
     it.todo('aligns the text on the left');
     it.todo('aligns the text on the middle');
     it.todo('aligns the text on the right');
+    it.todo('rotate the text left');
+    it.todo('rotate the text right');
   });
 });

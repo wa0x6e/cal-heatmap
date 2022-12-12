@@ -57,7 +57,7 @@ export default class Tooltip {
   }
 
   show(e) {
-    const title = e.getAttribute('title');
+    const title = e.getAttribute('aria-labelledby');
 
     if (!title) {
       return;

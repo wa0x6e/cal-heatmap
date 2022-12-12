@@ -46,6 +46,7 @@ describe('domainlabel', () => {
 
     expect(selectAll('.graph-label').html()).toBe('0;');
   });
+
   it('renders the format output of the given string format', () => {
     cal.init({
       range: 1,

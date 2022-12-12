@@ -13,6 +13,9 @@ describe('navigation', () => {
   it.todo('scrolls forward by one steps');
   it.todo('scrolls forward by n steps');
 
+  it.todo('can not scroll past the minDate');
+  it.todo('can not scroll past the maxDate');
+
   it.todo('jumpsTo a past date');
   it.todo('jumpsTo a future date');
   it.todo('jumpsTo a date inside the current calendar range');
