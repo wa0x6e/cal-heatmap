@@ -1,4 +1,3 @@
-import { select } from 'd3-selection';
 import { createPopper } from '@popperjs/core';
 
 const BASE_CLASSNAME = 'ch-tooltip';
@@ -20,51 +19,57 @@ export default class Tooltip {
     this.calendar = calendar;
     this.root = null;
     this.virtualElement = {
-      getBoundingClientRect: null,
+      getBoundingClientRect: (x = 0, y = 0) => () => ({
+        width: 0,
+        height: 0,
+        top: y,
+        right: x,
+        bottom: y,
+        left: x,
+      }),
     };
     this.popperInstance = null;
   }
 
   init() {
-    if (!this.calendar.options.options.tooltip) {
+    const { tooltip } = this.calendar.options.options;
+
+    if (!tooltip) {
       return;
     }
 
     this.popperOptions =
-      typeof this.calendar.options.options.tooltip === 'object' ?
-        this.calendar.options.options.tooltip :
-        DEFAULT_POPPER_OPTIONS;
+      typeof tooltip === 'object' ? tooltip : DEFAULT_POPPER_OPTIONS;
 
-    this.root = select(`#${BASE_CLASSNAME}`);
+    this.root = document.getElementById(BASE_CLASSNAME);
 
-    if (this.root.empty()) {
-      this.root = select('body')
-        .append('div')
-        .attr('id', BASE_CLASSNAME)
-        .attr('role', 'tooltip');
-      this.root
-        .append('div')
-        .attr('id', `${BASE_CLASSNAME}-arrow`)
-        .attr('data-popper-arrow', true);
-      this.root.append('span').attr('id', `${BASE_CLASSNAME}-body`);
+    if (!this.root) {
+      const tooltipElem = document.createElement('div');
+      tooltipElem.setAttribute('id', BASE_CLASSNAME);
+      tooltipElem.setAttribute('role', 'tooltip');
+      tooltipElem.innerHTML =
+        `<div id="${BASE_CLASSNAME}-arrow" data-popper-arrow="true"></div>` +
+        `<span id="${BASE_CLASSNAME}-body"></span>`;
+
+      this.root = document.body.appendChild(tooltipElem);
     }
 
     this.popperInstance = createPopper(
       this.virtualElement,
-      this.root.node(),
+      this.root,
       this.popperOptions,
     );
 
     this.calendar.eventEmitter.on('mouseover', (e) => {
-      this.show(e.target);
+      this.#show(e.target);
     });
 
     this.calendar.eventEmitter.on('mouseout', () => {
-      this.hide();
+      this.#hide();
     });
   }
 
-  show(e) {
+  #show(e) {
     const title = e.getAttribute('aria-labelledby');
 
     if (!title) {
@@ -72,7 +77,7 @@ export default class Tooltip {
     }
 
     this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
-    this.root.select(`#${BASE_CLASSNAME}-body`).html(title);
+    document.getElementById(`${BASE_CLASSNAME}-body`).innerHTML = title;
 
     this.popperInstance.setOptions(() => ({
       ...this.popperOptions,
@@ -84,11 +89,11 @@ export default class Tooltip {
 
     this.popperInstance.update();
 
-    this.root.attr('data-show', true);
+    this.root.setAttribute('data-show', true);
   }
 
-  hide() {
-    this.root.attr('data-show', null);
+  #hide() {
+    this.root.removeAttribute('data-show');
 
     this.popperInstance.setOptions(() => ({
       ...this.popperOptions,
