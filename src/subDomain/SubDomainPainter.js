@@ -69,7 +69,7 @@ export default class subDomainPainter {
   #setPositions(selection) {
     const { options } = this.calendar.options;
     const { padding } = options.domain;
-    const { position } = options.label.position;
+    const { position } = options.label;
 
     selection
       .attr('x', () => {
