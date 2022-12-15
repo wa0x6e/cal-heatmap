@@ -30,27 +30,27 @@ const dayTemplate = ({ DateHelper }, { domain, verticalOrientation }) => {
           return ROWS_COUNT;
       }
     },
-    mapping: (startTimestamp, endTimestamp, defaultValues) =>
-      // eslint-disable-next-line implicit-arrow-linebreak
-      DateHelper.intervals(
+    mapping: (startTimestamp, endTimestamp, defaultValues) => {
+      let weekNumber = 0;
+      let x = -1;
+
+      return DateHelper.intervals(
         'day',
         startTimestamp,
         DateHelper.date(endTimestamp),
       ).map((ts) => {
         const date = DateHelper.date(ts);
-        const endWeekNumber = DateHelper.date(ts).endOf('year').week();
-        let x = 0;
 
         switch (domainType) {
           case 'month':
             x = DateHelper.getMonthWeekNumber(ts) - 1;
             break;
           case 'year':
-            if (endWeekNumber === 1 && date.week() === endWeekNumber) {
-              x = DateHelper.date(ts).subtract(1, 'week').week() + 1;
+            if (weekNumber !== date.week()) {
+              weekNumber = date.week();
+              x += 1;
             }
 
-            x = date.week() - 1;
             break;
           case 'week':
             x = date.weekday();
@@ -64,7 +64,8 @@ const dayTemplate = ({ DateHelper }, { domain, verticalOrientation }) => {
           y: domainType === 'week' ? 0 : date.weekday(),
           ...defaultValues,
         };
-      }),
+      });
+    },
     format: {
       domainLabel: 'Do MMM',
     },
