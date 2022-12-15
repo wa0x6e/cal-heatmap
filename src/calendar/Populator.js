@@ -10,7 +10,8 @@ export default class Populator {
     const { options } = calendar.options;
     let colorScale = null;
     try {
-      colorScale = scale(options.legend);
+      const scaleOptions = options.scale;
+      colorScale = scale({ [scaleOptions.as]: scaleOptions });
     } catch (error) {
       // Do nothing
     }

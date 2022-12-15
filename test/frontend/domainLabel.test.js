@@ -21,7 +21,11 @@ describe('domainlabel', () => {
 
   [false, null, ''].forEach((formatter) => {
     it('does not render a label when formatter is disabled', () => {
-      cal.init({ range: 1, domain: { label: formatter } });
+      cal.init({
+        range: 1,
+        domain: { type: 'year', label: formatter },
+        subDomain: { type: 'month' },
+      });
 
       expect(selectAll('.graph-label').nodes().length).toBe(0);
     });
@@ -31,6 +35,7 @@ describe('domainlabel', () => {
     cal.init({
       range: 1,
       domain: { type: 'month', label: undefined },
+      subDomain: { type: 'week' },
       date: { start: new Date(2020, 0, 15) },
     });
 
@@ -41,6 +46,7 @@ describe('domainlabel', () => {
     cal.init({
       range: 1,
       domain: { type: 'month', label: (date) => `${date.getMonth()};` },
+      subDomain: { type: 'week' },
       date: { start: new Date(2020, 0, 15) },
     });
 
@@ -51,6 +57,7 @@ describe('domainlabel', () => {
     cal.init({
       range: 1,
       domain: { type: 'month', label: 'MMM' },
+      subDomain: { type: 'week' },
       date: { start: new Date(2020, 0, 15) },
     });
 

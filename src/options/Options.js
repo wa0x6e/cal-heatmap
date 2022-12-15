@@ -149,6 +149,13 @@ export default class Options {
         height: 25,
       },
 
+      scale: {
+        as: 'color',
+        type: 'quantize',
+        domain: [0, 100],
+        scheme: 'YlOrBr',
+      },
+
       // Legend properties
       legend: {
         // Whether to display the legend
@@ -158,10 +165,7 @@ export default class Options {
 
         label: null,
 
-        color: {
-          type: 'threshold',
-          domains: [0, 50, 100],
-        },
+        width: 130,
       },
 
       // Animation duration, in ms

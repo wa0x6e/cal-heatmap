@@ -50,7 +50,7 @@ export default class DataFetcher {
   }
 
   #fetch(source, startTimestamp, endTimestamp) {
-    const { type, requestInit } = this.calendar.options.options;
+    const { type, requestInit } = this.calendar.options.options.data;
 
     const url = parseURI(source, startTimestamp, endTimestamp);
 
@@ -64,7 +64,9 @@ export default class DataFetcher {
       case 'txt':
         return text(url, requestInit);
       default:
-        return new Promise();
+        return new Promise((resolve) => {
+          resolve({});
+        });
     }
   }
 }
