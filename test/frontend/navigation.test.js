@@ -99,8 +99,43 @@ describe('navigation', () => {
     );
   });
 
-  it.todo('can not scroll past the minDate');
-  it.todo('can not scroll past the maxDate');
+  it('can not scroll past the minDate', async () => {
+    cal.init({ date: { min: new Date(2015, 0, 1) } });
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.previous(10);
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2015',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2016',
+    );
+  });
+
+  it('can not scroll past the maxDate', async () => {
+    cal.init({ date: { max: new Date(2025, 0, 1) } });
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.next(10);
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2024',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2025',
+    );
+  });
 
   it('jumpsTo a past date', async () => {
     expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
@@ -135,6 +170,24 @@ describe('navigation', () => {
     );
     expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
       'y_2025',
+    );
+  });
+
+  it('jumpsTo a future date with reset', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.jumpTo(new Date(2025, 6, 3), true);
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2025',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2026',
     );
   });
 

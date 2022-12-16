@@ -17,3 +17,15 @@ it('destroys the calendar', () => {
     expect(select('#cal-heatmap').html()).toBe('');
   });
 });
+
+it('also destroys the legend', () => {
+  const cal = new CalHeatmap();
+  select('body').append('div').attr('id', 'cal-heatmap');
+
+  cal.init({ range: 1, legend: { show: true } });
+  expect(select('.graph-legend').size()).toBe(1);
+
+  cal.destroy(() => {
+    expect(select('.graph-legend').size()).toBe(0);
+  });
+});

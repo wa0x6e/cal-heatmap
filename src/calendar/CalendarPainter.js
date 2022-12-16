@@ -111,6 +111,7 @@ export default class CalendarPainter {
   }
 
   destroy(callback) {
+    this.legendPainter.destroy();
     this.root
       .transition()
       .duration(this.calendar.options.options.animationDuration)
