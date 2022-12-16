@@ -11,6 +11,7 @@ export default class DomainPainter {
   constructor(calendar) {
     this.calendar = calendar;
     this.coordinates = new DomainCoordinates(calendar, this);
+    this.root = null;
 
     // Dimensions of the internal area containing all the domains
     // Excluding all surrounding margins
@@ -30,7 +31,9 @@ export default class DomainPainter {
       scrollDirection,
     );
 
-    return calendarNode
+    const promises = [];
+
+    this.root = calendarNode
       .select('.graph')
       .selectAll(`.${DEFAULT_CLASSNAME}`)
       .data(this.calendar.domainCollection.keys, (d) => d)
@@ -47,28 +50,42 @@ export default class DomainPainter {
             .attr('width', (d) => coor.at(d).inner_width)
             .attr('height', (d) => coor.at(d).inner_height)
             .attr('class', 'domain-background'))
-          .call((enterSelection) => enterSelection
-            .transition(t)
-            .attr('x', (d) => coor.at(d).x)
-            .attr('y', (d) => coor.at(d).y)),
+          .call((enterSelection) => promises.push(
+            enterSelection
+              .transition(t)
+              .attr('x', (d) => coor.at(d).x)
+              .attr('y', (d) => coor.at(d).y)
+              .end(),
+          )),
         (update) => update
-          .call((updateSelection) => updateSelection
+          .call((updateSelection) => promises.push(
+            updateSelection
+              .transition(t)
+              .attr('x', (d) => coor.at(d).x)
+              .attr('y', (d) => coor.at(d).y)
+              .attr('width', (d) => coor.at(d).inner_width)
+              .attr('height', (d) => coor.at(d).inner_height)
+              .end(),
+          ))
+          .call((updateSelection) => promises.push(
+            updateSelection
+              .selectAll('.domain-background')
+              .transition(t)
+              .attr('width', (d) => coor.at(d).inner_width)
+              .attr('height', (d) => coor.at(d).inner_height)
+              .end(),
+          )),
+        (exit) => exit.call((exitSelection) => promises.push(
+          exitSelection
             .transition(t)
             .attr('x', (d) => coor.at(d).x)
             .attr('y', (d) => coor.at(d).y)
-            .attr('width', (d) => coor.at(d).inner_width)
-            .attr('height', (d) => coor.at(d).inner_height))
-          .call((updateSelection) => updateSelection
-            .selectAll('.domain-background')
-            .transition(t)
-            .attr('width', (d) => coor.at(d).inner_width)
-            .attr('height', (d) => coor.at(d).inner_height)),
-        (exit) => exit.call((exitSelection) => exitSelection
-          .transition(t)
-          .attr('x', (d) => coor.at(d).x)
-          .attr('y', (d) => coor.at(d).y)
-          .remove()),
+            .remove()
+            .end(),
+        )),
       );
+
+    return promises;
   }
 
   #getClassName(d) {

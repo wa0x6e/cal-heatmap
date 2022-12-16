@@ -31,7 +31,7 @@ export default class subDomainPainter {
     } = this.calendar.options.options;
     const evt = this.calendar.eventEmitter;
 
-    subDomainSvgGroup
+    return subDomainSvgGroup
       .selectAll('g')
       .data((d) => this.calendar.domainCollection.get(d))
       .join(

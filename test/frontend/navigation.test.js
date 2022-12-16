@@ -1,22 +1,158 @@
-// import { select } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 
 /**
  * @jest-environment jsdom
  */
 
-// import CalHeatmap from '../../src/CalHeatmap';
+import CalHeatmap from '../../src/CalHeatmap';
 
 describe('navigation', () => {
-  it.todo('scrolls back by one steps');
-  it.todo('scrolls back by n steps');
+  let cal = null;
+  beforeEach(() => {
+    cal = new CalHeatmap();
+    select('body').append('div').attr('id', 'cal-heatmap');
+    cal.init({
+      range: 2,
+      domain: { type: 'year' },
+      subDomain: { type: 'month' },
+      date: { start: new Date(2020, 0, 1) },
+    });
+  });
 
-  it.todo('scrolls forward by one steps');
-  it.todo('scrolls forward by n steps');
+  afterEach(() => {
+    cal.destroy();
+    cal = null;
+    document.getElementsByTagName('html')[0].innerHTML = '';
+  });
+
+  it('scrolls back by one steps', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.previous();
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2019',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2020',
+    );
+  });
+
+  it('scrolls back by n steps', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.previous(5);
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2015',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2016',
+    );
+  });
+
+  it('scrolls forward by one steps', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.next();
+
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2022',
+    );
+  });
+
+  it('scrolls forward by n steps', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.next(5);
+
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2025',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2026',
+    );
+  });
 
   it.todo('can not scroll past the minDate');
   it.todo('can not scroll past the maxDate');
 
-  it.todo('jumpsTo a past date');
-  it.todo('jumpsTo a future date');
-  it.todo('jumpsTo a date inside the current calendar range');
+  it('jumpsTo a past date', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.jumpTo(new Date(2015, 6, 3));
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2015',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2016',
+    );
+  });
+
+  it('jumpsTo a future date', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.jumpTo(new Date(2025, 6, 3));
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2024',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2025',
+    );
+  });
+
+  it('jumpsTo a date inside the current calendar range', async () => {
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+    expect(selectAll('.graph-domain').nodes().length).toBe(2);
+
+    await cal.jumpTo(new Date(2020, 6, 3));
+    expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
+      'y_2020',
+    );
+    expect(select('.graph-domain:nth-child(2)').attr('class')).toContain(
+      'y_2021',
+    );
+  });
 });

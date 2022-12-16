@@ -50,16 +50,16 @@ export default class CalendarPainter {
       .duration(this.calendar.options.options.animationDuration)
       .attr('x', this.domainSecondaryLabelPainter.dimensions.width);
 
-    const domainSvg = this.domainPainter.paint(navigationDir, this.root);
-    this.subDomainPainter.paint(domainSvg);
-    this.domainLabelPainter.paint(domainSvg);
+    const transitions = this.domainPainter.paint(navigationDir, this.root);
+    this.subDomainPainter.paint(this.domainPainter.root);
+    this.domainLabelPainter.paint(this.domainPainter.root);
 
     this.legendPainter.paint();
 
     this.resize();
 
     this.calendar.eventEmitter.emit('paint');
-    return true;
+    return Promise.allSettled(transitions);
   }
 
   #getHeight() {

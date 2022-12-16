@@ -109,12 +109,14 @@ export default class CalHeatmap {
    */
   next(n = 1) {
     const loadDirection = this.navigator.loadNewDomains(
-      this.createDomainCollection(this.domainCollection.max, n + 1).slice(1),
+      this.createDomainCollection(this.domainCollection.max, n + 1).slice(n),
       SCROLL_FORWARD,
     );
-    this.calendarPainter.paint(loadDirection);
+    const promise = this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
     this.fill();
+
+    return promise;
   }
 
   /**
@@ -127,9 +129,11 @@ export default class CalHeatmap {
       this.createDomainCollection(this.domainCollection.min, -n),
       SCROLL_BACKWARD,
     );
-    this.calendarPainter.paint(loadDirection);
+    const promise = this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
     this.fill();
+
+    return promise;
   }
 
   /**
@@ -146,9 +150,11 @@ export default class CalHeatmap {
    */
   jumpTo(date, reset = false) {
     const loadDirection = this.navigator.jumpTo(date, reset);
-    this.calendarPainter.paint(loadDirection);
+    const promise = this.calendarPainter.paint(loadDirection);
     // @TODO: Update only newly inserted domains
     this.fill();
+
+    return promise;
   }
 
   /**
