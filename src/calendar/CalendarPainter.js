@@ -58,7 +58,6 @@ export default class CalendarPainter {
 
     this.resize();
 
-    this.calendar.eventEmitter.emit('paint');
     return Promise.allSettled(transitions);
   }
 
@@ -96,12 +95,13 @@ export default class CalendarPainter {
       newWidth !== this.dimensions.width ||
       newHeight !== this.dimensions.height
     ) {
-      this.calendar.eventEmitter.emit('resize', [
+      this.calendar.eventEmitter.emit(
+        'resize',
         newWidth,
         newHeight,
         this.dimensions.width,
         this.dimensions.height,
-      ]);
+      );
     }
 
     this.dimensions = {

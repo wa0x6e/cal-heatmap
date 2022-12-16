@@ -125,6 +125,8 @@ export default class Navigator {
       const reached = lowerBound <= min;
       if (reached) {
         this.calendar.eventEmitter.emit('minDateReached');
+      } else {
+        this.calendar.eventEmitter.emit('minDateNotReached');
       }
       this.minDomainReached = reached;
     }
@@ -132,6 +134,8 @@ export default class Navigator {
       const reached = upperBound >= max;
       if (reached) {
         this.calendar.eventEmitter.emit('maxDateReached');
+      } else {
+        this.calendar.eventEmitter.emit('maxDateNotReached');
       }
       this.maxDomainReached = reached;
     }
