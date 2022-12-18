@@ -19,7 +19,7 @@ const basePlugins = [
     'process.env.NODE_ENV': JSON.stringify('production'),
   }),
   filesize(),
-  scss({ output: `dist/${pkg.name}.css`, outputStyle: 'compressed' }),
+  scss({ fileName: `${pkg.name}.css`, outputStyle: 'compressed' }),
 ];
 
 export default [

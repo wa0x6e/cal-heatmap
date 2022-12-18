@@ -66,7 +66,7 @@
   "scripts": {
     "format": "npx prettier-eslint --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "npx eslint src/ test/",
-    "build": "rm -rf dist/* && rm -rf build-tsc/* && npx tsc && rollup -c",
+    "build": "rm -rf dist/* && rm -rf build-tsc/* && npx tsc && cp ./src/*.scss ./build-tsc/src/ && rollup -c",
     "dev": "npx tsc -w & rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/"
   },

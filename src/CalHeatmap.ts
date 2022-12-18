@@ -11,8 +11,7 @@ import createHelpers from './helpers/HelperFactory';
 import validate from './options/OptionsValidator';
 
 // import extractSVG from './utils/extractSVG';
-// eslint-disable-next-line import/no-unresolved
-// import './cal-heatmap.scss';
+import './cal-heatmap.scss';
 
 import TemplateCollection from './calendar/TemplateCollection';
 
