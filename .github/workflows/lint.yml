@@ -18,4 +18,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Linting files
-        run: npx eslint src/ test/
+        run: npm run lint
