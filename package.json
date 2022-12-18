@@ -39,8 +39,16 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-terser": "^0.1.0",
-    "eslint": "^8.27.0",
+    "@types/d3-fetch": "^3.0.1",
+    "@types/d3-selection": "^3.0.3",
+    "@types/d3-transition": "^3.0.2",
+    "@types/jest": "^29.2.4",
+    "@types/lodash-es": "^4.17.6",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
+    "eslint": "^8.29.0",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-jest": "^27.1.5",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
@@ -51,14 +59,16 @@
     "rollup": "^3.2.5",
     "rollup-plugin-filesize": "^9.1.2",
     "rollup-plugin-scss": "^4.0.0",
-    "sass": "^1.56.1"
+    "sass": "^1.56.1",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.9.4"
   },
   "scripts": {
-    "format": "npx prettier-eslint --write \"src/**/*.js\" \"test/**/*.js\"",
+    "format": "npx prettier-eslint --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "npx eslint src/ test/",
-    "build": "rm -rf dist/* && rollup -c",
-    "dev": "rollup --config -w",
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest"
+    "build": "rm -rf dist/* && rm -rf dist-tsc/* && npx tsc && rollup -c",
+    "dev": "npx tsc -w & rollup --config -w",
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/"
   },
   "repository": {
     "type": "git",

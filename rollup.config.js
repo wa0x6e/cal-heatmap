@@ -24,7 +24,7 @@ const basePlugins = [
 
 export default [
   {
-    input: 'src/CalHeatmap.js',
+    input: 'build-tsc/CalHeatmap.js',
     output: [
       {
         file: `dist/${pkg.name}.js`,
@@ -35,7 +35,7 @@ export default [
     plugins: basePlugins,
   },
   {
-    input: 'src/CalHeatmap.js',
+    input: 'build-tsc/CalHeatmap.js',
     watch: false,
     output: [
       {
@@ -46,7 +46,7 @@ export default [
     plugins: basePlugins,
   },
   {
-    input: 'src/CalHeatmap.js',
+    input: 'build-tsc/CalHeatmap.js',
     watch: false,
     output: [
       {

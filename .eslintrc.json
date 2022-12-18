@@ -1,16 +1,23 @@
 {
-  "extends": ["airbnb-base", "plugin:jest/recommended"],
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:jest/recommended"
+  ],
   "env": {
     "browser": true
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 13
+    "ecmaVersion": 13,
+    "project": "./tsconfig.json"
   },
+  "parser": "@typescript-eslint/parser",
   "rules": {
     "no-prototype-builtins": "off",
     "operator-linebreak": ["error", "after"],
     "max-len": ["error", { "code": 80 }]
   },
-  "plugins": ["jest"]
+  "plugins": ["jest", "@typescript-eslint"],
+  "ignorePatterns": ["test/coverage/**/*.js"]
 }

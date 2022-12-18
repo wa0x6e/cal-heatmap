@@ -2,3 +2,4 @@
 /test/coverage/
 .DS_Store
 /dist/
+/build-tsc/
