@@ -292,7 +292,7 @@ export default class Options {
     return true;
   }
 
-  init(settings: any) {
+  init(settings: any): void {
     this.options = {
       // eslint-disable-next-line arrow-body-style
       ...mergeWith(this.options, settings, (objValue, srcValue) => {

@@ -19,7 +19,7 @@ export default class Navigator {
   loadNewDomains(
     newDomainCollection: DomainCollection,
     direction: ScrollDirection = ScrollDirection.SCROLL_FORWARD,
-  ): ScrollDirection | false {
+  ): ScrollDirection {
     const { options } = this.calendar.options;
     const templatesClt = this.calendar.templateCollection;
     const minDate = options.date.min ?
@@ -38,7 +38,7 @@ export default class Navigator {
         direction,
       )
     ) {
-      return false;
+      return ScrollDirection.SCROLL_NONE;
     }
 
     newDomainCollection
@@ -81,7 +81,7 @@ export default class Navigator {
     return direction;
   }
 
-  jumpTo(date: Date, reset: boolean) {
+  jumpTo(date: Date, reset: boolean): ScrollDirection {
     const { domainCollection } = this.calendar;
     const minDate = new Date(domainCollection.min!);
     const maxDate = new Date(domainCollection.max!);
@@ -111,7 +111,7 @@ export default class Navigator {
       );
     }
 
-    return false;
+    return ScrollDirection.SCROLL_NONE;
   }
 
   #isDomainBoundaryReached(

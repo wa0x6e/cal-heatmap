@@ -22,7 +22,7 @@ export default class TemplateCollection {
     return this.settings[domainType];
   }
 
-  has(domainType: string) {
+  has(domainType: string): boolean {
     return this.settings.hasOwnProperty(domainType);
   }
 

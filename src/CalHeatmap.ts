@@ -84,7 +84,7 @@ export default class CalHeatmap {
    * @param  {Object} settings Options
    * @return {boolean} True, unless there's an error
    */
-  init(settings: DeepPartial<OptionsType>) {
+  init(settings: DeepPartial<OptionsType>): boolean {
     this.options.init(settings);
 
     // Refresh the helpers with the correct options
@@ -196,7 +196,7 @@ export default class CalHeatmap {
     dataSource = this.options.options.data.source,
     dataProcessor = this.options.options.data.processor,
     updateMode: FillStrategy = FillStrategy.RESET_ALL_ON_UPDATE,
-  ) {
+  ): void {
     const { options } = this.options;
     const template = this.templateCollection;
     const endDate = this.helpers.DateHelper.intervals(
@@ -232,7 +232,7 @@ export default class CalHeatmap {
    * @param  {function} Callback function to execute on event trigger
    * @return void
    */
-  on(name: string, fn: () => any) {
+  on(name: string, fn: () => any): void {
     this.eventEmitter.on(name, fn);
   }
 
@@ -244,7 +244,7 @@ export default class CalHeatmap {
    * after destroying the calendar
    * @return void
    */
-  destroy(callback?: () => any) {
+  destroy(callback?: () => any): void {
     this.calendarPainter.destroy(callback);
   }
 

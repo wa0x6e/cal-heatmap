@@ -44,7 +44,7 @@ export default class Tooltip {
     this.popperInstance = null;
   }
 
-  init() {
+  init(): void {
     const { tooltip } = this.calendar.options.options;
 
     if (!tooltip) {
@@ -82,7 +82,7 @@ export default class Tooltip {
     });
   }
 
-  #show(e: any) {
+  #show(e: any): void {
     const title = e.getAttribute('aria-labelledby');
 
     if (!title) {
@@ -105,7 +105,7 @@ export default class Tooltip {
     this.root.setAttribute('data-show', true);
   }
 
-  #hide() {
+  #hide(): void {
     this.root.removeAttribute('data-show');
 
     this.popperInstance.setOptions(() => ({

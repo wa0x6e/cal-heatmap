@@ -42,7 +42,7 @@ export default class DomainCollection {
     }
   }
 
-  has(key: number) {
+  has(key: number): boolean {
     return this.collection.has(key);
   }
 
@@ -54,15 +54,15 @@ export default class DomainCollection {
     return this.collection.forEach(callback);
   }
 
-  at(index: number) {
+  at(index: number): number {
     return this.keys[index];
   }
 
-  keyIndex(d: number) {
+  keyIndex(d: number): number {
     return this.keys.indexOf(d);
   }
 
-  clamp(minDate: number, maxDate?: number) {
+  clamp(minDate: number, maxDate?: number): DomainCollection {
     if (minDate && this.min! < minDate) {
       this.keys
         .filter((key) => key < minDate)
@@ -84,7 +84,7 @@ export default class DomainCollection {
     newCollection: DomainCollection,
     limit: number,
     createValueCallback: Function,
-  ) {
+  ): void {
     this.yankedDomains = [];
 
     newCollection.keys.forEach((domainKey, index) => {
@@ -109,7 +109,7 @@ export default class DomainCollection {
     this.yankedDomains = this.yankedDomains.sort((a, b) => a - b);
   }
 
-  slice(limit: number = 0, fromBeginning: boolean = true) {
+  slice(limit: number = 0, fromBeginning: boolean = true): DomainCollection {
     if (this.keys.length > limit) {
       const keysToDelete = fromBeginning ?
         this.keys.slice(0, -limit) :
@@ -132,7 +132,7 @@ export default class DomainCollection {
     endDate: Date | number,
     domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
-  ) {
+  ): void {
     if (strategy === FillStrategy.RESET_ALL_ON_UPDATE) {
       this.#resetAllValues();
     }

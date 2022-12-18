@@ -13,7 +13,7 @@ export default class SubDomainPainter {
     this.root = null;
   }
 
-  paint(root: any) {
+  paint(root: any): void {
     this.root = root || this.root;
 
     const subDomainSvgGroup = this.root
@@ -38,7 +38,7 @@ export default class SubDomainPainter {
     } = this.calendar.options.options;
     const evt = this.calendar.eventEmitter;
 
-    return subDomainSvgGroup
+    subDomainSvgGroup
       .selectAll('g')
       .data((d: any) => this.calendar.domainCollection.get(d))
       .join(
@@ -79,7 +79,7 @@ export default class SubDomainPainter {
    * Set the subDomain group X and Y position
    * @param {d3-selection} selection A d3-selection object
    */
-  #setPositions(selection: any) {
+  #setPositions(selection: any): void {
     const { options } = this.calendar.options;
     const { padding } = options.domain;
     const { position } = options.label;
@@ -107,7 +107,7 @@ export default class SubDomainPainter {
    * @param  {number} timestamp Unix timestamp of the current subDomain
    * @return {String} the highlight class
    */
-  #classname(timestamp: number, ...otherClasses: any) {
+  #classname(timestamp: number, ...otherClasses: any): string {
     const { date, subDomain } = this.calendar.options.options;
     const { DateHelper } = this.calendar.helpers;
     let classname = '';
@@ -146,7 +146,7 @@ export default class SubDomainPainter {
         dateFmt.format(d.t, fmt, d.v, nodes[i]));
   }
 
-  #getCoordinates(axis: 'x' | 'y', d: any) {
+  #getCoordinates(axis: 'x' | 'y', d: any): number {
     const { subDomain } = this.calendar.options.options;
     return (
       d[axis] *
@@ -154,11 +154,11 @@ export default class SubDomainPainter {
     );
   }
 
-  #getX(d: any) {
+  #getX(d: any): number {
     return this.#getCoordinates('x', d);
   }
 
-  #getY(d: any) {
+  #getY(d: any): number {
     return this.#getCoordinates('y', d);
   }
 }

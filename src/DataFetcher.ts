@@ -47,7 +47,7 @@ export default class DataFetcher {
     source: DataOptions['source'],
     startTimestamp: number,
     endTimestamp: number,
-  ) {
+  ): Promise<unknown> {
     if (typeof source === 'string' && source.length > 0) {
       return this.#fetch(source, startTimestamp, endTimestamp);
     }
@@ -66,7 +66,7 @@ export default class DataFetcher {
     source: DataOptions['source'],
     startTimestamp: number,
     endTimestamp: number,
-  ) {
+  ): Promise<unknown> {
     const { type, requestInit } = this.options.options.data;
 
     const url = parseURI(source, startTimestamp, endTimestamp);

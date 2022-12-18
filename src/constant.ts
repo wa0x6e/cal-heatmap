@@ -5,7 +5,8 @@ export enum FillStrategy {
 }
 
 export enum ScrollDirection {
-  SCROLL_BACKWARD = 1,
+  SCROLL_NONE,
+  SCROLL_BACKWARD,
   SCROLL_FORWARD,
 }
 

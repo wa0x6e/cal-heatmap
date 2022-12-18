@@ -18,7 +18,7 @@ export default class DomainSecondaryLabel {
     };
   }
 
-  paint(root: any) {
+  paint(root: any): void {
     const { options } = this.calendar.options;
     const { width, height, gutter } = options.subDomain;
 

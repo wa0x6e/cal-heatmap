@@ -8,7 +8,7 @@ import Tooltip from '../tooltip/Tooltip';
 import LegendPainter from '../legend/LegendPainter';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { ScrollDirection } from '../constant';
+import { ScrollDirection } from '../constant';
 
 export default class CalendarPainter {
   calendar: CalHeatmap;
@@ -63,7 +63,7 @@ export default class CalendarPainter {
     return true;
   }
 
-  paint(navigationDir: ScrollDirection | false = false) {
+  paint(navigationDir: ScrollDirection = ScrollDirection.SCROLL_NONE) {
     this.domainSecondaryLabelPainter.paint(this.root);
     this.root
       .select('.graph')
@@ -101,7 +101,7 @@ export default class CalendarPainter {
     return domainsWidth + this.domainSecondaryLabelPainter.dimensions.width;
   }
 
-  resize() {
+  resize(): void {
     const { options } = this.calendar.options;
     const newWidth = this.#getWidth();
     const newHeight = this.#getHeight();
@@ -131,7 +131,7 @@ export default class CalendarPainter {
     };
   }
 
-  destroy(callback?: () => any) {
+  destroy(callback?: () => any): void {
     this.legendPainter.destroy();
     this.root
       .transition()

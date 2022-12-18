@@ -11,7 +11,7 @@ export default class DomainLabelPainter {
     this.calendar = calendar;
   }
 
-  paint(root: any) {
+  paint(root: any): void {
     const { options } = this.calendar.options;
     let format = options.domain.label;
     if (format === null || format === '') {
@@ -55,7 +55,7 @@ export default class DomainLabelPainter {
       );
   }
 
-  #textVerticalAlign() {
+  #textVerticalAlign(): string {
     const { options } = this.calendar.options;
 
     if (
@@ -75,7 +75,7 @@ export default class DomainLabelPainter {
     return 'hanging';
   }
 
-  #getX(d: any) {
+  #getX(d: any): number {
     const { options } = this.calendar.options;
 
     let x = options.domain.padding[Position.LEFT];
@@ -103,7 +103,7 @@ export default class DomainLabelPainter {
     return x + options.label.offset.x;
   }
 
-  #getY(d: any) {
+  #getY(d: any): number {
     const { options } = this.calendar.options;
 
     let y =
@@ -117,7 +117,7 @@ export default class DomainLabelPainter {
     return y + options.label.offset.y;
   }
 
-  #getDomainInsideWidth(d: number) {
+  #getDomainInsideWidth(d: number): number {
     const { options } = this.calendar.options;
     return (
       this.calendar.calendarPainter.domainPainter.coordinates.at(d)!
@@ -128,7 +128,7 @@ export default class DomainLabelPainter {
     );
   }
 
-  #getDomainInsideHeight(d: number) {
+  #getDomainInsideHeight(d: number): number {
     const { options } = this.calendar.options;
     return (
       this.calendar.calendarPainter.domainPainter.coordinates.at(d)!

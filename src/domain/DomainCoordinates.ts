@@ -24,7 +24,7 @@ export default class DomainCoordinates {
 
   collection: Map<number, SubDomainProperty>;
 
-  scrollDirection: ScrollDirection | false;
+  scrollDirection: ScrollDirection;
 
   constructor(calendar: CalHeatmap, domainPainter: DomainPainter) {
     this.calendar = calendar;
@@ -33,13 +33,13 @@ export default class DomainCoordinates {
     this.scrollDirection = ScrollDirection.SCROLL_FORWARD;
   }
 
-  at(domainKey: number) {
+  at(domainKey: number): SubDomainProperty | undefined {
     return this.collection.get(domainKey);
   }
 
   update(
     collection: DomainCollection,
-    scrollDirection: ScrollDirection | false,
+    scrollDirection: ScrollDirection,
   ) {
     const { verticalOrientation, domain } = this.calendar.options.options;
 
@@ -109,7 +109,7 @@ export default class DomainCoordinates {
    * including all padding and gutter
    * Used to compute the x position of the domains on the x axis
    */
-  #getWidth(d: number) {
+  #getWidth(d: number): number {
     const {
       domain, subDomain, x, verticalOrientation,
     } =
@@ -137,7 +137,7 @@ export default class DomainCoordinates {
    * including all paddings and gutter.
    * Used to compute the y position of the domains on the y axis
    */
-  #getHeight(d: number) {
+  #getHeight(d: number): number {
     const {
       domain, subDomain, x, verticalOrientation,
     } =
