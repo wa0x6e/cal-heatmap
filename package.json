@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-json": "^5.0.1",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-terser": "^0.1.0",
