@@ -1,7 +1,8 @@
 import type DateHelper from '../../helpers/DateHelper';
 import type { OptionsType, DomainOptions } from '../../options/Options';
+import type { Template, TemplateResult } from '../../index';
 
-const dayTemplate = (
+const dayTemplate: Template = (
   { DateHelper }: { DateHelper: DateHelper },
   {
     domain,
@@ -10,7 +11,7 @@ const dayTemplate = (
     domain: DomainOptions;
     verticalOrientation: OptionsType['verticalOrientation'];
   },
-) => {
+): TemplateResult => {
   const COLUMNS_COUNT = 7;
   const domainType = domain.type;
   const { dynamicDimension } = domain;

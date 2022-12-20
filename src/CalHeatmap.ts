@@ -16,6 +16,8 @@ import './cal-heatmap.scss';
 import TemplateCollection from './calendar/TemplateCollection';
 
 import type { OptionsType } from './options/Options';
+import type { Template } from './index';
+import type { Helpers } from './helpers/HelperFactory';
 
 import { FillStrategy, ScrollDirection } from './constant';
 
@@ -40,7 +42,7 @@ export default class CalHeatmap {
 
   templateCollection: TemplateCollection;
 
-  helpers: any;
+  helpers: Helpers;
 
   constructor() {
     // Default settings
@@ -124,7 +126,7 @@ export default class CalHeatmap {
    * A single, or an array of SubDomainTemplate object
    * @return void
    */
-  addTemplates(templates: any) {
+  addTemplates(templates: Template | Template[]) {
     this.templateCollection.add(templates);
   }
 
@@ -135,7 +137,7 @@ export default class CalHeatmap {
    */
   next(n: number = 1) {
     const loadDirection = this.navigator.loadNewDomains(
-      this.createDomainCollection(this.domainCollection.max!, n + 1).slice(n),
+      this.createDomainCollection(this.domainCollection.max, n + 1).slice(n),
       ScrollDirection.SCROLL_FORWARD,
     );
     const promise = this.calendarPainter.paint(loadDirection);
@@ -152,7 +154,7 @@ export default class CalHeatmap {
    */
   previous(n: number = 1) {
     const loadDirection = this.navigator.loadNewDomains(
-      this.createDomainCollection(this.domainCollection.min!, -n),
+      this.createDomainCollection(this.domainCollection.min, -n),
       ScrollDirection.SCROLL_BACKWARD,
     );
     const promise = this.calendarPainter.paint(loadDirection);
@@ -206,7 +208,7 @@ export default class CalHeatmap {
 
     const dataPromise = this.dataFetcher.getDatas(
       dataSource,
-      this.domainCollection.min!,
+      this.domainCollection.min,
       endDate,
     );
 
@@ -214,10 +216,10 @@ export default class CalHeatmap {
       this.domainCollection.fill(
         isFunction(dataProcessor) ? dataProcessor(data) : data,
         updateMode,
-        this.domainCollection.min!,
+        this.domainCollection.min,
         endDate,
-        template.at(options.domain.type).extractUnit,
-        template.at(options.subDomain.type).extractUnit,
+        template.get(options.domain.type)!.extractUnit,
+        template.get(options.subDomain.type)!.extractUnit,
       );
       this.populator.populate();
     });

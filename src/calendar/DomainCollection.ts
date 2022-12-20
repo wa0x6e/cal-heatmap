@@ -1,16 +1,14 @@
 import { castArray } from 'lodash-es';
 
 import { FillStrategy } from '../constant';
+import type { SubDomain } from '../index';
 
 export default class DomainCollection {
-  collection: Map<
-  number,
-  { t: number; x?: number; y?: number; v?: null | number }[]
-  >;
+  collection: Map<number, SubDomain[]>;
 
-  min?: number;
+  min: number;
 
-  max?: number;
+  max: number;
 
   keys: number[];
 
@@ -32,8 +30,8 @@ export default class DomainCollection {
       );
     }
 
-    this.min = undefined;
-    this.max = undefined;
+    this.min = 0;
+    this.max = 0;
     this.keys = [];
     this.yankedDomains = [];
 
@@ -62,7 +60,7 @@ export default class DomainCollection {
     return this.keys.indexOf(d);
   }
 
-  clamp(minDate: number, maxDate?: number): DomainCollection {
+  clamp(minDate?: number, maxDate?: number): DomainCollection {
     if (minDate && this.min! < minDate) {
       this.keys
         .filter((key) => key < minDate)

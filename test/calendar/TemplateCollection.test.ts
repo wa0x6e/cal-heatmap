@@ -1,6 +1,7 @@
 import TemplateCollection from '../../src/calendar/TemplateCollection';
 import DateHelper from '../../src/helpers/DateHelper';
 import Options from '../../src/options/Options';
+import type { TemplateResult } from '../../src/index';
 
 describe('TemplateCollection', () => {
   let t: TemplateCollection;
@@ -10,14 +11,12 @@ describe('TemplateCollection', () => {
 
   beforeEach(() => {
     t = new TemplateCollection(helpers, options);
-    t.settings = {
-      test_day: template,
-    };
+    t.settings.set('test_day', template as TemplateResult);
   });
 
   it('returns the settings from the specified domain', () => {
-    expect(t.at('test_day')).toEqual(template);
-    expect(t.at('nonexisting')).toEqual(undefined);
+    expect(t.get('test_day')).toEqual(template);
+    expect(t.get('nonexisting')).toEqual(undefined);
   });
 
   it('returns true if the specified domain exist', () => {
@@ -38,7 +37,7 @@ describe('TemplateCollection', () => {
     const name = 'test_year';
 
     expect(t.has(name)).toBe(false);
-    t.add(() => ({ name }));
+    t.add(() => ({ name } as TemplateResult));
     expect(t.has(name)).toBe(true);
   });
 
@@ -46,16 +45,19 @@ describe('TemplateCollection', () => {
     const name = 'test_year';
     const nameB = 'test_year2';
 
-    expect(t.settings).toEqual({
-      test_day: template,
-    });
-    t.add([() => ({ name }), () => ({ name: nameB })]);
+    expect(Array.from(t.settings.entries())).toEqual([
+      ['test_day', template],
+    ]);
+    t.add([
+      () => ({ name } as TemplateResult),
+      () => ({ name: nameB } as TemplateResult),
+    ]);
 
-    expect(t.settings).toEqual({
-      test_day: template,
-      test_year: { name },
-      test_year2: { name: nameB },
-    });
+    expect(Array.from(t.settings.entries())).toEqual([
+      ['test_day', template],
+      ['test_year', { name }],
+      ['test_year2', { name: nameB }],
+    ]);
   });
 
   it('keeps the existing templates', () => {
@@ -64,9 +66,12 @@ describe('TemplateCollection', () => {
 
     t.init();
 
-    const count = Object.keys(t.settings).length;
-    t.add([() => ({ name }), () => ({ name: nameB })]);
+    const count = t.settings.size;
+    t.add([
+      () => ({ name } as TemplateResult),
+      () => ({ name: nameB } as TemplateResult),
+    ]);
 
-    expect(Object.keys(t.settings).length).toBe(count + 2);
+    expect(t.settings.size).toBe(count + 2);
   });
 });

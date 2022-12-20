@@ -90,7 +90,9 @@ export type OptionsType = {
 export default class Options {
   options: OptionsType;
 
-  preProcessors: any;
+  preProcessors: {
+    [key: string]: (value: any) => any;
+  };
 
   constructor(processors = OptionsPreProcessors) {
     this.preProcessors = processors;

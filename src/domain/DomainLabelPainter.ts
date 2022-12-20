@@ -19,7 +19,7 @@ export default class DomainLabelPainter {
     }
 
     if (typeof format === 'undefined') {
-      format = this.calendar.templateCollection.at(options.domain.type).format
+      format = this.calendar.templateCollection.get(options.domain.type)!.format
         .domainLabel;
     }
 
@@ -39,7 +39,7 @@ export default class DomainLabelPainter {
           .attr('dominant-baseline', () => this.#textVerticalAlign())
           .text((d: any, i: number, nodes: any[]) =>
           // eslint-disable-next-line implicit-arrow-linebreak
-            this.calendar.helpers.DateHelper.format(d, format, nodes[i]))
+            this.calendar.helpers.DateHelper.format(d, format!, nodes[i]))
           .call((s: any) => this.#domainRotate(s)),
         (update: any) => {
           update
@@ -49,7 +49,7 @@ export default class DomainLabelPainter {
             .attr('dominant-baseline', () => this.#textVerticalAlign())
             .text((d: any, i: number, nodes: any[]) =>
               // eslint-disable-next-line implicit-arrow-linebreak
-              this.calendar.helpers.DateHelper.format(d, format, nodes[i]))
+              this.calendar.helpers.DateHelper.format(d, format!, nodes[i]))
             .call((s: any) => this.#domainRotate(s));
         },
       );
@@ -120,7 +120,7 @@ export default class DomainLabelPainter {
   #getDomainInsideWidth(d: number): number {
     const { options } = this.calendar.options;
     return (
-      this.calendar.calendarPainter.domainPainter.coordinates.at(d)!
+      this.calendar.calendarPainter.domainPainter.coordinates.get(d)!
         .inner_width -
       options.x.domainHorizontalLabelWidth -
       options.domain.padding[Position.RIGHT] -
@@ -131,7 +131,7 @@ export default class DomainLabelPainter {
   #getDomainInsideHeight(d: number): number {
     const { options } = this.calendar.options;
     return (
-      this.calendar.calendarPainter.domainPainter.coordinates.at(d)!
+      this.calendar.calendarPainter.domainPainter.coordinates.get(d)!
         .inner_height -
       options.x.domainVerticalLabelHeight -
       options.domain.padding[Position.TOP] -

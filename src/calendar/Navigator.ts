@@ -23,11 +23,11 @@ export default class Navigator {
     const { options } = this.calendar.options;
     const templatesClt = this.calendar.templateCollection;
     const minDate = options.date.min ?
-      templatesClt.at(options.domain.type).extractUnit(options.date.min) :
-      null;
+      templatesClt.get(options.domain.type)!.extractUnit(+options.date.min) :
+      undefined;
     const maxDate = options.date.max ?
-      templatesClt.at(options.domain.type).extractUnit(options.date.max) :
-      null;
+      templatesClt.get(options.domain.type)!.extractUnit(+options.date.max) :
+      undefined;
     const { domainCollection } = this.calendar;
 
     if (
@@ -60,14 +60,14 @@ export default class Navigator {
           ).pop();
         }
         return templatesClt
-          .at(options.subDomain.type)
-          .mapping(domainKey, subDomainEndDate - 1000, { v: null });
+          .get(options.subDomain.type)!
+          .mapping(domainKey, subDomainEndDate! - 1000, { v: null });
       },
     );
 
     this.#setDomainsBoundaryReached(
-      domainCollection.min!,
-      domainCollection.max!,
+      domainCollection.min,
+      domainCollection.max,
       minDate,
       maxDate,
     );
@@ -82,7 +82,7 @@ export default class Navigator {
   }
 
   jumpTo(date: Date, reset: boolean): ScrollDirection {
-    const { domainCollection } = this.calendar;
+    const { domainCollection, options } = this.calendar;
     const minDate = new Date(domainCollection.min!);
     const maxDate = new Date(domainCollection.max!);
 
@@ -94,10 +94,7 @@ export default class Navigator {
     }
     if (reset) {
       return this.loadNewDomains(
-        this.calendar.createDomainCollection(
-          date,
-          this.calendar.options.options.range,
-        ),
+        this.calendar.createDomainCollection(date, options.options.range),
         minDate < date ?
           ScrollDirection.SCROLL_FORWARD :
           ScrollDirection.SCROLL_BACKWARD,
@@ -116,9 +113,9 @@ export default class Navigator {
 
   #isDomainBoundaryReached(
     newDomainCollection: DomainCollection,
-    minDate: number | null,
-    maxDate: number | null,
-    direction: ScrollDirection,
+    minDate?: number,
+    maxDate?: number,
+    direction?: ScrollDirection,
   ): boolean {
     if (
       maxDate &&
@@ -144,25 +141,21 @@ export default class Navigator {
   #setDomainsBoundaryReached(
     lowerBound: number,
     upperBound: number,
-    min: number | null,
-    max: number | null,
+    min?: number,
+    max?: number,
   ): void {
     if (min) {
       const reached = lowerBound <= min;
-      if (reached) {
-        this.calendar.eventEmitter.emit('minDateReached');
-      } else {
-        this.calendar.eventEmitter.emit('minDateNotReached');
-      }
+      this.calendar.eventEmitter.emit(
+        reached ? 'minDateReached' : 'minDateNotReached',
+      );
       this.minDomainReached = reached;
     }
     if (max) {
       const reached = upperBound >= max;
-      if (reached) {
-        this.calendar.eventEmitter.emit('maxDateReached');
-      } else {
-        this.calendar.eventEmitter.emit('maxDateNotReached');
-      }
+      this.calendar.eventEmitter.emit(
+        reached ? 'maxDateReached' : 'maxDateNotReached',
+      );
       this.maxDomainReached = reached;
     }
   }

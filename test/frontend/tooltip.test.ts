@@ -26,7 +26,7 @@ describe('Tooltip', () => {
         target: select('.graph-rect').node(),
       });
 
-      expect(select('#ch-tooltip').attr('data-show')).toBe('true');
+      expect(select('#ch-tooltip').attr('data-show')).toBe('1');
       expect(select('#ch-tooltip-body').html()).not.toBeNull();
     });
 

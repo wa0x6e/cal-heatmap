@@ -40,7 +40,7 @@ export default class DateHelper {
 
   format(
     timestamp: number,
-    formatter: string | Function,
+    formatter: null | string | Function,
     ...args: any
   ): string | null {
     if (typeof formatter === 'function') {

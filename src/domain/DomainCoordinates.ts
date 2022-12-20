@@ -3,12 +3,9 @@ import { ScrollDirection, Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
 import type DomainPainter from './DomainPainter';
 import type DomainCollection from '../calendar/DomainCollection';
+import type { SubDomain } from '../index';
 
-type SubDomainProperty = {
-  t: number;
-  v: number;
-  x: number;
-  y: number;
+type SubDomainWithCoordinates = Required<SubDomain> & {
   pre_x: number;
   pre_y: number;
   width: number;
@@ -22,7 +19,7 @@ export default class DomainCoordinates {
 
   domainPainter: DomainPainter;
 
-  collection: Map<number, SubDomainProperty>;
+  collection: Map<number, SubDomainWithCoordinates>;
 
   scrollDirection: ScrollDirection;
 
@@ -33,7 +30,7 @@ export default class DomainCoordinates {
     this.scrollDirection = ScrollDirection.SCROLL_FORWARD;
   }
 
-  at(domainKey: number): SubDomainProperty | undefined {
+  get(domainKey: number): SubDomainWithCoordinates | undefined {
     return this.collection.get(domainKey);
   }
 
@@ -112,7 +109,7 @@ export default class DomainCoordinates {
     } =
       this.calendar.options.options;
     const columnsCount = this.calendar.templateCollection
-      .at(subDomain.type)
+      .get(subDomain.type)!
       .columnsCount(d);
 
     const subDomainWidth =
@@ -140,7 +137,7 @@ export default class DomainCoordinates {
     } =
       this.calendar.options.options;
     const rowsCount = this.calendar.templateCollection
-      .at(subDomain.type)
+      .get(subDomain.type)!
       .rowsCount(d);
 
     const subDomainHeight =

@@ -21,8 +21,8 @@ export default function validate(
     data: Partial<DataOptions>;
   },
 ): boolean {
-  const domainType = <string>domain.type;
-  const subDomainType = <string>subDomain.type;
+  const domainType = domain.type as string;
+  const subDomainType = subDomain.type as string;
 
   if (!templateCollection.has(domainType)) {
     throw new Error(`'${domainType}' is not a valid domain type'`);
@@ -33,8 +33,8 @@ export default function validate(
   }
 
   if (
-    templateCollection.at(domainType).level <=
-    templateCollection.at(subDomainType).level
+    templateCollection.get(domainType)!.level <=
+    templateCollection.get(subDomainType)!.level
   ) {
     throw new Error(
       `'${subDomainType}' is not a valid subDomain to '${domainType}'`,

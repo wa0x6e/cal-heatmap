@@ -21,8 +21,7 @@ const quarterTemplate = ({ DateHelper }: { DateHelper: DateHelper }) => ({
     ),
 
   format: {
-    date: 'Q',
-    legend: 'Q',
+    domainLabel: 'Q',
   },
   extractUnit(ts: number) {
     return DateHelper.date(ts).startOf('quarter').valueOf();

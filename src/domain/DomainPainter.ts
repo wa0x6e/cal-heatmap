@@ -1,8 +1,3 @@
-// // eslint-disable-next-line no-unused-vars
-// import { select, selectAll } from 'd3-selection';
-// // eslint-disable-next-line no-unused-vars
-// import { transition } from 'd3-transition';
-
 import DomainCoordinates from './DomainCoordinates';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -54,46 +49,46 @@ export default class DomainPainter {
       .join(
         (enter: any) => enter
           .append('svg')
-          .attr('x', (d: any) => coor.at(d)!.pre_x)
-          .attr('y', (d: any) => coor.at(d)!.pre_y)
-          .attr('width', (d: any) => coor.at(d)!.inner_width)
-          .attr('height', (d: any) => coor.at(d)!.inner_height)
+          .attr('x', (d: any) => coor.get(d)!.pre_x)
+          .attr('y', (d: any) => coor.get(d)!.pre_y)
+          .attr('width', (d: any) => coor.get(d)!.inner_width)
+          .attr('height', (d: any) => coor.get(d)!.inner_height)
           .attr('class', (d: any) => this.#getClassName(d))
           .call((enterSelection: any) => enterSelection
             .append('rect')
-            .attr('width', (d: any) => coor.at(d)!.inner_width)
-            .attr('height', (d: any) => coor.at(d)!.inner_height)
+            .attr('width', (d: any) => coor.get(d)!.inner_width)
+            .attr('height', (d: any) => coor.get(d)!.inner_height)
             .attr('class', 'domain-background'))
           .call((enterSelection: any) => promises.push(
             enterSelection
               .transition(t)
-              .attr('x', (d: any) => coor.at(d)!.x)
-              .attr('y', (d: any) => coor.at(d)!.y)
+              .attr('x', (d: any) => coor.get(d)!.x)
+              .attr('y', (d: any) => coor.get(d)!.y)
               .end(),
           )),
         (update: any) => update
           .call((updateSelection: any) => promises.push(
             updateSelection
               .transition(t)
-              .attr('x', (d: any) => coor.at(d)!.x)
-              .attr('y', (d: any) => coor.at(d)!.y)
-              .attr('width', (d: any) => coor.at(d)!.inner_width)
-              .attr('height', (d: any) => coor.at(d)!.inner_height)
+              .attr('x', (d: any) => coor.get(d)!.x)
+              .attr('y', (d: any) => coor.get(d)!.y)
+              .attr('width', (d: any) => coor.get(d)!.inner_width)
+              .attr('height', (d: any) => coor.get(d)!.inner_height)
               .end(),
           ))
           .call((updateSelection: any) => promises.push(
             updateSelection
               .selectAll('.domain-background')
               .transition(t)
-              .attr('width', (d: any) => coor.at(d)!.inner_width)
-              .attr('height', (d: any) => coor.at(d)!.inner_height)
+              .attr('width', (d: any) => coor.get(d)!.inner_width)
+              .attr('height', (d: any) => coor.get(d)!.inner_height)
               .end(),
           )),
         (exit: any) => exit.call((exitSelection: any) => promises.push(
           exitSelection
             .transition(t)
-            .attr('x', (d: any) => coor.at(d)!.x)
-            .attr('y', (d: any) => coor.at(d)!.y)
+            .attr('x', (d: any) => coor.get(d)!.x)
+            .attr('y', (d: any) => coor.get(d)!.y)
             .remove()
             .end(),
         )),

@@ -1,4 +1,5 @@
 import { createPopper } from '@popperjs/core';
+import type { VirtualElement } from '@popperjs/core';
 
 import type CalHeatmap from '../CalHeatmap';
 
@@ -19,9 +20,9 @@ const DEFAULT_POPPER_OPTIONS = {
 export default class Tooltip {
   calendar: CalHeatmap;
 
-  root: any;
+  root: HTMLElement | null;
 
-  virtualElement: any;
+  virtualElement: VirtualElement;
 
   popperInstance: any;
 
@@ -31,15 +32,19 @@ export default class Tooltip {
     this.calendar = calendar;
     this.root = null;
     this.virtualElement = {
-      getBoundingClientRect:
-        (x = 0, y = 0) => () => ({
+      getBoundingClientRect(x = 0, y = 0): DOMRect {
+        return {
           width: 0,
           height: 0,
           top: y,
           right: x,
           bottom: y,
           left: x,
-        }),
+          x,
+          y,
+          toJSON: () => {},
+        };
+      },
     };
     this.popperInstance = null;
   }
@@ -102,11 +107,11 @@ export default class Tooltip {
 
     this.popperInstance.update();
 
-    this.root.setAttribute('data-show', true);
+    this.root!.setAttribute('data-show', '1');
   }
 
   #hide(): void {
-    this.root.removeAttribute('data-show');
+    this.root!.removeAttribute('data-show');
 
     this.popperInstance.setOptions(() => ({
       ...this.popperOptions,

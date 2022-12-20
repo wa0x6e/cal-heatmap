@@ -1,10 +1,11 @@
 import type DateHelper from '../../helpers/DateHelper';
 import type { DomainOptions } from '../../options/Options';
+import type { Template, TemplateResult } from '../../index';
 
-const hourTemplate = (
+const hourTemplate: Template = (
   { DateHelper }: { DateHelper: DateHelper },
   { domain }: { domain: DomainOptions },
-) => {
+): TemplateResult => {
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
 

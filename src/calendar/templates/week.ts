@@ -1,10 +1,11 @@
 import type DateHelper from '../../helpers/DateHelper';
 import type { DomainOptions } from '../../options/Options';
+import type { Template, TemplateResult } from '../../index';
 
-const weekTemplate = (
+const weekTemplate: Template = (
   { DateHelper }: { DateHelper: DateHelper },
   { domain }: { domain: DomainOptions },
-) => {
+): TemplateResult => {
   const { dynamicDimension } = domain;
 
   function getTotalColNumber(ts: number) {
@@ -47,12 +48,6 @@ const weekTemplate = (
         y: 0,
         ...defaultValues,
       })),
-    position: {
-      x() {},
-      y() {
-        return 0;
-      },
-    },
     format: {
       domainLabel: 'wo [week] Y',
     },
