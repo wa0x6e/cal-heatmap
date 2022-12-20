@@ -20,8 +20,11 @@ describe('subDomainTitle', () => {
 
   it('formats the title with the user function', () => {
     const date = new Date(2000, 0, 5);
-    const data: any = {};
-    data[+date / 1000] = 10;
+    const data: any[] = [];
+    data.push({
+      time: +date / 1000,
+      value: 10,
+    });
 
     cal.on('fill', () => {
       expect(
@@ -49,8 +52,11 @@ describe('subDomainTitle', () => {
 
   it('formats the title with the default function', () => {
     const date = new Date(2000, 0, 5);
-    const data: any = {};
-    data[+date / 1000] = 10;
+    const data: any[] = [];
+    data.push({
+      time: +date / 1000,
+      value: 10,
+    });
 
     cal.on('fill', () => {
       expect(

@@ -1,5 +1,4 @@
 import EventEmmiter from 'eventemitter3';
-import { isFunction } from 'lodash-es';
 
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
@@ -19,7 +18,7 @@ import type { OptionsType } from './options/Options';
 import type { Template } from './index';
 import type { Helpers } from './helpers/HelperFactory';
 
-import { FillStrategy, ScrollDirection } from './constant';
+import { ScrollDirection } from './constant';
 
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
@@ -190,14 +189,8 @@ export default class CalHeatmap {
    *
    * @param  {object|string}    dataSource    The calendar's datasource,
    * same type as this.options.data.source
-   * @param  {function}    dataProcessor  The dataProcessor function to
-   * execute before processing your data
    */
-  fill(
-    dataSource = this.options.options.data.source,
-    dataProcessor = this.options.options.data.processor,
-    updateMode: FillStrategy = FillStrategy.RESET_ALL_ON_UPDATE,
-  ): void {
+  fill(dataSource = this.options.options.data.source): void {
     const { options } = this.options;
     const template = this.templateCollection;
     const endDate = this.helpers.DateHelper.intervals(
@@ -214,8 +207,8 @@ export default class CalHeatmap {
 
     dataPromise.then((data: any) => {
       this.domainCollection.fill(
-        isFunction(dataProcessor) ? dataProcessor(data) : data,
-        updateMode,
+        data,
+        options.data,
         this.domainCollection.min,
         endDate,
         template.get(options.domain.type)!.extractUnit,

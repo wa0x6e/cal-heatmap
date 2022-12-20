@@ -1,3 +1,4 @@
+import { isFunction } from 'lodash-es';
 import { select } from 'd3-selection';
 
 import DomainPainter from '../domain/DomainPainter';
@@ -140,7 +141,7 @@ export default class CalendarPainter {
       .attr('height', 0)
       .remove()
       .on('end.remove', () => {
-        if (typeof callback === 'function') {
+        if (isFunction(callback)) {
           callback();
         }
       });

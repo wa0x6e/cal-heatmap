@@ -1,7 +1,7 @@
-import { castArray } from 'lodash-es';
+import { castArray, isFunction, isString } from 'lodash-es';
 
-import { FillStrategy } from '../constant';
 import type { SubDomain } from '../index';
+import type { DataOptions } from '../options/Options';
 
 export default class DomainCollection {
   collection: Map<number, SubDomain[]>;
@@ -125,22 +125,23 @@ export default class DomainCollection {
 
   fill(
     data: any,
-    strategy: FillStrategy,
+    dataOptions: DataOptions,
     startDate: Date | number,
     endDate: Date | number,
     domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
   ): void {
-    if (strategy === FillStrategy.RESET_ALL_ON_UPDATE) {
-      this.#resetAllValues();
-    }
+    this.#resetAllValues();
 
-    Object.keys(data).forEach((date: any) => {
-      if (Number.isNaN(date)) {
+    data.forEach((datum: any) => {
+      let timestamp: number;
+      if (isFunction(dataOptions.x)) {
+        timestamp = dataOptions.x(datum);
+      } else if (isString(dataOptions.x) && dataOptions.x !== '') {
+        timestamp = datum[dataOptions.x];
+      } else {
         return;
       }
-
-      const timestamp = date * 1000;
 
       const domainKey = domainKeyExtractor(timestamp);
 
@@ -158,17 +159,20 @@ export default class DomainCollection {
         return;
       }
 
+      let value: number;
+      if (isFunction(dataOptions.y)) {
+        value = dataOptions.y(datum);
+      } else if (isString(dataOptions.y) && dataOptions.y !== '') {
+        value = datum[dataOptions.y];
+      } else {
+        return;
+      }
+
       const subDomainIndex = existingSubDomainsData
         .map((d: any) => d.t)
         .indexOf(subDomainKeyExtractor(timestamp));
 
-      if (strategy === FillStrategy.RESET_SINGLE_ON_UPDATE) {
-        existingSubDomainsData[subDomainIndex].v = data[date];
-      } else if (typeof existingSubDomainsData[subDomainIndex].v === 'number') {
-        existingSubDomainsData[subDomainIndex].v += data[date];
-      } else {
-        existingSubDomainsData[subDomainIndex].v = data[date];
-      }
+      existingSubDomainsData[subDomainIndex].v = value;
     });
   }
 

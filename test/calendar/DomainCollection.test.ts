@@ -2,7 +2,8 @@
 import { jest } from '@jest/globals';
 
 import DomainCollection from '../../src/calendar/DomainCollection';
-import { FillStrategy } from '../../src/constant';
+
+import type { DataOptions } from '../../src/options/Options';
 
 describe('DomainCollection', () => {
   let d: DomainCollection;
@@ -154,8 +155,11 @@ describe('DomainCollection', () => {
       h.keys = [1, 2];
 
       h.fill(
-        {},
-        FillStrategy.RESET_ALL_ON_UPDATE,
+        [],
+        {
+          x: '',
+          y: '',
+        } as DataOptions,
         0,
         0,
         () => {},

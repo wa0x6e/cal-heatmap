@@ -53,8 +53,11 @@ describe('subDomainlabel', () => {
 
   it('formats the label from a function', () => {
     const date = new Date(2020, 0, 1);
-    const data: any = {};
-    data[+date / 1000] = 10;
+    const data: any[] = [];
+    data.push({
+      time: +date / 1000,
+      value: 10,
+    });
 
     cal.on('fill', () => {
       const n = selectAll('.subdomain-text').nodes();

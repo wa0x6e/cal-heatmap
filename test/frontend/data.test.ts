@@ -19,9 +19,12 @@ describe('Data', () => {
   });
 
   it('populates from a JSON object', () => {
-    const data: any = {};
+    const data: any[] = [];
     const date = new Date(2000, 0, 1);
-    data[+date / 1000] = 10;
+    data.push({
+      time: +date / 1000,
+      value: 10,
+    });
 
     cal.on('fill', () => {
       expect(select('.graph-domain:nth-child(1) g text').html()).toBe('10');

@@ -1,3 +1,4 @@
+import { isString, isFunction } from 'lodash-es';
 import Moment from 'moment-timezone';
 import MomentRange from 'moment-range';
 
@@ -43,11 +44,11 @@ export default class DateHelper {
     formatter: null | string | Function,
     ...args: any
   ): string | null {
-    if (typeof formatter === 'function') {
+    if (isFunction(formatter)) {
       return formatter(timestamp, ...args);
     }
 
-    if (typeof formatter === 'string') {
+    if (isString(formatter)) {
       return this.date(timestamp).format(formatter);
     }
 

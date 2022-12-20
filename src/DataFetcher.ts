@@ -1,3 +1,5 @@
+import { isString } from 'lodash-es';
+
 import {
   json, csv, dsv, text,
 } from 'd3-fetch';
@@ -48,12 +50,12 @@ export default class DataFetcher {
     startTimestamp: number,
     endTimestamp: number,
   ): Promise<unknown> {
-    if (typeof source === 'string' && source.length > 0) {
+    if (isString(source) && source.length > 0) {
       return this.#fetch(source, startTimestamp, endTimestamp);
     }
 
-    let d = {};
-    if (typeof source === 'object' && source === Object(source)) {
+    let d: any[] = [];
+    if (Array.isArray(source)) {
       d = source;
     }
 
@@ -82,7 +84,7 @@ export default class DataFetcher {
         return text(url, requestInit);
       default:
         return new Promise((resolve) => {
-          resolve({});
+          resolve([]);
         });
     }
   }

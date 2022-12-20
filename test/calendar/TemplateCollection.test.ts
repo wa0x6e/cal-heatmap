@@ -45,9 +45,7 @@ describe('TemplateCollection', () => {
     const name = 'test_year';
     const nameB = 'test_year2';
 
-    expect(Array.from(t.settings.entries())).toEqual([
-      ['test_day', template],
-    ]);
+    expect(Array.from(t.settings.entries())).toEqual([['test_day', template]]);
     t.add([
       () => ({ name } as TemplateResult),
       () => ({ name: nameB } as TemplateResult),

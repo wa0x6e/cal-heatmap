@@ -38,7 +38,8 @@ export type DataOptions = {
   source: any;
   type: string;
   requestInit: object;
-  processor: (data: any) => object;
+  x: string;
+  y: string;
 };
 
 type LabelOptions = {
@@ -82,13 +83,17 @@ export type OptionsType = {
   tooltip: boolean | TooltipOptions;
   verticalOrientation: boolean;
   reversedDirection: boolean;
+};
+
+type InternalOptionsType = {
   x: {
     domainHorizontalLabelWidth: number;
     domainVerticalLabelHeight: number;
   };
 };
+
 export default class Options {
-  options: OptionsType;
+  options: OptionsType & InternalOptionsType;
 
   preProcessors: {
     [key: string]: (value: any) => any;
@@ -206,14 +211,11 @@ export default class Options {
 
         requestInit: {},
 
-        // Callback after fetching the datas,
-        // but before applying them to the calendar
-        // Used mainly to convert the datas if they're not formatted
-        // like expected
-        // Takes the fetched "data" object as argument,
-        // must return a json object
-        // formatted like {timestamp:count, timestamp2:count2},
-        processor: (data) => data,
+        // keyname of the time property
+        x: '',
+
+        // keyname of the value property
+        y: '',
       },
       // Domain Label properties
       label: {
