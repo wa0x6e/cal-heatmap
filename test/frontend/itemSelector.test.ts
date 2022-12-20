@@ -19,20 +19,20 @@ describe('itemSelector', () => {
   });
 
   it('renders the calendar inside the default itemSelector', () => {
-    cal.init({});
+    cal.paint({});
     expect(select('#cal-heatmap .cal-heatmap-container').node()).not.toBeNull();
   });
 
   it('renders nothing when the itemSelector is not valid', () => {
     const html = select('body').html();
 
-    cal.init({ itemSelector: '.not-existing' });
+    cal.paint({ itemSelector: '.not-existing' });
     expect(select('body').html()).toBe(html);
   });
 
   it('renders the calendar inside the empty given itemSelector', () => {
     select('body').append('div').attr('class', 'test-selector');
-    cal.init({ itemSelector: '.test-selector' });
+    cal.paint({ itemSelector: '.test-selector' });
 
     expect(select('#cal-heatmap .cal-heatmap-container').node()).toBeNull();
     expect(
@@ -47,7 +47,7 @@ describe('itemSelector', () => {
       .attr('class', 'test-selector')
       .append('span')
       .html(content);
-    cal.init({ itemSelector: '.test-selector' });
+    cal.paint({ itemSelector: '.test-selector' });
 
     expect(select('#cal-heatmap .cal-heatmap-container').node()).toBeNull();
     expect(

@@ -19,14 +19,14 @@ describe('subDomainlabel', () => {
   });
 
   it('do not show the label', () => {
-    cal.init({ subDomain: { label: null } });
+    cal.paint({ subDomain: { label: null } });
 
     const n = selectAll('.subdomain-text').nodes();
 
     expect(n.length).toBe(0);
   });
   it('shows the label', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { type: 'year' },
       subDomain: { type: 'month', label: '-' },
@@ -38,7 +38,7 @@ describe('subDomainlabel', () => {
   });
 
   it('formats the label from a string', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: new Date(2020, 0, 1) },
       domain: { type: 'year' },
@@ -63,7 +63,7 @@ describe('subDomainlabel', () => {
       expect(select(n[11]).html()).toBe('11-null');
     });
 
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: date },
       data: { source: data },

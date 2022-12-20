@@ -19,25 +19,25 @@ describe('Legend', () => {
   });
 
   it('renders the legend after the calendar', () => {
-    cal.init({ legend: { show: true } });
+    cal.paint({ legend: { show: true } });
     expect(select('#cal-heatmap .graph-legend')).not.toBeNull();
   });
 
   it('renders the legend in the itemSelector', () => {
     select('body').append('div').attr('id', 'legend');
-    cal.init({ legend: { show: true, itemSelector: '#legend' } });
+    cal.paint({ legend: { show: true, itemSelector: '#legend' } });
     expect(select('#cal-heatmap .graph-legend').node()).toBeNull();
     expect(select('#legend svg').node()).not.toBeNull();
   });
 
   it('does not render the legend', () => {
-    cal.init({ legend: { show: false } });
+    cal.paint({ legend: { show: false } });
     expect(select('.graph-legend').node()).toBeNull();
   });
 
   it('adds a title to the legend', () => {
     select('body').append('div').attr('id', 'legend');
-    cal.init({
+    cal.paint({
       legend: { show: true, label: 'Test', itemSelector: '#legend' },
     });
 
@@ -47,7 +47,7 @@ describe('Legend', () => {
   it('paints the subDomain with the colors', () => {
     select('body').append('div').attr('id', 'legend');
     const range = ['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494'];
-    cal.init({
+    cal.paint({
       legend: { show: true, itemSelector: '#legend' },
       scale: {
         as: 'color',

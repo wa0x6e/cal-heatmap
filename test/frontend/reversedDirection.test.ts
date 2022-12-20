@@ -12,7 +12,7 @@ describe('on non reversed direction', () => {
     cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
-    cal.init({
+    cal.paint({
       range: 12,
       date: {
         start: new Date(2020, 0, 1, 0, 0, 0),
@@ -48,7 +48,7 @@ describe('on reversed direction', () => {
     cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
-    cal.init({
+    cal.paint({
       range: 12,
       reversedDirection: true,
       date: {

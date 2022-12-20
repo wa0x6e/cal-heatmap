@@ -83,7 +83,7 @@ export default class CalHeatmap {
    * @param  {Object} settings Options
    * @return {boolean} True, unless there's an error
    */
-  init(settings: DeepPartial<OptionsType>): boolean {
+  paint(settings: DeepPartial<OptionsType>): boolean {
     this.options.init(settings);
 
     // Refresh the helpers with the correct options

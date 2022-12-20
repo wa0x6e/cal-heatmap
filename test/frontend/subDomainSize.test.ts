@@ -16,7 +16,7 @@ import CalHeatmap from '../../src/CalHeatmap';
       cal = new CalHeatmap();
       select('body').append('div').attr('id', 'cal-heatmap');
 
-      cal.init({
+      cal.paint({
         range: 2,
         domain: { type: 'year' },
         subDomain: {

@@ -12,7 +12,7 @@ describe('on horizontal orientation', () => {
     cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
-    cal.init({
+    cal.paint({
       range: 5,
     });
   });
@@ -41,7 +41,7 @@ describe('on vertical orientation', () => {
     cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
 
-    cal.init({
+    cal.paint({
       range: 5,
       verticalOrientation: true,
     });

@@ -35,10 +35,7 @@ export default class DomainPainter {
     };
   }
 
-  paint(
-    scrollDirection: ScrollDirection,
-    calendarNode: any,
-  ): Promise<void>[] {
+  paint(scrollDirection: ScrollDirection, calendarNode: any): Promise<void>[] {
     const { animationDuration } = this.calendar.options.options;
     const t = calendarNode.transition().duration(animationDuration);
     const coor = this.coordinates;

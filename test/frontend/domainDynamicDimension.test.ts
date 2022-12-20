@@ -20,7 +20,7 @@ describe('domain.dynamicDimension', () => {
   });
 
   it('renders domains with same size when disabled', () => {
-    cal.init({
+    cal.paint({
       range: 5,
       domain: { type: 'month', dynamicDimension: false },
       subDomain: { type: 'day', gutter: 0, width: 10 },
@@ -39,7 +39,7 @@ describe('domain.dynamicDimension', () => {
   });
 
   it('renders domains with different width when enabled', () => {
-    cal.init({
+    cal.paint({
       range: 5,
       domain: { type: 'month', dynamicDimension: true },
       subDomain: { type: 'day', gutter: 0 },

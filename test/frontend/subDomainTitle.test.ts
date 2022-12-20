@@ -32,7 +32,7 @@ describe('subDomainTitle', () => {
       ).toBe('2000-null');
     });
 
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: date },
       data: { source: data },
@@ -61,7 +61,7 @@ describe('subDomainTitle', () => {
       ).toBe(`null - ${new Date(2000, 11, 1).toISOString()}`);
     });
 
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: date },
       data: { source: data },

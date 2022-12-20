@@ -24,7 +24,7 @@ describe('SubDomainTemplate', () => {
     const date = new Date(2020, 3, 5, 3, 6);
 
     cal.addTemplates(quarterTemplate);
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: date },
       domain: { type: 'year' },

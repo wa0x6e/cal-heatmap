@@ -23,7 +23,7 @@ describe('on horizontal scroll', () => {
       it('renders the given domain gutter', () => {
         const baseWidth = 120;
 
-        cal.init({
+        cal.paint({
           range: 2,
           domain: { type: 'year', gutter, label: null },
           subDomain: { type: 'month', gutter: 0, width: 10 },
@@ -60,7 +60,7 @@ describe('on horizontal scroll', () => {
       it('does not affect the domain height', () => {
         const baseHeight = 10;
 
-        cal.init({
+        cal.paint({
           range: 2,
           domain: { type: 'year', gutter, label: null },
           subDomain: { type: 'month', gutter: 0, width: 10 },
@@ -111,7 +111,7 @@ describe('on vertical scroll', () => {
       it('renders the given domain gutter', () => {
         const baseHeight = 10;
 
-        cal.init({
+        cal.paint({
           range: 2,
           verticalOrientation: true,
           domain: { type: 'year', gutter, label: null },
@@ -138,7 +138,7 @@ describe('on vertical scroll', () => {
       it('does not affect the domain width', () => {
         const baseWidth = 120;
 
-        cal.init({
+        cal.paint({
           range: 2,
           verticalOrientation: true,
           domain: { type: 'year', gutter, label: null },

@@ -37,10 +37,7 @@ export default class DomainCoordinates {
     return this.collection.get(domainKey);
   }
 
-  update(
-    collection: DomainCollection,
-    scrollDirection: ScrollDirection,
-  ) {
+  update(collection: DomainCollection, scrollDirection: ScrollDirection) {
     const { verticalOrientation, domain } = this.calendar.options.options;
 
     this.scrollDirection = scrollDirection;

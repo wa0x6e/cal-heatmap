@@ -13,7 +13,7 @@ import CalHeatmap from '../../src/CalHeatmap';
       cal = new CalHeatmap();
       select('body').append('div').attr('id', 'cal-heatmap');
 
-      cal.init({
+      cal.paint({
         range: 1,
         domain: { type: 'hour' },
         subDomain: {

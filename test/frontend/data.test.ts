@@ -27,7 +27,7 @@ describe('Data', () => {
       expect(select('.graph-domain:nth-child(1) g text').html()).toBe('10');
     });
 
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: date },
       data: { source: data },

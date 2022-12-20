@@ -20,7 +20,7 @@ describe('domainlabel', () => {
 
   [null, ''].forEach((formatter) => {
     it('does not render a label when formatter is disabled', () => {
-      cal.init({
+      cal.paint({
         range: 1,
         domain: { type: 'year', label: formatter },
         subDomain: { type: 'month' },
@@ -31,7 +31,7 @@ describe('domainlabel', () => {
   });
 
   it('renders the default label when formatter is undefined', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { type: 'month', label: undefined },
       subDomain: { type: 'week' },
@@ -42,7 +42,7 @@ describe('domainlabel', () => {
   });
 
   it('renders the return value of the given function', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { type: 'month', label: (ts) => `${new Date(ts).getMonth()};` },
       subDomain: { type: 'week' },
@@ -53,7 +53,7 @@ describe('domainlabel', () => {
   });
 
   it('renders the format output of the given string format', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { type: 'month', label: 'MMM' },
       subDomain: { type: 'week' },

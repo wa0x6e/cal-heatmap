@@ -11,7 +11,7 @@ describe('navigation', () => {
   beforeEach(() => {
     cal = new CalHeatmap();
     select('body').append('div').attr('id', 'cal-heatmap');
-    cal.init({
+    cal.paint({
       range: 2,
       domain: { type: 'year' },
       subDomain: { type: 'month' },
@@ -99,7 +99,7 @@ describe('navigation', () => {
   });
 
   it('can not scroll past the minDate', async () => {
-    cal.init({ date: { min: new Date(2015, 0, 1) } });
+    cal.paint({ date: { min: new Date(2015, 0, 1) } });
     expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
       'y_2020',
     );
@@ -118,7 +118,7 @@ describe('navigation', () => {
   });
 
   it('can not scroll past the maxDate', async () => {
-    cal.init({ date: { max: new Date(2025, 0, 1) } });
+    cal.paint({ date: { max: new Date(2025, 0, 1) } });
     expect(select('.graph-domain:nth-child(1)').attr('class')).toContain(
       'y_2020',
     );

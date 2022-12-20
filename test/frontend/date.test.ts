@@ -21,7 +21,7 @@ describe('Date', () => {
   it('start the calendar with the given date', () => {
     const startDate = new Date(2020, 6, 15, 2, 6);
 
-    cal.init({
+    cal.paint({
       domain: { type: 'month' },
       subDomain: {
         type: 'day',
@@ -38,7 +38,7 @@ describe('Date', () => {
   it.todo('set the calendar timezone');
 
   it('set the calendar locale', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       date: { start: new Date(2020, 0, 15), locale: 'fr' },
       domain: { type: 'month' },
@@ -51,7 +51,7 @@ describe('Date', () => {
     const startDate = new Date(2020, 6, 15, 2, 6);
     const highlight = [startDate, new Date(2020, 6, 25, 6, 25)];
 
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { type: 'month' },
       subDomain: { type: 'day' },

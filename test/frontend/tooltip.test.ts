@@ -30,14 +30,14 @@ describe('Tooltip', () => {
       expect(select('#ch-tooltip-body').html()).not.toBeNull();
     });
 
-    cal.init({ tooltip: true });
+    cal.paint({ tooltip: true });
     expect(select('#ch-tooltip').node()).not.toBeNull();
   });
 
   it('disables the tooltip', () => {
     expect(select('#ch-tooltip').node()).toBeNull();
 
-    cal.init({ tooltip: false });
+    cal.paint({ tooltip: false });
 
     expect(select('#ch-tooltip').node()).toBeNull();
   });

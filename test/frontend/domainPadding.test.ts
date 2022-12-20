@@ -19,7 +19,7 @@ describe('Domain padding', () => {
   });
 
   it('adds padding to the top', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { padding: [10, 0, 0, 0] },
       subDomain: { gutter: 0, width: 10, height: 10 },
@@ -34,7 +34,7 @@ describe('Domain padding', () => {
     expect(select('.graph-domain').attr('height')).toBe('135');
   });
   it('adds padding to the right', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { padding: [0, 10, 0, 0] },
       subDomain: { gutter: 0, width: 10, height: 10 },
@@ -48,7 +48,7 @@ describe('Domain padding', () => {
     expect(select('.graph-domain').attr('height')).toBe('125');
   });
   it('adds padding to the bottom', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { padding: [0, 0, 10, 0] },
       subDomain: { gutter: 0, width: 10, height: 10 },
@@ -64,7 +64,7 @@ describe('Domain padding', () => {
     expect(select('.graph-domain').attr('height')).toBe('135');
   });
   it('adds padding to the left', () => {
-    cal.init({
+    cal.paint({
       range: 1,
       domain: { padding: [0, 0, 0, 10] },
       subDomain: { gutter: 0, width: 10, height: 10 },
