@@ -193,6 +193,7 @@ export default {
 
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '\\.(scss)$': '<rootDir>/test/jest/__mocks__/styleMock.ts',
   },
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
