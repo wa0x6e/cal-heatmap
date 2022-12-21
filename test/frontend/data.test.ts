@@ -22,7 +22,7 @@ describe('Data', () => {
     const data: any[] = [];
     const date = new Date(2000, 0, 1);
     data.push({
-      time: +date / 1000,
+      time: +date,
       value: 10,
     });
 
@@ -33,7 +33,7 @@ describe('Data', () => {
     cal.paint({
       range: 1,
       date: { start: date },
-      data: { source: data },
+      data: { source: data, x: 'time', y: 'value' },
       domain: { type: 'year' },
       subDomain: {
         type: 'month',

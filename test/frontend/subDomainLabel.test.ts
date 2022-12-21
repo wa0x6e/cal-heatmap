@@ -55,7 +55,7 @@ describe('subDomainlabel', () => {
     const date = new Date(2020, 0, 1);
     const data: any[] = [];
     data.push({
-      time: +date / 1000,
+      time: +date,
       value: 10,
     });
 
@@ -69,7 +69,7 @@ describe('subDomainlabel', () => {
     cal.paint({
       range: 1,
       date: { start: date },
-      data: { source: data },
+      data: { source: data, x: 'time', y: 'value' },
       domain: { type: 'year' },
       subDomain: {
         type: 'month',

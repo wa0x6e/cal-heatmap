@@ -1,10 +1,16 @@
-import { castArray, isFunction, isString } from 'lodash-es';
+import { castArray, isString, isFunction } from 'lodash-es';
+import {
+  group, sum, count, min, max, median,
+} from 'd3-array';
 
 import type { SubDomain } from '../index';
 import type { DataOptions } from '../options/Options';
+import type { Helpers } from '../helpers/HelperFactory';
 
 export default class DomainCollection {
   collection: Map<number, SubDomain[]>;
+
+  helpers: any;
 
   min: number;
 
@@ -15,18 +21,19 @@ export default class DomainCollection {
   yankedDomains: number[];
 
   constructor(
-    { DateHelper }: { DateHelper: any },
+    helpers: Helpers,
     interval?: string,
     start?: Date | number,
     range?: Date | number,
   ) {
     this.collection = new Map();
+    this.helpers = helpers;
 
     if (interval && start && range) {
       this.collection = new Map(
-        DateHelper.intervals(interval, start, range).map((d: number) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          castArray(d)),
+        this.helpers.DateHelper.intervals(interval, start, range).map(
+          (d: number) => castArray(d),
+        ),
       );
     }
 
@@ -54,10 +61,6 @@ export default class DomainCollection {
 
   at(index: number): number {
     return this.keys[index];
-  }
-
-  keyIndex(d: number): number {
-    return this.keys.indexOf(d);
   }
 
   clamp(minDate?: number, maxDate?: number): DomainCollection {
@@ -124,64 +127,100 @@ export default class DomainCollection {
   }
 
   fill(
-    data: any,
-    dataOptions: DataOptions,
+    data: any[],
+    {
+      x,
+      y,
+      groupY,
+    }: {
+      x: DataOptions['x'];
+      y: DataOptions['y'];
+      groupY: DataOptions['groupY'];
+    },
     startDate: Date | number,
     endDate: Date | number,
     domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
   ): void {
-    this.#resetAllValues();
+    const cleanedData: Map<number, Map<number, any[]>> = group(
+      data,
+      (d): number => this.#extractTimestamp(d, x, domainKeyExtractor),
+      (d): number => this.#extractTimestamp(d, x, subDomainKeyExtractor),
+    );
 
-    data.forEach((datum: any) => {
-      let timestamp: number;
-      if (isFunction(dataOptions.x)) {
-        timestamp = dataOptions.x(datum);
-      } else if (isString(dataOptions.x) && dataOptions.x !== '') {
-        timestamp = datum[dataOptions.x];
-      } else {
-        return;
-      }
+    this.keys.forEach((domainKey) => {
+      this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
+        let value: number | null = null;
 
-      const domainKey = domainKeyExtractor(timestamp);
+        if (
+          cleanedData.has(domainKey) &&
+          cleanedData.get(domainKey)!.has(subDomain.t)
+        ) {
+          value = this.#groupValues(
+            this.#extractValues(
+              cleanedData.get(domainKey)!.get(subDomain.t)!,
+              y,
+            ),
+            groupY,
+          );
+        }
 
-      // Skip if data is not relevant to current domain
-      if (
-        !this.has(domainKey) ||
-        !(domainKey >= +startDate && domainKey < +endDate)
-      ) {
-        return;
-      }
-
-      const existingSubDomainsData = this.get(domainKey);
-
-      if (typeof existingSubDomainsData === 'undefined') {
-        return;
-      }
-
-      let value: number;
-      if (isFunction(dataOptions.y)) {
-        value = dataOptions.y(datum);
-      } else if (isString(dataOptions.y) && dataOptions.y !== '') {
-        value = datum[dataOptions.y];
-      } else {
-        return;
-      }
-
-      const subDomainIndex = existingSubDomainsData
-        .map((d: any) => d.t)
-        .indexOf(subDomainKeyExtractor(timestamp));
-
-      existingSubDomainsData[subDomainIndex].v = value;
+        this.get(domainKey)![index].v = value;
+      });
     });
   }
 
-  #resetAllValues(): void {
-    this.keys.forEach((domainKey) => {
-      this.get(domainKey)!.forEach((_: any, index: number) => {
-        this.collection.get(domainKey)![index].v = null;
-      });
-    });
+  // eslint-disable-next-line class-methods-use-this
+  #extractValues(data: any[], y: string | Function): number[] {
+    return data.map((d): number => (typeof y === 'function' ? y(d) : d[y]));
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  #groupValues(
+    values: number[],
+    groupFn: string | ((values: number[]) => number),
+  ): number | null {
+    if (isString(groupFn)) {
+      switch (groupFn) {
+        case 'sum':
+          return sum(values);
+        case 'count':
+          return count(values);
+        case 'min':
+          return min(values) || null;
+        case 'max':
+          return max(values) || null;
+        case 'median':
+          return median(values) || null;
+        default:
+          return null;
+      }
+    } else if (isFunction(groupFn)) {
+      return groupFn(values);
+    }
+
+    return null;
+  }
+
+  #extractTimestamp(
+    datum: any,
+    x: string | Function,
+    extractorFn: Function,
+  ): number {
+    const { DateHelper } = this.helpers;
+
+    let timestamp: string | number =
+      typeof x === 'function' ? x(datum) : datum[x];
+
+    if (isString(timestamp)) {
+      if (DateHelper.date(timestamp).isValid()) {
+        timestamp = DateHelper.date(timestamp).valueOf();
+      } else {
+        return 0;
+      }
+    }
+
+    return extractorFn(timestamp);
   }
 
   #refreshKeys(): number[] {

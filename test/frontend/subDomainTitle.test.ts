@@ -22,7 +22,7 @@ describe('subDomainTitle', () => {
     const date = new Date(2000, 0, 5);
     const data: any[] = [];
     data.push({
-      time: +date / 1000,
+      time: +date,
       value: 10,
     });
 
@@ -38,7 +38,7 @@ describe('subDomainTitle', () => {
     cal.paint({
       range: 1,
       date: { start: date },
-      data: { source: data },
+      data: { source: data, x: 'time', y: 'value' },
       domain: { type: 'year' },
       subDomain: {
         type: 'month',
@@ -54,7 +54,7 @@ describe('subDomainTitle', () => {
     const date = new Date(2000, 0, 5);
     const data: any[] = [];
     data.push({
-      time: +date / 1000,
+      time: +date,
       value: 10,
     });
 
@@ -70,7 +70,7 @@ describe('subDomainTitle', () => {
     cal.paint({
       range: 1,
       date: { start: date },
-      data: { source: data },
+      data: { source: data, x: 'time', y: 'value' },
       domain: { type: 'year' },
       subDomain: {
         type: 'month',

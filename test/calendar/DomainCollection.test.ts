@@ -4,13 +4,16 @@ import { jest } from '@jest/globals';
 import DomainCollection from '../../src/calendar/DomainCollection';
 
 import type { DataOptions } from '../../src/options/Options';
+import type DateHelper from '../../src/helpers/DateHelper';
 
 describe('DomainCollection', () => {
   let d: DomainCollection;
 
   const dummyDateHelper = {
     intervals: () => [[2, 20], 1, 3, 4, 6, 5],
-  };
+    date: () => {},
+    format: () => {},
+  } as unknown as DateHelper;
 
   beforeEach(() => {
     d = new DomainCollection({ DateHelper: dummyDateHelper }, 'day', 1, 1);
@@ -70,12 +73,6 @@ describe('DomainCollection', () => {
     });
   });
 
-  it('returns the index of the key in the collection', () => {
-    expect(d.keyIndex(1)).toBe(0);
-    expect(d.keyIndex(2)).toBe(1);
-    expect(d.keyIndex(5)).toBe(4);
-  });
-
   it('clamps the domain to the minimum limit', () => {
     d.clamp(3);
     expect(d.keys).toEqual([3, 4, 5, 6]);
@@ -106,10 +103,14 @@ describe('DomainCollection', () => {
   describe('when merging with another collection', () => {
     const dummyDateHelperA = {
       intervals: () => [-2, -1, 0, 1],
-    };
+      date: () => {},
+      format: () => {},
+    } as unknown as DateHelper;
     const dummyDateHelperB = {
       intervals: () => [10, 20, 30],
-    };
+      date: () => {},
+      format: () => {},
+    } as unknown as DateHelper;
     let h: DomainCollection;
     let g: DomainCollection;
 

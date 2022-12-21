@@ -35,7 +35,7 @@ export default class DateHelper {
     return Math.ceil(date.diff(endOfWeek, 'weeks', true)) + 1;
   }
 
-  date(d: number | Date = new Date()) {
+  date(d: number | Date | string = new Date()) {
     return this.momentInstance.tz(d, this.timezone);
   }
 

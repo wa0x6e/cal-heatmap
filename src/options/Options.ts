@@ -40,6 +40,7 @@ export type DataOptions = {
   requestInit: object;
   x: string;
   y: string;
+  groupY: string | ((values: number[]) => number);
 };
 
 type LabelOptions = {
@@ -216,6 +217,9 @@ export default class Options {
 
         // keyname of the value property
         y: '',
+
+        // Grouping function of the values
+        groupY: 'sum',
       },
       // Domain Label properties
       label: {
