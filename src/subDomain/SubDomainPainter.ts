@@ -115,13 +115,7 @@ export default class SubDomainPainter {
     if (date.highlight.length > 0) {
       date.highlight.forEach((d) => {
         if (DateHelper.datesFromSameInterval(subDomain.type, +d, timestamp)) {
-          classname = DateHelper.datesFromSameInterval(
-            subDomain.type,
-            +d,
-            new Date(),
-          ) ?
-            'highlight-now' :
-            'highlight';
+          classname = 'highlight';
         }
       });
     }
