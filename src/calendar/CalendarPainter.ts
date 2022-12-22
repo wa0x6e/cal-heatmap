@@ -138,6 +138,7 @@ export default class CalendarPainter {
 
   destroy(): Promise<unknown> {
     this.legendPainter.destroy();
+    this.tooltip.destroy();
 
     return this.root
       .transition()

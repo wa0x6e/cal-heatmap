@@ -87,6 +87,12 @@ export default class Tooltip {
     });
   }
 
+  destroy() {
+    if (this.root) {
+      this.root.remove();
+    }
+  }
+
   #show(e: any): void {
     const title = e.getAttribute('aria-labelledby');
 
