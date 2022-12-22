@@ -9,7 +9,6 @@ import DomainCollection from './calendar/DomainCollection';
 import createHelpers from './helpers/HelperFactory';
 import validate from './options/OptionsValidator';
 
-// import extractSVG from './utils/extractSVG';
 import './cal-heatmap.scss';
 
 import TemplateCollection from './calendar/TemplateCollection';
@@ -239,8 +238,4 @@ export default class CalHeatmap {
   destroy(): Promise<unknown> {
     return this.calendarPainter.destroy();
   }
-
-  // getSVG() {
-  //   return extractSVG(this.calendarPainter.root, this.options.options);
-  // }
 }
