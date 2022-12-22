@@ -2,7 +2,7 @@
   display: block;
 
   .graph-label {
-    fill: #999;
+    fill: currentColor;
     font-size: 10px;
   }
 
@@ -17,17 +17,12 @@
 
   .subdomain-text {
     font-size: 8px;
-    fill: #999;
     pointer-events: none;
   }
 
   rect.highlight {
     stroke: #444;
     stroke-width: 1;
-  }
-
-  text.highlight {
-    fill: #444;
   }
 
   rect.highlight-now {
@@ -39,22 +34,9 @@
     font-weight: 800;
   }
 
-  .domain-background {
-    fill: none;
-    shape-rendering: crispedges;
-  }
-
-  .weekday-label-rect {
-    fill: transparent;
-  }
-
   .weekday-label-text {
     font-size: 10px;
-    fill: #999;
-  }
-
-  .graph {
-    shape-rendering: crispedges;
+    fill: currentColor;
   }
 }
 
