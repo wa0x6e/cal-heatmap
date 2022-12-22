@@ -1,5 +1,7 @@
 // @ts-ignore
 import { scale } from '@observablehq/plot';
+import { isFunction } from 'lodash-es';
+import { hcl } from 'd3-color';
 
 import type CalHeatmap from '../CalHeatmap';
 
@@ -39,9 +41,23 @@ export default class Populator {
           });
       })
       .call((element: any) => {
-        element.select('text').text((d: any, i: number, nodes: any) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          DateHelper.format(d.t, options.subDomain.label, d.v, nodes[i]));
+        element
+          .select('text')
+          .attr('style', (d: any) => {
+            let color =
+              options.subDomain.color || hcl(colorScale?.apply(d.v)).l > 60 ?
+                'black' :
+                'white';
+
+            if (isFunction(color)) {
+              color = color(d.t, d.v, colorScale?.apply(d.v));
+            }
+
+            return `fill: ${color};`;
+          })
+          .text((d: any, i: number, nodes: any) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+            DateHelper.format(d.t, options.subDomain.label, d.v, nodes[i]));
       })
       .call(() => {
         this.calendar.eventEmitter.emit('fill');

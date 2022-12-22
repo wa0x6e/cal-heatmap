@@ -23,6 +23,7 @@ export type SubDomainOptions = {
   | null
   | ((timestamp: number, value: number, element: SVGElement) => string);
   title: (timestamp: number, value: number) => string;
+  color?: string | Function
 };
 
 type DateOptions = {
@@ -158,6 +159,8 @@ export default class Options {
         // Refer to https://momentjs.com/docs/#/displaying/
         // for accepted date formatting used by moment().format()
         label: null,
+
+        color: undefined,
 
         // Formatting of the title displayed when hovering a subDomain cell
         // This will also be the tooltip's text when enabled
