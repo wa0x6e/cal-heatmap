@@ -234,12 +234,10 @@ export default class CalHeatmap {
    * Destroy the calendar
    *
    * @since  3.3.6
-   * @param {function} A callback function to trigger
-   * after destroying the calendar
-   * @return void
+   * @return Promise
    */
-  destroy(callback?: () => any): void {
-    this.calendarPainter.destroy(callback);
+  destroy(): Promise<unknown> {
+    return this.calendarPainter.destroy();
   }
 
   // getSVG() {

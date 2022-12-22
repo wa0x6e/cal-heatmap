@@ -136,14 +136,16 @@ describe('DomainCollection', () => {
   });
 
   describe('when filling with data', () => {
-    it('resets all values when RESET_ALL strategy', () => {
-      const h: DomainCollection = new DomainCollection(
+    let filledDomainCollection: DomainCollection;
+
+    beforeEach(() => {
+      filledDomainCollection = new DomainCollection(
         { DateHelper: dummyDateHelper },
         'day',
         1,
         1,
       );
-      h.collection = new Map([
+      filledDomainCollection.collection = new Map([
         [
           1,
           [
@@ -153,9 +155,9 @@ describe('DomainCollection', () => {
         ],
         [2, [{ t: 4, v: 100 }]],
       ]);
-      h.keys = [1, 2];
+      filledDomainCollection.keys = [1, 2];
 
-      h.fill(
+      filledDomainCollection.fill(
         [],
         {
           x: '',
@@ -166,12 +168,19 @@ describe('DomainCollection', () => {
         () => {},
         () => {},
       );
+    });
 
-      expect(h.get(1)).toEqual([
+    it('resets all values to null', () => {
+      expect(filledDomainCollection.get(1)).toEqual([
         { t: 1, v: null },
         { t: 3, v: null },
       ]);
-      expect(h.get(2)).toEqual([{ t: 4, v: null }]);
+      expect(filledDomainCollection.get(2)).toEqual([{ t: 4, v: null }]);
     });
+
+    it.todo('parse a date field as timestamp');
+    it.todo('parse a date field as string');
+    it.todo('groups the value using a string argument');
+    it.todo('groups the value using a function');
   });
 });

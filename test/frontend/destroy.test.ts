@@ -13,7 +13,7 @@ it('destroys the calendar', () => {
   cal.paint({ range: 1 });
   expect(select('#cal-heatmap').selectAll('.graph-domain').size()).toBe(1);
 
-  cal.destroy(() => {
+  return cal.destroy().then(() => {
     expect(select('#cal-heatmap').html()).toBe('');
   });
 });
@@ -25,7 +25,7 @@ it('also destroys the legend', () => {
   cal.paint({ range: 1, legend: { show: true } });
   expect(select('.graph-legend').size()).toBe(1);
 
-  cal.destroy(() => {
+  return cal.destroy().then(() => {
     expect(select('.graph-legend').size()).toBe(0);
   });
 });

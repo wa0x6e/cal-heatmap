@@ -1,4 +1,3 @@
-import { isFunction } from 'lodash-es';
 import { select } from 'd3-selection';
 
 import DomainPainter from '../domain/DomainPainter';
@@ -78,7 +77,7 @@ export default class CalendarPainter {
 
     this.legendPainter.paint();
 
-    this.resize();
+    this.#resize();
 
     return Promise.allSettled(transitions);
   }
@@ -102,7 +101,7 @@ export default class CalendarPainter {
     return domainsWidth + this.domainSecondaryLabelPainter.dimensions.width;
   }
 
-  resize(): void {
+  #resize(): void {
     const { options } = this.calendar.options;
     const newWidth = this.#getWidth();
     const newHeight = this.#getHeight();
@@ -132,18 +131,15 @@ export default class CalendarPainter {
     };
   }
 
-  destroy(callback?: () => any): void {
+  destroy(): Promise<unknown> {
     this.legendPainter.destroy();
-    this.root
+
+    return this.root
       .transition()
       .duration(this.calendar.options.options.animationDuration)
       .attr('width', 0)
       .attr('height', 0)
       .remove()
-      .on('end.remove', () => {
-        if (isFunction(callback)) {
-          callback();
-        }
-      });
+      .end();
   }
 }
