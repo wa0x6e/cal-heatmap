@@ -41,6 +41,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-terser": "^0.2.0",
+    "@rollup/plugin-typescript": "^10.0.1",
     "@types/d3-array": "^3.0.3",
     "@types/d3-color": "^3.1.0",
     "@types/d3-fetch": "^3.0.1",
@@ -70,8 +71,8 @@
   "scripts": {
     "format": "npx prettier-eslint --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "npx eslint src/ test/",
-    "build": "rm -rf dist/* && rm -rf build-tsc/* && npx tsc && cp ./src/*.scss ./build-tsc/src/ && rollup -c",
-    "dev": "npx tsc -w & rollup --config -w",
+    "build": "rm -rf dist/* && rollup -c",
+    "dev": "rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/"
   },
   "repository": {

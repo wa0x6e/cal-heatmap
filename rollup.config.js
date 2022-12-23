@@ -7,10 +7,12 @@ import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import filesize from 'rollup-plugin-filesize';
 import scss from 'rollup-plugin-scss';
+import typescript from '@rollup/plugin-typescript';
 
 const pkg = JSON.parse(readFileSync('./package.json'));
 
 const basePlugins = [
+  typescript(),
   json(),
   commonjs(),
   resolve(),
@@ -24,7 +26,7 @@ const basePlugins = [
 
 export default [
   {
-    input: 'build-tsc/src/CalHeatmap.js',
+    input: 'src/CalHeatmap.ts',
     output: [
       {
         file: `dist/${pkg.name}.js`,
@@ -35,7 +37,7 @@ export default [
     plugins: basePlugins,
   },
   {
-    input: 'build-tsc/src/CalHeatmap.js',
+    input: 'src/CalHeatmap.ts',
     watch: false,
     output: [
       {
@@ -46,7 +48,7 @@ export default [
     plugins: basePlugins,
   },
   {
-    input: 'build-tsc/src/CalHeatmap.js',
+    input: 'src/CalHeatmap.ts',
     watch: false,
     output: [
       {
