@@ -25,7 +25,7 @@ describe('on horizontal scroll', () => {
 
         cal.paint({
           range: 2,
-          domain: { type: 'year', gutter, label: null },
+          domain: { type: 'year', gutter, label: { text: null } },
           subDomain: { type: 'month', gutter: 0, width: 10 },
         });
         expect(
@@ -62,7 +62,7 @@ describe('on horizontal scroll', () => {
 
         cal.paint({
           range: 2,
-          domain: { type: 'year', gutter, label: null },
+          domain: { type: 'year', gutter, label: { text: null } },
           subDomain: { type: 'month', gutter: 0, width: 10 },
         });
         expect(
@@ -114,7 +114,7 @@ describe('on vertical scroll', () => {
         cal.paint({
           range: 2,
           verticalOrientation: true,
-          domain: { type: 'year', gutter, label: null },
+          domain: { type: 'year', gutter, label: { text: null } },
           subDomain: { type: 'month', gutter: 0, width: 10 },
         });
         expect(
@@ -141,7 +141,7 @@ describe('on vertical scroll', () => {
         cal.paint({
           range: 2,
           verticalOrientation: true,
-          domain: { type: 'year', gutter, label: null },
+          domain: { type: 'year', gutter, label: { text: null } },
           subDomain: { type: 'month', gutter: 0, width: 10 },
         });
         expect(

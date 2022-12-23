@@ -28,7 +28,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the left', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'top', textAlign: 'start' },
+          domain: { label: { position: 'top', textAlign: 'start' } },
         }),
       );
 
@@ -39,7 +39,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the middle', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'top', textAlign: 'middle' },
+          domain: { label: { position: 'top', textAlign: 'middle' } },
         }),
       );
       const width: number = +select('.graph-domain').attr('width');
@@ -50,7 +50,9 @@ describe('DomainLabelPainter', () => {
     });
     it('aligns the text on the right', () => {
       cal.paint(
-        merge(defaultOptions, { label: { position: 'top', textAlign: 'end' } }),
+        merge(defaultOptions, {
+          domain: { label: { position: 'top', textAlign: 'end' } },
+        }),
       );
       const width: number = +select('.graph-domain').attr('width');
 
@@ -64,7 +66,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the left', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'bottom', textAlign: 'start' },
+          domain: { label: { position: 'bottom', textAlign: 'start' } },
         }),
       );
 
@@ -76,7 +78,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the middle', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'bottom', textAlign: 'middle' },
+          domain: { label: { position: 'bottom', textAlign: 'middle' } },
         }),
       );
       const width = select('.graph-domain').attr('width');
@@ -88,7 +90,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the right', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'bottom', textAlign: 'end' },
+          domain: { label: { position: 'bottom', textAlign: 'end' } },
         }),
       );
       const width = select('.graph-domain').attr('width');
@@ -103,7 +105,9 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the left', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'left', textAlign: 'start', width: 50 },
+          domain: {
+            label: { position: 'left', textAlign: 'start', width: 50 },
+          },
         }),
       );
 
@@ -117,7 +121,9 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the middle', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'left', textAlign: 'middle', width: 50 },
+          domain: {
+            label: { position: 'left', textAlign: 'middle', width: 50 },
+          },
         }),
       );
 
@@ -130,7 +136,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the right', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'left', textAlign: 'end', width: 50 },
+          domain: { label: { position: 'left', textAlign: 'end', width: 50 } },
         }),
       );
 
@@ -148,7 +154,9 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the left', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'right', textAlign: 'start', width: 50 },
+          domain: {
+            label: { position: 'right', textAlign: 'start', width: 50 },
+          },
         }),
       );
 
@@ -162,7 +170,9 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the middle', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'right', textAlign: 'middle', width: 50 },
+          domain: {
+            label: { position: 'right', textAlign: 'middle', width: 50 },
+          },
         }),
       );
 
@@ -176,7 +186,7 @@ describe('DomainLabelPainter', () => {
     it('aligns the text on the right', () => {
       cal.paint(
         merge(defaultOptions, {
-          label: { position: 'right', textAlign: 'end', width: 50 },
+          domain: { label: { position: 'right', textAlign: 'end', width: 50 } },
         }),
       );
 

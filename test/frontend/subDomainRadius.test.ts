@@ -15,7 +15,7 @@ import CalHeatmap from '../../src/CalHeatmap';
 
       cal.paint({
         range: 2,
-        domain: { type: 'year', label: null },
+        domain: { type: 'year', label: { text: null } },
         subDomain: {
           type: 'month',
           radius,

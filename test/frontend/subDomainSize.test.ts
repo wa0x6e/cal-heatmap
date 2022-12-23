@@ -18,15 +18,17 @@ import CalHeatmap from '../../src/CalHeatmap';
 
       cal.paint({
         range: 2,
-        domain: { type: 'year' },
+        domain: {
+          type: 'year',
+          label: {
+            height: 20,
+          },
+        },
         subDomain: {
           type: 'month',
           gutter: 0,
           width: size[0],
           height: size[1],
-        },
-        label: {
-          height: 20,
         },
       });
     });

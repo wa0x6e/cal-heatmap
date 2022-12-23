@@ -22,7 +22,7 @@ describe('domainlabel', () => {
     it('does not render a label when formatter is disabled', () => {
       cal.paint({
         range: 1,
-        domain: { type: 'year', label: formatter },
+        domain: { type: 'year', label: { text: formatter } },
         subDomain: { type: 'month' },
       });
 
@@ -44,7 +44,10 @@ describe('domainlabel', () => {
   it('renders the return value of the given function', () => {
     cal.paint({
       range: 1,
-      domain: { type: 'month', label: (ts) => `${new Date(ts).getMonth()};` },
+      domain: {
+        type: 'month',
+        label: { text: (ts) => `${new Date(ts).getMonth()};` },
+      },
       subDomain: { type: 'week' },
       date: { start: new Date(2020, 0, 15) },
     });
@@ -55,7 +58,7 @@ describe('domainlabel', () => {
   it('renders the format output of the given string format', () => {
     cal.paint({
       range: 1,
-      domain: { type: 'month', label: 'MMM' },
+      domain: { type: 'month', label: { text: 'MMM' } },
       subDomain: { type: 'week' },
       date: { start: new Date(2020, 0, 15) },
     });

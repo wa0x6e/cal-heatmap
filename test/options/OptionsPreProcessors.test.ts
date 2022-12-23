@@ -20,7 +20,6 @@ describe('OptionsPreProcessors', () => {
 
       expect(OptionsPreProcessors[key]('')).toBe(null);
       expect(OptionsPreProcessors[key](null)).toBe(null);
-      expect(OptionsPreProcessors[key](undefined)).toBe(null);
 
       expect(OptionsPreProcessors[key]('A')).toBe('A');
       expect(OptionsPreProcessors[key](fn)).toBe(fn);

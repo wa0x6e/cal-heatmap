@@ -9,7 +9,20 @@ export type DomainOptions = {
   gutter: number;
   padding: [number, number, number, number];
   dynamicDimension: boolean;
-  label?: string | null | ((timestamp: number, element: SVGElement) => string);
+  label: LabelOptions;
+};
+
+type LabelOptions = {
+  text?: string | null | ((timestamp: number, element: SVGElement) => string);
+  position: string;
+  textAlign: string;
+  offset: {
+    x: number;
+    y: number;
+  };
+  rotate: null | 'left' | 'right';
+  width: number;
+  height: number;
 };
 
 export type SubDomainOptions = {
@@ -23,7 +36,7 @@ export type SubDomainOptions = {
   | null
   | ((timestamp: number, value: number, element: SVGElement) => string);
   title: (timestamp: number, value: number) => string;
-  color?: string | Function
+  color?: string | Function;
 };
 
 type DateOptions = {
@@ -42,18 +55,6 @@ export type DataOptions = {
   x: string;
   y: string;
   groupY: string | ((values: number[]) => number);
-};
-
-type LabelOptions = {
-  position: string;
-  textAlign: string;
-  offset: {
-    x: number;
-    y: number;
-  };
-  rotate: null | 'left' | 'right';
-  width: number;
-  height: number;
 };
 
 type ScaleOptions = {
@@ -78,7 +79,6 @@ export type OptionsType = {
   dayLabel: boolean;
   date: DateOptions;
   data: DataOptions;
-  label: LabelOptions;
   scale: ScaleOptions;
   legend: LegendOptions;
   animationDuration: number;
@@ -126,14 +126,37 @@ export default class Options {
         // subDomains items count
         dynamicDimension: true,
 
-        // Formatting of the domain label
-        // @default: undefined, will use the formatting according to domain type
-        // Accept a string used as specifier by moment().format()
-        // or a function
-        //
-        // Refer to https://momentjs.com/docs/#/displaying/
-        // for accepted date formatting used by moment().format()
-        label: undefined,
+        label: {
+          // Formatting of the domain label
+          // @default: undefined, will use the formatting
+          // according to domain type
+          // Accept a string used as specifier by moment().format()
+          // or a function
+          //
+          // Refer to https://momentjs.com/docs/#/displaying/
+          // for accepted date formatting used by moment().format()
+          text: undefined,
+
+          // valid: top, right, bottom, left
+          position: 'bottom',
+
+          // Valid are the direct svg values: start, middle, end
+          textAlign: 'middle',
+
+          // By default, there is no margin/padding around the label
+          offset: {
+            x: 0,
+            y: 0,
+          },
+
+          rotate: null,
+
+          // Used only on vertical orientation
+          width: 100,
+
+          // Used only on horizontal orientation
+          height: 25,
+        },
       },
 
       subDomain: {
@@ -224,28 +247,6 @@ export default class Options {
         // Grouping function of the values
         groupY: 'sum',
       },
-      // Domain Label properties
-      label: {
-        // valid: top, right, bottom, left
-        position: 'bottom',
-
-        // Valid are the direct svg values: start, middle, end
-        textAlign: 'middle',
-
-        // By default, there is no margin/padding around the label
-        offset: {
-          x: 0,
-          y: 0,
-        },
-
-        rotate: null,
-
-        // Used only on vertical orientation
-        width: 100,
-
-        // Used only on horizontal orientation
-        height: 25,
-      },
 
       scale: {
         as: 'color',
@@ -317,20 +318,23 @@ export default class Options {
       set(options, key, get(this.preProcessors, key)(get(options, key)));
     });
 
-    options.x.domainVerticalLabelHeight = options.label.height;
+    options.x.domainVerticalLabelHeight = options.domain.label.height;
 
     // When the label is affecting the height
     if (
-      options.label.position === 'top' ||
-      options.label.position === 'bottom'
+      options.domain.label.position === 'top' ||
+      options.domain.label.position === 'bottom'
     ) {
       options.x.domainHorizontalLabelWidth = 0;
     } else {
       options.x.domainVerticalLabelHeight = 0;
-      options.x.domainHorizontalLabelWidth = options.label.width;
+      options.x.domainHorizontalLabelWidth = options.domain.label.width;
     }
 
-    if (options.domain.label === null || options.domain.label === '') {
+    if (
+      options.domain.label.text === null ||
+      options.domain.label.text === ''
+    ) {
       options.x.domainVerticalLabelHeight = 0;
       options.x.domainHorizontalLabelWidth = 0;
     }
