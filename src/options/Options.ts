@@ -10,6 +10,7 @@ export type DomainOptions = {
   padding: [number, number, number, number];
   dynamicDimension: boolean;
   label: LabelOptions;
+  sort: 'asc' | 'desc';
 };
 
 type LabelOptions = {
@@ -36,7 +37,9 @@ export type SubDomainOptions = {
   | null
   | ((timestamp: number, value: number, element: SVGElement) => string);
   title: (timestamp: number, value: number) => string;
-  color?: string | Function;
+  color?:
+  | string
+  | ((timestamp: number, value: number, backgroundColor: string) => string);
 };
 
 type DateOptions = {
@@ -52,8 +55,8 @@ export type DataOptions = {
   source: any;
   type: string;
   requestInit: object;
-  x: string;
-  y: string;
+  x: string | ((datum: any) => number);
+  y: string | ((data: any[]) => number[]);
   groupY: string | ((values: number[]) => number);
 };
 
@@ -84,7 +87,6 @@ export type OptionsType = {
   animationDuration: number;
   tooltip: boolean | TooltipOptions;
   verticalOrientation: boolean;
-  reversedDirection: boolean;
 };
 
 type InternalOptionsType = {
@@ -125,6 +127,9 @@ export default class Options {
         // The width/height on a domain depends on the number of
         // subDomains items count
         dynamicDimension: true,
+
+        // Whether to show most recent date first
+        sort: 'asc',
 
         label: {
           // Formatting of the domain label
@@ -223,9 +228,6 @@ export default class Options {
       // false: display domains side by side
       // true : display domains one under the other
       verticalOrientation: false,
-
-      // Whether to show most recent date first
-      reversedDirection: false,
 
       data: {
         // Data source

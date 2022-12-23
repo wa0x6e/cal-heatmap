@@ -46,7 +46,7 @@ export default class DomainCoordinates {
     let scrollFactor =
       scrollDirection === ScrollDirection.SCROLL_FORWARD ? -1 : 1;
     const { keys } = collection;
-    if (this.calendar.options.options.reversedDirection) {
+    if (this.calendar.options.options.domain.sort === 'desc') {
       keys.reverse();
       scrollFactor *= -1;
     }

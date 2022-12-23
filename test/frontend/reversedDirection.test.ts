@@ -50,7 +50,7 @@ describe('on reversed direction', () => {
 
     cal.paint({
       range: 12,
-      reversedDirection: true,
+      domain: { sort: 'desc' },
       date: {
         start: new Date(2020, 0, 1, 0, 0, 0),
       },
