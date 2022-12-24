@@ -52,12 +52,11 @@ export default class Tooltip {
   init(): void {
     const { tooltip } = this.calendar.options.options;
 
-    if (!tooltip) {
+    if (!tooltip.show) {
       return;
     }
 
-    this.popperOptions =
-      typeof tooltip === 'object' ? tooltip : DEFAULT_POPPER_OPTIONS;
+    this.popperOptions = { ...DEFAULT_POPPER_OPTIONS, ...tooltip };
 
     this.root = document.getElementById(BASE_CLASSNAME);
 
@@ -78,9 +77,12 @@ export default class Tooltip {
       this.popperOptions,
     );
 
-    this.calendar.eventEmitter.on('mouseover', (e: PointerEvent) => {
-      this.#show(e.target);
-    });
+    this.calendar.eventEmitter.on(
+      'mouseover',
+      (e: PointerEvent, timestamp: number, value: number) => {
+        this.#show(e.target, timestamp, value);
+      },
+    );
 
     this.calendar.eventEmitter.on('mouseout', () => {
       this.#hide();
@@ -93,8 +95,9 @@ export default class Tooltip {
     }
   }
 
-  #show(e: any): void {
-    const title = e.getAttribute('aria-labelledby');
+  #show(e: any, timestamp: number, value: number): void {
+    const formatter = this.calendar.options.options.tooltip.title;
+    const title = formatter ? formatter(timestamp, value) : null;
 
     if (!title) {
       return;

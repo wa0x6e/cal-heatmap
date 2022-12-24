@@ -33,12 +33,7 @@ export default class Populator {
       .call((element: any) => {
         element
           .select('rect')
-          .style('fill', (d: any) => colorScale?.apply(d.v))
-          .attr('aria-labelledby', (d: any) => {
-            const { title } = options.subDomain;
-
-            return title ? title(d.t, d.v) : null;
-          });
+          .style('fill', (d: any) => colorScale?.apply(d.v));
       })
       .call((element: any) => {
         element

@@ -36,7 +36,6 @@ export type SubDomainOptions = {
   | string
   | null
   | ((timestamp: number, value: number, element: SVGElement) => string);
-  title: (timestamp: number, value: number) => string;
   color?:
   | string
   | ((timestamp: number, value: number, backgroundColor: string) => string);
@@ -85,7 +84,10 @@ export type OptionsType = {
   scale: ScaleOptions;
   legend: LegendOptions;
   animationDuration: number;
-  tooltip: boolean | TooltipOptions;
+  tooltip: {
+    show: boolean;
+    title: (timestamp: number, value: number) => string;
+  } & TooltipOptions;
   verticalOrientation: boolean;
 };
 
@@ -189,13 +191,6 @@ export default class Options {
         label: null,
 
         color: undefined,
-
-        // Formatting of the title displayed when hovering a subDomain cell
-        // This will also be the tooltip's text when enabled
-        // Expecting a function, which is returning the title's text
-        title: (timestamp: number, value: number): string =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          `${value} - ${new Date(timestamp).toISOString()}`,
       },
 
       // Show weekday's name when showing full month
@@ -274,7 +269,15 @@ export default class Options {
 
       // Whether to show tooltip on subDomain cell hover
       // To format its content, see subDomain.title option
-      tooltip: false,
+      tooltip: {
+        show: false,
+
+        // Formatting of the tooltip's text, when enabled
+        // Expecting a function, which will return the title's text
+        title: (timestamp: number, value: number): string =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+          `${value} - ${new Date(timestamp).toISOString()}`,
+      },
 
       // Internally used options, do not edit not set
       x: {

@@ -22,23 +22,108 @@ describe('Tooltip', () => {
     expect(select('#ch-tooltip').node()).toBeNull();
 
     cal.on('fill', () => {
-      cal.eventEmitter.emit('mouseover', {
-        target: select('.graph-rect').node(),
-      });
+      cal.eventEmitter.emit(
+        'mouseover',
+        {
+          target: select('.graph-rect').node(),
+        },
+        1,
+        1,
+      );
 
       expect(select('#ch-tooltip').attr('data-show')).toBe('1');
       expect(select('#ch-tooltip-body').html()).not.toBeNull();
     });
 
-    cal.paint({ tooltip: true });
+    cal.paint({ tooltip: { show: true } });
     expect(select('#ch-tooltip').node()).not.toBeNull();
   });
 
   it('disables the tooltip', () => {
     expect(select('#ch-tooltip').node()).toBeNull();
 
-    cal.paint({ tooltip: false });
+    cal.paint({ tooltip: { show: false } });
 
     expect(select('#ch-tooltip').node()).toBeNull();
+  });
+
+  it('formats the title with the user function', () => {
+    const date = new Date(2000, 0, 5);
+    const data: any[] = [];
+    data.push({
+      time: +date,
+      value: 10,
+    });
+
+    cal.on('fill', () => {
+      cal.eventEmitter.emit(
+        'mouseover',
+        {
+          target: select('.graph-rect').node(),
+        },
+        +date,
+        10,
+      );
+
+      expect(select('#ch-tooltip-body').html()).toBe('2000-10');
+
+      expect(select('#ch-tooltip').attr('data-show')).toBe('1');
+    });
+
+    cal.paint({
+      range: 1,
+      date: { start: date },
+      data: { source: data, x: 'time', y: 'value' },
+      domain: { type: 'year' },
+      subDomain: {
+        type: 'month',
+        label: (d, v) => `${v}`,
+      },
+      tooltip: {
+        show: true,
+        title: (d: number, value: number) =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+          `${new Date(d).getFullYear()}-${value}`,
+      },
+    });
+  });
+
+  it('formats the title with the default function', () => {
+    const date = new Date(2000, 0, 5);
+    const data: any[] = [];
+    data.push({
+      time: +date,
+      value: 10,
+    });
+
+    cal.on('fill', () => {
+      cal.eventEmitter.emit(
+        'mouseover',
+        {
+          target: select('.graph-rect').node(),
+        },
+        +date,
+        10,
+      );
+
+      expect(select('#ch-tooltip-body').html()).toBe(
+        `10 - ${new Date(date).toISOString()}`,
+      );
+
+      expect(select('#ch-tooltip').attr('data-show')).toBe('1');
+    });
+
+    cal.paint({
+      range: 1,
+      date: { start: date },
+      data: { source: data, x: 'time', y: 'value' },
+      domain: { type: 'year' },
+      subDomain: {
+        type: 'month',
+      },
+      tooltip: {
+        show: true,
+      },
+    });
   });
 });
