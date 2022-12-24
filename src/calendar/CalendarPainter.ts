@@ -137,6 +137,10 @@ export default class CalendarPainter {
   }
 
   destroy(): Promise<unknown> {
+    if (!this.root) {
+      return Promise.resolve();
+    }
+
     this.legendPainter.destroy();
     this.tooltip.destroy();
 

@@ -306,10 +306,10 @@ export default class Options {
     return true;
   }
 
-  init(settings: any): void {
+  init(opts: any): void {
     this.options = {
       // eslint-disable-next-line arrow-body-style
-      ...mergeWith(this.options, settings, (objValue, srcValue) => {
+      ...mergeWith(this.options, opts, (objValue, srcValue) => {
         return Array.isArray(srcValue) ? srcValue : undefined;
       }),
     };

@@ -43,10 +43,10 @@ export default class CalHeatmap {
   helpers: Helpers;
 
   constructor() {
-    // Default settings
+    // Default options
     this.options = new Options();
 
-    // Init the helpers with the default settings
+    // Init the helpers with the default options
     this.helpers = createHelpers(this.options);
     this.templateCollection = new TemplateCollection(
       this.helpers,
@@ -80,11 +80,12 @@ export default class CalHeatmap {
   /**
    * Setup and paint the calendar with the given options
    *
-   * @param  {Object} settings Options
-   * @return {boolean} True, unless there's an error
+   * @param  {Object} options The Options object
+   * @return A Promise, which will fulfill once all the underlying asynchronous
+   * tasks settle, whether resolved or rejected.
    */
-  paint(settings: DeepPartial<OptionsType>): boolean {
-    this.options.init(settings);
+  paint(options?: DeepPartial<OptionsType>): Promise<unknown> {
+    this.options.init(options);
 
     // Refresh the helpers with the correct options
     this.helpers = createHelpers(this.options);
@@ -93,9 +94,7 @@ export default class CalHeatmap {
     try {
       validate(this.templateCollection, this.options.options);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-      return false;
+      return Promise.reject(error);
     }
 
     this.calendarPainter.setup();
@@ -109,57 +108,61 @@ export default class CalHeatmap {
         this.options.options.range,
       ),
     );
-    this.calendarPainter.paint();
 
-    this.fill();
-
-    return true;
+    return Promise.allSettled([
+      this.calendarPainter.paint(),
+      this.fill(),
+    ]);
   }
 
   /**
    * Add a new subDomainTemplate
    *
    * @since 4.0.0
-   * @param  {Array<SubDomainTemplate> | SubDomainTemplate} templates
+   * @param  {SubDomainTemplate[] | SubDomainTemplate} templates
    * A single, or an array of SubDomainTemplate object
    * @return void
    */
-  addTemplates(templates: Template | Template[]) {
+  addTemplates(templates: Template | Template[]): void {
     this.templateCollection.add(templates);
   }
 
   /**
    * Shift the calendar by n domains forward
    *
-   * @param {number} Number of domain interval to shift
+   * @param {number} n Number of domain intervals to shift forward
+   * @return A Promise, which will fulfill once all the underlying asynchronous
+   * tasks settle, whether resolved or rejected.
    */
-  next(n: number = 1) {
+  next(n: number = 1): Promise<unknown> {
     const loadDirection = this.navigator.loadNewDomains(
       this.createDomainCollection(this.domainCollection.max, n + 1).slice(n),
       ScrollDirection.SCROLL_FORWARD,
     );
-    const promise = this.calendarPainter.paint(loadDirection);
-    // @TODO: Update only newly inserted domains
-    this.fill();
 
-    return promise;
+    return Promise.allSettled([
+      this.calendarPainter.paint(loadDirection),
+      this.fill(),
+    ]);
   }
 
   /**
    * Shift the calendar by n domains backward
    *
-   * @param {number} Number of domain interval to shift
+   * @param {number} n Number of domain intervals to shift backward
+   * @return A Promise, which will fulfill once all the underlying asynchronous
+   * tasks settle, whether resolved or rejected.
    */
-  previous(n: number = 1) {
+  previous(n: number = 1): Promise<unknown> {
     const loadDirection = this.navigator.loadNewDomains(
       this.createDomainCollection(this.domainCollection.min, -n),
       ScrollDirection.SCROLL_BACKWARD,
     );
-    const promise = this.calendarPainter.paint(loadDirection);
-    // @TODO: Update only newly inserted domains
-    this.fill();
 
-    return promise;
+    return Promise.allSettled([
+      this.calendarPainter.paint(loadDirection),
+      this.fill(),
+    ]);
   }
 
   /**
@@ -167,29 +170,30 @@ export default class CalHeatmap {
    *
    * JumpTo will scroll the calendar until the wanted domain with the specified
    * date is visible. Unless you set reset to true, the wanted domain
-   * will not necessarily be the first (leftmost) domain of the calendar.
+   * will not necessarily be the first domain of the calendar.
    *
-   * @param Date date Jump to the domain containing that date
+   * @param {Date} date Jump to the domain containing that date
    * @param {boolean} reset Whether the wanted domain
    * should be the first domain of the calendar
-   * @param {boolean} True of the calendar was scrolled
+   * @return A Promise, which will fulfill once all the underlying asynchronous
+   * tasks settle, whether resolved or rejected.
    */
-  jumpTo(date: Date, reset: boolean = false) {
-    const loadDirection = this.navigator.jumpTo(date, reset);
-    const promise = this.calendarPainter.paint(loadDirection);
-    // @TODO: Update only newly inserted domains
-    this.fill();
-
-    return promise;
+  jumpTo(date: Date, reset: boolean = false): Promise<unknown> {
+    return Promise.allSettled([
+      this.calendarPainter.paint(this.navigator.jumpTo(date, reset)),
+      this.fill(),
+    ]);
   }
 
   /**
-   * Fill the calendar with some data
+   * Fill the calendar with the given data
    *
-   * @param  {object|string}    dataSource    The calendar's datasource,
-   * same type as this.options.data.source
+   * @param  {Object|string}    dataSource    The calendar's datasource,
+   * same type as `options.data.source`
+   * @return A Promise, which will fulfill once all the underlying asynchronous
+   * tasks settle, whether resolved or rejected.
    */
-  fill(dataSource = this.options.options.data.source): void {
+  fill(dataSource = this.options.options.data.source): Promise<unknown> {
     const { options } = this.options;
     const template = this.templateCollection;
     const endDate = this.helpers.DateHelper.intervals(
@@ -204,16 +208,21 @@ export default class CalHeatmap {
       endDate,
     );
 
-    dataPromise.then((data: any) => {
-      this.domainCollection.fill(
-        data,
-        options.data,
-        this.domainCollection.min,
-        endDate,
-        template.get(options.domain.type)!.extractUnit,
-        template.get(options.subDomain.type)!.extractUnit,
-      );
-      this.populator.populate();
+    return new Promise((resolve, reject) => {
+      dataPromise.then((data: any) => {
+        this.domainCollection.fill(
+          data,
+          options.data,
+          this.domainCollection.min,
+          endDate,
+          template.get(options.domain.type)!.extractUnit,
+          template.get(options.subDomain.type)!.extractUnit,
+        );
+        this.populator.populate();
+        resolve(null);
+      }, (error) => {
+        reject(error);
+      });
     });
   }
 
@@ -221,7 +230,7 @@ export default class CalHeatmap {
    * Listener for all events
    *
    * @since 4.0.0
-   * @param  {string} eventName Name of the event to listen to
+   * @param  {string}  eventName  Name of the event to listen to
    * @param  {function} Callback function to execute on event trigger
    * @return void
    */
@@ -233,7 +242,8 @@ export default class CalHeatmap {
    * Destroy the calendar
    *
    * @since  3.3.6
-   * @return Promise
+   * @return A Promise, which will fulfill once all the underlying asynchronous
+   * tasks settle, whether resolved or rejected.
    */
   destroy(): Promise<unknown> {
     return this.calendarPainter.destroy();
