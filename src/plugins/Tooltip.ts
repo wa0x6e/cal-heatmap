@@ -113,6 +113,11 @@ export default class Tooltip {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  paint(): Promise<unknown> {
+    return Promise.resolve();
+  }
+
   destroy() {
     if (this.root) {
       this.root.remove();

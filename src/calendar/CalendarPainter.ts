@@ -4,7 +4,6 @@ import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
 import DomainSecondaryLabelPainter from '../domain/DomainSecondaryLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
-import LegendPainter from '../legend/LegendPainter';
 
 import type CalHeatmap from '../CalHeatmap';
 import { ScrollDirection } from '../constant';
@@ -25,8 +24,6 @@ export default class CalendarPainter {
 
   subDomainPainter: SubDomainPainter;
 
-  legendPainter: LegendPainter;
-
   domainSecondaryLabelPainter: DomainSecondaryLabelPainter;
 
   constructor(calendar: CalHeatmap) {
@@ -42,7 +39,6 @@ export default class CalendarPainter {
     this.domainSecondaryLabelPainter = new DomainSecondaryLabelPainter(
       calendar,
     );
-    this.legendPainter = new LegendPainter(calendar);
   }
 
   setup(): boolean {
@@ -83,7 +79,11 @@ export default class CalendarPainter {
     this.subDomainPainter.paint(this.domainPainter.root);
     this.domainLabelPainter.paint(this.domainPainter.root);
 
-    this.legendPainter.paint();
+    transitions.concat(
+      Array.from(this.calendar.plugins.values()).map((plugin: any) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        plugin.instance.paint()),
+    );
 
     this.#resize();
 
@@ -151,8 +151,6 @@ export default class CalendarPainter {
     if (!this.root) {
       return Promise.allSettled(result);
     }
-
-    this.legendPainter.destroy();
 
     result.push(
       this.root

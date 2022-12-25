@@ -4,29 +4,52 @@ import { legend } from '@observablehq/plot';
 
 import type CalHeatmap from '../CalHeatmap';
 
+type LegendOptions = {
+  enabled: boolean;
+  itemSelector: string | null;
+  label: string | null;
+  width: number;
+};
+
 const DEFAULT_CLASSNAME = '.graph-legend';
 
-export default class LegendPainter {
+const defaultOptions: LegendOptions = {
+  // Whether to display the legend
+  enabled: true,
+
+  itemSelector: null,
+
+  label: null,
+
+  width: 130,
+};
+
+export default class Legend {
   calendar: CalHeatmap;
 
   root: any;
 
   shown: boolean;
 
+  options: LegendOptions;
+
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.root = null;
     this.shown = false;
+    this.options = defaultOptions;
   }
 
-  paint(): boolean {
-    const legendOptions = this.calendar.options.options.legend;
-    const scaleOptions = this.calendar.options.options.scale;
-    const { show, itemSelector } = legendOptions;
+  setup(pluginOptions: Partial<LegendOptions>): void {
+    this.options = { ...defaultOptions, ...pluginOptions };
+  }
 
-    if (!show || (itemSelector && select(itemSelector).empty())) {
-      this.destroy();
-      return false;
+  paint(): Promise<unknown> {
+    const scaleOptions = this.calendar.options.options.scale;
+    const { enabled, itemSelector } = this.options;
+
+    if (!enabled || (itemSelector && select(itemSelector).empty())) {
+      return this.destroy();
     }
 
     this.shown = true;
@@ -45,21 +68,21 @@ export default class LegendPainter {
 
     const node = legend({
       [scaleOptions.as]: scaleOptions,
-      ...legendOptions,
+      ...this.options,
     });
 
     this.root.selectAll('*').remove();
     this.root.append(() => node);
 
-    return true;
+    return Promise.resolve();
   }
 
-  destroy(): void {
-    if (this.root === null) {
-      return;
+  destroy(): Promise<unknown> {
+    if (this.root !== null) {
+      this.root.remove();
+      this.root = null;
     }
 
-    this.root.remove();
-    this.root = null;
+    return Promise.resolve();
   }
 }

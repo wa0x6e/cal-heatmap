@@ -64,13 +64,6 @@ type ScaleOptions = {
   [key: string]: any;
 };
 
-type LegendOptions = {
-  show: boolean;
-  itemSelector: string | null;
-  label: string | null;
-  width: number;
-};
-
 export type OptionsType = {
   itemSelector: string;
   range: number;
@@ -80,7 +73,6 @@ export type OptionsType = {
   date: DateOptions;
   data: DataOptions;
   scale: ScaleOptions;
-  legend: LegendOptions;
   animationDuration: number;
   verticalOrientation: boolean;
 };
@@ -244,18 +236,6 @@ export default class Options {
         type: 'quantize',
         domain: [0, 100],
         scheme: 'YlOrBr',
-      },
-
-      // Legend properties
-      legend: {
-        // Whether to display the legend
-        show: false,
-
-        itemSelector: null,
-
-        label: null,
-
-        width: 130,
       },
 
       // Animation duration, in ms

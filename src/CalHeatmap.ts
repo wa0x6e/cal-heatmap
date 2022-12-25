@@ -90,7 +90,7 @@ export default class CalHeatmap {
    */
   paint(
     options?: DeepPartial<OptionsType>,
-    plugins?: Array<[any, any]>,
+    plugins?: Array<[any, any?]>,
   ): Promise<unknown> {
     this.options.init(options);
 
