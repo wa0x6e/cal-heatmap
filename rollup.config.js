@@ -24,47 +24,65 @@ const basePlugins = [
   scss({ fileName: `${pkg.name}.css`, outputStyle: 'compressed' }),
 ];
 
+const globals = {
+  '@popperjs/core': 'Popper'
+};
+
+const exportConfig = (input, name, output, options = {}) => {
+  return [
+    {
+      input,
+      output: [
+        {
+          file: `dist/${output}.js`,
+          name,
+          format: 'umd',
+          globals,
+        },
+      ],
+      plugins: basePlugins,
+      ...options
+    },
+    {
+      input,
+      watch: false,
+      output: [
+        {
+          file: `dist/${output}.esm.js`,
+          format: 'esm',
+          globals,
+        },
+      ],
+      plugins: basePlugins,
+      ...options
+    },
+    {
+      input,
+      watch: false,
+      output: [
+        {
+          compact: true,
+          file: `dist/${output}.min.esm.js`,
+          format: 'esm',
+          sourcemap: true,
+          globals,
+        },
+        {
+          compact: true,
+          file: `dist/${output}.min.js`,
+          name,
+          format: 'umd',
+          sourcemap: true,
+          globals,
+        },
+      ],
+      plugins: [...basePlugins, terser()],
+      ...options
+    },
+  ]
+}
+
 export default [
-  {
-    input: 'src/CalHeatmap.ts',
-    output: [
-      {
-        file: `dist/${pkg.name}.js`,
-        name: 'CalHeatmap',
-        format: 'umd',
-      },
-    ],
-    plugins: basePlugins,
-  },
-  {
-    input: 'src/CalHeatmap.ts',
-    watch: false,
-    output: [
-      {
-        file: `dist/${pkg.name}.esm.js`,
-        format: 'esm',
-      },
-    ],
-    plugins: basePlugins,
-  },
-  {
-    input: 'src/CalHeatmap.ts',
-    watch: false,
-    output: [
-      {
-        compact: true,
-        file: `dist/${pkg.name}.min.esm.js`,
-        format: 'esm',
-        sourcemap: true,
-      },
-      {
-        compact: true,
-        file: `dist/${pkg.name}.min.js`,
-        name: 'CalHeatmap',
-        format: 'umd',
-        sourcemap: true,
-      },
-    ],
-    plugins: [...basePlugins, terser()],
-  },
+  ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name),
+  ...exportConfig('src/plugins/Tooltip.ts', 'Tooltip', 'plugins/Tooltip', { external: ['@popperjs/core'] }),
 ];

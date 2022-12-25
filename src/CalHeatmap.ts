@@ -1,4 +1,5 @@
 import EventEmmiter from 'eventemitter3';
+import { eq } from 'lodash-es';
 
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
@@ -42,6 +43,8 @@ export default class CalHeatmap {
 
   helpers: Helpers;
 
+  plugins: Map<string, { options: {}; class: any; instance?: any }>;
+
   constructor() {
     // Default options
     this.options = new Options();
@@ -59,6 +62,7 @@ export default class CalHeatmap {
 
     this.calendarPainter = new CalendarPainter(this);
     this.eventEmitter = new EventEmmiter();
+    this.plugins = new Map();
   }
 
   createDomainCollection(
@@ -84,7 +88,10 @@ export default class CalHeatmap {
    * @return A Promise, which will fulfill once all the underlying asynchronous
    * tasks settle, whether resolved or rejected.
    */
-  paint(options?: DeepPartial<OptionsType>): Promise<unknown> {
+  paint(
+    options?: DeepPartial<OptionsType>,
+    plugins?: Array<[any, any]>,
+  ): Promise<unknown> {
     this.options.init(options);
 
     // Refresh the helpers with the correct options
@@ -97,6 +104,20 @@ export default class CalHeatmap {
       return Promise.reject(error);
     }
 
+    if (plugins) {
+      plugins.forEach(([Plugin, pluginOptions]) => {
+        if (
+          this.plugins.has(Plugin.name) &&
+          eq(this.plugins.get(Plugin.name)!.options, pluginOptions)
+        ) {
+          return;
+        }
+        this.plugins.set(Plugin.name, {
+          options: pluginOptions,
+          class: Plugin,
+        });
+      });
+    }
     this.calendarPainter.setup();
 
     // Record all the valid domains
@@ -109,10 +130,7 @@ export default class CalHeatmap {
       ),
     );
 
-    return Promise.allSettled([
-      this.calendarPainter.paint(),
-      this.fill(),
-    ]);
+    return Promise.allSettled([this.calendarPainter.paint(), this.fill()]);
   }
 
   /**
@@ -209,20 +227,23 @@ export default class CalHeatmap {
     );
 
     return new Promise((resolve, reject) => {
-      dataPromise.then((data: any) => {
-        this.domainCollection.fill(
-          data,
-          options.data,
-          this.domainCollection.min,
-          endDate,
-          template.get(options.domain.type)!.extractUnit,
-          template.get(options.subDomain.type)!.extractUnit,
-        );
-        this.populator.populate();
-        resolve(null);
-      }, (error) => {
-        reject(error);
-      });
+      dataPromise.then(
+        (data: any) => {
+          this.domainCollection.fill(
+            data,
+            options.data,
+            this.domainCollection.min,
+            endDate,
+            template.get(options.domain.type)!.extractUnit,
+            template.get(options.subDomain.type)!.extractUnit,
+          );
+          this.populator.populate();
+          resolve(null);
+        },
+        (error) => {
+          reject(error);
+        },
+      );
     });
   }
 

@@ -4,7 +4,6 @@ import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
 import DomainSecondaryLabelPainter from '../domain/DomainSecondaryLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
-import Tooltip from '../tooltip/Tooltip';
 import LegendPainter from '../legend/LegendPainter';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -19,8 +18,6 @@ export default class CalendarPainter {
   };
 
   root: any;
-
-  tooltip: Tooltip;
 
   domainPainter: DomainPainter;
 
@@ -39,7 +36,6 @@ export default class CalendarPainter {
       height: 0,
     };
     this.root = null;
-    this.tooltip = new Tooltip(calendar);
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.domainLabelPainter = new DomainLabelPainter(calendar);
@@ -62,8 +58,15 @@ export default class CalendarPainter {
         .append('svg')
         .attr('class', 'graph')
         .attr('style', 'fill: transparent;');
-      this.tooltip.init();
     }
+
+    this.calendar.plugins.forEach((plugin, name) => {
+      const PluginName = plugin.class;
+      const instance = new PluginName(this.calendar);
+      instance.setup(plugin.options);
+
+      this.calendar.plugins.set(name, { ...plugin, instance });
+    });
 
     return true;
   }
@@ -137,19 +140,30 @@ export default class CalendarPainter {
   }
 
   destroy(): Promise<unknown> {
+    const result: Promise<unknown>[] = [];
+
+    result.concat(
+      Array.from(this.calendar.plugins.values()).map((plugin: any) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        plugin.instance.destroy()),
+    );
+
     if (!this.root) {
-      return Promise.resolve();
+      return Promise.allSettled(result);
     }
 
     this.legendPainter.destroy();
-    this.tooltip.destroy();
 
-    return this.root
-      .transition()
-      .duration(this.calendar.options.options.animationDuration)
-      .attr('width', 0)
-      .attr('height', 0)
-      .remove()
-      .end();
+    result.push(
+      this.root
+        .transition()
+        .duration(this.calendar.options.options.animationDuration)
+        .attr('width', 0)
+        .attr('height', 0)
+        .remove()
+        .end(),
+    );
+
+    return Promise.allSettled(result);
   }
 }

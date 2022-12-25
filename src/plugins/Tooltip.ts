@@ -1,9 +1,30 @@
 import { createPopper } from '@popperjs/core';
-import type { VirtualElement } from '@popperjs/core';
 
+import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
 
 const BASE_CLASSNAME = 'ch-tooltip';
+
+type PopperOptions = {
+  placement: any;
+  modifiers: any[];
+  strategy: any;
+  onFirstUpdate?: any;
+};
+
+type TooltipOptions = {
+  enable: boolean;
+  text: (timestamp: number, value: number) => string;
+} & PopperOptions;
+
+const defaultOptions = {
+  enable: true,
+
+  // Expecting a function, which will return the tooltip content
+  text: (timestamp: number, value: number): string =>
+    // eslint-disable-next-line implicit-arrow-linebreak
+    `${value} - ${new Date(timestamp).toISOString()}`,
+};
 
 const DEFAULT_POPPER_OPTIONS = {
   placement: 'top',
@@ -17,46 +38,49 @@ const DEFAULT_POPPER_OPTIONS = {
   ],
 };
 
+const virtualElement: VirtualElement = {
+  getBoundingClientRect(x = 0, y = 0): DOMRect {
+    return {
+      width: 0,
+      height: 0,
+      top: y,
+      right: x,
+      bottom: y,
+      left: x,
+      x,
+      y,
+      toJSON: () => {},
+    };
+  },
+};
+
 export default class Tooltip {
+  name = 'Tooltip';
+
   calendar: CalHeatmap;
 
   root: HTMLElement | null;
-
-  virtualElement: VirtualElement;
 
   popperInstance: any;
 
   popperOptions: any;
 
+  options: Partial<TooltipOptions>;
+
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.root = null;
-    this.virtualElement = {
-      getBoundingClientRect(x = 0, y = 0): DOMRect {
-        return {
-          width: 0,
-          height: 0,
-          top: y,
-          right: x,
-          bottom: y,
-          left: x,
-          x,
-          y,
-          toJSON: () => {},
-        };
-      },
-    };
     this.popperInstance = null;
+    this.options = defaultOptions;
   }
 
-  init(): void {
-    const { tooltip } = this.calendar.options.options;
-
-    if (!tooltip.show) {
+  setup(pluginOptions: Partial<TooltipOptions>): void {
+    this.options = { ...defaultOptions, ...pluginOptions };
+    if (!this.options.enable) {
       return;
     }
 
-    this.popperOptions = { ...DEFAULT_POPPER_OPTIONS, ...tooltip };
+    this.popperOptions = { ...DEFAULT_POPPER_OPTIONS, ...this.options };
 
     this.root = document.getElementById(BASE_CLASSNAME);
 
@@ -71,8 +95,8 @@ export default class Tooltip {
       this.root = document.body.appendChild(tooltipElem);
     }
 
-    this.popperInstance = createPopper(
-      this.virtualElement,
+    this.popperInstance = createPopper<StrictModifiers>(
+      virtualElement,
       this.root,
       this.popperOptions,
     );
@@ -93,17 +117,19 @@ export default class Tooltip {
     if (this.root) {
       this.root.remove();
     }
+
+    return Promise.resolve();
   }
 
   #show(e: any, timestamp: number, value: number): void {
-    const formatter = this.calendar.options.options.tooltip.title;
+    const formatter = this.options.text;
     const title = formatter ? formatter(timestamp, value) : null;
 
     if (!title) {
       return;
     }
 
-    this.virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
+    virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
     document.getElementById(`${BASE_CLASSNAME}-body`)!.innerHTML = title;
 
     this.popperInstance.setOptions(() => ({

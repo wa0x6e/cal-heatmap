@@ -4,6 +4,7 @@ import { select } from 'd3-selection';
  * @jest-environment jsdom
  */
 
+import Tooltip from '../../src/plugins/Tooltip';
 import CalHeatmap from '../../src/CalHeatmap';
 
 describe('Tooltip', () => {
@@ -35,14 +36,14 @@ describe('Tooltip', () => {
       expect(select('#ch-tooltip-body').html()).not.toBeNull();
     });
 
-    cal.paint({ tooltip: { show: true } });
+    cal.paint({}, [[Tooltip, { enable: true }]]);
     expect(select('#ch-tooltip').node()).not.toBeNull();
   });
 
   it('disables the tooltip', () => {
     expect(select('#ch-tooltip').node()).toBeNull();
 
-    cal.paint({ tooltip: { show: false } });
+    cal.paint({}, [[Tooltip, { enable: false }]]);
 
     expect(select('#ch-tooltip').node()).toBeNull();
   });
@@ -66,26 +67,31 @@ describe('Tooltip', () => {
       );
 
       expect(select('#ch-tooltip-body').html()).toBe('2000-10');
-
       expect(select('#ch-tooltip').attr('data-show')).toBe('1');
     });
 
-    cal.paint({
-      range: 1,
-      date: { start: date },
-      data: { source: data, x: 'time', y: 'value' },
-      domain: { type: 'year' },
-      subDomain: {
-        type: 'month',
-        label: (d, v) => `${v}`,
+    cal.paint(
+      {
+        range: 1,
+        date: { start: date },
+        data: { source: data, x: 'time', y: 'value' },
+        domain: { type: 'year' },
+        subDomain: {
+          type: 'month',
+        },
       },
-      tooltip: {
-        show: true,
-        title: (d: number, value: number) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          `${new Date(d).getFullYear()}-${value}`,
-      },
-    });
+      [
+        [
+          Tooltip,
+          {
+            show: true,
+            text: (d: number, value: number) =>
+              // eslint-disable-next-line implicit-arrow-linebreak
+              `${new Date(d).getFullYear()}-${value}`,
+          },
+        ],
+      ],
+    );
   });
 
   it('formats the title with the default function', () => {
@@ -113,17 +119,24 @@ describe('Tooltip', () => {
       expect(select('#ch-tooltip').attr('data-show')).toBe('1');
     });
 
-    cal.paint({
-      range: 1,
-      date: { start: date },
-      data: { source: data, x: 'time', y: 'value' },
-      domain: { type: 'year' },
-      subDomain: {
-        type: 'month',
+    cal.paint(
+      {
+        range: 1,
+        date: { start: date },
+        data: { source: data, x: 'time', y: 'value' },
+        domain: { type: 'year' },
+        subDomain: {
+          type: 'month',
+        },
       },
-      tooltip: {
-        show: true,
-      },
-    });
+      [[Tooltip, { enable: true }]],
+    );
+  });
+
+  it('destroys the tooltip along the calendar', async () => {
+    cal.paint({}, [[Tooltip, { enable: true }]]);
+    expect(select('#ch-tooltip').node()).not.toBeNull();
+    await cal.destroy();
+    expect(select('#ch-tooltip').node()).toBeNull();
   });
 });
