@@ -1,5 +1,5 @@
 import EventEmmiter from 'eventemitter3';
-import { eq } from 'lodash-es';
+import { castArray } from 'lodash-es';
 
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
@@ -9,6 +9,7 @@ import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
 import createHelpers from './helpers/HelperFactory';
 import validate from './options/OptionsValidator';
+import PluginManager from './PluginManager';
 
 import './cal-heatmap.scss';
 
@@ -43,7 +44,7 @@ export default class CalHeatmap {
 
   helpers: Helpers;
 
-  plugins: Map<string, { options: {}; class: any; instance?: any }>;
+  pluginManager: PluginManager;
 
   constructor() {
     // Default options
@@ -62,7 +63,7 @@ export default class CalHeatmap {
 
     this.calendarPainter = new CalendarPainter(this);
     this.eventEmitter = new EventEmmiter();
-    this.plugins = new Map();
+    this.pluginManager = new PluginManager(this);
   }
 
   createDomainCollection(
@@ -90,7 +91,7 @@ export default class CalHeatmap {
    */
   paint(
     options?: DeepPartial<OptionsType>,
-    plugins?: Array<[any, any?]>,
+    plugins?: Array<[any, any?]> | [any, any?],
   ): Promise<unknown> {
     this.options.init(options);
 
@@ -104,20 +105,8 @@ export default class CalHeatmap {
       return Promise.reject(error);
     }
 
-    if (plugins) {
-      plugins.forEach(([Plugin, pluginOptions]) => {
-        if (
-          this.plugins.has(Plugin.name) &&
-          eq(this.plugins.get(Plugin.name)!.options, pluginOptions)
-        ) {
-          return;
-        }
-        this.plugins.set(Plugin.name, {
-          options: pluginOptions,
-          class: Plugin,
-        });
-      });
-    }
+    this.pluginManager.add(castArray(plugins));
+
     this.calendarPainter.setup();
 
     // Record all the valid domains

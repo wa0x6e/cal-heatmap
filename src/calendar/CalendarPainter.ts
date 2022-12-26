@@ -56,13 +56,7 @@ export default class CalendarPainter {
         .attr('style', 'fill: transparent;');
     }
 
-    this.calendar.plugins.forEach((plugin, name) => {
-      const PluginName = plugin.class;
-      const instance = new PluginName(this.calendar);
-      instance.setup(plugin.options);
-
-      this.calendar.plugins.set(name, { ...plugin, instance });
-    });
+    this.calendar.pluginManager.setupAll();
 
     return true;
   }
@@ -75,14 +69,12 @@ export default class CalendarPainter {
       .duration(this.calendar.options.options.animationDuration)
       .attr('x', this.domainSecondaryLabelPainter.dimensions.width);
 
-    const transitions = this.domainPainter.paint(navigationDir, this.root);
+    let transitions = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(this.domainPainter.root);
     this.domainLabelPainter.paint(this.domainPainter.root);
 
-    transitions.concat(
-      Array.from(this.calendar.plugins.values()).map((plugin: any) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        plugin.instance.paint()),
+    transitions = transitions.concat(
+      this.calendar.pluginManager.paintAll(),
     );
 
     this.#resize();
@@ -140,12 +132,10 @@ export default class CalendarPainter {
   }
 
   destroy(): Promise<unknown> {
-    const result: Promise<unknown>[] = [];
+    let result: Promise<unknown>[] = [];
 
-    result.concat(
-      Array.from(this.calendar.plugins.values()).map((plugin: any) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        plugin.instance.destroy()),
+    result = result.concat(
+      this.calendar.pluginManager.destroyAll(),
     );
 
     if (!this.root) {
