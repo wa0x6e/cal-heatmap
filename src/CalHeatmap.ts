@@ -105,7 +105,9 @@ export default class CalHeatmap {
       return Promise.reject(error);
     }
 
-    this.pluginManager.add(castArray(plugins));
+    if (plugins) {
+      this.pluginManager.add(castArray(plugins));
+    }
 
     this.calendarPainter.setup();
 
