@@ -13,12 +13,12 @@ type PopperOptions = {
 };
 
 type TooltipOptions = {
-  enable: boolean;
+  enabled: boolean;
   text: (timestamp: number, value: number) => string;
 } & PopperOptions;
 
 const defaultOptions = {
-  enable: true,
+  enabled: true,
 
   // Expecting a function, which will return the tooltip content
   text: (timestamp: number, value: number): string =>
@@ -76,7 +76,8 @@ export default class Tooltip {
 
   setup(pluginOptions: Partial<TooltipOptions>): void {
     this.options = { ...defaultOptions, ...pluginOptions };
-    if (!this.options.enable) {
+    if (!this.options.enabled) {
+      this.destroy();
       return;
     }
 
@@ -118,7 +119,7 @@ export default class Tooltip {
     return Promise.resolve();
   }
 
-  destroy() {
+  destroy(): Promise<unknown> {
     if (this.root) {
       this.root.remove();
     }

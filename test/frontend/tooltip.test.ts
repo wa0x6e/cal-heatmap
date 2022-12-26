@@ -36,14 +36,14 @@ describe('Tooltip', () => {
       expect(select('#ch-tooltip-body').html()).not.toBeNull();
     });
 
-    cal.paint({}, [[Tooltip, { enable: true }]]);
+    cal.paint({}, [[Tooltip, { enabled: true }]]);
     expect(select('#ch-tooltip').node()).not.toBeNull();
   });
 
   it('disables the tooltip', () => {
     expect(select('#ch-tooltip').node()).toBeNull();
 
-    cal.paint({}, [[Tooltip, { enable: false }]]);
+    cal.paint({}, [[Tooltip, { enabled: false }]]);
 
     expect(select('#ch-tooltip').node()).toBeNull();
   });
@@ -129,12 +129,12 @@ describe('Tooltip', () => {
           type: 'month',
         },
       },
-      [[Tooltip, { enable: true }]],
+      [[Tooltip, { enabled: true }]],
     );
   });
 
   it('destroys the tooltip along the calendar', async () => {
-    cal.paint({}, [[Tooltip, { enable: true }]]);
+    cal.paint({}, [[Tooltip, { enabled: true }]]);
     expect(select('#ch-tooltip').node()).not.toBeNull();
     await cal.destroy();
     expect(select('#ch-tooltip').node()).toBeNull();
