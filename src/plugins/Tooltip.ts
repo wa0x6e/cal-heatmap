@@ -67,16 +67,28 @@ export default class Tooltip {
 
   options: Partial<TooltipOptions>;
 
+  listenerAttached: boolean;
+
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.root = null;
     this.popperInstance = null;
     this.options = defaultOptions;
+    this.listenerAttached = false;
   }
 
   setup(pluginOptions: Partial<TooltipOptions>): void {
     this.options = { ...defaultOptions, ...pluginOptions };
+    const event = this.calendar.eventEmitter;
+
     if (!this.options.enabled) {
+      if (this.listenerAttached) {
+        event.off('mouseover', this.mouseOverCallback, this);
+        event.off('mouseout', this.mouseOutCallback, this);
+
+        this.listenerAttached = false;
+      }
+
       this.destroy();
       return;
     }
@@ -102,16 +114,19 @@ export default class Tooltip {
       this.popperOptions,
     );
 
-    this.calendar.eventEmitter.on(
-      'mouseover',
-      (e: PointerEvent, timestamp: number, value: number) => {
-        this.#show(e.target, timestamp, value);
-      },
-    );
+    if (!this.listenerAttached) {
+      event.on('mouseover', this.mouseOverCallback, this);
+      event.on('mouseout', this.mouseOutCallback, this);
+      this.listenerAttached = true;
+    }
+  }
 
-    this.calendar.eventEmitter.on('mouseout', () => {
-      this.#hide();
-    });
+  mouseOverCallback(e: PointerEvent, timestamp: number, value: number) {
+    this.#show(e.target, timestamp, value);
+  }
+
+  mouseOutCallback() {
+    this.#hide();
   }
 
   // eslint-disable-next-line class-methods-use-this
