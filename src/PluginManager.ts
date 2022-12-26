@@ -34,13 +34,13 @@ export default class PluginManager {
 
   setupAll() {
     this.plugins.forEach((pluginInstance, name) => {
-      const { options, dirty } = this.settings.get(name);
+      const settings = this.settings.get(name);
 
-      if (dirty) {
-        pluginInstance.setup(options);
-        delete options.dirty;
+      if (settings.dirty) {
+        pluginInstance.setup(settings.options);
+        delete settings.dirty;
 
-        this.settings.set(name, options);
+        this.settings.set(name, settings);
       }
     });
   }
