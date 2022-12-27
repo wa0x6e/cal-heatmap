@@ -27,7 +27,14 @@ const basePlugins = [
 const globals = {
   '@popperjs/core': 'Popper',
   'd3-selection': 'd3',
-  'd3': 'd3'
+  'd3': 'd3',
+  'd3-array': 'd3',
+  'd3-color': 'd3',
+  'd3-fetch': 'd3',
+  'd3-format': 'd3',
+  'd3-scale': 'd3',
+  'd3-selection': 'd3',
+  'd3-transition': 'd3',
 };
 
 const exportConfig = (input, name, output, options = {}) => {
@@ -85,7 +92,7 @@ const exportConfig = (input, name, output, options = {}) => {
 }
 
 export default [
-  ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name),
+  ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name, { external: ['d3', 'd3-array', 'd3-color', 'd3-fetch', 'd3-format', 'd3-scale', 'd3-selection', 'd3-transition'] }),
   ...exportConfig('src/plugins/Tooltip.ts', 'Tooltip', 'plugins/Tooltip', { external: ['@popperjs/core'] }),
   ...exportConfig('src/plugins/Legend.ts', 'Legend', 'plugins/Legend', { external: ['d3-selection', 'd3'] }),
 ];
