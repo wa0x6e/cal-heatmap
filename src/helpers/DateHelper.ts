@@ -1,5 +1,6 @@
 import { isString, isFunction } from 'lodash-es';
 import Moment from 'moment-timezone';
+import moment from 'moment-timezone/moment-timezone';
 import MomentRange from 'moment-range';
 
 export default class DateHelper {
@@ -11,7 +12,7 @@ export default class DateHelper {
 
   constructor(locale?: string, timezone?: string) {
     // @ts-ignore
-    this.momentInstance = MomentRange.extendMoment(Moment);
+    this.momentInstance = MomentRange.extendMoment(moment);
 
     this.locale = locale || 'en';
     this.timezone = timezone || this.momentInstance.tz.guess();

@@ -35,6 +35,8 @@ const globals = {
   'd3-scale': 'd3',
   'd3-selection': 'd3',
   'd3-transition': 'd3',
+  'moment': 'moment',
+  'moment-timezone': 'moment-timezone',
 };
 
 const exportConfig = (input, name, output, options = {}) => {
@@ -92,7 +94,7 @@ const exportConfig = (input, name, output, options = {}) => {
 }
 
 export default [
-  ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name, { external: ['d3', 'd3-array', 'd3-color', 'd3-fetch', 'd3-format', 'd3-scale', 'd3-selection', 'd3-transition'] }),
+  ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name, { external: ['d3', 'd3-array', 'd3-color', 'd3-fetch', 'd3-format', 'd3-scale', 'd3-selection', 'd3-transition', 'moment', 'moment-timezone'] }),
   ...exportConfig('src/plugins/Tooltip.ts', 'Tooltip', 'plugins/Tooltip', { external: ['@popperjs/core'] }),
   ...exportConfig('src/plugins/Legend.ts', 'Legend', 'plugins/Legend', { external: ['d3-selection', 'd3'] }),
 ];
