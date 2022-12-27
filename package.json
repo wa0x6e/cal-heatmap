@@ -20,7 +20,7 @@
     "test": "test"
   },
   "node": ">=14.16",
-  "browserslist": "defaults and supports es6-module",
+  "browserslist": "last 2 versions, not dead, > 0.2%",
   "dependencies": {
     "@observablehq/plot": "^0.6.0",
     "@popperjs/core": "^2.11.6",
