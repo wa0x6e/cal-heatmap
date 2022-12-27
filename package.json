@@ -20,6 +20,7 @@
     "test": "test"
   },
   "node": ">=14.16",
+  "browserslist": "defaults and supports es6-module",
   "dependencies": {
     "@observablehq/plot": "^0.6.0",
     "@popperjs/core": "^2.11.6",
@@ -36,6 +37,8 @@
     "moment-timezone": "^0.5.39"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -51,6 +54,7 @@
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
+    "browserslist": "^4.21.4",
     "eslint": "^8.29.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",

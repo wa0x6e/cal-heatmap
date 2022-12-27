@@ -8,6 +8,7 @@ import terser from '@rollup/plugin-terser';
 import filesize from 'rollup-plugin-filesize';
 import scss from 'rollup-plugin-scss';
 import typescript from '@rollup/plugin-typescript';
+import { babel } from '@rollup/plugin-babel';
 
 const pkg = JSON.parse(readFileSync('./package.json'));
 
@@ -22,6 +23,7 @@ const basePlugins = [
   }),
   filesize(),
   scss({ fileName: `${pkg.name}.css`, outputStyle: 'compressed' }),
+  babel({ babelHelpers: 'bundled', extensions: ['.ts'] })
 ];
 
 const globals = {
