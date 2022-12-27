@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash-es';
+import isEqual from 'lodash-es/isEqual';
 
 import type CalHeatmap from './CalHeatmap';
 

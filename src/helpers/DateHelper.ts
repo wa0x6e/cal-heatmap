@@ -1,5 +1,6 @@
-import { isString, isFunction } from 'lodash-es';
-import Moment from 'moment-timezone';
+import isString from 'lodash-es/isString';
+import isFunction from 'lodash-es/isFunction';
+// @ts-ignore
 import moment from 'moment-timezone/moment-timezone';
 import MomentRange from 'moment-range';
 

@@ -1,6 +1,6 @@
 // @ts-ignore
 import { scale } from '@observablehq/plot';
-import { isFunction } from 'lodash-es';
+import isFunction from 'lodash-es/isFunction';
 import { hcl } from 'd3-color';
 
 import type CalHeatmap from '../CalHeatmap';

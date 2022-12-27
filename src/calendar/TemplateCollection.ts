@@ -1,4 +1,4 @@
-import { castArray } from 'lodash-es';
+import castArray from 'lodash-es/castArray';
 
 import DefaultTemplates from './templates/index';
 import type Options from '../options/Options';

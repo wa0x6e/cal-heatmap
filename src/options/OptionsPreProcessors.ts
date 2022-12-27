@@ -1,4 +1,6 @@
-import { castArray, isFunction, isString } from 'lodash-es';
+import castArray from 'lodash-es/castArray';
+import isFunction from 'lodash-es/isFunction';
+import isString from 'lodash-es/isString';
 import type { SubDomainOptions } from './Options';
 
 export default {

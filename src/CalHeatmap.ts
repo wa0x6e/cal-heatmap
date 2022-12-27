@@ -1,5 +1,5 @@
 import EventEmmiter from 'eventemitter3';
-import { castArray } from 'lodash-es';
+import castArray from 'lodash-es/castArray';
 
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';

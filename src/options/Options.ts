@@ -1,6 +1,8 @@
-import {
-  mergeWith, isEqual, has, get, set,
-} from 'lodash-es';
+import mergeWith from 'lodash-es/mergeWith';
+import isEqual from 'lodash-es/isEqual';
+import has from 'lodash-es/has';
+import get from 'lodash-es/get';
+import set from 'lodash-es/set';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 

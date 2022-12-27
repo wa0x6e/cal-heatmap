@@ -1,5 +1,5 @@
 import { select } from 'd3-selection';
-import { merge } from 'lodash-es';
+import merge from 'lodash-es/merge';
 
 /**
  * @jest-environment jsdom

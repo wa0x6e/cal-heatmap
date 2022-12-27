@@ -1,4 +1,7 @@
-import { castArray, isString, isFunction } from 'lodash-es';
+import castArray from 'lodash-es/castArray';
+import isString from 'lodash-es/isString';
+import isFunction from 'lodash-es/isFunction';
+
 import {
   group, sum, count, min, max, median,
 } from 'd3-array';
