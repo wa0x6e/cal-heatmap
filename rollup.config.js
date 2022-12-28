@@ -13,7 +13,7 @@ import { babel } from '@rollup/plugin-babel';
 
 const pkg = JSON.parse(readFileSync('./package.json'));
 
-const basePlugins = [
+let basePlugins = [
   typescript(),
   json(),
   commonjs(),
