@@ -23,13 +23,26 @@ const basePlugins = [
     'process.env.NODE_ENV': JSON.stringify('production'),
   }),
   filesize(),
+];
+
+const productionPlugins = [
+  babel({ babelHelpers: 'bundled', extensions: ['.ts'] }),
   postcss({
     extract: `${pkg.name}.css`,
     minimize: true,
     plugins: [autoprefixer],
   }),
-  babel({ babelHelpers: 'bundled', extensions: ['.ts'] }),
 ];
+
+if (!process.env.ROLLUP_WATCH) {
+  basePlugins = basePlugins.concat(productionPlugins);
+} else {
+  basePlugins.push(
+    postcss({
+      extract: `${pkg.name}.css`,
+    }),
+  );
+}
 
 const globals = {
   '@popperjs/core': 'Popper',
