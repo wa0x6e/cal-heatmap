@@ -13,7 +13,7 @@ export default class Timezone {
   }
 
   setup(pluginOptions: any): void {
-    const { moment } = pluginOptions;
+    const moment = pluginOptions.moment || window.moment;
     const timezone = pluginOptions.timezone || moment.tz.guess();
 
     this.calendar.dateHelper.setMoment(moment);

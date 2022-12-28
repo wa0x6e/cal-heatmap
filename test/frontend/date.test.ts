@@ -45,6 +45,33 @@ describe('Date', () => {
 
     expect(select('.graph-label').html()).toBe('janvier');
   });
+
+  it('start the week on sunday', async () => {
+    await cal.paint({
+      range: 1,
+      date: { start: new Date(2020, 0, 15), locale: 'en' },
+      domain: { type: 'month' },
+      subDomain: { type: 'day' },
+    });
+
+    expect(select('.graph-subdomain-group g:nth-child(5) rect').attr('y')).toBe(
+      '0',
+    );
+  });
+
+  it('start the week on monday', async () => {
+    await cal.paint({
+      range: 1,
+      date: { start: new Date(2020, 0, 15), locale: 'fr' },
+      domain: { type: 'month' },
+      subDomain: { type: 'day' },
+    });
+
+    expect(select('.graph-subdomain-group g:nth-child(6) rect').attr('y')).toBe(
+      '0',
+    );
+  });
+
   it('set the given dates as highlighted', () => {
     const startDate = new Date(2020, 6, 15, 2, 6);
     const highlight = [startDate, new Date(2020, 6, 25, 6, 25)];
