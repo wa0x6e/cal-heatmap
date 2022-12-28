@@ -55,7 +55,7 @@ const globals = {
   'd3-scale': 'd3',
   'd3-selection': 'd3',
   'd3-transition': 'd3',
-  // moment: 'moment',
+  moment: 'moment',
 };
 
 const exportConfig = (input, name, output, options = {}) => {
@@ -123,7 +123,7 @@ export default [
       'd3-scale',
       'd3-selection',
       'd3-transition',
-      // 'moment',
+      'moment',
     ],
   }),
   ...exportConfig('src/plugins/Tooltip.ts', 'Tooltip', 'plugins/Tooltip', {
