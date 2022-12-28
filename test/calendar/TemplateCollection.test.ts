@@ -7,10 +7,9 @@ describe('TemplateCollection', () => {
   let t: TemplateCollection;
   const template = { name: 'test_day' };
   const options = new Options();
-  const helpers = { DateHelper: new DateHelper() };
 
   beforeEach(() => {
-    t = new TemplateCollection(helpers, options);
+    t = new TemplateCollection(new DateHelper(), options);
     t.settings.set('test_day', template as TemplateResult);
   });
 

@@ -55,8 +55,7 @@ const globals = {
   'd3-scale': 'd3',
   'd3-selection': 'd3',
   'd3-transition': 'd3',
-  moment: 'moment',
-  'moment-timezone': 'moment-timezone',
+  // moment: 'moment',
 };
 
 const exportConfig = (input, name, output, options = {}) => {
@@ -124,8 +123,7 @@ export default [
       'd3-scale',
       'd3-selection',
       'd3-transition',
-      'moment',
-      'moment-timezone',
+      // 'moment',
     ],
   }),
   ...exportConfig('src/plugins/Tooltip.ts', 'Tooltip', 'plugins/Tooltip', {
@@ -133,5 +131,8 @@ export default [
   }),
   ...exportConfig('src/plugins/Legend.ts', 'Legend', 'plugins/Legend', {
     external: ['d3-selection', 'd3'],
+  }),
+  ...exportConfig('src/plugins/Timezone.ts', 'Timezone', 'plugins/Timezone', {
+
   }),
 ];

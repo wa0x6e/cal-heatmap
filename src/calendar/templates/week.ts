@@ -3,7 +3,7 @@ import type { DomainOptions } from '../../options/Options';
 import type { Template, TemplateResult } from '../../index';
 
 const weekTemplate: Template = (
-  { DateHelper }: { DateHelper: DateHelper },
+  DateHelper: DateHelper,
   { domain }: { domain: DomainOptions },
 ): TemplateResult => {
   const { dynamicDimension } = domain;

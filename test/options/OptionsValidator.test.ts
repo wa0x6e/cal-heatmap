@@ -3,10 +3,10 @@ import TemplateCollection from '../../src/calendar/TemplateCollection';
 import Options from '../../src/options/Options';
 
 import type { TemplateResult } from '../../src/index';
-import type { Helpers } from '../../src/helpers/HelperFactory';
+import DateHelper from '../../src/helpers/DateHelper';
 
 describe('OptionsValidator', () => {
-  const helpers = { DateHelper: {} } as Helpers;
+  const dateHelper = new DateHelper();
   const options = new Options();
 
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe('OptionsValidator', () => {
     });
   });
 
-  const validSubDomainTemplate = new TemplateCollection(helpers, options);
+  const validSubDomainTemplate = new TemplateCollection(dateHelper, options);
   validSubDomainTemplate.settings = new Map([
     ['day', { level: 10 } as TemplateResult],
     ['x_day', { level: 10 } as TemplateResult],

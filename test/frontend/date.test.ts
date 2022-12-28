@@ -35,8 +35,6 @@ describe('Date', () => {
     );
   });
 
-  it.todo('set the calendar timezone');
-
   it('set the calendar locale', () => {
     cal.paint({
       range: 1,

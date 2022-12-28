@@ -3,7 +3,7 @@ import type { OptionsType, DomainOptions } from '../../options/Options';
 import type { Template, TemplateResult } from '../../index';
 
 const dayTemplate: Template = (
-  { DateHelper }: { DateHelper: DateHelper },
+  DateHelper: DateHelper,
   {
     domain,
     verticalOrientation,

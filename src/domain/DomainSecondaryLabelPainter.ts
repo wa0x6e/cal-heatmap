@@ -27,7 +27,7 @@ export default class DomainSecondaryLabel {
       options.domain.type === 'month' &&
       options.subDomain.type === 'day'
     ) {
-      const dayNames = this.calendar.helpers.DateHelper.momentInstance
+      const dayNames = this.calendar.dateHelper.momentInstance
         .weekdays()
         .map((d: any) => d[0]);
 

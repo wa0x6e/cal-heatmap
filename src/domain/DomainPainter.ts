@@ -102,7 +102,7 @@ export default class DomainPainter {
 
   #getClassName(d: number): string {
     let classname = DEFAULT_CLASSNAME;
-    const helper = this.calendar.helpers.DateHelper.date(d);
+    const helper = this.calendar.dateHelper.date(d);
 
     switch (this.calendar.options.options.domain.type) {
       case 'hour':

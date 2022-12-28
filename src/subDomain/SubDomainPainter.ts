@@ -109,12 +109,12 @@ export default class SubDomainPainter {
    */
   #classname(timestamp: number, ...otherClasses: any): string {
     const { date, subDomain } = this.calendar.options.options;
-    const { DateHelper } = this.calendar.helpers;
+    const { dateHelper } = this.calendar;
     let classname = '';
 
     if (date.highlight.length > 0) {
       date.highlight.forEach((d) => {
-        if (DateHelper.datesFromSameInterval(subDomain.type, +d, timestamp)) {
+        if (dateHelper.datesFromSameInterval(subDomain.type, +d, timestamp)) {
           classname = 'highlight';
         }
       });
@@ -126,7 +126,7 @@ export default class SubDomainPainter {
   #appendText(elem: any) {
     const { options } = this.calendar.options;
     const fmt = options.subDomain.label;
-    const dateFmt = this.calendar.helpers.DateHelper;
+    const dateFmt = this.calendar.dateHelper;
 
     if (!fmt) {
       return null;

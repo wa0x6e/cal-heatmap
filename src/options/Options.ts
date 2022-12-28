@@ -48,7 +48,6 @@ type DateOptions = {
   min?: Date;
   max?: Date;
   highlight: Date[];
-  timezone?: string;
   locale: string;
 };
 
@@ -198,10 +197,6 @@ export default class Options {
         // - []: don't highlight anything
         // - an array of Date objects: highlight the specified dates
         highlight: [],
-
-        // Timezone of the calendar
-        // When undefined, will default to browser local timezone
-        timezone: undefined,
 
         // MomentJS locale
         locale: 'en',

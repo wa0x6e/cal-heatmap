@@ -16,7 +16,7 @@ describe('DomainCollection', () => {
   } as unknown as DateHelper;
 
   beforeEach(() => {
-    d = new DomainCollection({ DateHelper: dummyDateHelper }, 'day', 1, 1);
+    d = new DomainCollection(dummyDateHelper, 'day', 1, 1);
   });
 
   it('get the specified key from the collection', () => {
@@ -115,8 +115,8 @@ describe('DomainCollection', () => {
     let g: DomainCollection;
 
     beforeEach(() => {
-      h = new DomainCollection({ DateHelper: dummyDateHelperA }, 'day', 1, 1);
-      g = new DomainCollection({ DateHelper: dummyDateHelperB }, 'day', 1, 1);
+      h = new DomainCollection(dummyDateHelperA, 'day', 1, 1);
+      g = new DomainCollection(dummyDateHelperB, 'day', 1, 1);
     });
 
     it('prepends the new collection', () => {
@@ -140,7 +140,7 @@ describe('DomainCollection', () => {
 
     beforeEach(() => {
       filledDomainCollection = new DomainCollection(
-        { DateHelper: dummyDateHelper },
+        dummyDateHelper,
         'day',
         1,
         1,

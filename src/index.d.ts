@@ -1,8 +1,8 @@
 import type { OptionsType } from './options/Options';
-import type { Helpers } from './helpers/HelperFactory';
+import type DateHelper from './helpers/DateHelper';
 
 export type Template = {
-  (helpers: Helpers, options: OptionsType): TemplateResult;
+  (dateHelper: DateHelper, options: OptionsType): TemplateResult;
 };
 
 export type SubDomain = {

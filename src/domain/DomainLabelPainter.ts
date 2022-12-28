@@ -13,7 +13,7 @@ export default class DomainLabelPainter {
 
   paint(root: any): void {
     const { label, type } = this.calendar.options.options.domain;
-    const { DateHelper } = this.calendar.helpers;
+    const { dateHelper } = this.calendar;
     let format = label.text;
     if (format === null || format === '') {
       return;
@@ -39,7 +39,7 @@ export default class DomainLabelPainter {
           .attr('dominant-baseline', () => this.#textVerticalAlign())
           .text((d: any, i: number, nodes: any[]) =>
           // eslint-disable-next-line implicit-arrow-linebreak
-            DateHelper.format(d, format!, nodes[i]))
+            dateHelper.format(d, format!, nodes[i]))
           .call((s: any) => this.#domainRotate(s)),
         (update: any) => {
           update
@@ -49,7 +49,7 @@ export default class DomainLabelPainter {
             .attr('dominant-baseline', () => this.#textVerticalAlign())
             .text((d: any, i: number, nodes: any[]) =>
               // eslint-disable-next-line implicit-arrow-linebreak
-              DateHelper.format(d, format!, nodes[i]))
+              dateHelper.format(d, format!, nodes[i]))
             .call((s: any) => this.#domainRotate(s));
         },
       );

@@ -7,7 +7,7 @@ import Populator from './calendar/Populator';
 import Options from './options/Options';
 import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
-import createHelpers from './helpers/HelperFactory';
+import DateHelper from './helpers/DateHelper';
 import validate from './options/OptionsValidator';
 import PluginManager from './PluginManager';
 
@@ -17,7 +17,6 @@ import TemplateCollection from './calendar/TemplateCollection';
 
 import type { OptionsType } from './options/Options';
 import type { Template } from './index';
-import type { Helpers } from './helpers/HelperFactory';
 
 import { ScrollDirection } from './constant';
 
@@ -42,7 +41,7 @@ export default class CalHeatmap {
 
   templateCollection: TemplateCollection;
 
-  helpers: Helpers;
+  dateHelper: DateHelper;
 
   pluginManager: PluginManager;
 
@@ -51,9 +50,9 @@ export default class CalHeatmap {
     this.options = new Options();
 
     // Init the helpers with the default options
-    this.helpers = createHelpers(this.options);
+    this.dateHelper = new DateHelper();
     this.templateCollection = new TemplateCollection(
-      this.helpers,
+      this.dateHelper,
       this.options,
     );
     this.dataFetcher = new DataFetcher(this.options);
@@ -71,7 +70,7 @@ export default class CalHeatmap {
     range: number | Date,
   ): DomainCollection {
     return new DomainCollection(
-      this.helpers,
+      this.dateHelper,
       this.options.options.domain.type,
       startDate,
       range,
@@ -94,9 +93,8 @@ export default class CalHeatmap {
     plugins?: Array<[any, any?]> | [any, any?],
   ): Promise<unknown> {
     this.options.init(options);
+    this.dateHelper.setup(this.options);
 
-    // Refresh the helpers with the correct options
-    this.helpers = createHelpers(this.options);
     this.templateCollection.init();
 
     try {
@@ -113,7 +111,7 @@ export default class CalHeatmap {
 
     // Record all the valid domains
     // Each domain value is a timestamp in milliseconds
-    this.domainCollection = new DomainCollection(this.helpers);
+    this.domainCollection = new DomainCollection(this.dateHelper);
     this.navigator.loadNewDomains(
       this.createDomainCollection(
         this.options.options.date.start,
@@ -205,7 +203,7 @@ export default class CalHeatmap {
   fill(dataSource = this.options.options.data.source): Promise<unknown> {
     const { options } = this.options;
     const template = this.templateCollection;
-    const endDate = this.helpers.DateHelper.intervals(
+    const endDate = this.dateHelper.intervals(
       options.domain.type,
       this.domainCollection.max,
       2,

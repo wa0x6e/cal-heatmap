@@ -8,12 +8,11 @@ import {
 
 import type { SubDomain } from '../index';
 import type { DataOptions } from '../options/Options';
-import type { Helpers } from '../helpers/HelperFactory';
 
 export default class DomainCollection {
   collection: Map<number, SubDomain[]>;
 
-  helpers: any;
+  dateHelper: any;
 
   min: number;
 
@@ -24,17 +23,17 @@ export default class DomainCollection {
   yankedDomains: number[];
 
   constructor(
-    helpers: Helpers,
+    dateHelper: any,
     interval?: string,
     start?: Date | number,
     range?: Date | number,
   ) {
     this.collection = new Map();
-    this.helpers = helpers;
+    this.dateHelper = dateHelper;
 
     if (interval && start && range) {
       this.collection = new Map(
-        this.helpers.DateHelper.intervals(interval, start, range).map(
+        this.dateHelper.intervals(interval, start, range).map(
           (d: number) => castArray(d),
         ),
       );
@@ -210,14 +209,12 @@ export default class DomainCollection {
     x: string | Function,
     extractorFn: Function,
   ): number {
-    const { DateHelper } = this.helpers;
-
     let timestamp: string | number =
       typeof x === 'function' ? x(datum) : datum[x];
 
     if (isString(timestamp)) {
-      if (DateHelper.date(timestamp).isValid()) {
-        timestamp = DateHelper.date(timestamp).valueOf();
+      if (this.dateHelper.date(timestamp).isValid()) {
+        timestamp = this.dateHelper.date(timestamp).valueOf();
       } else {
         return 0;
       }

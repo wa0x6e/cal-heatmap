@@ -15,7 +15,6 @@ export default class Populator {
   populate(): void {
     const { calendar } = this;
     const { options } = calendar.options;
-    const { DateHelper } = calendar.helpers;
 
     let colorScale: any = null;
     try {
@@ -52,10 +51,15 @@ export default class Populator {
           })
           .text((d: any, i: number, nodes: any) =>
             // eslint-disable-next-line implicit-arrow-linebreak
-            DateHelper.format(d.t, options.subDomain.label, d.v, nodes[i]));
+            calendar.dateHelper.format(
+              d.t,
+              options.subDomain.label,
+              d.v,
+              nodes[i],
+            ));
       })
       .call(() => {
-        this.calendar.eventEmitter.emit('fill');
+        calendar.eventEmitter.emit('fill');
       });
   }
 }

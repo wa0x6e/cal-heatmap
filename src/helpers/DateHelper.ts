@@ -1,23 +1,26 @@
 import isString from 'lodash-es/isString';
 import isFunction from 'lodash-es/isFunction';
-// @ts-ignore
-import moment from 'moment-timezone/moment-timezone';
+import moment from 'moment';
 import MomentRange from 'moment-range';
+
+import type Options from '../options/Options';
 
 export default class DateHelper {
   locale: string;
 
-  timezone: string;
-
   momentInstance: any;
 
-  constructor(locale?: string, timezone?: string) {
-    // @ts-ignore
-    this.momentInstance = MomentRange.extendMoment(moment);
+  constructor() {
+    this.locale = 'en';
+  }
 
-    this.locale = locale || 'en';
-    this.timezone = timezone || this.momentInstance.tz.guess();
+  setup(options: Options) {
+    this.locale = options.options.date.locale || this.locale;
+    this.setMoment(moment);
+  }
 
+  setMoment(customMoment: any) {
+    this.momentInstance = MomentRange.extendMoment(customMoment);
     this.momentInstance.locale(this.locale);
   }
 
@@ -38,7 +41,7 @@ export default class DateHelper {
   }
 
   date(d: number | Date | string = new Date()) {
-    return this.momentInstance.tz(d, this.timezone);
+    return this.momentInstance(d);
   }
 
   format(

@@ -1,11 +1,7 @@
 import type DateHelper from '../../helpers/DateHelper';
 import type { Template, TemplateResult } from '../../index';
 
-const monthTemplate: Template = ({
-  DateHelper,
-}: {
-  DateHelper: DateHelper;
-}): TemplateResult => ({
+const monthTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
   name: 'month',
   level: 50,
   rowsCount() {
