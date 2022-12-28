@@ -1,3 +1,5 @@
+import moment from 'moment-timezone';
+
 import DateHelper from '../../src/helpers/DateHelper';
 import weekData from '../fixtures/weekNumberDates';
 import dates from '../fixtures/dates';
@@ -5,7 +7,6 @@ import Options from '../../src/options/Options';
 
 const date = new Date('2020-01-02T04:24:25.256+00:00');
 const DEFAULT_LOCALE = 'en';
-const DEFAULT_TIMEZONE = 'utc';
 
 describe('DateHelper', () => {
   let options: Options;
@@ -15,9 +16,13 @@ describe('DateHelper', () => {
     options = new Options();
     dateHelper = new DateHelper();
     dateHelper.setup(options);
+    dateHelper.setMoment(moment);
+    dateHelper.date = (
+      d: number | Date | string = new Date(),
+    ) => moment.tz(d, 'utc');
   });
 
-  describe('new()', () => {
+  describe('setup()', () => {
     ['en', 'fr'].forEach((locale) => {
       describe(`when passing locale ${locale}`, () => {
         it(`instantiate moment with the ${locale} locale`, () => {
@@ -33,22 +38,12 @@ describe('DateHelper', () => {
         });
       });
     });
-
-    ['Asia/Taipei', 'America/Toronto'].forEach((zone) => {
-      describe(`when passing timezone ${zone}`, () => {
-        it(`instantiate moment with the ${zone} timezone`, () => {
-          options.init({ date: { locale: 'en', timezone: zone } });
-          dateHelper.setup(options);
-          expect(dateHelper.date().tz()).toEqual(zone);
-        });
-      });
-    });
   });
 
   describe('moment()', () => {
     describe('is locale aware', () => {
       it('returns monday as first week day on FR locale', () => {
-        options.init({ date: { locale: 'fr', timezone: DEFAULT_TIMEZONE } });
+        options.init({ date: { locale: 'fr' } });
         dateHelper.setup(options);
         expect(dateHelper.date().startOf('week').format('dddd')).toEqual(
           'lundi',
@@ -56,7 +51,7 @@ describe('DateHelper', () => {
       });
 
       it('returns sunday as first week day on EN locale', () => {
-        options.init({ date: { locale: 'en', timezone: DEFAULT_TIMEZONE } });
+        options.init({ date: { locale: 'en' } });
         dateHelper.setup(options);
         expect(dateHelper.date().startOf('week').format('dddd')).toEqual(
           'Sunday',
@@ -72,7 +67,7 @@ describe('DateHelper', () => {
       value.forEach((key, index) => {
         key.forEach((monthDate) => {
           it(`assigns ${monthDate} to the week ${index + 1}`, () => {
-            options.init({ date: { locale, timezone: DEFAULT_TIMEZONE } });
+            options.init({ date: { locale } });
             dateHelper.setup(options);
             expect(dateHelper.getMonthWeekNumber(monthDate)).toEqual(index + 1);
           });
@@ -105,7 +100,7 @@ describe('DateHelper', () => {
 
       describe(`With moment [${locale}] locale`, () => {
         beforeEach(() => {
-          options.init({ date: { locale, timezone: DEFAULT_TIMEZONE } });
+          options.init({ date: { locale } });
           dateHelper.setup(options);
         });
 
