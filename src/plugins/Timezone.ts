@@ -12,9 +12,9 @@ export default class Timezone {
     this.options = {};
   }
 
-  setup(pluginOptions: any): void {
-    const moment = pluginOptions.moment || window.moment;
-    const timezone = pluginOptions.timezone || moment.tz.guess();
+  setup(pluginOptions?: any): void {
+    const moment = pluginOptions?.moment || window.moment;
+    const timezone = pluginOptions?.timezone || moment.tz.guess();
 
     this.calendar.dateHelper.setMoment(moment);
     this.calendar.dateHelper.date = (
