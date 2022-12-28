@@ -25,6 +25,8 @@ const defaultOptions: LegendOptions = {
 };
 
 export default class Legend {
+  name = 'Legend';
+
   calendar: CalHeatmap;
 
   root: any;
