@@ -3,6 +3,7 @@ import isEqual from 'lodash-es/isEqual';
 import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
+import type { Moment } from 'moment';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
@@ -12,6 +13,7 @@ export type DomainOptions = {
   padding: [number, number, number, number];
   dynamicDimension: boolean;
   label: LabelOptions;
+  subLabel?: SubLabelOptions;
   sort: 'asc' | 'desc';
 };
 
@@ -26,6 +28,13 @@ type LabelOptions = {
   rotate: null | 'left' | 'right';
   width: number;
   height: number;
+};
+
+type SubLabelOptions = {
+  text: (moment: Moment) => string[];
+  radius?: number;
+  width?: number;
+  height?: number;
 };
 
 export type SubDomainOptions = {
@@ -70,7 +79,6 @@ export type OptionsType = {
   range: number;
   domain: DomainOptions;
   subDomain: SubDomainOptions;
-  dayLabel: boolean;
   date: DateOptions;
   data: DataOptions;
   scale: ScaleOptions;
@@ -151,6 +159,8 @@ export default class Options {
           // Used only on horizontal orientation
           height: 25,
         },
+
+        subLabel: undefined,
       },
 
       subDomain: {
@@ -179,9 +189,6 @@ export default class Options {
 
         color: undefined,
       },
-
-      // Show weekday's name when showing full month
-      dayLabel: false,
 
       date: {
         // Start date of the graph

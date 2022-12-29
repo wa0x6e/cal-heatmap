@@ -1,7 +1,7 @@
 .cal-heatmap-container {
   display: block;
 
-  .graph-label {
+  .graph-label, .sublabel-text {
     fill: currentColor;
     font-size: 10px;
   }
@@ -22,12 +22,7 @@
 
   rect.highlight {
     stroke: #444;
-    stroke-width: 1;
-  }
-
-  .weekday-label-text {
-    font-size: 10px;
-    fill: currentColor;
+    stroke-width: 1px;
   }
 }
 

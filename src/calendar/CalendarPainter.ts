@@ -2,7 +2,7 @@ import { select } from 'd3-selection';
 
 import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
-import DomainSecondaryLabelPainter from '../domain/DomainSecondaryLabelPainter';
+import DomainSubLabelPainter from '../domain/DomainSubLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -24,7 +24,7 @@ export default class CalendarPainter {
 
   subDomainPainter: SubDomainPainter;
 
-  domainSecondaryLabelPainter: DomainSecondaryLabelPainter;
+  domainSubLabelPainter: DomainSubLabelPainter;
 
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
@@ -36,7 +36,7 @@ export default class CalendarPainter {
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.domainLabelPainter = new DomainLabelPainter(calendar);
-    this.domainSecondaryLabelPainter = new DomainSecondaryLabelPainter(
+    this.domainSubLabelPainter = new DomainSubLabelPainter(
       calendar,
     );
   }
@@ -62,12 +62,12 @@ export default class CalendarPainter {
   }
 
   paint(navigationDir: ScrollDirection = ScrollDirection.SCROLL_NONE) {
-    this.domainSecondaryLabelPainter.paint(this.root);
+    this.domainSubLabelPainter.paint(this.root);
     this.root
       .select('.graph')
       .transition()
       .duration(this.calendar.options.options.animationDuration)
-      .attr('x', this.domainSecondaryLabelPainter.dimensions.width);
+      .attr('x', this.domainSubLabelPainter.dimensions.width);
 
     let transitions = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(this.domainPainter.root);
@@ -98,7 +98,7 @@ export default class CalendarPainter {
       this.domainPainter.dimensions.width -
       (options.verticalOrientation ? 0 : options.domain.gutter);
 
-    return domainsWidth + this.domainSecondaryLabelPainter.dimensions.width;
+    return domainsWidth + this.domainSubLabelPainter.dimensions.width;
   }
 
   #resize(): void {
