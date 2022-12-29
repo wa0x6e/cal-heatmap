@@ -1,6 +1,7 @@
 import type CalHeatmap from '../CalHeatmap';
 
 const BASE_CLASSNAME = 'sublabel';
+const SEP = '||';
 
 export default class DomainSubLabel {
   calendar: CalHeatmap;
@@ -19,7 +20,10 @@ export default class DomainSubLabel {
   }
 
   paint(root: any): Promise<unknown> {
-    const { domain: { subLabel }, subDomain } = this.calendar.options.options;
+    const {
+      domain: { subLabel },
+      subDomain,
+    } = this.calendar.options.options;
 
     if (!subLabel) {
       this.dimensions = {
@@ -31,17 +35,21 @@ export default class DomainSubLabel {
       return Promise.resolve();
     }
 
-    const { gutter } = subDomain;
     const { radius, text } = subLabel;
-    let { width, height } = subLabel;
+    let { width, height, gutter } = subLabel;
     if (!width) {
       width = subDomain.width;
     }
     if (!height) {
       height = subDomain.height;
     }
+    if (!gutter) {
+      gutter = subDomain.gutter;
+    }
 
-    const labels = text(this.calendar.dateHelper.momentInstance);
+    const labels = text(this.calendar.dateHelper.momentInstance).map(
+      (t: string, i: number) => `${i}${SEP}${t}`,
+    );
 
     this.dimensions = {
       width: width + gutter,
@@ -60,30 +68,69 @@ export default class DomainSubLabel {
     dayLabelSvgGroup
       .selectAll('g')
       .data(labels)
-      .enter()
-      .append('g')
-      .call((selection: any) => selection
-        .append('rect')
-        .attr('class', `${BASE_CLASSNAME}-rect`)
-        .attr('style', 'fill: transparent;')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('rx', radius && radius > 0 ? radius : null)
-        .attr('ry', radius && radius > 0 ? radius : null)
-        .attr('x', 0)
-        .attr('y', (data: any, i: number) => i * (height! + gutter)))
-      .call((selection: any) => selection
-        .append('text')
-        .attr('class', `${BASE_CLASSNAME}-text`)
-        .attr('dominant-baseline', 'central')
-        .attr('text-anchor', 'middle')
-        .attr('x', width! / 2)
-        .attr(
-          'y',
-          (data: any, i: number) => i * (height! + gutter) + height! / 2,
-        )
-        .text((data: any) => data));
+      .join(
+        (enter: any) => enter
+          .append('g')
+          .call((selection: any) => selection
+            .append('rect')
+            .attr('class', `${BASE_CLASSNAME}-rect`)
+            .attr('style', 'fill: transparent;')
+            .attr('x', 0)
+            .call((s: any) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+              this.#setRectAttr(s, width!, height!, gutter!, radius)))
+          .call((selection: any) => selection
+            .append('text')
+            .attr('class', `${BASE_CLASSNAME}-text`)
+            .attr('dominant-baseline', 'central')
+            .attr('text-anchor', 'middle')
+            .call((s: any) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+              this.#setTextAttr(s, width!, height!, gutter!))),
+        (update: any) => update
+          .call((selection: any) => selection.selectAll('rect').call((s: any) =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+            this.#setRectAttr(s, width!, height!, gutter!, radius)))
+          .call((selection: any) => selection
+            .selectAll('text')
+            .call((s: any) => this.#setTextAttr(s, width!, height!, gutter!))),
+      );
 
     return Promise.resolve();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  #setRectAttr(
+    selection: any,
+    width: number,
+    height: number,
+    gutter: number,
+    radius?: number,
+  ) {
+    selection
+      .attr('width', width)
+      .attr('height', height)
+      .attr('rx', radius && radius > 0 ? radius : null)
+      .attr('ry', radius && radius > 0 ? radius : null)
+      .attr('y', (data: string) => {
+        const i = +data.split(SEP)[0];
+        return i * (height! + gutter);
+      });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  #setTextAttr(
+    selection: any,
+    width: number,
+    height: number,
+    gutter: number,
+  ): void {
+    selection
+      .attr('x', width! / 2)
+      .attr('y', (data: any) => {
+        const i = +data.split(SEP)[0];
+        return i * (height! + gutter) + height! / 2;
+      })
+      .text((data: any) => data.split(SEP)[1]);
   }
 }

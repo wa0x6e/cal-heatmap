@@ -35,6 +35,7 @@ type SubLabelOptions = {
   radius?: number;
   width?: number;
   height?: number;
+  gutter?: number;
 };
 
 export type SubDomainOptions = {
