@@ -70,6 +70,7 @@ describe('OptionsValidator', () => {
     expect(() => {
       validate(validSubDomainTemplate, {
         ...options.options,
+        // @ts-ignore
         data: { type: 'hello' },
       });
     }).toThrow();
