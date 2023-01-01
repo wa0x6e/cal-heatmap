@@ -2,6 +2,7 @@ import DomainCoordinates from './DomainCoordinates';
 
 import type CalHeatmap from '../CalHeatmap';
 import type { ScrollDirection } from '../constant';
+import type { Dimensions } from '../index';
 
 const DEFAULT_CLASSNAME = 'graph-domain';
 
@@ -12,10 +13,7 @@ export default class DomainPainter {
 
   root: any;
 
-  dimensions: {
-    width: number;
-    height: number;
-  };
+  dimensions: Dimensions;
 
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;

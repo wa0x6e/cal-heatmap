@@ -3,7 +3,7 @@ import { ScrollDirection, Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
 import type DomainPainter from './DomainPainter';
 import type DomainCollection from '../calendar/DomainCollection';
-import type { SubDomain } from '../index';
+import type { SubDomain, Dimensions } from '../index';
 
 type SubDomainWithCoordinates = Required<SubDomain> & {
   pre_x: number;
@@ -38,7 +38,7 @@ export default class DomainCoordinates {
     const { verticalOrientation, domain } = this.calendar.options.options;
 
     this.scrollDirection = scrollDirection;
-    const dimensions = {
+    const dimensions: Dimensions = {
       width: 0,
       height: 0,
     };

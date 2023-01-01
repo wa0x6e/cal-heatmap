@@ -7,14 +7,12 @@ import SubDomainPainter from '../subDomain/SubDomainPainter';
 
 import type CalHeatmap from '../CalHeatmap';
 import { ScrollDirection } from '../constant';
+import type { Dimensions } from '../index';
 
 export default class CalendarPainter {
   calendar: CalHeatmap;
 
-  dimensions: {
-    width: number;
-    height: number;
-  };
+  dimensions: Dimensions;
 
   root: any;
 

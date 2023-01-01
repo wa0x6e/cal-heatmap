@@ -16,7 +16,7 @@ import './cal-heatmap.scss';
 import TemplateCollection from './calendar/TemplateCollection';
 
 import type { OptionsType } from './options/Options';
-import type { Template } from './index';
+import type { Template, Dimensions } from './index';
 
 import { ScrollDirection } from './constant';
 
@@ -248,7 +248,7 @@ export default class CalHeatmap {
     this.eventEmitter.on(name, fn);
   }
 
-  dimensions(): any {
+  dimensions(): Dimensions {
     return this.calendarPainter.dimensions;
   }
 

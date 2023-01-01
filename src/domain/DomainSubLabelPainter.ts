@@ -1,4 +1,5 @@
 import type CalHeatmap from '../CalHeatmap';
+import type { Dimensions } from '../index';
 
 const BASE_CLASSNAME = 'sublabel';
 const SEP = '||';
@@ -6,10 +7,7 @@ const SEP = '||';
 export default class DomainSubLabel {
   calendar: CalHeatmap;
 
-  dimensions: {
-    width: number;
-    height: number;
-  };
+  dimensions: Dimensions;
 
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;

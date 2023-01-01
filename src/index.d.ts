@@ -12,6 +12,11 @@ export type SubDomain = {
   y?: number;
 };
 
+export type Dimensions = {
+  width: number;
+  height: number;
+};
+
 export type TemplateResult = {
   name: string;
   level: number;
