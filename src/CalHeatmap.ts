@@ -248,6 +248,10 @@ export default class CalHeatmap {
     this.eventEmitter.on(name, fn);
   }
 
+  dimensions(): any {
+    return this.calendarPainter.dimensions;
+  }
+
   /**
    * Destroy the calendar
    *
