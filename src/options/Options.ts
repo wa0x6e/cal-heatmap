@@ -19,8 +19,8 @@ export type DomainOptions = {
 
 type LabelOptions = {
   text?: string | null | ((timestamp: number, element: SVGElement) => string);
-  position: string;
-  textAlign: string;
+  position: 'top' | 'right' | 'bottom' | 'left';
+  textAlign: 'start' | 'middle' | 'end';
   offset: {
     x: number;
     y: number;
@@ -36,7 +36,7 @@ type SubLabelOptions = {
   width?: number;
   height?: number;
   gutter?: number;
-  textAlign?: string;
+  textAlign?: 'start' | 'middle' | 'end';
 };
 
 export type SubDomainOptions = {
@@ -64,7 +64,7 @@ type DateOptions = {
 
 export type DataOptions = {
   source: any;
-  type: string;
+  type: 'json' | 'csv' | 'tsv' | 'txt';
   requestInit: object;
   x: string | ((datum: any) => number);
   y: string | ((data: any[]) => number[]);
@@ -72,7 +72,7 @@ export type DataOptions = {
 };
 
 type ScaleOptions = {
-  as: string;
+  as: 'color' | 'opacity';
   [key: string]: any;
 };
 
