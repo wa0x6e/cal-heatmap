@@ -36,6 +36,7 @@ type SubLabelOptions = {
   width?: number;
   height?: number;
   gutter?: number;
+  textAlign?: string;
 };
 
 export type SubDomainOptions = {

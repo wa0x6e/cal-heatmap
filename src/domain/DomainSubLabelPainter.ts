@@ -36,7 +36,9 @@ export default class DomainSubLabel {
     }
 
     const { radius, text } = subLabel;
-    let { width, height, gutter } = subLabel;
+    let {
+      width, height, gutter, textAlign,
+    } = subLabel;
     if (!width) {
       width = subDomain.width;
     }
@@ -45,6 +47,9 @@ export default class DomainSubLabel {
     }
     if (!gutter) {
       gutter = subDomain.gutter;
+    }
+    if (!textAlign) {
+      textAlign = 'start';
     }
 
     const labels = text(this.calendar.dateHelper.momentInstance).map(
@@ -86,14 +91,14 @@ export default class DomainSubLabel {
             .attr('text-anchor', 'middle')
             .call((s: any) =>
             // eslint-disable-next-line implicit-arrow-linebreak
-              this.#setTextAttr(s, width!, height!, gutter!))),
+              this.#setTextAttr(s, width!, height!, gutter!, textAlign!))),
         (update: any) => update
           .call((selection: any) => selection.selectAll('rect').call((s: any) =>
           // eslint-disable-next-line implicit-arrow-linebreak
             this.#setRectAttr(s, width!, height!, gutter!, radius)))
-          .call((selection: any) => selection
-            .selectAll('text')
-            .call((s: any) => this.#setTextAttr(s, width!, height!, gutter!))),
+          .call((selection: any) => selection.selectAll('text').call((s: any) =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+            this.#setTextAttr(s, width!, height!, gutter!, textAlign!))),
       );
 
     return Promise.resolve();
@@ -124,13 +129,29 @@ export default class DomainSubLabel {
     width: number,
     height: number,
     gutter: number,
+    textAlign: string,
   ): void {
     selection
-      .attr('x', width! / 2)
+      .attr('text-anchor', textAlign)
+      .attr('x', this.#getX(textAlign, width!))
       .attr('y', (data: any) => {
         const i = +data.split(SEP)[0];
         return i * (height! + gutter) + height! / 2;
       })
       .text((data: any) => data.split(SEP)[1]);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  #getX(textAlign: string, width: number) {
+    switch (textAlign) {
+      case 'start':
+        return 0;
+      case 'middle':
+        return width / 2;
+      case 'end':
+        return width;
+      default:
+        return 0;
+    }
   }
 }
