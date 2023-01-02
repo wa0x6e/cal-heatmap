@@ -27,8 +27,6 @@
     "d3-array": "^3.2.1",
     "d3-color": "^3.1.0",
     "d3-fetch": "^3.0.1",
-    "d3-format": "^3.1.0",
-    "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
     "eventemitter3": "^5.0.0",

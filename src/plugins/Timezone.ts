@@ -17,9 +17,9 @@ export default class Timezone {
     const timezone = pluginOptions?.timezone || moment.tz.guess();
 
     this.calendar.dateHelper.setMoment(moment);
-    this.calendar.dateHelper.date = (
-      d: number | Date | string = new Date(),
-    ) => moment.tz(d, timezone);
+    this.calendar.dateHelper.date = (d: number | Date | string = new Date()) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      moment.tz(d, timezone);
   }
 
   // eslint-disable-next-line class-methods-use-this

@@ -17,9 +17,9 @@ describe('DateHelper', () => {
     dateHelper = new DateHelper();
     dateHelper.setup(options);
     dateHelper.setMoment(moment);
-    dateHelper.date = (
-      d: number | Date | string = new Date(),
-    ) => moment.tz(d, 'utc');
+    dateHelper.date = (d: number | Date | string = new Date()) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      moment.tz(d, 'utc');
   });
 
   describe('setup()', () => {
