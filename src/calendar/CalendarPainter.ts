@@ -34,9 +34,7 @@ export default class CalendarPainter {
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.domainLabelPainter = new DomainLabelPainter(calendar);
-    this.domainSubLabelPainter = new DomainSubLabelPainter(
-      calendar,
-    );
+    this.domainSubLabelPainter = new DomainSubLabelPainter(calendar);
   }
 
   setup(): boolean {
@@ -71,9 +69,7 @@ export default class CalendarPainter {
     this.subDomainPainter.paint(this.domainPainter.root);
     this.domainLabelPainter.paint(this.domainPainter.root);
 
-    transitions = transitions.concat(
-      this.calendar.pluginManager.paintAll(),
-    );
+    transitions = transitions.concat(this.calendar.pluginManager.paintAll());
 
     this.#resize();
 
@@ -132,9 +128,7 @@ export default class CalendarPainter {
   destroy(): Promise<unknown> {
     let result: Promise<unknown>[] = [];
 
-    result = result.concat(
-      this.calendar.pluginManager.destroyAll(),
-    );
+    result = result.concat(this.calendar.pluginManager.destroyAll());
 
     if (!this.root) {
       return Promise.allSettled(result);

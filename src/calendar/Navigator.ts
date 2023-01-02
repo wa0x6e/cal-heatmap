@@ -53,11 +53,9 @@ export default class Navigator {
         if (newDomainCollection.at(index + 1)) {
           subDomainEndDate = newDomainCollection.at(index + 1);
         } else {
-          subDomainEndDate = this.calendar.dateHelper.intervals(
-            options.domain.type,
-            domainKey,
-            2,
-          ).pop();
+          subDomainEndDate = this.calendar.dateHelper
+            .intervals(options.domain.type, domainKey, 2)
+            .pop();
         }
         return templatesClt
           .get(options.subDomain.type)!
