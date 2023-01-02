@@ -19,6 +19,7 @@
   "directories": {
     "test": "test"
   },
+  "types": "./src/index.d.ts",
   "node": ">=14.16",
   "browserslist": "last 2 versions, not dead, > 0.2%",
   "dependencies": {
@@ -84,17 +85,16 @@
     "type": "git",
     "url": "https://github.com/wa0x6e/cal-heatmap.git"
   },
-  "homepage": "https://github.com/wa0x6e/cal-heatmap",
+  "homepage": "https://cal-heatmap.com",
   "author": {
     "name": "Wan Qi Chen",
     "url": "http://www.kamisama.me"
   },
   "license": "MIT",
-  "gitHead": "e7bf798c210e0c25df9f6857bdb268001ef67fd1",
   "bugs": "https://github.com/wa0x6e/cal-heatmap/issues",
-  "github": "https://github.com/wa0x6e/cal-heatmap",
   "categories": [
     "Data",
     "Visualization"
-  ]
+  ],
+  "files": ["src", "dist"]
 }
