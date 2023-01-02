@@ -67,7 +67,7 @@ export type DataOptions = {
   type: 'json' | 'csv' | 'tsv' | 'txt';
   requestInit: object;
   x: string | ((datum: any) => number);
-  y: string | ((data: any[]) => number[]);
+  y: string | ((datum: any) => number);
   groupY: string | ((values: number[]) => number);
 };
 
