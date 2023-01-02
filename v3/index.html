@@ -1,0 +1,5505 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>
+      Cal-HeatMap : Javascript calendar heatmap for time series data
+    </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="description"
+      content="Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data"
+    />
+    <meta
+      name="keywords"
+      content="cal-heatmap, calendar, heatmap, d3.js, time series data, graph"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"
+      rel="stylesheet"
+    />
+    <link href="./css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/cal-heatmap.css?v=3.5.1" />
+    <link rel="stylesheet" href="./css/main.css?v=3.3.11" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Exo:400,800,600,400italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Titillium+Web:400,400italic,700italic,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"></script>
+    <script type="text/javascript" src="./js/moment.min.js"></script>
+    <script type="text/javascript" src="./js/lang.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"
+    ></script>
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+      <p class="browsehappy">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="http://browsehappy.com/">upgrade your browser</a> to improve
+        your experience.
+        <strong>Cal-heatmap is not supported on your browser version</strong>
+      </p>
+    <![endif]-->
+
+    <nav>
+      <span class="title">Cal-heatmap</span>
+      <span class="subtitle"
+        >A javascript module to create a calendar heatmap</span
+      >
+
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li>
+          <a href="#getting-started">Getting started</a>
+          <ul>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#basic-usage">Basic Usage</a></li>
+            <li><a href="#browsers-support">Browsers Support</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#documentation">Documentation</a>
+          <ul>
+            <li>
+              <a href="#options" class="nav-sectitle">Options</a>
+              <ul>
+                <li>
+                  <span class="head">Presentation</span>
+                  <ul>
+                    <li><a href="#itemSelector">itemSelector</a></li>
+                    <li><a href="#domain">domain</a></li>
+                    <li><a href="#subDomain">subDomain</a></li>
+                    <li><a href="#range">range</a></li>
+                    <li><a href="#cellSize">cellSize</a></li>
+                    <li><a href="#cellPadding">cellPadding</a></li>
+                    <li><a href="#cellRadius">cellRadius</a></li>
+                    <li><a href="#domainGutter">domainGutter</a></li>
+                    <li><a href="#domainMargin">domainMargin</a></li>
+                    <li>
+                      <a href="#domainDynamicDimension"
+                        >domainDynamicDimension</a
+                      >
+                    </li>
+                    <li>
+                      <a href="#verticalOrientation">verticalOrientation</a>
+                    </li>
+                    <li><a href="#label">label</a></li>
+                    <li><a href="#colLimit">colLimit</a></li>
+                    <li><a href="#rowLimit">rowLimit</a></li>
+                    <li><a href="#tooltip">tooltip</a></li>
+                    <li></li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="head">Data</span>
+                  <ul>
+                    <li><a href="#start">start</a></li>
+                    <li><a href="#data">data</a></li>
+                    <li><a href="#dataType">dataType</a></li>
+                    <li><a href="#highlight">highlight</a></li>
+                    <li><a href="#weekStartOnMonday">weekStartOnMonday</a></li>
+                    <li><a href="#minDate">minDate</a></li>
+                    <li><a href="#maxDate">maxDate</a></li>
+                    <li>
+                      <a href="#considerMissingDataAsZero"
+                        >considerMissingDataAsZero</a
+                      >
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="head">Legend</span>
+                  <ul>
+                    <li><a href="#legend">legend</a></li>
+                    <li><a href="#displayLegend">displayLegend</a></li>
+                    <li><a href="#legendCellSize">legendCellSize</a></li>
+                    <li><a href="#legendCellPadding">legendCellPadding</a></li>
+                    <li><a href="#legendMargin">legendMargin</a></li>
+                    <li>
+                      <a href="#legendVerticalPosition"
+                        >legendVerticalPosition</a
+                      >
+                    </li>
+                    <li>
+                      <a href="#legendHorizontalPosition"
+                        >legendHorizontalPosition</a
+                      >
+                    </li>
+                    <li><a href="#legendOrientation">legendOrientation</a></li>
+                    <li><a href="#legendColors">legendColors</a></li>
+                    <li>
+                      <a href="#legend-playground" class="playground-link"
+                        ><i class="icon-gamepad"></i> Playground</a
+                      >
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="head">i18n</span>
+                  <ul>
+                    <li><a href="#itemName">itemName</a></li>
+                    <li>
+                      <a href="#subDomainTitleFormat">subDomainTitleFormat</a>
+                    </li>
+                    <li>
+                      <a href="#subDomainDateFormat">subDomainDateFormat</a>
+                    </li>
+                    <li>
+                      <a href="#subDomainTextFormat">subDomainTextFormat</a>
+                    </li>
+                    <li><a href="#domainLabelFormat">domainLabelFormat</a></li>
+                    <li><a href="#legendTitleFormat">legendTitleFormat</a></li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="head">Other</span>
+                  <ul>
+                    <li><a href="#animationDuration">animationDuration</a></li>
+                    <li><a href="#previousSelector">previousSelector</a></li>
+                    <li><a href="#nextSelector">nextSelector</a></li>
+                    <li><a href="#itemNamespace">itemNamespace</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#methods" class="nav-sectitle">Methods</a>
+              <ul>
+                <li><a href="#previous">previous</a></li>
+                <li><a href="#next">next</a></li>
+                <li><a href="#jumpto">jumpTo</a></li>
+                <li><a href="#rewind">rewind</a></li>
+                <li><a href="#update">update</a></li>
+                <li><a href="#highlight-method">highlight</a></li>
+                <li><a href="#getSVG">getSVG</a></li>
+                <li><a href="#setLegend">setLegend</a></li>
+                <li><a href="#removeLegend">removeLegend</a></li>
+                <li><a href="#showLegend">showLegend</a></li>
+                <li><a href="#destroy">destroy</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#events" class="nav-sectitle">Events</a>
+              <ul>
+                <li><a href="#onClick">onClick</a></li>
+                <li><a href="#afterLoad">afterLoad</a></li>
+                <li><a href="#afterLoadNextDomain">afterLoadNextDomain</a></li>
+                <li>
+                  <a href="#afterLoadPreviousDomain">afterLoadPreviousDomain</a>
+                </li>
+                <li><a href="#onComplete">onComplete</a></li>
+                <li><a href="#afterLoadData">afterLoadData</a></li>
+                <li><a href="#onMinDomainReached">onMinDomainReached</a></li>
+                <li><a href="#onMaxDomainReached">onMaxDomainReached</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#data-format" class="nav-sectitle">Data Format</a>
+            </li>
+            <li>
+              <a href="#domain-highlight" class="nav-sectitle"
+                >Domain Highlight</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li><a href="#migrating-from-2x">Migrating from 2.x</a></li>
+        <li><a href="#examples">Examples</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="https://github.com/wa0x6e/cal-heatmap">GitHub</a></li>
+        <li>
+          <a href="https://github.com/wa0x6e/cal-heatmap/issues?state=open"
+            >Issues/Bug report</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <div class="alert alert-error" style="margin-top: 40px">
+        <h4 style="padding-top: 10px">
+          This documentation has been deprecated
+        </h4>
+        You are viewing the documention for v3.x, which is no longer supported.
+        <br />
+        <a href="/">Check out the documentation for the latest version</a>.
+      </div>
+
+      <h2 id="home">What is Cal-heatmap ?</h2>
+
+      <p>
+        <def>Cal-Heatmap</def> is a javascript module to create a calendar
+        heatmap.
+      </p>
+
+      <div class="" style="padding-top: 10px; margin-right: 3px">
+        <a href="#" id="ftr-demo-previous"
+          ><i class="icon icon-chevron-left"></i
+        ></a>
+        <a href="#" id="ftr-demo-next"
+          ><i class="icon icon-chevron-right"></i
+        ></a>
+      </div>
+      <div id="cal-heatmap"></div>
+      <script>
+        (function () {
+          var cal = new CalHeatMap();
+          cal.init({
+            range: 10,
+            start: new Date(2000, 0, 1, 1),
+            data: 'datas-hours.json',
+            previousSelector: '#ftr-demo-previous',
+            nextSelector: '#ftr-demo-next',
+          });
+        })();
+      </script>
+
+      <h2 id="getting-started">Getting started</h2>
+
+      <h3 id="installation">Installation</h3>
+
+      <h5>The classic way</h5>
+
+      <ol>
+        <li>
+          <a href="https://github.com/wa0x6e/cal-heatmap/archive/master.zip"
+            >Download</a
+          >
+          the latest version of Cal-Heatmap in your application
+        </li>
+        <li>
+          Include the d3.js library (refer to d3.js website for the latest
+          version number)
+          <pre><code class="language-markup">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8">&lt;/script></code></pre>
+          Or you can <a href="http://d3js.org/d3.v3.zip">download</a> it and use
+          it locally
+        </li>
+        <li>
+          Install Cal-HeatMap in your application by including the javascript
+          and the css file
+          <pre><code class="language-markup">&lt;link rel="stylesheet" href="path/to/css/cal-heatmap.css" />
+&lt;script type="text/javascript" src="path/to/cal-heatmap.min.js">&lt;/script></code></pre>
+        </li>
+      </ol>
+
+      <h5>With Bower</h5>
+
+      <pre><code class="language-javascript">bower install cal-heatmap</code></pre>
+
+      <p>
+        Then continue with step 3 of the classic way to include it in your
+        application
+      </p>
+
+      <h5>With Jam</h5>
+
+      <pre><code class="language-javascript">jam install cal-heatmap</code></pre>
+
+      <p>
+        Then continue with step 3 of the classic way to include it in your
+        application
+      </p>
+
+      <h5>Via a CDN (jsDelivr)</h5>
+
+      <p>
+        Just include the following lines in your page <code>head</code> section:
+      </p>
+
+      <pre><code class="language-markup">&lt;script type="text/javascript" src="//d3js.org/d3.v3.min.js">&lt;/script>
+&lt;script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js">&lt;/script>
+&lt;link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css" />
+</code></pre>
+
+      <p class="alert alert-info">Cal-Heatmap is compatible with AMD module.</p>
+
+      <h3 id="basic-usage">Basic usage</h3>
+
+      <p>Creating your first calendar is easy</p>
+
+      <pre><code class="language-javascript">&lt;div id="cal-heatmap">&lt;/div>
+&lt;script type="text/javascript">
+  var cal = new CalHeatMap();
+  cal.init({});
+&lt;/script>
+</code></pre>
+
+      <p>
+        By default, calling <code>init()</code> with an empty object will
+        initialize a blank calendar of 12 hours, with 60 minutes each, starting
+        from the current hour.
+      </p>
+
+      <p>
+        Read the <a href="#data">data</a> section for how to fill the calendar
+        with your own data, and the
+        <a href="#itemSelector">presentation</a> section for the calendar
+        layout.
+      </p>
+
+      <h3 id="browsers-support">Browsers support</h3>
+
+      <p>
+        Cal-Heatmap works on most modern browsers supporting SVG, and was tested
+        on
+      </p>
+
+      <ul>
+        <li>Internet Explorer 9+</li>
+        <li>Firefox 4+</li>
+        <li>Chrome 14+</li>
+        <li>Safari 5.0+</li>
+        <li>Opera 10+</li>
+      </ul>
+
+      <h2 id="documentation">Documentation</h2>
+
+      <p>
+        Calendar can be customized by setting various options in the object
+        passed to <code>init()</code>.
+      </p>
+
+      <h3 id="options">Options</h3>
+
+      <div class="section-head">Presentation</div>
+
+      <h4 id="itemSelector">itemSelector</h4>
+      <div class="option-type">Selector string or Element</div>
+      <div class="option-default"><code>#cal-heatmap</code></div>
+
+      <p>DOM node to insert the calendar in.</p>
+
+      <h5>With a Selector String</h5>
+
+      <p>
+        All <a href="http://www.w3.org/TR/css3-selectors/">CSS3</a> selectors
+        can be used as a Selector String, so you can, for example, select by:
+      </p>
+
+      <table class="table table-condensed">
+        <tr>
+          <td>tag</td>
+          <td><code>cal.init({ itemSelector: "div"})</code></td>
+        </tr>
+        <tr>
+          <td>ID</td>
+          <td><code>cal.init({ itemSelector: "#id"})</code></td>
+        </tr>
+        <tr>
+          <td>class</td>
+          <td><code>cal.init({ itemSelector: ".class"})</code></td>
+        </tr>
+        <tr>
+          <td>attribute</td>
+          <td><code>cal.init({ itemSelector: "[title=hi]"})</code></td>
+        </tr>
+        <tr>
+          <td>containement</td>
+          <td><code>cal.init({ itemSelector: "div > span + b"})</code></td>
+        </tr>
+      </table>
+
+      <p class="alert alert-info">
+        If the Selector String is returning multiple node, the first one will be
+        used.
+      </p>
+
+      <h5>With a DOM Element</h5>
+
+      <p>
+        If you already have a reference to a DOM Element, you can directly use
+        it.
+      </p>
+      <table class="table table-condensed">
+        <tr>
+          <td>getElementByID()</td>
+          <td>
+            <code
+              >cal.init({ itemSelector: document.getElementByID("myId")
+              });</code
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>getElementsByClassName()</td>
+          <td>
+            <code
+              >cal.init({ itemSelector:
+              document.getElementsByClassName(".class")[0] });</code
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>querySelector()</td>
+          <td>
+            <code
+              >cal.init({ itemSelector: document.querySelector(".class")
+              });</code
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>jQuery Selector</td>
+          <td><code>cal.init({ itemSelector: $(".class")[0] });</code></td>
+        </tr>
+        <tr>
+          <td>d3.js selector</td>
+          <td>
+            <code>cal.init({ itemSelector: d3.select(".class")[0][0] });</code>
+          </td>
+        </tr>
+      </table>
+
+      <h4 id="domain">domain</h4>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>hour</code></div>
+
+      <p>Type of domain</p>
+
+      <p>Valid domains:</p>
+
+      <ul>
+        <li>hour</li>
+        <li>day</li>
+        <li>week</li>
+        <li>month</li>
+        <li>year</li>
+      </ul>
+
+      <h4 id="subDomain">subDomain</h4>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>min</code></div>
+      <p>Type of subDomain</p>
+
+      <p>Valid subDomains:</p>
+
+      <ul>
+        <li>min</li>
+        <li>x_min</li>
+        <li>hour</li>
+        <li>x_hour</li>
+        <li>day</li>
+        <li>x_day</li>
+        <li>week</li>
+        <li>x_week</li>
+        <li>month</li>
+        <li>x_month</li>
+      </ul>
+
+      <p>
+        By default, all subdomain cells are read from top to bottom, and from
+        left to right. The <em>x_</em> variants are used to rotate the reading
+        order to left to right, then top to bottom.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <style>
+          #domain-a .subdomain-text,
+          #domain-b .subdomain-text {
+            fill: #000;
+          }
+
+          #domain-a .graph-label,
+          #domain-b .graph-label {
+            font-size: 18px;
+            text-transform: uppercase;
+            font-weight: bold;
+          }
+        </style>
+        <div>
+          <div id="domain-a"></div>
+          <p><code>day</code> subDomain</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domain-a',
+                domain: 'month',
+                subDomain: 'day',
+                cellSize: 20,
+                subDomainTextFormat: '%d',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="domain-b"></div>
+          <p><code>x_day</code> subDomain</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domain-b',
+                domain: 'month',
+                subDomain: 'x_day',
+                cellSize: 20,
+                subDomainTextFormat: '%d',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p>
+        When not set, Cal-heatmap will decide the most appropriate subDomain for
+        the current type of domain.
+      </p>
+
+      <p class="alert alert-error">
+        <strong>Not all subDomains can be used with a domain.</strong><br />
+        Only "responsible" domain/subDomain couple are available,
+        <br />e.g: <code>{domain: "year", subDomain: "min"}</code> will
+        <strong>not</strong> work. <br /><small
+          >(Because painting one half million svg nodes will probably crash your
+          browser ...)</small
+        >
+      </p>
+
+      <p class="alert">subDomain must always be smaller than domain.</p>
+
+      <h4 id="range">range</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>12</code></div>
+
+      <p>Number of domain to display</p>
+
+      <h4 id="cellSize">cellSize</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>10</code></div>
+
+      <p>Size of each subDomain cell, in pixel.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="cellSize-a"></div>
+          <p>Default cellSize of 10px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#cellSize-a',
+                domain: 'day',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="cellSize-b"></div>
+          <p>cellSize of 15px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#cellSize-b',
+                domain: 'day',
+                range: 1,
+                cellSize: 15,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="cellPadding">cellPadding</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>2</code></div>
+
+      <p>Space between each subDomain cell, in pixel.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="cellPadding-a"></div>
+          <p>Default cellPadding of 2px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#cellPadding-a',
+                domain: 'day',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="cellPadding-b"></div>
+          <p>cellPadding of 5px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#cellPadding-b',
+                domain: 'day',
+                range: 1,
+                cellPadding: 5,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="cellRadius">cellRadius</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>0</code></div>
+
+      <p>subDomain cell's border radius, for rounder corner, in pixel.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="cellRadius-a"></div>
+          <p>Default cellRadius of 0px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#cellRadius-a',
+                cellSize: 15,
+                domain: 'day',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="cellRadius-b"></div>
+          <p>cellRadius of 5px</p>
+          <style>
+            #cellRadius-b {
+              shape-rendering: optimizeSpeed;
+            }
+          </style>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#cellRadius-b',
+                cellSize: 15,
+                domain: 'day',
+                range: 1,
+                cellRadius: 10,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-info">
+        Set <code>shape-rendering</code> value to other than
+        <code>crispedges</code> for better rendering.
+      </p>
+
+      <h4 id="domainGutter">domainGutter</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>2</code></div>
+
+      <p>Space between each domain, in pixel.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="domainGutter-a"></div>
+          <p>Default domainGutter of 2px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainGutter-a',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="domainGutter-b"></div>
+          <p>domainGutter of 10px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainGutter-b',
+                domain: 'day',
+                range: 2,
+                domainGutter: 10,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="domainMargin">domainMargin</h4>
+      <div class="option-type">integer or Array</div>
+      <div class="option-default"><code>[0, 0, 0, 0]</code></div>
+
+      <p>Margin around each domain, in pixel.</p>
+
+      <p>
+        Ordered like in CSS (top, right, bottom, left), it also accepts CSS like
+        values:
+      </p>
+
+      <ul>
+        <li>
+          <code>0</code> and <code>[0]</code> are equivalent to
+          <code>[0, 0, 0, 0]</code>
+        </li>
+        <li><code>[0, 1]</code> is equivalent to <code>[0, 1, 0, 1]</code></li>
+        <li>
+          <code>[0, 1, 2]</code> is equivalent to <code>[0, 1, 2, 1]</code>
+        </li>
+      </ul>
+
+      <div class="example clearfix empty-calendar">
+        <style>
+          #domainMargin-a .domain-background,
+          #domainMargin-b .domain-background {
+            fill: #eee;
+          }
+        </style>
+        <div>
+          <div id="domainMargin-a"></div>
+          <p>No margin</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainMargin-a',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="domainMargin-b"></div>
+          <p>10px margin</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainMargin-b',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                domainMargin: 10,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-info">
+        <code>domainMargin</code> is specially useful when coupled with the
+        domain highlighting function.
+      </p>
+
+      <h4 id="domainDynamicDimension">domainDynamicDimension</h4>
+      <strong class="version-added">3.0.6+</strong>
+      <div class="option-type">boolean</div>
+      <div class="option-default"><code>true</code></div>
+
+      <p>Whether to enable domain dynamic width and height.</p>
+
+      <p>
+        Some <em>domain>subdomain</em> couple, like <em>month>days</em>, doesn't
+        always have the same number of subDomain cells. Some months have 6
+        weeks, some only 4.
+      </p>
+
+      <p>
+        With dynamic dimension enabled, the domain width and height will be
+        adjusted to fit the domain content, whereas when it's disabled, all
+        domains will have the same dimension : the biggest.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div style="float: none; margin-bottom: 20px">
+          <button class="btn" id="domainDynamicDimension-previous">
+            Previous
+          </button>
+          <button class="btn" id="domainDynamicDimension-next">Next</button>
+        </div>
+
+        <style>
+          #domainDynamicDimension-a .cal-heatmap-container,
+          #domainDynamicDimension-b .cal-heatmap-container {
+            outline: 1px solid #ccc;
+          }
+        </style>
+
+        <div>
+          <div id="domainDynamicDimension-a"></div>
+          <p>
+            Dynamic dimensions enabled.<br />
+            Browse with the next/previous buttons, and note that the whole
+            calendar is also resized to fit the domains width
+          </p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainDynamicDimension-a',
+                domain: 'month',
+                range: 5,
+                cellSize: 8,
+                displayLegend: false,
+                nextSelector: '#domainDynamicDimension-next',
+                previousSelector: '#domainDynamicDimension-previous',
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="domainDynamicDimension-b"></div>
+          <p>
+            Dynamic dimensions disabled. <br />Notice that, sometimes, there's a
+            gap between domains, when the month has less than 6 weeks
+          </p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainDynamicDimension-b',
+                domain: 'month',
+                range: 5,
+                cellSize: 8,
+                displayLegend: false,
+                domainDynamicDimension: false,
+                nextSelector: '#domainDynamicDimension-next',
+                previousSelector: '#domainDynamicDimension-previous',
+                itemNamespace: 'domainDynamicDimension',
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="verticalOrientation">verticalOrientation</h4>
+      <div class="option-type">boolean</div>
+      <div class="option-default"><code>false</code></div>
+
+      <p>
+        To display the calendar vertically, with each domain one under the other
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="verticalOrientation-a"></div>
+          <p>Default horizontal orientation</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#verticalOrientation-a',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="verticalOrientation-b"></div>
+          <p>Vertical orientation</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#verticalOrientation-b',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                verticalOrientation: true,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-info">
+        Use the <code>x_</code> variant subDomain for a more natural reading
+        order.
+      </p>
+
+      <p class="alert alert-info">
+        For a smoother reading, see the
+        <a href="#label"><code>label</code></a> option to move the label
+        position on the side.
+      </p>
+
+      <h4 id="label">label</h4>
+      <div class="option-type">object</div>
+
+      <p>Position and alignment of the domain label.</p>
+
+      <p>It takes an object with up to 5 properties:</p>
+
+      <table class="table table-bordered">
+        <tr>
+          <th>name</th>
+          <th>default</th>
+          <th>values</th>
+          <th>description</th>
+        </tr>
+
+        <tr>
+          <td>position</td>
+          <td>bottom</td>
+          <td>top, right, bottom, left</td>
+          <td>Position of the label, relative to the domain</td>
+        </tr>
+        <tr>
+          <td>align</td>
+          <td>center</td>
+          <td>left, center, right</td>
+          <td>Horizontal align of the domain</td>
+        </tr>
+        <tr>
+          <td>rotate</td>
+          <td>null</td>
+          <td>null, left, right</td>
+          <td>Rotation for a vertical label</td>
+        </tr>
+        <tr>
+          <td>width</td>
+          <td>100</td>
+          <td>any integer</td>
+          <td>
+            Only used when label is rotated, defines the width of the label
+          </td>
+        </tr>
+        <tr>
+          <td>offset</td>
+          <td>{x:0, y:0}</td>
+          <td>An object with x and y</td>
+          <td>
+            More control about label positioning, if the default value does not
+            fit your need, especially when label is rotated, or when using a big
+            font-size.
+          </td>
+        </tr>
+        <tr>
+          <td>height</td>
+          <td>null</td>
+          <td>any integer</td>
+          <td>
+            <strong class="version-added">3.1.1+</strong>
+            <p>
+              Height of the domain label in pixels. <br />By leaving it to null,
+              the label will be set to 2 times the height of the subDomain cell.
+            </p>
+            <p>
+              If you want to remove the label, set
+              <a href="#domainLabelFormat"><code>domainLabelFormat</code></a> to
+              <code>""</code> (empty string), instead of setting the label
+              height to 0.
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <p class="alert">
+        Default values are only for when label is positioned on bottom, without
+        rotation.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="label-a"></div>
+          <p>Label on bottom, centered</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-a',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="label-b"></div>
+          <p>Label on top, centered</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-b',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'top',
+                },
+              });
+            })();
+          </script>
+        </div>
+      </div>
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="label-c"></div>
+          <p>Label on left</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-c',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'left',
+                  width: 46,
+                },
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="label-d"></div>
+          <p>Label on right, with offset</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-d',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'right',
+                  width: 46,
+                  offset: { x: 10, y: 30 },
+                },
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="label-e"></div>
+          <p>Label on left, rotate left</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-e',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'left',
+                  width: 46,
+                  rotate: 'left',
+                },
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="label-f"></div>
+          <p>Label on right, rotated left, with a bigger width</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-f',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'right',
+                  width: 150,
+                  rotate: 'left',
+                },
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="label-g"></div>
+          <p>Label on right, rotate left</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-g',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'right',
+                  width: 46,
+                  rotate: 'left',
+                },
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="label-h"></div>
+          <p>Label on right. rotate left, aligned right</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#label-h',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                label: {
+                  position: 'right',
+                  width: 46,
+                  rotate: 'right',
+                  align: 'right',
+                },
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        Use <code>.graph-label</code> to style the label.
+      </p>
+
+      <h4 id="colLimit">colLimit</h4>
+      <strong class="version-added">3.3.0+</strong>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>null</code></div>
+
+      <p>Control the number of columns to split the domain dates into.</p>
+
+      <p>
+        Each domain is split into an arbitrary number of columns (or rows
+        depending on the reading direction). You can overwrite that number with
+        <code>colLimit</code>, and force all dates on the same line, or split
+        them into more columns.
+      </p>
+
+      <p>
+        That setting limit the <em>maximum</em> number of columns, and doesn't
+        necessary means that each rows will contains that number of columns.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="colLimit-a"></div>
+          <p>Default splitting, 4 columns with 6 hours each</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#colLimit-a',
+                domain: 'day',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+
+        <div>
+          <div id="colLimit-b"></div>
+          <p>All hours on the same line</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#colLimit-b',
+                domain: 'day',
+                colLimit: 24,
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="rowLimit">rowLimit</h4>
+      <strong class="version-added">3.3.0+</strong>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>null</code></div>
+
+      <p>Control the number of rows to split the domain dates into.</p>
+
+      <p>
+        If <code>rowLimit</code> and <code>colLimit</code> are both used,
+        <code>rowLimit</code> will be ignored.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="rowLimit-a"></div>
+          <p>7 days per column (default)</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#rowLimit-a',
+                domain: 'month',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+
+        <div>
+          <div id="rowLimit-b"></div>
+          <p>10 days per column</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#rowLimit-b',
+                domain: 'month',
+                rowLimit: 10,
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="tooltip">tooltip</h4>
+      <strong class="version-added">3.3.3+</strong>
+      <div class="option-type">boolean</div>
+      <div class="option-default"><code>false</code></div>
+
+      <p>Whether to display a tooltip when hovering over a date.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="tooltip-a"></div>
+          <p>Default title on hover</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#tooltip-a',
+                domain: 'month',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+
+        <div>
+          <div id="tooltip-b"></div>
+          <p>Tooltip on hover</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#tooltip-b',
+                domain: 'month',
+                range: 1,
+                displayLegend: false,
+                tooltip: true,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="section-head">Data</div>
+
+      <h4 id="start">start</h4>
+      <div class="option-type">Date</div>
+      <div class="option-default"><code>new Date()</code></div>
+
+      <p>Starting date of the calendar</p>
+
+      <p>
+        It doesn't have to be precise, the calendar will not start at that date,
+        but at the first domain containing that date.
+      </p>
+
+      <div class="example-bloc">
+        <h5>Example</h5>
+        <p>For the date: January 15, 2000 @15:36 :</p>
+
+        <ul>
+          <li>
+            When domain is <b>month</b>: calendar will start on January 1st,
+            2000, @00:00
+          </li>
+          <li>
+            When domain is <b>day</b>: calendar will start on January 15th,
+            2000, @00:00
+          </li>
+          <li>
+            When domain is <b>hour</b>: calendar will start on January 15th,
+            2000, @15:00
+          </li>
+        </ul>
+      </div>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="start-a"></div>
+          <p>Starting today</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#start-a',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="start-b"></div>
+          <p>Starting January 15th, 2000</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#start-b',
+                domain: 'day',
+                range: 2,
+                start: new Date(2000, 0, 15),
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="data">data</h4>
+      <div class="option-type">String or Json object</div>
+      <div class="option-default"><code>""</code></div>
+
+      <p>Data used to fill the calendar.</p>
+
+      <p>It can accepts either a string, or a json object</p>
+
+      <h5>String</h5>
+
+      <p>
+        The string is interpreted as an URL to an API, which should be returning
+        the data used to fill the calendar.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  data: "http://localhost/datas.json"
+});
+</code></pre>
+
+      <p>
+        The data must be formatted according to the expected
+        <a href="#data-format">data format</a>. In case it's not possible, you
+        should first set the correct
+        <a href="#dataType"><code>dataType</code></a> if it's not returning a
+        json response, then use the
+        <a href="#afterLoadData"><code>afterLoadData()</code></a> to transform
+        the data into the <a href="#data-format">expected format</a>.
+      </p>
+
+      <p>
+        4 template strings are available to limit the scope of data returned by
+        the API
+      </p>
+
+      <table class="table table-condensed">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>{{t:start}}</code></td>
+          <td>Timestamp of the first subDomain cell</td>
+        </tr>
+        <tr>
+          <td><code>{{t:end}}</code></td>
+          <td>Timestamp of the last subDomain cell</td>
+        </tr>
+        <tr>
+          <td><code>{{d:start}}</code></td>
+          <td>ISO-8601 formatted date of the first subDomain cell</td>
+        </tr>
+        <tr>
+          <td><code>{{d:end}}</code></td>
+          <td>ISO-8601 formatted date of the last subDomain cell</td>
+        </tr>
+      </table>
+
+      <p>
+        The first time, the first subDomain cell will be the one in the first
+        domain, and the last subDomain cell, the one in the last domain, so
+        that, if your calendar have 5 domains, it'll get the data for the 5
+        domains.
+      </p>
+
+      <p>
+        For each subsequent call, like when loading new domains dynamically with
+        <a href="#next"><code>next()</code></a> and
+        <a href="#previous"><code>previous()</code></a
+        >, the first and last subDomain cell will only be the ones inside the
+        newly loaded domain.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  start: new Date(2000, 0), // January, 1st 2000
+  range: 12,
+  domain: "year",
+  subDomain: "month",
+  data: "http://localhost/api?start={{d:start}}&amp;stop={{d:end}}"
+});
+
+/*
+  {{d:start}} === 2000-01-01T00:00:00Z
+  {{d:end}}   === 2000-12-31T23:59:59Z
+  => Fetch 12 months
+ */
+
+cal.next(); // Load January 2001
+
+/*
+  {{d:start}} === 2001-01-01T00:00:00Z
+  {{d:end}}   === 2001-01-31T23:59:59Z
+  => Fetch 1 month
+ */
+</code></pre>
+
+      <h5>Json Object</h5>
+
+      <p>The object will be used to fill the calendar.</p>
+
+      <p>
+        Again, if the object is not formatted according to the
+        <a href="#data-format">expected format</a>, use
+        <a href="#afterLoadData"><code>afterLoadData()</code></a> callback to
+        transform it.
+      </p>
+
+      <h4 id="dataType">dataType</h4>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>json</code></div>
+
+      <p>Engine used to parse the data.</p>
+
+      <table class="table table-condensed">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>json</code></td>
+          <td>Interpret the data as json</td>
+        </tr>
+        <tr>
+          <td><code>csv</code></td>
+          <td>
+            Interpret the data as
+            <a href="http://tools.ietf.org/html/rfc4180">csv</a>
+          </td>
+        </tr>
+        <tr>
+          <td><code>tsv</code></td>
+          <td>
+            Interpret the data exactly like <code>csv</code>, but are delimited
+            with a tab character, instead of a comma.
+          </td>
+        </tr>
+        <tr>
+          <td><code>txt</code></td>
+          <td>Just return the data as a string</td>
+        </tr>
+      </table>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  data: "http://localhost/datas.csv",
+  dataType: "csv"
+});
+</code></pre>
+
+      <p class="alert alert-info">
+        When using the <code>txt</code> dataType, the data is returned as a
+        plain text. You have to use the
+        <a href="#afterLoadData"><code>afterLoadData()</code></a> callback to
+        transform it to the expected <a href="#data-format">data format</a>.
+      </p>
+
+      <h4 id="highlight">highlight</h4>
+      <div class="option-type">String or Array</div>
+      <div class="option-default"><code>false</code></div>
+
+      <p>Highlight selected subDomain cells.</p>
+
+      <p>
+        Takes an array of Date object. Can also accepts the
+        <code>now</code> string, equivalent to <code>Date.now()</code>.
+      </p>
+
+      <div class="example-bloc">
+        <h5>Example</h5>
+        <ul>
+          <li><code>{highlight: "now"}</code></li>
+          <li><code>{highlight: ["now"]}</code></li>
+          <li><code>{highlight: ["now", new Date(2000, 1, 15)]}</code></li>
+          <li><code>{highlight: [new Date(2000, 1, 15)]}</code></li>
+          <li><code>{highlight: new Date(2000, 1, 15)}</code></li>
+        </ul>
+      </div>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="highlight-a"></div>
+          <p>Highlight current hour, and tomorrow at the same hour</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              var dt = new Date();
+              dt.setDate(dt.getDate() + 1);
+              cal.init({
+                itemSelector: '#highlight-a',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+                highlight: ['now', dt],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        The <code>.highlight</code> class is used to style highlighted cells.<br />
+        Additionally, a <code>.now</code> is also applied when the highlighted
+        cells correspond to the current time.<br /><br />
+        Use <code>rect.highlight</code>/<code>rect.now</code> and
+        <code>text.highlight</code>/<code>text.now</code> to style the cell and
+        the text inside respectively.
+      </p>
+
+      <p class="alert">
+        See the <a href="#domain-highlight">domain highlighting section</a> if
+        you want to highlight the entire domain.
+      </p>
+
+      <h4 id="weekStartOnMonday">weekStartOnMonday</h4>
+      <div class="option-type">boolean</div>
+      <div class="option-default"><code>true</code></div>
+
+      <p>Whether to start the week on Monday, instead of Sunday.</p>
+
+      <div class="example clearfix empty-calendar">
+        <style>
+          #weekStartOnMonday-a .subdomain-text,
+          #weekStartOnMonday-b .subdomain-text {
+            fill: #000;
+          }
+
+          #weekStartOnMonday-a .graph-label,
+          #weekStartOnMonday-b .graph-label {
+            font-size: 18px;
+            text-transform: uppercase;
+            font-weight: bold;
+          }
+        </style>
+        <div>
+          <div id="weekStartOnMonday-a"></div>
+          <p>First column is Monday</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#weekStartOnMonday-a',
+                domain: 'month',
+                subDomain: 'x_day',
+                cellSize: 20,
+                subDomainTextFormat: '%d',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="weekStartOnMonday-b"></div>
+          <p>First column is Sunday</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#weekStartOnMonday-b',
+                domain: 'month',
+                subDomain: 'x_day',
+                cellSize: 20,
+                subDomainTextFormat: '%d',
+                range: 1,
+                weekStartOnMonday: false,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="minDate">minDate</h4>
+      <strong class="version-added">3.0.8+</strong>
+      <div class="option-type">Date</div>
+      <div class="option-default"><code>null</code></div>
+
+      <p>
+        Lower limit of the domain navigation, preventing navigating beyond a
+        certain date.
+      </p>
+
+      <p>
+        When set, calling <a href="#previous"><code>previous()</code></a> will
+        only work only until the leftmost domain containing
+        <code>minDate</code>. Like with <a href="#start"><code>start</code></a
+        >, <code>minDate</code> does not have to be precise, and just have to be
+        a date inside the domain.
+      </p>
+
+      <p>
+        <a href="#previous"><code>previous()</code></a> will always return
+        <code>true</code>, unless the domain containing
+        <a href="#minDate"><code>minDate</code></a> is reached, in which case,
+        it'll return <code>false</code>.
+      </p>
+
+      <div class="example-bloc">
+        <h5>Example</h5>
+
+        <p>
+          Considering a calendar with <em>month</em> domain, and
+          <em>day</em> subDomain, let's set
+          <a href="#minDate"><code>minDate</code></a> to
+          <em>January 25th, 2000</em>. The last
+          <a href="#previous"><code>previous()</code></a> call will load the
+          January domain, as January 25th is a subDomain inside the January
+          domain.
+        </p>
+
+        <p>
+          Calling <a href="#previous"><code>previous()</code></a> again will do
+          nothing and just return <code>false</code>, since the next incoming
+          domain is December, and January 25th is not a subDomain of the
+          December domain.
+        </p>
+      </div>
+
+      <div class="example clearfix empty-calendar full-width">
+        <div>
+          <button id="minDate-previous" style="margin-bottom: 10px" class="btn">
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button id="minDate-next" style="margin-bottom: 10px" class="btn">
+            <i class="icon icon-chevron-right"></i>
+          </button>
+
+          <div id="minDate-a"></div>
+
+          <p>Bound the calendar from February to September</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#minDate-a',
+                domain: 'month',
+                start: new Date(2000, 4),
+                minDate: new Date(2000, 1),
+                maxDate: new Date(2000, 8),
+                subDomain: 'day',
+                range: 4,
+                displayLegend: false,
+              });
+
+              $('#minDate-previous').on('click', function (e) {
+                e.preventDefault();
+                if (!cal.previous()) {
+                  alert('No more domains to load');
+                }
+              });
+
+              $('#minDate-next').on('click', function (e) {
+                e.preventDefault();
+                if (!cal.next()) {
+                  alert('No more domains to load');
+                }
+              });
+            })();
+          </script>
+        </div>
+        <div></div>
+      </div>
+
+      <p class="alert alert-info">
+        The
+        <a href="#onMinDomainReached"><code>onMinDomainReached()</code></a>
+        event is triggered when you've hit the leftmost domain allowed by
+        <a href="#minDate"><code>minDate</code></a
+        >.
+      </p>
+
+      <h4 id="maxDate">maxDate</h4>
+      <strong class="version-added">3.0.8+</strong>
+      <div class="option-type">Date</div>
+      <div class="option-default"><code>null</code></div>
+
+      <p>
+        Upper limit of the domain navigation, preventing navigating beyond a
+        certain date.
+      </p>
+
+      <p>
+        Same as <a href="#minDate"><code>minDate</code></a
+        >, but for the upper limit. Refer to
+        <a href="#minDate"><code>minDate</code></a> documentation.
+      </p>
+
+      <h4 id="considerMissingDataAsZero">considerMissingDataAsZero</h4>
+      <strong class="version-added">3.0.9+</strong>
+      <div class="option-type">boolean</div>
+      <div class="option-default"><code>false</code></div>
+
+      <p>
+        Whether to consider missing date:value couple in the data source as
+        equal to 0.
+      </p>
+
+      <p>
+        By default, when the a date is not associated to a value, it's
+        considered as null, and rendered as a no value cell.
+      </p>
+
+      <p>
+        You should ask yourself, if the API is not returning result for a date,
+        is it because there is really no value associated to this date, or
+        because it's supposed to be equal to 0, and it's skipped in order to
+        save bandwidth ?
+      </p>
+
+      <div class="section-head">Legend</div>
+
+      <h4 id="legend">legend</h4>
+      <div class="option-type">Array</div>
+      <div class="option-default"><code>[10, 20, 30, 40]</code></div>
+
+      <p>Assign each range of values to a color.</p>
+
+      <p>
+        <a href="#legend"><code>legend</code></a> accepts an array of any number
+        of arguments, as long as they are number (even negative numbers), and in
+        ascendant order.<br />
+        An array of <b>N</b> values (thresholds) will generate a legend of
+        <b>N + 1</b> colors. Each colors correspond to a CSS class, formatted
+        like <code>.q{n}</code>.
+      </p>
+
+      <div class="example-bloc">
+        <h5>Example</h5>
+
+        <p>With <code>[10, 20, 30, 40]</code>, you end up with 5 colors:</p>
+
+        <table class="table table-condensed">
+          <tr>
+            <th>CSS Class</th>
+            <th>Range</th>
+          </tr>
+          <tr>
+            <td><code>.q1</code></td>
+            <td>Less than 10</td>
+          </tr>
+          <tr>
+            <td><code>.q2</code></td>
+            <td>Between 10 and 20</td>
+          </tr>
+          <tr>
+            <td><code>.q3</code></td>
+            <td>Between 20 and 30</td>
+          </tr>
+          <tr>
+            <td><code>.q4</code></td>
+            <td>Between 30 and 40</td>
+          </tr>
+          <tr>
+            <td><code>.q5</code></td>
+            <td>More than 40</td>
+          </tr>
+        </table>
+      </div>
+
+      <p>
+        By default, the CSS only come with 5 <em>.q{n}</em> class. You're free
+        to add your own if needed, and modify the colors of the existing one.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <span class="tips"
+          >Hover on a legend cell to see the associated range</span
+        >
+        <div>
+          <div id="legend-a"></div>
+          <p>Default legend</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legend-a',
+                domain: 'day',
+                range: 2,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legend-b"></div>
+          <p>Float and negative legend values</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legend-b',
+                domain: 'day',
+                range: 2,
+                legend: [-2.5, 0, 2.5],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        <code>.graph-rect</code> class is applied to all subDomain cells, and
+        used when the cell is not associated to a value.
+      </p>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        <code>.q0</code> will be applied to all dates with values == 0.
+      </p>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        <code>.qi</code> will be applied to all dates with "overflowing" values,
+        like negative values, when the legend is all positive.
+      </p>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        Use the <code>.q{n} + title + .subdomain-text</code> CSS selector to
+        change cell text style.
+      </p>
+
+      <p class="alert alert-info">
+        You can also generate the colors automatically without using CSS, refer
+        to <a href="#legendColors"><code>legendColors</code></a
+        >.
+      </p>
+
+      <h4 id="displayLegend">displayLegend</h4>
+      <div class="option-type">boolean</div>
+      <div class="option-default"><code>true</code></div>
+
+      <p>Whether to display the legend.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="displayLegend-a"></div>
+          <p>Legend</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#displayLegend-a',
+                domain: 'day',
+                range: 2,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="displayLegend-b"></div>
+          <p>No legend</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#displayLegend-b',
+                domain: 'day',
+                range: 2,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-info">
+        Legend can be added or removed after initialisation, by calling
+        <a href="#showLegend"><code>showLegend()</code></a> and
+        <a href="#removeLegend"><code>removeLegend()</code></a
+        >.
+      </p>
+
+      <h4 id="legendCellSize">legendCellSize</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>10</code></div>
+
+      <p>Size of the legend cells, in pixel.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="legendCellSize-a"></div>
+          <p>Default legendCellSize of 10px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendCellSize-a',
+                domain: 'day',
+                range: 2,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendCellSize-b"></div>
+          <p>legendCellSize of 5px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendCellSize-b',
+                domain: 'day',
+                range: 2,
+                legendCellSize: 5,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="legendCellPadding">legendCellPadding</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>2</code></div>
+
+      <p>Padding between each legend cell, in pixel.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="legendCellPadding-a"></div>
+          <p>Default legendCellPadding</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendCellPadding-a',
+                domain: 'day',
+                range: 3,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendCellPadding-b"></div>
+          <p>legendCellPadding of 5px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendCellPadding-b',
+                domain: 'day',
+                range: 3,
+                legendCellPadding: 5,
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="legendMargin">legendMargin</h4>
+      <div class="option-type">integer or Array</div>
+      <div class="option-default"><code>[10, 0, 0, 0]</code></div>
+
+      <p>Margin around the legend, in pixel</p>
+
+      <div class="example clearfix empty-calendar">
+        <style>
+          #legendMargin-a .graph-legend,
+          #legendMargin-b .graph-legend {
+            fill: #000;
+          }
+        </style>
+        <div>
+          <div id="legendMargin-a"></div>
+          <p>Default legendMargin</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendMargin-a',
+                domain: 'day',
+                range: 3,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendMargin-b"></div>
+          <p>Margin of 50px on top and left</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendMargin-b',
+                domain: 'day',
+                range: 3,
+                legendMargin: [50, 0, 0, 50],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="legendVerticalPosition">legendVerticalPosition</h4>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>bottom</code></div>
+
+      <p>Vertical position of the legend.</p>
+
+      <table class="table-condensed table">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>top</code></td>
+          <td>Place the legend above the calendar</td>
+        </tr>
+        <tr>
+          <td><code>center</code></td>
+          <td>
+            <p>Place the legend on the calendar's side</p>
+            <p>
+              Use with
+              <a href="#legendHorizontalPosition"
+                ><code>legendHorizontalPosition</code></a
+              >, to position the legend on the left (default) or on the right.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td><code>bottom</code></td>
+          <td>Place the legend below the calendar</td>
+        </tr>
+      </table>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="legendVerticalPosition-a"></div>
+          <p>Default legendVerticalPosition</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendVerticalPosition-a',
+                domain: 'day',
+                range: 2,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendVerticalPosition-b"></div>
+          <p>legend on top, with a legend margin-bottom of 10px</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendVerticalPosition-b',
+                domain: 'day',
+                range: 2,
+                legendVerticalPosition: 'top',
+                legendMargin: [0, 0, 10, 0],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="legendVerticalPosition-c"></div>
+          <p>Legend on the left side</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendVerticalPosition-c',
+                domain: 'day',
+                range: 2,
+                legendVerticalPosition: 'center',
+                legendMargin: [0, 10, 0, 0],
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendVerticalPosition-d"></div>
+          <p>Legend on the right side</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendVerticalPosition-d',
+                domain: 'day',
+                range: 2,
+                legendVerticalPosition: 'center',
+                legendHorizontalPosition: 'right',
+                legendMargin: [0, 0, 0, 10],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="legendHorizontalPosition">legendHorizontalPosition</h4>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>left</code></div>
+
+      <p>Horizontal position of the legend.</p>
+
+      <table class="table-condensed table">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>left</code></td>
+          <td>Align the legend to the left</td>
+        </tr>
+        <tr>
+          <td><code>center</code></td>
+          <td>Center the legend</td>
+        </tr>
+        <tr>
+          <td><code>right</code></td>
+          <td>Align the legend to the right</td>
+        </tr>
+      </table>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="legendHorizontalPosition-a"></div>
+          <p>Default legendHorizontalPosition</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendHorizontalPosition-a',
+                domain: 'day',
+                range: 3,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendHorizontalPosition-b"></div>
+          <p>legend align on the right</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendHorizontalPosition-b',
+                domain: 'day',
+                range: 3,
+                legendHorizontalPosition: 'right',
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="legendOrientation">legendOrientation</h4>
+      <b class="version-added">3.3.0+</b>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>horizontal</code></div>
+
+      <p>Orientation of the legend.</p>
+
+      <table class="table-condensed table">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>horizontal</code></td>
+          <td>Legend is displayed horizontally, from left to right</td>
+        </tr>
+        <tr>
+          <td><code>vertical</code></td>
+          <td>Legend is displayed vertically, from top to bottom</td>
+        </tr>
+      </table>
+
+      <p>
+        <a href="#legendOrientation"><code>legendOrientation</code></a> is best
+        used together with
+        <a href="#legendHorizontalPosition"
+          ><code>legendHorizontalPosition</code></a
+        >
+        when the legend is positioned on the side.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="legendOrientation-a"></div>
+          <p>Vertical legend on the left side</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendOrientation-a',
+                domain: 'day',
+                range: 3,
+                legendVerticalPosition: 'center',
+                legendOrientation: 'vertical',
+                legendMargin: [0, 10, 0, 0],
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="legendOrientation-b"></div>
+          <p>
+            Vertical legend on the right side, on a vertical oriented calendar
+          </p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendOrientation-b',
+                domain: 'month',
+                subDomain: 'x_day',
+                range: 3,
+                verticalOrientation: true,
+                legendVerticalPosition: 'center',
+                legendHorizontalPosition: 'right',
+                legendOrientation: 'vertical',
+                legendMargin: [0, 0, 0, 20],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="legendColors">legendColors</h4>
+      <b class="version-added">3.3.0+</b>
+      <div class="option-type">Array or Object</div>
+      <div class="option-default"><code>null</code></div>
+
+      <p>Set of colors to automagically compute the heatmap colors.</p>
+
+      <p>
+        Instead of relying on the CSS for your heatmap's colors, you can also
+        set the heatmap's colors directly with cal-heatmap on initilialisation,
+        or even dynamically change them after.
+      </p>
+
+      <p>
+        The <code>legendColors</code> setting takes an object with the following
+        keys:
+      </p>
+
+      <table class="table-condensed table">
+        <tr>
+          <th>Key</th>
+          <th>Description</th>
+          <th>CSS equivalent</th>
+        </tr>
+        <tr>
+          <td><code>min</code></td>
+          <td>Color of the smallest value on the legend</td>
+          <td><code>.q1</code></td>
+        </tr>
+        <tr>
+          <td><code>max</code></td>
+          <td>Color of the highest value on the legend</td>
+          <td><code>.qx</code>, where x is the highest number</td>
+        </tr>
+        <tr>
+          <td><code>empty</code></td>
+          <td>
+            <span class="label label-info">Optional</span> Color for the dates
+            with value == 0
+          </td>
+          <td><code>.q0</code></td>
+        </tr>
+        <tr>
+          <td><code>base</code></td>
+          <td>
+            <span class="label label-info">Optional</span> Base color of the
+            date cell's
+          </td>
+          <td><code>.graph-rect</code></td>
+        </tr>
+        <tr>
+          <td><code>overflow</code></td>
+          <td>
+            <span class="label label-info">Optional</span> Color for the special
+            value
+          </td>
+          <td><code>.qi</code></td>
+        </tr>
+      </table>
+
+      <p>
+        Colors can be defined using the hexadecimal notation
+        <code>#FFFFFF</code> or its english equivalent name <code>white</code>.
+        <br />Other fancy function like <code>hsl(350, 100%, 50%)</code> are
+        also accepted.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  legendColors: {
+    min: "#efefef",
+    max: "steelblue",
+    empty: "white"
+    // Will use the CSS for the missing keys
+  }
+});
+</code></pre>
+
+      <p class="alert alert-info">
+        When using only the mandatory <code>min</code> and
+        <code>max</code> keys, you can use an array <code>[min, max]</code>,
+        instead of the whole object.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  legendColors: ["#efefef", "steelblue"]
+});
+</code></pre>
+
+      <p>
+        All the intermediate colors on the legend will be interpolated from the
+        <code>min</code> and <code>max</code> colors, using the
+        <a href="https://gist.github.com/mbostock/3014589">HCL interpolation</a
+        >.
+      </p>
+
+      <h4>Note</h4>
+      <div class="option-type"></div>
+
+      <p>
+        All legend settings can be changed dynamically after calendar
+        initialisation, with <a href="#setLegend"><code>setLegend()</code></a
+        >.
+      </p>
+    </div>
+
+    <div class="playground">
+      <div class="container">
+        <h4 id="legend-playground">
+          <i class="icon-gamepad"></i> Legend Playground
+        </h4>
+
+        <div class="cal">
+          <div id="legend-playground-example"></div>
+        </div>
+
+        <div class="playground-controls">
+          <form id="legend-playground-controls" class="form-horizontal">
+            <div class="control-group">
+              <a href="#animationDuration"><code>animationDuration</code></a>
+              <label class="control-label">Animation duration</label>
+              <div class="controls" id="legend-playground-duration">
+                <input
+                  class="span1"
+                  type="number"
+                  min="400"
+                  max="5000"
+                  step="200"
+                  value="400"
+                />
+                ms
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Horizontal position</label>
+              <a href="#legendHorizontalPosition"
+                ><code>legendHorizontalPosition</code></a
+              >
+              <div class="controls" id="legend-playground-h-position">
+                <button class="btn btn-primary" value="left">left</button>
+                <button class="btn" value="center">center</button>
+                <button class="btn" value="right">right</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Vertical position</label>
+              <a href="#legendVerticalPosition"
+                ><code>legendVerticalPosition</code></a
+              >
+              <div class="controls" id="legend-playground-v-position">
+                <button class="btn btn-primary" value="top">top</button>
+                <button class="btn" value="center">center</button>
+                <button class="btn" value="bottom">bottom</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Orientation</label>
+              <a href="#legendOrientation"><code>animationDuration</code></a>
+              <div class="controls" id="legend-playground-orientation">
+                <button class="btn btn-primary" value="horizontal">
+                  horizontal
+                </button>
+                <button class="btn" value="vertical">vertical</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Margin</label>
+              <a href="#legendMargin"><code>legendMargin</code></a>
+              <div class="controls" id="legend-playground-margin">
+                <input
+                  class="span1"
+                  type="number"
+                  min="0"
+                  max="50"
+                  step="5"
+                  value="0"
+                />
+                <input
+                  class="span1"
+                  type="number"
+                  min="0"
+                  max="50"
+                  step="5"
+                  value="0"
+                />
+                <input
+                  class="span1"
+                  type="number"
+                  min="0"
+                  max="50"
+                  step="5"
+                  value="20"
+                />
+                <input
+                  class="span1"
+                  type="number"
+                  min="0"
+                  max="50"
+                  step="5"
+                  value="0"
+                />
+                <span class="help-block"
+                  ><small>(top, right, bottom, left)</small></span
+                >
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Legend domain</label>
+              <a href="#legend"><code>legend</code></a>
+              <div class="controls" id="legend-playground-domain">
+                <input
+                  class="span1"
+                  type="number"
+                  min="5"
+                  max="20"
+                  step="5"
+                  value="10"
+                />
+                <input
+                  class="span1"
+                  type="number"
+                  min="25"
+                  max="40"
+                  step="5"
+                  value="40"
+                />
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Legend domain step</label>
+              <a href="#legend"><code>legend</code></a>
+              <div class="controls" id="legend-playground-domain-step">
+                <input
+                  class="span1"
+                  type="number"
+                  min="2"
+                  max="20"
+                  value="10"
+                />
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Final generated legend</label>
+              <div class="controls" id="legend-playground-domain-result">
+                [10, 20, 30, 40]
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Color range</label>
+              <a href="#legendColors"><code>legendColors</code></a>
+              <div class="controls" id="legend-playground-color">
+                <select
+                  class="span2"
+                  style="
+                    font-family: Monaco, Menlo, Consolas, 'Courier New',
+                      monospace;
+                  "
+                >
+                  <option value="#f4decd" style="background: #f4decd">
+                    #f4decd
+                  </option>
+                  <option value="#f5e7d8" style="background: #f5e7d8">
+                    #f5e7d8
+                  </option>
+                  <option value="#ecf5e2" style="background: #ecf5e2">
+                    #ecf5e2
+                  </option>
+                  <option value="#fdffbe" style="background: #fdffbe">
+                    #fdffbe
+                  </option>
+                  <option value="#eeebf3" style="background: #eeebf3">
+                    #eeebf3
+                  </option>
+                  <option value="#ffffff" style="background: #ffffff">
+                    #ffffff
+                  </option>
+                  <option value="#d2de76" style="background: #d2de76">
+                    #d2de76
+                  </option>
+                  <option value="#fcffa3" style="background: #fcffa3">
+                    #fcffa3
+                  </option>
+                  <option value="#f6fcfd" style="background: #f6fcfd">
+                    #f6fcfd
+                  </option>
+                </select>
+
+                <select
+                  class="span2"
+                  style="
+                    font-family: Monaco, Menlo, Consolas, 'Courier New',
+                      monospace;
+                  "
+                >
+                  <option value="#761d15" style="background: #761d15">
+                    #761d15
+                  </option>
+                  <option value="#510d63" style="background: #510d63">
+                    #510d63
+                  </option>
+                  <option value="#305920" style="background: #305920">
+                    #305920
+                  </option>
+                  <option value="#232181" style="background: #232181">
+                    #232181
+                  </option>
+                  <option value="#840033" style="background: #840033">
+                    #840033
+                  </option>
+                  <option value="#000000" style="background: #000000">
+                    #000000
+                  </option>
+                  <option value="#51682a" style="background: #51682a">
+                    #51682a
+                  </option>
+                  <option value="#ad001d" style="background: #ad001d">
+                    #ad001d
+                  </option>
+                  <option value="#12481b" style="background: #12481b">
+                    #12481b
+                  </option>
+                </select>
+
+                <button class="btn" value="apply">Apply</button>
+                <button class="btn" value="reset">Reset</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Cell size</label>
+              <a href="#legendCellSize"><code>legendCellSize</code></a>
+              <div class="controls" id="legend-playground-cellsize">
+                <input
+                  class="span1"
+                  type="number"
+                  min="2"
+                  max="50"
+                  step="1"
+                  value="10"
+                />
+                px
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Cell padding</label>
+              <a href="#legendCellPadding"><code>legendCellPadding</code></a>
+              <div class="controls" id="legend-playground-cellpadding">
+                <input
+                  class="span1"
+                  type="number"
+                  min="2"
+                  max="50"
+                  step="1"
+                  value="2"
+                />
+                px
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Visibility</label>
+              <a href="#displayLegend"><code>displayLegend</code></a>
+              <div class="controls" id="legend-playground-visibility">
+                <button class="btn btn-danger" value="remove">
+                  <i class="icon-remove"></i> Remove legend
+                </button>
+                <button
+                  class="btn btn-success"
+                  value="add"
+                  style="display: none"
+                >
+                  <i class="icon-plus"></i> Re-insert legend
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <script>
+          (function () {
+            var cal = new CalHeatMap();
+            cal.init({
+              itemSelector: '#legend-playground-example',
+              start: new Date(2000, 0, 1),
+              data: 'datas-hours.json',
+              legendVerticalPosition: 'top',
+              legendHorizontalPosition: 'left',
+              legendMargin: [0, 0, 20, 0],
+              range: 6,
+            });
+
+            $('#legend-playground-v-position button').on('click', function (e) {
+              e.preventDefault();
+              $('#legend-playground-v-position button').removeClass(
+                'btn-primary'
+              );
+              $(this).addClass('btn-primary');
+              cal.options.legendVerticalPosition = $(this).val();
+              checkIdiotSetting();
+              cal.setLegend();
+            });
+
+            $('#legend-playground-h-position button').on('click', function (e) {
+              e.preventDefault();
+              $('#legend-playground-h-position button').removeClass(
+                'btn-primary'
+              );
+              $(this).addClass('btn-primary');
+              cal.options.legendHorizontalPosition = $(this).val();
+              checkIdiotSetting();
+              cal.setLegend();
+            });
+
+            $('#legend-playground-orientation button').on(
+              'click',
+              function (e) {
+                e.preventDefault();
+                $('#legend-playground-orientation button').removeClass(
+                  'btn-primary'
+                );
+                $(this).addClass('btn-primary');
+                cal.options.legendOrientation = $(this).val();
+                cal.setLegend();
+              }
+            );
+
+            $('#legend-playground-margin input').on('change', function (e) {
+              var margin = [];
+              $('#legend-playground-margin input').each(function () {
+                margin.push(parseInt($(this).val(), 10));
+              });
+
+              cal.options.legendMargin = margin;
+              cal.setLegend();
+            });
+
+            $(
+              '#legend-playground-domain input, #legend-playground-domain-step input'
+            ).on('change', function (e) {
+              var domain = d3.range(
+                parseInt($($('#legend-playground-domain input')[0]).val(), 10),
+                parseInt($($('#legend-playground-domain input')[1]).val(), 10),
+                parseInt($('#legend-playground-domain-step input').val(), 10)
+              );
+
+              $('#legend-playground-domain-result').html(
+                '[' + domain.join(', ') + ']'
+              );
+
+              cal.setLegend(domain);
+            });
+
+            $('#legend-playground-color button').on('click', function (e) {
+              e.preventDefault();
+
+              if ($(this).val() === 'reset') {
+                cal.setLegend(cal.options.legend, null);
+              } else {
+                cal.setLegend(cal.options.legend, [
+                  $($('#legend-playground-color select')[0])
+                    .find('option:selected')
+                    .val(),
+                  $($('#legend-playground-color select')[1])
+                    .find('option:selected')
+                    .val(),
+                ]);
+              }
+            });
+
+            $('#legend-playground-cellsize input').on('change', function (e) {
+              cal.options.legendCellSize = parseInt($(this).val(), 10);
+              cal.setLegend();
+            });
+
+            $('#legend-playground-cellpadding input').on(
+              'change',
+              function (e) {
+                cal.options.legendCellPadding = parseInt($(this).val(), 10);
+                cal.setLegend();
+              }
+            );
+
+            $('#legend-playground-duration input').on('change', function (e) {
+              cal.options.animationDuration = parseInt($(this).val(), 10);
+            });
+
+            $('#legend-playground-visibility button[value=remove]').on(
+              'click',
+              function (e) {
+                e.preventDefault();
+                cal.removeLegend();
+                $(this).hide();
+                $('#legend-playground-visibility button[value=add]').show();
+              }
+            );
+
+            $('#legend-playground-visibility button[value=add]').on(
+              'click',
+              function (e) {
+                e.preventDefault();
+                cal.showLegend();
+                $(this).hide();
+                $('#legend-playground-visibility button[value=remove]').show();
+              }
+            );
+
+            function checkIdiotSetting() {
+              if (
+                cal.options.legendHorizontalPosition === 'center' &&
+                cal.options.legendVerticalPosition === 'center'
+              ) {
+                cal.options.legendHorizontalPosition = 'left';
+              }
+            }
+          })();
+        </script>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="section-head">i18n</div>
+
+      <h4 id="itemName">itemName</h4>
+      <div class="option-type">String or Array</div>
+      <div class="option-default"><code>["item", "items"]</code></div>
+
+      <p>Name of the entity you're representing on the calendar.</p>
+
+      <p>
+        Takes an array of String, with the first index as singular form, and the
+        second index, the plural form.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  itemName: ["cat", "cats"]
+});</code></pre>
+
+      <p>
+        For the lazy, you can also pass a simple string, ar a single element
+        array, and it'll automatically guess the plural form, as long as it's
+        the singular form plus the "s" suffix.
+      </p>
+
+      <p>The 2 following examples are the same as the one above</p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  itemName: "cat"
+});</code></pre>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  itemName: ["cat"]
+});</code></pre>
+
+      <h4 id="subDomainTitleFormat">subDomainTitleFormat</h4>
+      <div class="option-type">Object</div>
+
+      <p>Format of the title displayed when hovering a subDomain.</p>
+
+      <p>Takes an object with 2 properties:</p>
+
+      <table class="table-condensed table">
+        <tr>
+          <th>Property name</th>
+          <th>Default value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>empty</code></td>
+          <td><code>{date}</code></td>
+          <td>
+            Format of the title when there is no value associated to the date.
+          </td>
+        </tr>
+        <tr>
+          <td><code>filled</code></td>
+          <td><code>{count} {name} {connector} {date}</code></td>
+          <td>Format of the title when it's associated to a value</td>
+        </tr>
+      </table>
+
+      <p>Some template string are available, and enclosed in braces.</p>
+
+      <table class="table">
+        <tr>
+          <th>Template</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>{name}</code></td>
+          <td>
+            Name of the entity represented in the calendar (see
+            <a href="#itemName"><code>itemName</code></a
+            >)
+          </td>
+        </tr>
+        <tr>
+          <td><code>{count}</code></td>
+          <td>The value associated to the date</td>
+        </tr>
+        <tr>
+          <td><code>{date}</code></td>
+          <td>
+            The date of the cell. It's automatically formatted according to the
+            type of subDomain. <br />
+            See <code>subDomainDateFormat</code> to further customize that date
+            formatting.
+          </td>
+        </tr>
+        <tr>
+          <td><code>{connector}</code></td>
+          <td>
+            An English preposition placed before a datetime (<em>on</em> Monday,
+            <em>at</em> 15:00, etc..). Each subDomain have their own default
+            connector, corresponding to the default date format.
+          </td>
+        </tr>
+      </table>
+
+      <h4 id="subDomainDateFormat">subDomainDateFormat</h4>
+      <div class="option-type">String or function</div>
+
+      <p>
+        Format of the <code>{date}</code> template string inside
+        <code>subDomainTitleFormat</code>.
+      </p>
+
+      <p>
+        <code>{date}</code> is by default formatted according to the subDomain
+        type.
+      </p>
+
+      <div class="example-bloc">
+        <h6>Example</h6>
+
+        <ul>
+          <li>
+            With a <code>month</code> subDomain, it'll return something like
+            <b>January, 2000</b>
+          </li>
+          <li>
+            With a <code>week</code> subDomain, it'll return for example
+            <b>Week #1</b>
+          </li>
+          <li>
+            With a <code>hour</code> subDomain, it'll return
+            <b>20h, January 6th, 2000</b>
+          </li>
+        </ul>
+      </div>
+
+      <p>
+        <code>subDomainDateFormat</code> can accepts any string with directive
+        accepted by
+        <a href="https://github.com/mbostock/d3/wiki/Time-Formatting"
+          >d3.time.format()</a
+        >, like <code>"%Y-%m-%d".</code>
+      </p>
+
+      <p>
+        As
+        <a href="https://github.com/mbostock/d3/wiki/Time-Formatting"
+          >d3.time.format()</a
+        >
+        will only output english dates, <code>subDomainDateFormat</code> can
+        also accepts a function, with the subDomain date as argument.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  subDomainDateFormat: function(date) {
+    return moment(date).format("LL"); // Use the moment library to format the Date
+  }
+});
+</code></pre>
+
+      <h4 id="subDomainTextFormat">subDomainTextFormat</h4>
+      <div class="option-type">String or function</div>
+
+      <p>Format of the text inside a subDomain cell.</p>
+
+      <p>
+        Disabled by default, you can display a text inside each subDomain cell.
+        Works exactly like <code>subDomainDateFormat</code>, except that the
+        function takes the cell value as second argument.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="subDomainTextFormat-a"></div>
+          <p>Display the date in cell</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#subDomainTextFormat-a',
+                start: new Date(2000, 0, 1, 1),
+                domain: 'month',
+                subDomain: 'x_day',
+                cellSize: 20,
+                range: 1,
+                displayLegend: false,
+                subDomainTextFormat: '%d',
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="subDomainTextFormat-b"></div>
+          <p>Display the value in cell</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#subDomainTextFormat-b',
+                start: new Date(2000, 0, 1, 1),
+                data: 'datas-years.json',
+                domain: 'month',
+                subDomain: 'x_day',
+                cellSize: 20,
+                range: 1,
+                displayLegend: false,
+                subDomainTextFormat: function (date, value) {
+                  return value;
+                },
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        Use <code>.subdomain-text</code> in your CSS to style the text. Text is
+        centered horizontally and vertically, and can not by changed.
+      </p>
+
+      <h4 id="domainLabelFormat">domainLabelFormat</h4>
+      <div class="option-type">String or function</div>
+
+      <p>Format of the domain label.</p>
+
+      <p>
+        Works exactly like
+        <a href="#subDomainDateFormat"><code>subDomainDateFormat</code></a
+        >, and will format the domain label with any string accepted by
+        <a href="https://github.com/mbostock/d3/wiki/Time-Formatting"
+          >d3.time.format()</a
+        >, or a function.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="domainLabelFormat-a"></div>
+          <p>Default label according to the domain type</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainLabelFormat-a',
+                domain: 'month',
+                subDomain: 'day',
+                range: 1,
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="domainLabelFormat-b"></div>
+          <p>Custom domain label</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domainLabelFormat-b',
+                domain: 'month',
+                subDomain: 'day',
+                range: 1,
+                displayLegend: false,
+                domainLabelFormat: '%m-%Y',
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p class="alert alert-info">
+        See
+        <a href="#subDomainDateFormat"><code>subDomainDateFormat</code></a> for
+        more infos on accepted values.
+      </p>
+
+      <p>
+        To not display the domain label, set
+        <a href="#domainLabelFormat"><code>domainLabelFormat</code></a> to
+        <code>""</code> (empty string). <b class="version-added">3.1.1+</b>
+      </p>
+
+      <h4 id="legendTitleFormat">legendTitleFormat</h4>
+      <div class="option-type">Object</div>
+
+      <p>
+        Formatting of the legend title, displayed when hovering a legend cell.
+      </p>
+
+      <p>It takes an object with up to 3 properties:</p>
+
+      <table class="table table-condensed">
+        <tr>
+          <th>Property</th>
+          <th>Default value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>lower</td>
+          <td><code>less than {min} {name}</code></td>
+          <td>Formatting of the smallest (leftmost) value of the legend</td>
+        </tr>
+        <tr>
+          <td>inner</td>
+          <td><code>between {down} and {up} {name}</code></td>
+          <td>Formatting of all the value but the first and the last</td>
+        </tr>
+        <tr>
+          <td>upper</td>
+          <td><code>more than {max} {name}</code></td>
+          <td>Formatting of the biggest (rightmost) value of the legend</td>
+        </tr>
+      </table>
+
+      <p>Some template string are available, and enclosed in braces.</p>
+
+      <table class="table">
+        <tr>
+          <th>Template</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>{name}</code></td>
+          <td>
+            Name of the entity represented in the calendar (see
+            <a href="#itemName"><code>itemName</code></a
+            >)
+          </td>
+        </tr>
+        <tr>
+          <td><code>{min}</code></td>
+          <td>
+            The first value of the
+            <a href="#legend"><code>legend</code></a> array.
+          </td>
+        </tr>
+        <tr>
+          <td><code>{max}</code></td>
+          <td>
+            The last value of the
+            <a href="#legend"><code>legend</code></a> array.
+          </td>
+        </tr>
+        <tr>
+          <td><code>{down}</code></td>
+          <td>The lower bound of a color</td>
+        </tr>
+        <tr>
+          <td><code>{up}</code></td>
+          <td>The upper bound of a color</td>
+        </tr>
+      </table>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <span class="tips"
+            >Hover over the legend cells to see how it's formatted</span
+          >
+          <div id="legendTitleFormat-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#legendTitleFormat-a',
+                domain: 'day',
+                range: 3,
+              });
+            })();
+          </script>
+        </div>
+        <div></div>
+      </div>
+
+      <h4 id="animationDuration">animationDuration</h4>
+      <div class="option-type">integer</div>
+      <div class="option-default"><code>500</code></div>
+
+      <p>Animation duration, in milliseconds.</p>
+
+      <div class="example clearfix empty-calendar">
+        <div style="float: none; margin-bottom: 20px">
+          <button class="btn" id="animationDuration-previous">Previous</button>
+          <button class="btn" id="animationDuration-next">Next</button>
+        </div>
+
+        <div>
+          <div id="animationDuration-a"></div>
+          <p>500ms</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#animationDuration-a',
+                domain: 'day',
+                range: 4,
+                previousSelector: '#animationDuration-previous',
+                nextSelector: '#animationDuration-next',
+                itemNamespace: 'animationDuration-a',
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="animationDuration-b"></div>
+          <p>1.5 second</p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#animationDuration-b',
+                domain: 'day',
+                range: 4,
+                animationDuration: 1500,
+                previousSelector: '#animationDuration-previous',
+                nextSelector: '#animationDuration-next',
+                itemNamespace: 'animationDuration-b',
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="previousSelector">previousSelector</h4>
+      <div class="option-type">String selector or Element</div>
+      <div class="option-default"><code>false</code></div>
+
+      <p>
+        Will attach the <a href="#previous"><code>previous()</code></a> event to
+        the specified element, on a mouse click, shifting the calendar one
+        domain back.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="previousSelector-a"></div>
+          <p>Targeting a simple #ID</p>
+
+          <div style="float: none; margin-top: 20px">
+            <button class="btn" id="previousSelector-a-previous">
+              Previous
+            </button>
+            <button class="btn" id="previousSelector-a-next">Next</button>
+          </div>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#previousSelector-a',
+                domain: 'day',
+                range: 4,
+                previousSelector: '#previousSelector-a-previous',
+                nextSelector: '#previousSelector-a-next',
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <div id="previousSelector-b"></div>
+          <p>Using a more complex Selector String</p>
+
+          <div
+            style="float: none; margin-top: 20px"
+            id="example-previousSelector"
+          >
+            <ul title="next">
+              <li><em>Next</em></li>
+              <li>Next (ignored)</li>
+              <li>Next (ignored)</li>
+            </ul>
+            <p>Then, let's <em>go back</em> to the previous domain.</p>
+          </div>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#previousSelector-b',
+                domain: 'day',
+                range: 4,
+                previousSelector: '#example-previousSelector  ul + p > em',
+                nextSelector: '#example-previousSelector [title=next] li',
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <p>
+        If you want to shift by more than one domain, see the
+        <a href=""><code>previous()</code></a> method
+      </p>
+
+      <p class="alert alert-info">
+        See <a href="#itemSelector"><code>itemSelector</code></a> for details
+        about String Selector and Element type.
+      </p>
+
+      <h4 id="nextSelector">nextSelector</h4>
+      <div class="option-type">String selector or Element</div>
+      <div class="option-default"><code>false</code></div>
+
+      <p>
+        Will attach the <a href="#next"><code>next()</code></a> event to the
+        specified element, on a mouse click, shifting the calendar one domain
+        forward.
+      </p>
+
+      <p>
+        If you want to shift by more than one domain, see the
+        <a href="#next"><code>next()</code></a> method
+      </p>
+
+      <p class="alert alert-info">
+        See <a href="#previousSelector"><code>previousSelector</code></a> for an
+        example.
+      </p>
+
+      <p class="alert alert-info">
+        See <a href="#itemSelector"><code>itemSelector</code></a> for details
+        about String Selector and Element type.
+      </p>
+
+      <h4 id="itemNamespace">itemNamespace</h4>
+      <div class="option-type">String</div>
+      <div class="option-default"><code>cal-heatmap</code></div>
+
+      <p>The calendar instance namespace.</p>
+
+      <p>
+        If you have more than one instance of Cal-Heatmap, you should assign
+        each instance its own namespace, in order to isolate each instance event
+        handler.
+      </p>
+
+      <p>This will <em>not</em> work</p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  nextSelector: "#next" // Attach #next onClick event to cal.next()
+
+});
+
+var cal2 = new CalHeatMap();
+cal2.init({
+  nextSelector: "#next" // Attach #next onClick event to cal2.next(), overiding cal.next()
+
+});
+</code></pre>
+
+      <p>This will work</p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  nextSelector: "#next",
+    // Attach #next.cal onClick event to cal.next()
+  itemNamespace: "cal"
+
+});
+
+var cal2 = new CalHeatMap();
+cal2.init({
+  nextSelector: "#next",
+    // Attach #next.cal2 onClick event to cal2.next()
+  itemNamespace: "cal2"
+
+});
+</code></pre>
+
+      <h3 id="methods">Methods</h3>
+
+      <p>
+        Beside <code>init()</code>, Cal-HeatMap also boast other methods to
+        control the behavior of the calendar.
+      </p>
+
+      <h4 id="previous">previous(n)</h4>
+      <div class="option-type"></div>
+      <p>Shift the calendar <b>n</b> domains back</p>
+
+      <p><b>n</b> is optional, and by default is equal to 1.</p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatmap();
+cal.init({});
+cal.previous();
+</code></pre>
+      <p class="alert alert-info">
+        See <a href="#previousSelector"><code>previousSelector</code></a> if you
+        wish to directly attach <code>previous()</code> to an Element mouse
+        click event.
+      </p>
+
+      <h4 id="next">next(n)</h4>
+      <div class="option-type"></div>
+      <p>Shift the calendar <b>n</b> domains forward</p>
+
+      <p><b>n</b> is optional, and by default is equal to 1.</p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatmap();
+cal.init({});
+cal.next();
+cal.next(5); // Move back by 5 domains
+</code></pre>
+
+      <p class="alert alert-info">
+        See <a href="#previousSelector"><code>nextSelector</code></a> if you
+        wish to directly attach <code>next()</code> to an Element mouse click
+        event.
+      </p>
+
+      <h4 id="jumpto">jumpTo(date, reset)</h4>
+      <strong class="version-added">3.3.0+</strong>
+      <div class="option-type"></div>
+      <p>Jump the calendar to the specified date</p>
+
+      <p>
+        This method will shift the calendar backward or forward, until the
+        domain containing the specified date is visible.
+      </p>
+
+      <table class="table">
+        <tr>
+          <th>Argument</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>Date</code></td>
+          <td><code>Date</code></td>
+          <td>The date to jump to.</td>
+        </tr>
+        <tr>
+          <td><code>reset</code></td>
+          <td><code>boolean</code></td>
+          <td>
+            <span class="label label-info">Optional</span> Default:
+            <code>false</code>
+            <p>
+              Whether to set the domain with the specified as the calendar's
+              first domain.
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="jumpTo-a"></div>
+          <p>
+            With <code>reset</code> == false, <code>jumpTo</code> will stop as
+            soon as the wanted date is visible
+          </p>
+
+          <div style="float: none; margin-top: 20px">
+            <button class="btn" id="jumpTo-a-btn">Jump to May 2000</button>
+          </div>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#jumpTo-a',
+                start: new Date(2000, 0),
+                domain: 'month',
+                range: 4,
+              });
+
+              $('#jumpTo-a-btn').on('click', function (event) {
+                cal.jumpTo(new Date(2000, 4));
+              });
+            })();
+          </script>
+        </div>
+
+        <div>
+          <div id="jumpTo-b"></div>
+          <p>
+            With <code>reset</code> == true, <code>jumpTo</code> will move the
+            wanted domain to the start of the calendar
+          </p>
+
+          <div style="float: none; margin-top: 20px">
+            <button class="btn" id="jumpTo-b-btn">Jump to May 2000</button>
+          </div>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#jumpTo-b',
+                start: new Date(2000, 0),
+                domain: 'month',
+                range: 4,
+              });
+
+              $('#jumpTo-b-btn').on('click', function (event) {
+                cal.jumpTo(new Date(2000, 4), true);
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="rewind">rewind()</h4>
+      <strong class="version-added">3.3.8+</strong>
+      <div class="option-type"></div>
+      <p>Reset the calendar back to the start date</p>
+
+      <div class="example clearfix empty-calendar">
+        <div>
+          <div id="rewind-a"></div>
+          <p>
+            The following calendar will jump 5 domains forward immediatly on
+            load. Use the Rewind button to reset to the initial start date.
+          </p>
+
+          <div style="float: none; margin-top: 20px">
+            <button class="btn" id="rewind-a-btn">Rewind</button>
+          </div>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#rewind-a',
+                start: new Date(2000, 0),
+                domain: 'month',
+                range: 4,
+              });
+              cal.next(3);
+
+              $('#rewind-a-btn').on('click', function (event) {
+                cal.rewind();
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="update">update(data, afterLoad, updateMode)</h4>
+      <strong class="version-added">3.1.0+</strong>
+      <div class="option-type"></div>
+      <p>Update the calendar with new data</p>
+
+      <p>
+        Use <code>update()</code> when you want to refresh the calendar with a
+        new set of data. <br />Particularly useful if you're filling the
+        calendar in realtime, or if you want to display a subset of the current
+        data.
+      </p>
+
+      <table class="table">
+        <tr>
+          <th>Argument</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>data</code></td>
+          <td><code>string</code>|<code>object</code></td>
+          <td>
+            Accept the same format as the
+            <a href="#data"><code>data</code></a> option.
+          </td>
+        </tr>
+        <tr>
+          <td><code>afterLoad</code></td>
+          <td><code>boolean</code>|<code>function</code></td>
+          <td>
+            <span class="label label-info">Optional</span> Default:
+            <code>true</code>
+
+            <p>
+              Whether to execute the
+              <a href="#afterLoad"><code>afterLoad()</code></a> callback to
+              convert your data into <em>the</em> json object, expected by
+              cal-heatmap.
+            </p>
+
+            <p>
+              It can also directly takes a function, in case your data can not
+              be converted with the
+              <a href="#afterLoad"><code>afterLoad()</code></a> function you
+              defined.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td><code>updateMode</code></td>
+          <td><code>constant</code></td>
+          <td>
+            <p>
+              <span class="label label-info">Optional</span> Define how to
+              insert the new data into the calendar.
+            </p>
+
+            <p>Accepted values are:</p>
+
+            <dl>
+              <dt><code>Instance.RESET_ALL_ON_UPDATE</code> (default)</dt>
+              <dd>
+                Reset the whole calendar data before inserting the new data.
+              </dd>
+
+              <dt><code>Instance.RESET_SINGLE_ON_UPDATE</code></dt>
+              <dd>
+                Update only the dates (subDomain) you pass in the
+                <code>data</code> argument, replace their value by the new ones.
+                All other dates are leaved untouched.
+              </dd>
+
+              <dt><code>Instance.APPEND_ON_UPDATE</code></dt>
+              <dd>
+                Instead of replacing a date's value by a new one, increment it
+                by the new value. All other dates are leaved untouched. That's
+                the one you want to use of you're populating the calendar in
+                realtime!
+              </dd>
+            </dl>
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        The updated data are not persisted across domain navigation. If the
+        domain was removed then reinserted after a navigation, all updates will
+        be lost, since it'll fetch the datasource given in
+        <a href="#data"><code>data</code></a
+        >.
+      </p>
+
+      <p>
+        If you're using the <code>Instance.RESET_ALL_ON_UPDATE</code> mode, you
+        can change <a href="#data"><code>data</code></a> to the new datasource,
+        to persist the change.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatmap();
+cal.init({
+  data: "user=Eric"
+});
+
+// Wrong way !
+cal.update("user=Marc");
+// Same as calling cal.update("user=Marc", true, cal.RESET_ALL_ON_UPDATE);
+cal.next();
+// => The new loaded domain contains data from Eric !
+
+// Right way
+cal.update("user=Marc");
+cal.options.data = "user=Marc";
+cal.next();
+</code></pre>
+
+      <div class="example clearfix full-width">
+        <div>
+          <p>Toggling between 2 data sets</p>
+          <div style="margin: 20px 0">
+            <button id="update-a-display-marc" class="btn">
+              Display Marc's data
+            </button>
+            <button id="update-a-display-eric" class="btn">
+              Display Eric's data
+            </button>
+          </div>
+
+          <div id="update-a"></div>
+
+          <script>
+            (function () {
+              var weekStart = new Date();
+              weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+              var ranges = d3.range(
+                +weekStart / 1000,
+                +weekStart / 1000 + 3600 * 24 * 8,
+                3600 * 24
+              );
+
+              var max = 5;
+              var min = 1;
+
+              var ericData = {};
+              var marcData = {};
+
+              // Creating 2 random data sets
+              ranges.map(function (element, index, array) {
+                marcData[element] = Math.floor(
+                  Math.random() * (max - min) + min
+                );
+                ericData[element] = Math.floor(
+                  Math.random() * (max - min) + min
+                );
+              });
+
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#update-a',
+                domain: 'week',
+                subDomain: 'x_day',
+                data: marcData,
+                cellSize: 20,
+                range: 1,
+                legend: [1, 2, 3, 4],
+              });
+
+              $('#update-a-display-marc').on('click', function () {
+                cal.update(marcData);
+              });
+
+              $('#update-a-display-eric').on('click', function () {
+                cal.update(ericData);
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <div>
+          <p>Increment a random date by 2</p>
+          <div style="margin: 20px 0">
+            <button id="update-b-increment" class="btn">
+              Increment a random date by 2
+            </button>
+          </div>
+
+          <div id="update-b"></div>
+
+          <script>
+            (function () {
+              var weekStart = new Date();
+              weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+              var ranges = d3.range(
+                +weekStart / 1000,
+                +weekStart / 1000 + 3600 * 24 * 8,
+                3600 * 24
+              );
+
+              var max = 5;
+              var min = 1;
+
+              var marcData = {};
+
+              // Creating a random data set
+              ranges.map(function (element, index, array) {
+                marcData[element] = Math.floor(
+                  Math.random() * (max - min) + min
+                );
+              });
+
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#update-b',
+                domain: 'week',
+                subDomain: 'x_day',
+                data: marcData,
+                cellSize: 20,
+                range: 1,
+                legend: [1, 2, 3, 4],
+              });
+
+              $('#update-b-increment').on('click', function () {
+                var randomData = {};
+                randomData[
+                  Math.floor(
+                    Math.random() * (ranges[ranges.length - 1] - ranges[0]) +
+                      ranges[0]
+                  )
+                ] = 2;
+                cal.update(randomData, false, cal.APPEND_ON_UPDATE);
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <div>
+          <p>Set a random date to 1</p>
+          <div style="margin: 20px 0">
+            <button id="update-c-update" class="btn">
+              Set a random date to 1
+            </button>
+          </div>
+
+          <div id="update-c"></div>
+
+          <script>
+            (function () {
+              var weekStart = new Date();
+              weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+              var ranges = d3.range(
+                +weekStart / 1000,
+                +weekStart / 1000 + 3600 * 24 * 8,
+                3600 * 24
+              );
+
+              var max = 5;
+              var min = 2;
+
+              var marcData = {};
+
+              // Creating a random data set
+              ranges.map(function (element, index, array) {
+                marcData[element] = Math.floor(
+                  Math.random() * (max - min) + min
+                );
+              });
+
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#update-c',
+                domain: 'week',
+                subDomain: 'x_day',
+                data: marcData,
+                cellSize: 20,
+                range: 1,
+                legend: [1, 2, 3, 4],
+              });
+
+              $('#update-c-update').on('click', function () {
+                var randomData = {};
+                randomData[
+                  Math.floor(
+                    Math.random() * (ranges[ranges.length - 1] - ranges[0]) +
+                      ranges[0]
+                  )
+                ] = 1;
+                cal.update(randomData, false, cal.RESET_SINGLE_ON_UPDATE);
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="highlight-method">highlight(dates)</h4>
+      <strong class="version-added">3.3.5+</strong>
+      <div class="option-type"></div>
+      <p>Change the highlighed dates</p>
+
+      <p>
+        Accepts the same arguments as the
+        <a href="#highlight"><code>highlight</code></a> option in
+        <code>init()</code>.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  highlight: new Date(2000, 0, 1) // Highlight January 1st
+});
+
+// I changed my mind, let's highlight January 2nd instead
+cal.highlight(new Date(2000, 0, 2));
+
+// Add January 5th to already highlighted dates
+cal.highlight(cal.options.highlight.push(new Date(2000, 0, 5)));
+</code></pre>
+
+      <h4 id="getSVG">getSVG()</h4>
+      <div class="option-type"></div>
+      <p>Return the SVG source code with the appropriate CSS</p>
+
+      <p>
+        The returned string code is valid and ready to be placed in a .svg file.
+      </p>
+
+      <div class="example clearfix full-width empty-calendar">
+        <div>
+          <div id="example-getsvg"></div>
+          <textarea
+            style="width: 95%; display: block; margin-top: 20px"
+            id="example-getsvg-textarea"
+            placeholder="Click on the button below to get the calendar SVG code"
+          ></textarea>
+          <button class="btn" id="example-getsvg-button">
+            Get the calendar SVG code
+          </button>
+
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-getsvg',
+                range: 2,
+              });
+
+              d3.select('#example-getsvg-button').on('click', function (event) {
+                event.preventDefault();
+                d3.select('#example-getsvg-textarea').text(cal.getSVG());
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <h4 id="setLegend">setLegend(legend, legendColors)</h4>
+      <b class="version-added">3.3.0+</b>
+      <div class="option-type"></div>
+      <p>Change the legend settings and/or threshold</p>
+
+      <p>Can takes 2 optional arguments:</p>
+
+      <table class="table table-condensed">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>legend</code></td>
+          <td>
+            Same as <a href="#legend"><code>legend</code></a
+            >: an array of thresholds
+          </td>
+        </tr>
+        <tr>
+          <td><code>legendColors</code></td>
+          <td>
+            Same as <a href="#legendColors"><code>legendColors</code></a
+            >: an object with the heatmap's colors, or an array of 2 colors
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        When called without arguments,
+        <a href="setLegend"><code>setLegend()</code></a> will just redraw the
+        legend.
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({
+  legendVerticalPosition: "top",
+  legendHorizontalPosition: "left",
+  legendOrientation: "horizontal"
+});
+
+// Lets' move the legend on the right side, and rotate it by 90deg
+cal.legendVerticalPosition: "center";
+cal.legendHorizontalPosition: "right";
+cal.legendOrientation: "vertical";
+
+// Let's redraw the calendar to apply the settings
+cal.setLegend();
+</code></pre>
+
+      <p class="alert alert-info">
+        Check the <a href="#legend-playground">legend playground</a> for
+        example.
+      </p>
+
+      <h4 id="removeLegend">removeLegend()</h4>
+      <b class="version-added">3.3.0+</b>
+      <div class="option-type"></div>
+      <p>Remove the legend from the calendar</p>
+
+      <p>
+        Settings are kept and you can re-add the legend with the same settings
+        using <a href="#showLegend"><code>showLegend()</code></a
+        >.
+      </p>
+
+      <p class="alert alert-info">
+        Check the <a href="#legend-playground">legend playground</a> for
+        example.
+      </p>
+
+      <h4 id="showLegend">showLegend()</h4>
+      <b class="version-added">3.3.0+</b>
+      <div class="option-type"></div>
+      <p>Display the legend, if not already shown</p>
+
+      <p class="alert alert-info">
+        Check the <a href="#legend-playground">legend playground</a> for
+        example.
+      </p>
+
+      <h4 id="destroy">destroy(callback)</h4>
+      <b class="version-added">3.3.6+</b>
+      <div class="option-type">Function</div>
+      <p>Remove the calendar from the DOM</p>
+
+      <p><code>destroy()</code> always return <code>null</code>.</p>
+
+      <p>
+        It can take a function as argument, that will be executed when the
+        calendar is removed from the DOM, at the end of the animation.
+      </p>
+
+      <p>
+        <em
+          >Remember to self-assign the result of <code>destroy()</code> to your
+          calendar instance, or it'll lead to a memory leak.</em
+        >
+      </p>
+
+      <pre><code class="language-javascript">var cal = new CalHeatMap();
+cal.init({}); // Creating the calendar
+cal = cal.destroy(); // Remove the calendar from the DOM, and assign the 'cal' variable to `null`
+</code></pre>
+
+      <h3 id="events">Events</h3>
+
+      <h4 id="onClick">onClick(date, value)</h4>
+      <div class="option-type"></div>
+
+      <p>Called after a mouse click event on a subDomain cell.</p>
+
+      <div class="example clearfix">
+        <div class="expandable-source">
+          <div id="onClick-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#onClick-a',
+                domain: 'day',
+                range: 5,
+                data: 'datas-years.json',
+                start: new Date(2000, 0),
+                onClick: function (date, nb) {
+                  $('#onClick-placeholder').html(
+                    'You just clicked <br/>on <b>' +
+                      date +
+                      '</b> <br/>with <b>' +
+                      (nb === null ? 'unknown' : nb) +
+                      '</b> items'
+                  );
+                },
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <span id="onClick-placeholder">Click a date on the calendar</span>
+        </div>
+      </div>
+
+      <p class="alert alert-success">
+        <strong><i class="icon icon-magic"></i>Styling tips</strong><br />
+        <code>.hover_cursor</code> style is applied to all click-able cells.
+      </p>
+
+      <h4 id="afterLoad">afterLoad()</h4>
+      <div class="option-type"></div>
+      <p>
+        Called after drawing the empty calendar, and before filling it with
+        data.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div class="expandable-source">
+          <button
+            id="afterLoad-init"
+            style="display: block; margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-pencil"></i> Draw the calendar
+          </button>
+          <div id="afterLoad-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var start;
+              var end;
+
+              $('#afterLoad-init').on('click', function (e) {
+                start = Date.now();
+                $('#afterLoad-placeholder')
+                  .empty()
+                  .append('- Start drawing the calendar');
+                $(this).remove();
+                init();
+              });
+
+              function init() {
+                var cal = new CalHeatMap();
+                cal.init({
+                  itemSelector: '#afterLoad-a',
+                  domain: 'day',
+                  range: 5,
+                  afterLoad: function () {
+                    end = Date.now();
+
+                    $('#afterLoad-placeholder').append(
+                      '<br/>- The blank calendar was drawn in <b>' +
+                        (end - start) +
+                        '</b> ms'
+                    );
+                  },
+                  onComplete: function () {
+                    end = Date.now();
+
+                    $('#afterLoad-placeholder').append(
+                      '<br/>- The calendar was filled and completed in <b>' +
+                        (end - start) +
+                        '</b> ms'
+                    );
+                  },
+                });
+              }
+            })();
+          </script>
+        </div>
+        <div>
+          <span id="afterLoad-placeholder"
+            >Calendar waiting to be drawn ...</span
+          >
+        </div>
+      </div>
+
+      <h4 id="afterLoadPreviousDomain">afterLoadPreviousDomain(date)</h4>
+      <div class="option-type"></div>
+      <p>Called after shifting the calendar one domain back.</p>
+
+      <p>
+        The <code>date</code> argument is the start date of the domain that was
+        added.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div class="expandable-source">
+          <button
+            id="afterLoadPreviousDomain-selector"
+            style="display: block; margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i> Load previous domain
+          </button>
+          <div id="afterLoadPreviousDomain-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#afterLoadPreviousDomain-a',
+                domain: 'day',
+                range: 5,
+                afterLoadPreviousDomain: function (date) {
+                  $('#afterLoadPreviousDomain-placeholder').html(
+                    'The domain starting on <br/><b>' +
+                      date +
+                      '</b><br/> was just loaded'
+                  );
+                },
+                previousSelector: '#afterLoadPreviousDomain-selector',
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <span id="afterLoadPreviousDomain-placeholder"
+            >No previous domain loaded yet</span
+          >
+        </div>
+      </div>
+
+      <h4 id="afterLoadNextDomain">afterLoadNextDomain(date)</h4>
+      <div class="option-type"></div>
+      <p>Called after shifting the calendar one domain forward.</p>
+
+      <p>
+        The <code>date</code> argument is the start date of the domain that was
+        added.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div class="expandable-source">
+          <button
+            id="afterLoadNextDomain-selector"
+            style="display: block; margin-bottom: 10px"
+            class="btn"
+          >
+            Load next domain <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="afterLoadNextDomain-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#afterLoadNextDomain-a',
+                domain: 'day',
+                range: 5,
+                afterLoadNextDomain: function (date) {
+                  $('#afterLoadNextDomain-placeholder').html(
+                    'The domain starting on <br/><b>' +
+                      date +
+                      '</b><br/> was just loaded'
+                  );
+                },
+                nextSelector: '#afterLoadNextDomain-selector',
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <span id="afterLoadNextDomain-placeholder"
+            >No next domain loaded yet</span
+          >
+        </div>
+      </div>
+
+      <h4 id="onComplete">onComplete()</h4>
+      <div class="option-type"></div>
+      <p>Called after drawing and filling the calendar.</p>
+
+      <p>
+        Useful in case you're loading data via ajax, as it's loading data
+        asynchronously. This event will wait for the ajax request to complete
+        before triggering.
+      </p>
+
+      <p>
+        This event will only <strong>trigger once</strong>, on the initial
+        setup. See
+        <a href="#afterLoadPreviousDomain"
+          ><code>afterLoadPreviousDomain</code></a
+        >
+        and
+        <a href="#afterLoadNextDomain"><code>afterLoadNextDomain</code></a> for
+        callback events after a domain navigation.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div class="expandable-source">
+          <button
+            id="onComplete-init"
+            style="display: block; margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-pencil"></i> Draw the calendar
+          </button>
+          <div id="onComplete-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              $('#onComplete-init').on('click', function (e) {
+                $(this).remove();
+                init();
+              });
+
+              function init() {
+                var start = Date.now();
+                var end;
+
+                var cal = new CalHeatMap();
+                cal.init({
+                  itemSelector: '#onComplete-a',
+                  domain: 'day',
+                  range: 5,
+                  onComplete: function () {
+                    end = Date.now();
+                    $('#onComplete-placeholder').html(
+                      '- The calendar was loaded in <b>' +
+                        (end - start) +
+                        '</b> ms'
+                    );
+
+                    $('#onComplete-placeholder').append(
+                      '<br>- The calendar height is ' +
+                        $('#onComplete-a').height() +
+                        ' pixels'
+                    );
+                    $('#onComplete-placeholder').append(
+                      '<br>- The calendar width is ' +
+                        $('#onComplete-a').width() +
+                        ' pixels'
+                    );
+                    $('#onComplete-placeholder').append(
+                      '<br>- Setting the opacity of the calendar to 0.5, with 3 seconds animation'
+                    );
+
+                    $('#onComplete-a').animate(
+                      { opacity: 0.5 },
+                      3000,
+                      function () {
+                        $('#onComplete-placeholder').append(
+                          '<br/>- Animation complete'
+                        );
+                      }
+                    );
+                  },
+                });
+              }
+            })();
+          </script>
+        </div>
+        <div>
+          <span id="onComplete-placeholder">Calendar waiting to be drawn</span>
+        </div>
+      </div>
+
+      <h4 id="afterLoadData">afterLoadData(data)</h4>
+      <div class="option-type"></div>
+      <p>
+        Called after getting the data from source, but before filling the
+        calendar.
+      </p>
+
+      <p>
+        This callback must return a json object formatted in the
+        <a href="#data-format">expected data format</a>.
+      </p>
+
+      <p>
+        <code>afterLoadData()</code> is used to do some works on the data,
+        especially when the data source is not returning data in the expected
+        format.
+      </p>
+
+      <pre><code class="language-javascript">// datas is an array of object
+var datas = [
+  {date: 946702811, value: 15},
+  {date: 946702812, value: 25},
+  {date: 946702813, value: 10}
+]
+
+var parser = function(data) {
+  var stats = {};
+  for (var d in data) {
+    stats[data[d].date] = data[d].value;
+  }
+  return stats;
+};
+
+/* Parser will output the object
+{
+  "946702811": 15,
+  "946702812": 25,
+  "946702813": 10
+}*/
+
+var cal = new CalHeatMap();
+cal.init({
+  data: datas,
+  afterLoadData: parser
+});
+</code></pre>
+
+      <h4 id="onMinDomainReached">onMinDomainReached(reached)</h4>
+      <strong class="version-added">3.0.8+</strong>
+      <div class="option-type"></div>
+
+      <p>
+        Triggered after <a href="#previous"><code>previous()</code></a
+        >, when the incoming domain is containing
+        <a href="#minDate"><code>minDate</code></a
+        >.
+      </p>
+
+      <p>
+        When the leftmost domain set by
+        <a href="#minDate"><code>minDate</code></a> is loaded into the calendar,
+        <code>onMinDomainReached()</code> will be triggered with
+        <code>true</code> as argument.
+      </p>
+
+      <p>
+        This event is useful if you want to disable your
+        <em>previous</em> button, since there is no more previous domains to
+        load.
+      </p>
+
+      <p>
+        In order to reverse the action,
+        <a href="onMinDomainReached"><code>onMinDomainReached()</code></a> will
+        be called with <code>false</code> as argument after
+        <a href="#next"><code>next()</code></a
+        >, only once, and only if the leftmost domain is not the lower limit
+        domain anymore.
+      </p>
+
+      <div class="example clearfix empty-calendar">
+        <div class="expandable-source">
+          <button
+            id="onMinDomainReached-previous"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+
+          <button
+            id="onMinDomainReached-next"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+
+          <div id="onMinDomainReached-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#onMinDomainReached-a',
+                domain: 'month',
+                range: 5,
+                start: new Date(2000, 4),
+                minDate: new Date(2000, 3),
+                maxDate: new Date(2000, 11),
+                onMinDomainReached: function (hit) {
+                  if (hit) {
+                    $('#onMinDomainReached-placeholder').append(
+                      '<li>Lower limit domain reached, will now disable the <strong>PREVIOUS</strong> button</li>'
+                    );
+                    $('#onMinDomainReached-previous').attr(
+                      'disabled',
+                      'disabled'
+                    );
+                  } else {
+                    $('#onMinDomainReached-placeholder').append(
+                      '<li>Re-enabling <strong>PREVIOUS</strong> button</li>'
+                    );
+                    $('#onMinDomainReached-previous').attr('disabled', false);
+                  }
+                },
+                onMaxDomainReached: function (hit) {
+                  if (hit) {
+                    $('#onMinDomainReached-placeholder').append(
+                      '<li>Upper limit domain reached, will now disable the <strong>NEXT</strong> button</li>'
+                    );
+                    $('#onMinDomainReached-next').attr('disabled', 'disabled');
+                  } else {
+                    $('#onMinDomainReached-placeholder').append(
+                      '<li>Re-enabling <strong>NEXT</strong> button</li>'
+                    );
+                    $('#onMinDomainReached-next').attr('disabled', false);
+                  }
+                },
+                nextSelector: '#onMinDomainReached-next',
+                previousSelector: '#onMinDomainReached-previous',
+                displayLegend: false,
+              });
+            })();
+          </script>
+        </div>
+        <div>
+          <ul id="onMinDomainReached-placeholder"></ul>
+        </div>
+      </div>
+
+      <h4 id="onMaxDomainReached">onMaxDomainReached(reached)</h4>
+      <strong class="version-added">3.0.8+</strong>
+      <div class="option-type"></div>
+
+      <p>
+        Triggered after <a href="#next"><code>next()</code></a
+        >, when the incoming domain is containing
+        <a href="#maxDate"><code>maxDate</code></a
+        >.
+      </p>
+
+      <p>
+        See <a href="#onMinDomainReached"><code>onMinDomainReached()</code></a
+        >.
+      </p>
+
+      <h2 id="data-format">Data Format</h2>
+
+      <p>Cal-Heatmap expects data in a JSON object in the following format:</p>
+
+      <pre><code class="language-javascript">{
+  "timestamp": value,
+  "timestamp2": value2,
+  ...
+}</code></pre>
+
+      <p class="alert">All <code>timestamp</code> are in seconds.</p>
+
+      <p><code>value</code> can be any number (integer or float).</p>
+
+      <p>
+        If your API is not returning a JSON object, set the
+        <a href="#dataType"><code>dataType</code></a> option according to the
+        returned result mimetype. In addition to JSON, Cal-Heatmap can also
+        parse CSV, TSV and plain text file.
+      </p>
+
+      <p>
+        Using the right <a href="#dataType"><code>dataType</code></a> allows
+        cal-heatmap to interpret and convert the response to a valid json
+        object, but does not guarantee that it'll be formatted in the
+        <b>timestamp:value</b> format.
+      </p>
+
+      <p>
+        If the first and second column of your CSV or TSV files are respectively
+        the timestamp and value, no additional action is required, cal-heatmap
+        will try to extract the appropriate data, else, you have to use the
+        <a href="#afterLoadData"><code>afterLoadData()</code></a> callback to
+        convert the data yourself. See
+        <a href="#google-analytics-example"
+          >example with Google Analytics data</a
+        >.
+      </p>
+
+      <p>
+        All timestamps belonging to the same subDomain will be stacked together,
+        and all subDomains with no associated data will be considered as empty
+        (no data), and <strong>does not fall back to value = 0</strong>.
+      </p>
+
+      <h2 id="domain-highlight">Domain Highlighting</h2>
+
+      <p>
+        Opposed to <a href="#highlight">subDomain Highlight</a>, domain
+        highlighting is "passive", you don't need to inject code into the
+        calendar to highlight a domain, you have to edit the stylesheet.
+      </p>
+
+      <p>Each domain have a set of class according to a date.</p>
+
+      <table class="table table-condensed">
+        <tr>
+          <td><code>y_xxxx</code></td>
+          <td>Year, xxxx is a four digit year</td>
+        </tr>
+        <tr>
+          <td><code>m_1</code> to <code>m_12</code></td>
+          <td>From January to December</td>
+        </tr>
+        <tr>
+          <td><code>w_1</code> to <code>w_54</code></td>
+          <td>Week 1 to Week 54</td>
+        </tr>
+        <tr>
+          <td><code>d_1</code> to <code>d_31</code></td>
+          <td>Day of the month</td>
+        </tr>
+        <tr>
+          <td><code>dy_0</code> to <code>dy_6</code></td>
+          <td>
+            Day of the week, Sunday is 0 and Saturday is 6
+            <strong class="version-added">3.0.7+</strong>
+          </td>
+        </tr>
+        <tr>
+          <td><code>h_0</code> to <code>h_23</code></td>
+          <td>From 00h to 23h</td>
+        </tr>
+      </table>
+
+      <div class="example-bloc">
+        <h5>Example</h5>
+
+        <ul>
+          <li>
+            The domain <b>January 2000</b> will have the classes
+            <code>y_2000</code> and <code>m_1</code>
+          </li>
+          <li>
+            The domain <b>January 1st, 2000 @15h</b> will have the classes
+            <code>y_2000</code>, <code>m_1</code>, <code>w_1</code>,
+            <code>d_1</code> and <code>h_15</code>
+          </li>
+        </ul>
+      </div>
+
+      <p>To highlight January 2000, you can use</p>
+
+      <pre><code class="language-css">/* Apply a red background to january 2000 */
+.y_2000.m_1 .domain-background {
+  fill: red;
+}</code></pre>
+
+      <p>
+        For better result, apply some margin with
+        <a href="#domainMargin"><code>domainMargin</code></a
+        >.
+      </p>
+
+      <p>
+        You can also apply some "recursive" style, to highlight sleep hours.
+      </p>
+
+      <pre><code class="language-css">.h_23 .domain-background, .h_0 .domain-background, .h_1 .domain-background, .h_2 .domain-background, .h_3 .domain-background, .h_4 .domain-background, .h_5 .domain-background, .h_6 .domain-background, .h_7 .domain-background {
+  fill: steelblue;
+}
+.h_23 .graph-label, .h_0 .graph-label, .h_1 .graph-label, .h_2 .graph-label, .h_3 .graph-label, .h_4 .graph-label, .h_5 .graph-label, .h_6 .graph-label, .h_7 .graph-label {
+  fill: #fff;
+}</code></pre>
+
+      <div class="example clearfix empty-calendar">
+        <div class="expandable-source">
+          <style>
+            #domain-highlight-a .h_23 .domain-background,
+            #domain-highlight-a .h_0 .domain-background,
+            #domain-highlight-a .h_1 .domain-background,
+            #domain-highlight-a .h_2 .domain-background,
+            #domain-highlight-a .h_3 .domain-background,
+            #domain-highlight-a .h_4 .domain-background,
+            #domain-highlight-a .h_5 .domain-background,
+            #domain-highlight-a .h_6 .domain-background,
+            #domain-highlight-a .h_7 .domain-background {
+              fill: steelblue;
+            }
+            #domain-highlight-a .h_23 .graph-label,
+            #domain-highlight-a .h_0 .graph-label,
+            #domain-highlight-a .h_1 .graph-label,
+            #domain-highlight-a .h_2 .graph-label,
+            #domain-highlight-a .h_3 .graph-label,
+            #domain-highlight-a .h_4 .graph-label,
+            #domain-highlight-a .h_5 .graph-label,
+            #domain-highlight-a .h_6 .graph-label,
+            #domain-highlight-a .h_7 .graph-label {
+              fill: #fff;
+            }
+          </style>
+          <button
+            id="domain-highlight-previous-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="domain-highlight-next-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="domain-highlight-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#domain-highlight-a',
+                domain: 'hour',
+                cellSize: 5,
+                range: 12,
+                animationDuration: 100,
+                domainGutter: 0,
+                domainMargin: 5,
+                nextSelector: '#domain-highlight-next-selector',
+                previousSelector: '#domain-highlight-previous-selector',
+              });
+            })();
+          </script>
+        </div>
+        <div></div>
+      </div>
+
+      <h2 id="migrating-from-2x">Migrating from 2.x</h2>
+
+      <p class="alert">
+        v2 documentation is still available at
+        <a href="/v2/">/v2/</a>
+      </p>
+
+      <p>
+        There's a lot of changes coming with the 3.x branch. You should read the
+        full documentation to use all the new features. Instruction below are
+        only to migrate your v2 code to the v3 version.
+      </p>
+
+      <h6>onClick</h6>
+
+      <p>
+        <code>onClick</code> event is now applied even to date with no data.
+        <br />
+        The second argument will be equal to <code>null</code> when there is no
+        data associated to this date.
+      </p>
+
+      <h6>duration</h6>
+
+      <p>
+        The <code>duration</code> option has been renamed to
+        <code>animationDuration</code>
+      </p>
+
+      <h6>id</h6>
+
+      <p>
+        The <code>id</code> option has been replaced by
+        <code>itemSelector</code>, and now accepts a Selector String or an
+        Element, instead of an ID name.
+      </p>
+
+      <h6>cellsize</h6>
+
+      <p>
+        <code>cellsize</code> has been renamed to <code>cellSize</code> (camel
+        case)
+      </p>
+
+      <h6>cellpadding</h6>
+
+      <p>
+        <code>cellpadding</code> has been renamed to
+        <code>cellPadding</code> (camel case)
+      </p>
+
+      <h6>cellradius</h6>
+
+      <p>
+        <code>cellradius</code> has been renamed to
+        <code>cellRadius</code> (camel case)
+      </p>
+
+      <h6>cellLabel</h6>
+
+      <p>
+        <code>cellLabel</code> has been renamed to
+        <code>subDomainTitleFormat</code>
+      </p>
+
+      <h6>scaleLabel</h6>
+
+      <p>
+        <code>scaleLabel</code> has been renamed to
+        <code>legendTitleFormat</code>
+      </p>
+
+      <h6>weekStartOnMonday</h6>
+
+      <p>
+        <code>weekStartOnMonday</code> now takes a boolean (true/false) instead
+        of an integer (0/1)
+      </p>
+
+      <h6>format</h6>
+
+      <p><code>format</code> has been spitted into multiple options.</p>
+
+      <ul>
+        <li>
+          <code>format.date</code> is now <code>subDomainDateFormat</code>
+        </li>
+        <li>
+          <code>format.legend</code> is now <code>domainLabelFormat</code>
+        </li>
+      </ul>
+
+      <p>
+        The domain label can now be customized, by passing a function to
+        <code>domainLabelFormat</code>.
+      </p>
+
+      <h6>browsing</h6>
+
+      <p>
+        <code>browsing</code> option has been removed, see the
+        <code>next()</code>, <code>previous()</code> events, and the
+        <code>nextSelector</code> and <code>previousSelector</code> options.
+      </p>
+
+      <h6>highlightToday</h6>
+
+      <p>
+        <code>highlightToday</code> has been replaced by <code>highlight</code>,
+        and accepts an array of dates, allowing highlighting more than one date.
+      </p>
+
+      <h6>itemName</h6>
+
+      <p>
+        <code>itemName</code> now accepts a single value array, or just a
+        string, and will auto guess the plural form as long as it's just the
+        singular form plus "s".
+      </p>
+
+      <h6>Calendar dynamic width</h6>
+
+      <p>
+        Previously, calendar width was dynamic, when using the month domain,
+        coupled with the x_week subDomain, as a month not always contains the
+        same number of weeks. Domain width was adjusted to the number of weeks
+        to avoid blank space.
+      </p>
+
+      <p>
+        This function has been removed in v3, the domains will now always have
+        the same width, so there'll be a blank space on some months with fewer
+        weeks. This will avoid complex calculation, and allow smoother animation
+        when navigating between domains.
+      </p>
+
+      <p>This does not affect other domain/subDomain couple.</p>
+
+      <h2 id="examples">Examples</h2>
+
+      <p class="alert alert-info">
+        All examples are using the
+        <a href="./datas-hours.json">datas-hours</a> and
+        <a href="datas-years.json">datas-years</a> data source.
+      </p>
+
+      <p>
+        Read the page source for the examples' complete code, as the stylesheet
+        is not visible via the <em>View code</em> buttons.
+      </p>
+
+      <div class="example clearfix full-width">
+        <p>
+          Localized in French, this graph is displaying the number of flies
+          falling in Master Lao Zhi's living room because of his suffocating ki
+          energy.
+        </p>
+
+        <p>
+          Hover over the subDomain and legend cells to view the new customized
+          title.
+        </p>
+
+        <div>
+          <button
+            id="example-a-PreviousDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="example-a-NextDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="example-a"></div>
+          <p></p>
+          <script>
+            (function () {
+              moment.lang('fr'); // Set current local to French
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-a',
+                domain: 'hour',
+                data: 'datas-hours.json',
+                start: new Date(2000, 0),
+                cellSize: 9,
+                range: 10,
+                previousSelector: '#example-a-PreviousDomain-selector',
+                nextSelector: '#example-a-NextDomain-selector',
+
+                itemName: ['moustique tuée', 'moustiques tuées'],
+                subDomainTitleFormat: {
+                  empty: 'Aucune données pour le {date}',
+                  filled: 'il y a eu {count} {name} le {date}',
+                },
+                legendTitleFormat: {
+                  lower:
+                    'Moins de {min} {name}, Master Lao Zhi a du prendre une pause',
+                  inner: 'Entre {down} et {up} {name}, pas mal',
+                  upper: 'Plus de {max} {name}, fuyez !',
+                },
+                domainLabelFormat: '%H\h',
+                subDomainDateFormat: function (date) {
+                  return moment(date).format('LL'); // Use moment.js library to translate date
+                },
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>
+          Let's try other calendar view (month > day), and re-calibrate the
+          legend colors for our data.
+        </p>
+
+        <div>
+          <button
+            id="example-b-PreviousDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="example-b-NextDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="example-b"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-b',
+                domain: 'day',
+                data: 'datas-years.json',
+                start: new Date(2000, 0),
+                cellSize: 9,
+                range: 15,
+                previousSelector: '#example-b-PreviousDomain-selector',
+                nextSelector: '#example-b-NextDomain-selector',
+
+                legend: [2, 4, 6, 8],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>Week > hour view.</p>
+
+        <div>
+          <button
+            id="example-c-PreviousDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="example-c-NextDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="example-c"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-c',
+                domain: 'week',
+                subDomain: 'hour',
+                data: 'datas-years.json',
+                start: new Date(2000, 0, 5),
+                cellSize: 10,
+                range: 2,
+                previousSelector: '#example-c-PreviousDomain-selector',
+                nextSelector: '#example-c-NextDomain-selector',
+
+                legend: [2, 4, 6, 8],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>Year > day view.</p>
+
+        <div>
+          <div id="example-d"></div>
+          <p></p>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-d',
+                domain: 'year',
+                subDomain: 'day',
+                data: 'datas-years.json',
+                start: new Date(2000, 0),
+                cellSize: 10,
+                range: 1,
+                legend: [20, 40, 60, 80],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>Year > Month view.</p>
+
+        <div>
+          <div id="example-e"></div>
+          <p></p>
+          <style>
+            #example-e .subdomain-text {
+              fill: #fff;
+            }
+          </style>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-e',
+                domain: 'year',
+                subDomain: 'month',
+                data: 'datas-years.json',
+                start: new Date(2000, 0),
+                cellSize: 25,
+                range: 1,
+                subDomainTextFormat: '%m',
+                legend: [1900, 2000, 2100, 2200],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>
+          Week > day view, vertically. <br />Dynamic domain dimension was
+          disabled to avoid page height "fluctuation". <br />Pass domain label
+          to an external function to uppercase it.
+        </p>
+
+        <div>
+          <button
+            id="example-f-PreviousDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="example-f-NextDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="example-f"></div>
+          <p></p>
+          <style>
+            #example-f .graph-label {
+              font-weight: bold;
+            }
+          </style>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-f',
+                domain: 'month',
+                subDomain: 'x_day',
+                data: 'datas-years.json',
+                start: new Date(2000, 0, 5),
+                cellSize: 10,
+                range: 2,
+                verticalOrientation: true,
+                domainDynamicDimension: false,
+                previousSelector: '#example-f-PreviousDomain-selector',
+                nextSelector: '#example-f-NextDomain-selector',
+                label: {
+                  position: 'right',
+                  rotate: 'left',
+                  offset: {
+                    x: 0,
+                    y: 15,
+                  },
+                },
+                domainLabelFormat: function (date) {
+                  moment.lang('en');
+                  return moment(date).format('MMMM').toUpperCase();
+                },
+                legend: [20, 40, 60, 80],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>Week > day view</p>
+
+        <p>Hover on a subDomain cell to view the date</p>
+
+        <div>
+          <button
+            id="example-g-PreviousDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="example-g-NextDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="example-g"></div>
+          <p></p>
+          <style>
+            #example-g .graph-label {
+              font-weight: bold;
+              font-size: 18px;
+            }
+
+            #example-g .subdomain-text {
+              fill: #fff;
+              opacity: 0;
+            }
+
+            #example-g g:hover .subdomain-text {
+              opacity: 1;
+            }
+          </style>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-g',
+                domain: 'month',
+                subDomain: 'x_day',
+                data: 'datas-years.json',
+                start: new Date(2000, 0, 5),
+                cellSize: 20,
+                cellPadding: 5,
+                domainGutter: 20,
+                range: 2,
+                domainDynamicDimension: false,
+                previousSelector: '#example-g-PreviousDomain-selector',
+                nextSelector: '#example-g-NextDomain-selector',
+                domainLabelFormat: function (date) {
+                  moment.lang('en');
+                  return moment(date).format('MMMM').toUpperCase();
+                },
+                subDomainTextFormat: '%d',
+                legend: [20, 40, 60, 80],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>Give another background color for all February.</p>
+        <div>
+          <button
+            id="example-h-PreviousDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-left"></i>
+          </button>
+          <button
+            id="example-h-NextDomain-selector"
+            style="margin-bottom: 10px"
+            class="btn"
+          >
+            <i class="icon icon-chevron-right"></i>
+          </button>
+          <div id="example-h"></div>
+          <p></p>
+          <style>
+            #example-h .graph-label {
+              font-weight: bold;
+              font-size: 18px;
+              fill: #fff;
+            }
+
+            #example-h .domain-background {
+              fill: #2d3a47;
+            }
+
+            #example-h .graph-domain.m_2 .domain-background {
+              fill: red;
+            }
+
+            #example-h .grap-rect {
+              fill: #35252d;
+            }
+            #example-h .q0 {
+              fill: #35252d;
+            }
+            #example-h .q1 {
+              fill: #fea1eb;
+              opacity: 0.1;
+            }
+            #example-h .q2 {
+              fill: #fea1eb;
+              opacity: 0.2;
+            }
+            #example-h .q3 {
+              fill: #fea1eb;
+              opacity: 0.4;
+            }
+            #example-h .q4 {
+              fill: #fea1eb;
+              opacity: 0.6;
+            }
+            #example-h .q5 {
+              fill: #fea1eb;
+              opacity: 0.8;
+            }
+            #example-h .q6 {
+              fill: #fea1eb;
+              opacity: 1;
+            }
+            #example-h .graph-rect:hover {
+              fill: #fff;
+              opacity: 1;
+              stroke-width: 0;
+            }
+          </style>
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-h',
+                domain: 'month',
+                subDomain: 'x_day',
+                data: 'datas-years.json',
+                start: new Date(2000, 0, 5),
+                cellSize: 15,
+                cellRadius: 3,
+                cellPadding: 5,
+                range: 1,
+                domainMargin: 20,
+                animationDuration: 800,
+                domainDynamicDimension: false,
+                previousSelector: '#example-h-PreviousDomain-selector',
+                nextSelector: '#example-h-NextDomain-selector',
+                label: {
+                  position: 'left',
+                  offset: {
+                    x: 20,
+                    y: 35,
+                  },
+                  width: 110,
+                },
+                legend: [20, 40, 60, 80],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <p>Display all the hours of the day on the same line.</p>
+        <div>
+          <div id="example-i"></div>
+          <p></p>
+
+          <script>
+            (function () {
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-i',
+                domain: 'day',
+                subDomain: 'hour',
+                rowLimit: 1,
+                domainGutter: 0,
+                data: 'datas-years.json',
+                start: new Date(2000, 0, 5),
+                cellSize: 15,
+                cellPadding: 5,
+                range: 7,
+                verticalOrientation: true,
+                displayLegend: false,
+                label: {
+                  position: 'left',
+                  offset: {
+                    x: 20,
+                    y: 12,
+                  },
+                  width: 110,
+                },
+                legend: [1, 2, 3, 4],
+                legendColors: ['#ecf5e2', '#232181'],
+              });
+            })();
+          </script>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width" id="google-analytics-example">
+        <p>Use Google Analytics data</p>
+
+        <div>
+          <div id="example-j"></div>
+
+          <script>
+            (function () {
+              var startDate = new Date(2013, 6, 25);
+              var startTimestamp = new Date(2013, 6, 1).getTime() / 1000;
+
+              function GAconverter(data) {
+                var i,
+                  total,
+                  results = {};
+                for (i = 0, total = data.length; i < total; i++) {
+                  results[+data[i].Hour * 3600 + startTimestamp] =
+                    +data[i].Visits;
+                }
+                return results;
+              }
+
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-j',
+                domain: 'day',
+                subDomain: 'hour',
+                data: 'google-analytics.csv',
+                dataType: 'csv',
+                start: startDate,
+                afterLoadData: GAconverter,
+                range: 10,
+                itemName: 'visit',
+                legend: [5, 10, 15, 20, 25, 30],
+                legendColors: {
+                  empty: '#ededed',
+                  min: '#40ffd8',
+                  max: '#f20013',
+                },
+              });
+            })();
+          </script>
+
+          <p>
+            You have to pre-process the csv files generated by Google Analytics
+            to remove the header comments, as well as the last 2 lines.
+          </p>
+        </div>
+      </div>
+
+      <div class="example clearfix full-width">
+        <div>
+          <div id="example-k"></div>
+
+          <script>
+            (function () {
+              var startDate = new Date(2013, 6, 25);
+              var startTimestamp = new Date(2013, 6, 1).getTime() / 1000;
+
+              function GAconverter(data) {
+                var i,
+                  total,
+                  results = {};
+                for (i = 0, total = data.length; i < total; i++) {
+                  results[+data[i].Hour * 3600 + startTimestamp] =
+                    +data[i].Visits;
+                }
+                return results;
+              }
+
+              var cal = new CalHeatMap();
+              cal.init({
+                itemSelector: '#example-k',
+                domain: 'day',
+                subDomain: 'hour',
+                rowLimit: 1,
+                cellSize: 15,
+                domainGutter: 0,
+                verticalOrientation: true,
+                label: {
+                  position: 'left',
+                  offset: {
+                    x: 20,
+                    y: 12,
+                  },
+                  width: 110,
+                },
+                data: 'google-analytics.csv',
+                dataType: 'csv',
+                start: startDate,
+                afterLoadData: GAconverter,
+                range: 10,
+                itemName: 'visit',
+                legend: [5, 10, 15, 20, 25, 30],
+                legendHorizontalPosition: 'right',
+                legendColors: {
+                  empty: '#ededed',
+                  min: '#40ffd8',
+                  max: '#f20013',
+                },
+              });
+            })();
+          </script>
+
+          <p>Same datasource as previous example, with one line per day</p>
+        </div>
+      </div>
+
+      <h2 id="faq">FAQ</h2>
+
+      <p class="alert">Coming soon ...</p>
+
+      <h2 id="about">About</h2>
+
+      <p>
+        Cal-HeatMap is licensed under the
+        <a href="http://opensource.org/licenses/MIT">MIT License</a>
+      </p>
+
+      <p>
+        Developed with love by
+        <a href="https://github.com/wa0x6e">Wan Qi Chen</a>
+      </p>
+    </div>
+
+    <script src="./js/prism.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        $('.example > div').each(function () {
+          var code = $(this).find('script');
+          $(this).append('<div class=source>');
+          var sourceDiv = $(this).find('.source');
+
+          if (code.length > 0) {
+            sourceDiv.append(
+              '<button class="btn btn-small"><i class=\'icon icon-indent-right\'></i> View code</button>'
+            );
+
+            sourceDiv.find('button').on('click', function (e) {
+              var source = code.html();
+              source = source
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace('(function() {', '')
+                .replace('})();', '');
+
+              sourceDiv.append(
+                "<pre><code class='language-javascript'>" +
+                  source.trim() +
+                  '</code></pre>'
+              );
+              Prism.highlightElement(sourceDiv.find('code')[0]);
+
+              $(this).remove();
+            });
+          }
+        });
+      });
+    </script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-38672186-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src =
+          ('https:' == document.location.protocol
+            ? 'https://ssl'
+            : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
+</html>

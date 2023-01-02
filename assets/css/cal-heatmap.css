@@ -1,0 +1,66 @@
+.cal-heatmap-container {
+  display: block;
+}
+.cal-heatmap-container .graph-label, .cal-heatmap-container .sublabel-text {
+  fill: currentColor;
+  font-size: 10px;
+}
+.cal-heatmap-container .graph-rect {
+  fill: #ededed;
+}
+.cal-heatmap-container .graph-subdomain-group rect:hover {
+  stroke: #000;
+  stroke-width: 1px;
+}
+.cal-heatmap-container .subdomain-text {
+  font-size: 8px;
+  pointer-events: none;
+}
+.cal-heatmap-container rect.highlight {
+  stroke: #444;
+  stroke-width: 1px;
+}
+
+#ch-tooltip {
+  padding: 5px 10px;
+  background: #222;
+  color: #bbb;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  border-radius: 2px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+  display: none;
+  box-sizing: border-box;
+}
+#ch-tooltip[data-show] {
+  display: block;
+}
+#ch-tooltip-arrow, #ch-tooltip-arrow::before {
+  background: inherit;
+  width: 8px;
+  height: 8px;
+  position: absolute;
+}
+#ch-tooltip-arrow {
+  visibility: hidden;
+}
+#ch-tooltip-arrow::before {
+  visibility: visible;
+  content: "";
+  transform: rotate(45deg);
+}
+#ch-tooltip[data-popper-placement^=top] > #ch-tooltip-arrow {
+  bottom: -4px;
+  margin-left: -4px;
+}
+#ch-tooltip[data-popper-placement^=bottom] > #ch-tooltip-arrow {
+  top: -4px;
+  margin-left: -4px;
+}
+#ch-tooltip[data-popper-placement^=left] > #ch-tooltip-arrow {
+  right: -4px;
+}
+#ch-tooltip[data-popper-placement^=right] > #ch-tooltip-arrow {
+  left: -4px;
+}
