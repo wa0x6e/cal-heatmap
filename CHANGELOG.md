@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.0.0 [Unreleased]
+## v4.0.0-beta.1 [2023-01-02]
 
 V4 is a complete rewrite from the ground up.
 See the [Migration guide](https://cal-heatmap.com/migrate_from_v3.html) if migrating from v3.x

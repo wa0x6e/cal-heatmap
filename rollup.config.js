@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -43,6 +43,11 @@ if (!process.env.ROLLUP_WATCH) {
     }),
   );
 }
+
+writeFileSync(
+  './src/version.ts',
+  `const VERSION = '${pkg.version.replace(/^v/, '')}'; export default VERSION;\n`,
+);
 
 const globals = {
   '@popperjs/core': 'Popper',
@@ -130,7 +135,10 @@ export default [
   ...exportConfig('src/plugins/Legend.ts', 'Legend', 'plugins/Legend', {
     external: ['d3-selection', 'd3'],
   }),
-  ...exportConfig('src/plugins/Timezone.ts', 'Timezone', 'plugins/Timezone', {
-
-  }),
+  ...exportConfig(
+    'src/plugins/Timezone.ts',
+    'Timezone',
+    'plugins/Timezone',
+    {},
+  ),
 ];

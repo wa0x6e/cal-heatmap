@@ -10,6 +10,7 @@ import DomainCollection from './calendar/DomainCollection';
 import DateHelper from './helpers/DateHelper';
 import validate from './options/OptionsValidator';
 import PluginManager from './PluginManager';
+import VERSION from './version';
 
 import './cal-heatmap.scss';
 
@@ -25,6 +26,8 @@ type DeepPartial<T> = {
 };
 
 export default class CalHeatmap {
+  static VERSION = VERSION;
+
   options: Options;
 
   calendarPainter: CalendarPainter;
