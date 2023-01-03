@@ -16,7 +16,7 @@ export default class DateHelper {
 
   setup(options: Options) {
     this.locale = options.options.date.locale || this.locale;
-    this.setMoment(moment);
+    this.setMoment(window.moment || moment);
   }
 
   setMoment(customMoment: any) {
