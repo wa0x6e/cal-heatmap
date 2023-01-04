@@ -51,6 +51,7 @@
     "@types/d3-transition": "^3.0.2",
     "@types/jest": "^29.2.4",
     "@types/lodash-es": "^4.17.6",
+    "@types/selenium-webdriver": "^4.1.10",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
     "autoprefixer": "^10.4.13",
@@ -71,6 +72,7 @@
     "rollup-plugin-filesize": "^9.1.2",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.56.1",
+    "selenium-webdriver": "^4.7.1",
     "ts-jest": "^29.0.3",
     "typescript": "^4.9.4"
   },
@@ -79,7 +81,8 @@
     "lint": "npx eslint src/ test/",
     "build": "rm -rf dist/* && rollup -c",
     "dev": "rollup --config -w",
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/",
+    "test:e2e": "node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/"
   },
   "repository": {
     "type": "git",
@@ -96,5 +99,8 @@
     "Data",
     "Visualization"
   ],
-  "files": ["src", "dist"]
+  "files": [
+    "src",
+    "dist"
+  ]
 }
