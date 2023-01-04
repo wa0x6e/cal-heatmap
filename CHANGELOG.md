@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.0-beta.2 [2023-01-05]
+
+### Bug Fixes
+
+- [fix] Fix #286 Uncaught TypeError: Cannot set properties of undefined (setting 'range')
+
 ## v4.0.0-beta.1 [2023-01-02]
 
 V4 is a complete rewrite from the ground up.
