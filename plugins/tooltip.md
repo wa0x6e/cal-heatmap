@@ -26,7 +26,7 @@ Add the tooltip plugin script and its dependencies in your `<head>`
 
 ```html
 <script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.1/dist/plugins/Tooltip.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/plugins/Tooltip.min.js"></script>
 ```
 
 ### Usage

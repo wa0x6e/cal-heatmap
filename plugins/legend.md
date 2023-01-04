@@ -25,7 +25,7 @@ import Legend from 'cal-heatmap/src/plugins/Legend';
 Add the legend plugin in your `<head>`
 
 ```html
-<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.1/dist/plugins/Legend.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/plugins/Legend.min.js"></script>
 ```
 
 ## Usage

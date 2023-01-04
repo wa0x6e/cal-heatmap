@@ -19,7 +19,7 @@ Install the library and its dependencies in your page `head`.
 ### CalHeatmap
 
 ```html
-<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.1/dist/cal-heatmap.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/cal-heatmap.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/cal-heatmap@4.0.0-beta.1/dist/cal-heatmap.css"></script>
 ```
 
