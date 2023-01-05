@@ -1,4 +1,3 @@
-import path from 'path';
 import webdriver from 'selenium-webdriver';
 
 describe('d3js matrix', () => {
@@ -15,8 +14,9 @@ describe('d3js matrix', () => {
   ['v6', 'v7'].forEach((version: string) => {
     describe(`D3js ${version}`, () => {
       beforeAll(async () => {
-        const file = `./test/e2e/index-d3${version}.html`;
-        await driver.get(`file://${path.resolve(file)}`);
+        await driver.get(
+          `http://localhost:8080/test/e2e/index-d3${version}.html`,
+        );
       }, 30000);
 
       it('renders the default number of domains;', async () => {
@@ -121,9 +121,7 @@ describe('d3js matrix', () => {
 
       it('destroys the calendar', async () => {
         await driver.findElement(webdriver.By.id('cal-heatmap'));
-        const paintPromise = await driver.executeScript(
-          'return cal.paint();',
-        );
+        const paintPromise = await driver.executeScript('return cal.paint();');
         await paintPromise;
 
         const destroyPromise = await driver.executeScript(
