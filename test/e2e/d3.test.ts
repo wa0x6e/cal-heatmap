@@ -4,7 +4,24 @@ describe('d3js matrix', () => {
   let driver: any;
 
   beforeAll(async () => {
-    driver = new webdriver.Builder().forBrowser('chrome').build();
+    const username = process.env.BROWSERSTACK_USERNAME;
+    const accesskey = process.env.BROWSERSTACK_ACCESS_KEY;
+
+    const capabilities = {
+      'bstack:options': {
+        projectName: 'Testing CalHeatmap and d3js on browsers matrix',
+        local: true,
+      },
+    };
+
+    driver = new webdriver.Builder()
+      .usingServer(
+        `https://${username}:${accesskey}` +
+          '@hub-cloud.browserstack.com/wd/hub',
+      )
+      .withCapabilities(capabilities)
+      .forBrowser('chrome')
+      .build();
   }, 30000);
 
   afterAll(async () => {
@@ -15,7 +32,7 @@ describe('d3js matrix', () => {
     describe(`D3js ${version}`, () => {
       beforeAll(async () => {
         await driver.get(
-          `http://localhost:8080/test/e2e/index-d3${version}.html`,
+          `http://bs-local.com:3003/test/e2e/index-d3${version}.html`,
         );
       }, 30000);
 
@@ -50,6 +67,7 @@ describe('d3js matrix', () => {
       }, 35000);
 
       it('scrolls back by the given number of domains', async () => {
+        expect.assertions(4);
         await driver.findElement(webdriver.By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript(
           'return cal.paint({ animationDuration: 0, ' +
@@ -85,6 +103,7 @@ describe('d3js matrix', () => {
       }, 35000);
 
       it('scrolls forward by the given number of domains', async () => {
+        expect.assertions(4);
         await driver.findElement(webdriver.By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript(
           'return cal.paint({ animationDuration: 0, ' +
