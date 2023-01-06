@@ -1,27 +1,11 @@
-import webdriver from 'selenium-webdriver';
+import { By } from 'selenium-webdriver';
 
 describe('d3js matrix', () => {
   let driver: any;
 
   beforeAll(async () => {
-    const username = process.env.BROWSERSTACK_USERNAME;
-    const accesskey = process.env.BROWSERSTACK_ACCESS_KEY;
-
-    const capabilities = {
-      'bstack:options': {
-        projectName: 'Testing CalHeatmap and d3js on browsers matrix',
-        local: true,
-      },
-    };
-
-    driver = new webdriver.Builder()
-      .usingServer(
-        `https://${username}:${accesskey}` +
-          '@hub-cloud.browserstack.com/wd/hub',
-      )
-      .withCapabilities(capabilities)
-      .forBrowser('chrome')
-      .build();
+    // @ts-ignore
+    driver = await globalThis.buildDriver();
   }, 30000);
 
   afterAll(async () => {
@@ -32,12 +16,12 @@ describe('d3js matrix', () => {
     describe(`D3js ${version}`, () => {
       beforeAll(async () => {
         await driver.get(
-          `http://bs-local.com:3003/test/e2e/index-d3${version}.html`,
+          `http://localhost:3003/test/e2e/index-d3${version}.html`,
         );
       }, 30000);
 
       it('renders the default number of domains;', async () => {
-        await driver.findElement(webdriver.By.id('cal-heatmap'));
+        await driver.findElement(By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript(
           'return cal.paint({ animationDuration: 0 });',
         );
@@ -52,7 +36,7 @@ describe('d3js matrix', () => {
       }, 35000);
 
       it('renders the given number of domains', async () => {
-        await driver.findElement(webdriver.By.id('cal-heatmap'));
+        await driver.findElement(By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript(
           'return cal.paint({ animationDuration: 0, range: 5 });',
         );
@@ -68,7 +52,7 @@ describe('d3js matrix', () => {
 
       it('scrolls back by the given number of domains', async () => {
         expect.assertions(4);
-        await driver.findElement(webdriver.By.id('cal-heatmap'));
+        await driver.findElement(By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript(
           'return cal.paint({ animationDuration: 0, ' +
             "date: { start: new Date(2020, 1) }, domain: { type: 'year' }, " +
@@ -104,7 +88,7 @@ describe('d3js matrix', () => {
 
       it('scrolls forward by the given number of domains', async () => {
         expect.assertions(4);
-        await driver.findElement(webdriver.By.id('cal-heatmap'));
+        await driver.findElement(By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript(
           'return cal.paint({ animationDuration: 0, ' +
             "date: { start: new Date(2020, 1) }, domain: { type: 'year' }, " +
@@ -139,7 +123,7 @@ describe('d3js matrix', () => {
       }, 35000);
 
       it('destroys the calendar', async () => {
-        await driver.findElement(webdriver.By.id('cal-heatmap'));
+        await driver.findElement(By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript('return cal.paint();');
         await paintPromise;
 

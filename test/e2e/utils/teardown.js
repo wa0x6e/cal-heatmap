@@ -10,5 +10,7 @@ export default async function globalTeardown() {
       });
     });
   }
-  await stop();
+  if (typeof process.env.LOCAL === 'undefined') {
+    await stop();
+  }
 }

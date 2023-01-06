@@ -27,5 +27,7 @@ export default async function globalSetup() {
       );
     });
   }
-  await start();
+  if (typeof process.env.LOCAL === 'undefined') {
+    await start();
+  }
 }
