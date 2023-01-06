@@ -122,6 +122,27 @@ describe('d3js matrix', () => {
         ).toContain('y_2026');
       }, 35000);
 
+      it('returns the dimensions', async () => {
+        await driver.findElement(By.id('cal-heatmap'));
+        const paintPromise = await driver.executeScript('return cal.paint();');
+        await paintPromise;
+
+        const dimensions = await driver.executeScript(
+          'return cal.dimensions()',
+        );
+
+        const dom = await driver.findElement(
+          By.className('cal-heatmap-container'),
+        );
+
+        expect(dimensions.width.toString()).toBe(
+          await dom.getAttribute('width'),
+        );
+        expect(dimensions.height.toString()).toBe(
+          await dom.getAttribute('height'),
+        );
+      });
+
       it('destroys the calendar', async () => {
         await driver.findElement(By.id('cal-heatmap'));
         const paintPromise = await driver.executeScript('return cal.paint();');
