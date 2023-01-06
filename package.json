@@ -42,7 +42,7 @@
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
-    "@rollup/plugin-terser": "^0.2.0",
+    "@rollup/plugin-terser": "^0.3.0",
     "@rollup/plugin-typescript": "^10.0.1",
     "@types/d3-array": "^3.0.3",
     "@types/d3-color": "^3.1.0",
