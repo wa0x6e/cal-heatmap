@@ -41,7 +41,7 @@ cal.paint({}, [[Tooltip, TOOLTIP_OPTIONS]]);
 ```js
 type TooltipOptions = {
   enabled: boolean,
-  text: (timestamp: number, value: number) => string,
+  text: (timestamp: number, value: number, moment: any) => string,
 } & PopperOptions;
 
 // Popper options, as defined in https://popper.js.org/docs/v2/constructors/
@@ -95,19 +95,25 @@ To customize the tooltip's UI, look for `#ch-tooltip` in the CSS.
 
 ### text
 
-Content of the tooltip
+A function, returning the content of the tooltip
 
 ```js
-text: (timestamp: number, value: number) => string;
+text: (timestamp: number, value: number, moment: any) => string;
 ```
 
 Default:
 
 ```js
-function (timestamp, value) {
-  return `${value} - ${new Date(timestamp).toISOString()}`;
+function (timestamp, value, moment) {
+  return `${value} - ${moment(timestamp).format('LLLL')}`;
 }
 ```
+
+#### Arguments:
+
+- `timestamp`: The timestamp of the current subDomain, in ms, rounded to the start of the subDomain
+- `value`: The value of the current subDomain
+- `moment`: A locale-aware `moment` object. When enabling the [`Timezone`](/plugins/timezone.html) plugin, the `.tz()` method will automatically be available to format the date in different timezone.
 
 ### Addition Popper options
 
