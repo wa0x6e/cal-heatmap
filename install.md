@@ -16,7 +16,7 @@ Install the library and its dependencies in your page `head`.
 <script src="https://d3js.org/d3.v7.min.js"></script>
 ```
 
-Although v7 is recommended, any `d3js >= 6` is supported.
+Although v7 is recommended, `d3js >= 6` is supported.
 
 ### CalHeatmap
 

@@ -25,13 +25,29 @@ type scaleOptions = {
 
 ## as
 
+```js
+as: 'color' | 'opacity',
+```
+
 ## type
 
+```js
+type: 'threshold',
+```
+
 ## domain
+
+```js
+domain: number[],
+```
 
 ## scheme
 
 Set a color scheme.
+
+```js
+scheme: string,
+```
 
 Support all schemes from [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic).
 Just use any scheme name without the `scheme` prefix.
@@ -42,5 +58,9 @@ Just use any scheme name without the `scheme` prefix.
 ## range
 
 Define a range of colors, instead of using one the predefined `scheme`.
+
+```js
+range: string[] | d3-scale-chromatic
+```
 
 Accepts an array of colors, a color scheme, or an color interpolator.

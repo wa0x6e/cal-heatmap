@@ -10,9 +10,6 @@ parent: Plugins
 This plugin add timezone support
 {: .fs-6}
 
-{: .warning}
-Documention for this option is still work in progress, and is incomplete
-
 ## Install
 
 ### NPM

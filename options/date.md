@@ -100,3 +100,8 @@ locale: string;
 Default: `en`
 
 For performance reasons, only the `en` locale is included by default.
+
+To add more locales, you can either:
+
+- Add `<script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>` in your page `<head>`
+- Add your chosen locale manually, via [`moment.locale(LOCALE)`](https://momentjs.com/docs/#/i18n/loading-into-nodejs/)
