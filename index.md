@@ -5,7 +5,10 @@ nav_order: 1
 ---
 
 {: .warning}
-Documention for this option is still work in progress, and is incomplete
+Documention for v4 is still work in progress, and is incomplete
+
+{: .warning}
+You can see documentation for v3 at [/v3](/v3/)
 
 ## What is Cal-heatmap ?
 

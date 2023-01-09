@@ -9,12 +9,10 @@ nav_order: 3
 After [installing](/install.html) the script:
 
 - insert `<div id="cal-heatmap"></div>` where you want to render the calendar in your page
-- create a calendar
-- paint the calendar with a set of given options/plugins.
+- create a calendar instance
+- paint the calendar with your desired options/plugins.
 
-By default, it renders an empty calendar with the default options
-
-#### Example calendar with default options
+#### Example calendar with no set options
 
 <div class="code-example">
   <div id="default-example-1"></div>
@@ -26,6 +24,24 @@ By default, it renders an empty calendar with the default options
 ```js
 const cal = new CalHeatmap();
 cal.paint();
+```
+
+#### Example calendar with custom options
+
+<div class="code-example">
+  <div id="default-example-2"></div>
+  <script>
+    const cal2 = new CalHeatmap();
+    cal2.paint({ itemSelector: '#default-example-2', date: { start: new Date(2020, 0, 15) }, domain: { type: 'month' }, subDomain: { type: 'day' } });
+  </script>
+</div>
+```js
+const cal = new CalHeatmap();
+cal.paint({
+  date: { start: new Date(2020, 0, 15) },
+  domain: { type: 'month' },
+  subDomain: { type: 'day' },
+});
 ```
 
 You can customize the calendar by passing an [`Options`](/options/) object and/or
