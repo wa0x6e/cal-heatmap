@@ -14,16 +14,16 @@ type PopperOptions = {
 
 type TooltipOptions = {
   enabled: boolean;
-  text: (timestamp: number, value: number) => string;
+  text: (timestamp: number, value: number, moment: any) => string;
 } & PopperOptions;
 
 const defaultOptions = {
   enabled: true,
 
   // Expecting a function, which will return the tooltip content
-  text: (timestamp: number, value: number): string =>
+  text: (timestamp: number, value: number, moment: any): string =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    `${value} - ${new Date(timestamp).toISOString()}`,
+    `${value} - ${moment(timestamp).format('LLLL')}`,
 };
 
 const DEFAULT_POPPER_OPTIONS = {
@@ -144,7 +144,9 @@ export default class Tooltip {
 
   #show(e: any, timestamp: number, value: number): void {
     const formatter = this.options.text;
-    const title = formatter ? formatter(timestamp, value) : null;
+    const title = formatter ?
+      formatter(timestamp, value, this.calendar.dateHelper.momentInstance) :
+      null;
 
     if (!title) {
       return;
