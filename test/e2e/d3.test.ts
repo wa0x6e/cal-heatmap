@@ -66,12 +66,14 @@ describe('d3js matrix', () => {
                   await setupPromise;
 
                   if (test.preExpectations) {
-                    test.preExpectations.forEach(async (e: any) => {
+                    const results = test.preExpectations.map(async (e: any) => {
                       const current = await driver.executeScript(
                         getArrowFunctionBody(e.current),
                       );
                       expect(current).toBe(e.expected());
                     });
+
+                    await Promise.allSettled(results);
                   }
 
                   if (test.execute) {
