@@ -36,12 +36,16 @@ describe('d3js matrix', () => {
     await driver.quit();
   }, 20000);
 
-  ['v6', 'v7'].forEach((version: string) => {
-    describe(`D3js ${version}`, () => {
+  const testFamily: any = {
+    'D3JS v7 / UMD': 'http://localhost:3003/test/e2e/index-d3v7.html',
+    'D3JS v6 / UMD': 'http://localhost:3003/test/e2e/index-d3v6.html',
+    'D3JS v7 / ESM': 'http://localhost:3003/test/e2e/index-esm-d3v7.html',
+  };
+
+  Object.keys(testFamily).forEach((name: string) => {
+    describe(name, () => {
       beforeEach(async () => {
-        await driver.get(
-          `http://localhost:3003/test/e2e/index-d3${version}.html`,
-        );
+        await driver.get(testFamily[name]);
         await driver.executeScript(
           `window.defaultOptions = {
             animationDuration: 100,

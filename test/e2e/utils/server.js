@@ -25,7 +25,12 @@ http
           res.end();
           return;
         }
-        res.writeHead(200);
+
+        let contentType = 'text/html';
+        if (filename.endsWith('.js')) {
+          contentType = 'application/javascript';
+        }
+        res.writeHead(200, { 'Content-Type': contentType });
         res.write(file, 'binary');
         res.end();
       });
