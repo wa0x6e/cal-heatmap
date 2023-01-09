@@ -1,13 +1,11 @@
 import castArray from 'lodash-es/castArray';
-import isString from 'lodash-es/isString';
-import isFunction from 'lodash-es/isFunction';
 
 import {
   group, sum, count, min, max, median,
 } from 'd3-array';
 
 import type { SubDomain } from '../index';
-import type { DataOptions } from '../options/Options';
+import type { DataOptions, DataGroupType } from '../options/Options';
 
 export default class DomainCollection {
   collection: Map<number, SubDomain[]>;
@@ -180,9 +178,9 @@ export default class DomainCollection {
   // eslint-disable-next-line class-methods-use-this
   #groupValues(
     values: number[],
-    groupFn: string | ((values: number[]) => number),
+    groupFn: DataGroupType | ((values: number[]) => number),
   ): number | null {
-    if (isString(groupFn)) {
+    if (typeof groupFn === 'string') {
       switch (groupFn) {
         case 'sum':
           return sum(values);
@@ -197,7 +195,7 @@ export default class DomainCollection {
         default:
           return null;
       }
-    } else if (isFunction(groupFn)) {
+    } else if (typeof groupFn === 'function') {
       return groupFn(values);
     }
 
@@ -212,7 +210,7 @@ export default class DomainCollection {
     let timestamp: string | number =
       typeof x === 'function' ? x(datum) : datum[x];
 
-    if (isString(timestamp)) {
+    if (typeof timestamp === 'string') {
       if (this.dateHelper.date(timestamp).isValid()) {
         timestamp = this.dateHelper.date(timestamp).valueOf();
       } else {

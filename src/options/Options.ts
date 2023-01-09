@@ -54,6 +54,8 @@ export type SubDomainOptions = {
   | ((timestamp: number, value: number, backgroundColor: string) => string);
 };
 
+export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'median';
+
 type DateOptions = {
   start: Date;
   min?: Date;
@@ -68,7 +70,7 @@ export type DataOptions = {
   requestInit: object;
   x: string | ((datum: any) => number);
   y: string | ((datum: any) => number);
-  groupY: string | ((values: number[]) => number);
+  groupY: DataGroupType | ((values: number[]) => number);
 };
 
 type ScaleOptions = {
