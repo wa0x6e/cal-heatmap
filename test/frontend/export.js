@@ -13,6 +13,7 @@ import subDomainLabel from './subDomainLabel';
 import domainDynamicDimension from './domainDynamicDimension';
 import domainSort from './domainSort';
 import data from './data';
+import tooltip from './tooltip';
 
 export default [
   range,
@@ -29,4 +30,5 @@ export default [
   domainDynamicDimension,
   domainSort,
   data,
+  tooltip,
 ];

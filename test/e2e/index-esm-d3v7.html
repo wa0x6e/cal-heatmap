@@ -2,6 +2,7 @@
 	<head>
 		<script src="https://d3js.org/d3.v7.min.js"></script>
 		<link rel="stylesheet" href="../../dist/cal-heatmap.css" />
+		<script src="https://unpkg.com/@popperjs/core@2"></script>
 		<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 		<title>CalHeatmap E2E test with ESM d3v7</title>
 	</head>
@@ -15,7 +16,8 @@
 			    "d3-array": "https://cdn.skypack.dev/d3-array",
 			    "d3-fetch": "https://cdn.skypack.dev/d3-fetch",
 			    "d3-transition": "https://cdn.skypack.dev/d3-transition",
-			    "d3": "https://cdn.skypack.dev/d3"
+			    "d3": "https://cdn.skypack.dev/d3",
+			    "@popperjs/core": "https://cdn.skypack.dev/@popperjs/core"
 			  }
 			}
 		</script>
@@ -24,6 +26,9 @@
 		</script>
 		<script type="module">
 			import CalHeatmap from "../../dist/cal-heatmap.esm.js";
+			import Tooltip from "../../dist/plugins/Tooltip.esm.js";
+			window.Tooltip = Tooltip;
+
 			cal = new CalHeatmap();
 			cal.paint();
 		</script>
