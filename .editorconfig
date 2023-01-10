@@ -1,6 +1,6 @@
 root = true
 
-[**.js,**.scss]
+[**.js,**.scss,**.md]
 end_of_line = lf
 indent_style = space
 indent_size = 2

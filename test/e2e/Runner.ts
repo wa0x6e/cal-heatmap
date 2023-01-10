@@ -1,5 +1,6 @@
 /* eslint-disable jest/no-conditional-expect */
 /* eslint-disable jest/valid-title */
+import { Builder } from 'selenium-webdriver';
 
 // @ts-ignore
 import suite from '../frontend/export';
@@ -24,14 +25,51 @@ function getArrowFunctionBody(f: any) {
   return secondPass;
 }
 
-const Runner = (name: string, file: string) => {
+const Runner = (
+  name: string,
+  file: string,
+  customCapabilities: any = { 'bstack:options': {} },
+) => {
+  if (
+    process.env.LOCAL === '1' &&
+    Object.keys(customCapabilities['bstack:options']).length > 0
+  ) {
+    // eslint-disable-next-line jest/no-disabled-tests, jest/expect-expect
+    it.skip('is skipped on local', () => {});
+    return;
+  }
+
   describe(name, () => {
     let driver: any;
+    let driverBuilder: any;
+
+    if (process.env.LOCAL === '1') {
+      driverBuilder = () => new Builder().forBrowser('chrome').build();
+    } else {
+      const username = process.env.BROWSERSTACK_USERNAME;
+      const accesskey = process.env.BROWSERSTACK_ACCESS_KEY;
+
+      const capabilities = {
+        ...customCapabilities,
+        'bstack:options': {
+          projectName: 'Testing CalHeatmap and d3js on browsers matrix',
+          local: false,
+          ...customCapabilities['bstack:options'],
+        },
+      };
+
+      driverBuilder = () => new Builder()
+        .usingServer(
+          `https://${username}:${accesskey}@hub-cloud.browserstack.com/wd/hub`,
+        )
+        .forBrowser('chrome')
+        .withCapabilities(capabilities)
+        .build();
+    }
 
     beforeAll(async () => {
-      // @ts-ignore
-      driver = await globalThis.buildDriver();
-    }, 15000);
+      driver = await driverBuilder();
+    }, 45000);
 
     afterAll(async () => {
       await driver.quit();

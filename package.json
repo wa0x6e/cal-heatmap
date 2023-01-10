@@ -85,7 +85,7 @@
     "dev": "rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/",
     "test:e2e": "node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/",
-    "test:e2e:local": "node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e-local.config.mjs test/"
+    "test:e2e:local": "LOCAL=1 node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/"
   },
   "repository": {
     "type": "git",
