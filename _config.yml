@@ -54,10 +54,12 @@ plugins:
 keep_files:
   - v3/
   - v2/
+  - tests/
 
 include:
   - v3/
   - v2/
+  - tests/
 
 callouts_level: quiet # or loud
 callouts:
