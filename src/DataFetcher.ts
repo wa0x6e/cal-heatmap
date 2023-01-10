@@ -1,10 +1,8 @@
-import isString from 'lodash-es/isString';
-
 import {
   json, csv, dsv, text,
 } from 'd3-fetch';
 
-import type { DataOptions } from './options/Options';
+import type { DataOptions, DataRecord } from './options/Options';
 import type Options from './options/Options';
 
 const parseURI = (
@@ -50,11 +48,11 @@ export default class DataFetcher {
     startTimestamp: number,
     endTimestamp: number,
   ): Promise<unknown> {
-    if (isString(source) && source.length > 0) {
+    if (typeof source === 'string' && source.length > 0) {
       return this.#fetch(source, startTimestamp, endTimestamp);
     }
 
-    let d: any[] = [];
+    let d: DataRecord[] = [];
     if (Array.isArray(source)) {
       d = source;
     }
@@ -71,7 +69,7 @@ export default class DataFetcher {
   ): Promise<unknown> {
     const { type, requestInit } = this.options.options.data;
 
-    const url = parseURI(source, startTimestamp, endTimestamp);
+    const url = parseURI(source as string, startTimestamp, endTimestamp);
 
     switch (type) {
       case 'json':

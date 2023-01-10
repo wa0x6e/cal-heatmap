@@ -5,7 +5,11 @@ import {
 } from 'd3-array';
 
 import type { SubDomain } from '../index';
-import type { DataOptions, DataGroupType } from '../options/Options';
+import type {
+  DataOptions,
+  DataGroupType,
+  DataRecord,
+} from '../options/Options';
 
 export default class DomainCollection {
   collection: Map<number, SubDomain[]>;
@@ -127,7 +131,7 @@ export default class DomainCollection {
   }
 
   fill(
-    data: any[],
+    data: DataRecord[],
     {
       x,
       y,
@@ -142,7 +146,7 @@ export default class DomainCollection {
     domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
   ): void {
-    const cleanedData: Map<number, Map<number, any[]>> = group(
+    const cleanedData: Map<number, Map<number, DataRecord[]>> = group(
       data,
       (d): number => this.#extractTimestamp(d, x, domainKeyExtractor),
       (d): number => this.#extractTimestamp(d, x, subDomainKeyExtractor),
@@ -171,7 +175,7 @@ export default class DomainCollection {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  #extractValues(data: any[], y: string | Function): number[] {
+  #extractValues(data: DataRecord[], y: string | Function): number[] {
     return data.map((d): number => (typeof y === 'function' ? y(d) : d[y]));
   }
 
@@ -203,7 +207,7 @@ export default class DomainCollection {
   }
 
   #extractTimestamp(
-    datum: any,
+    datum: DataRecord,
     x: string | Function,
     extractorFn: Function,
   ): number {

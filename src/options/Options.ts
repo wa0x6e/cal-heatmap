@@ -64,8 +64,9 @@ type DateOptions = {
   locale: string;
 };
 
+export type DataRecord = Record<string, string | number>;
 export type DataOptions = {
-  source: any;
+  source: string | DataRecord[];
   type: 'json' | 'csv' | 'tsv' | 'txt';
   requestInit: object;
   x: string | ((datum: any) => number);

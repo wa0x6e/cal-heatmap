@@ -183,7 +183,7 @@ describe('Methods', () => {
 
     // eslint-disable-next-line arrow-body-style
     it('returns a resolved promise', () => {
-      return expect(cal.fill({})).resolves.toBe(null);
+      return expect(cal.fill([])).resolves.toBe(null);
     });
 
     // eslint-disable-next-line arrow-body-style

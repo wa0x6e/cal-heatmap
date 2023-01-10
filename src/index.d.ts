@@ -32,5 +32,3 @@ export type TemplateResult = {
   };
   extractUnit: (ts: number) => number;
 };
-
-export type Data = Record<number, Record<number, number[]>>;
