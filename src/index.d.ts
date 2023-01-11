@@ -32,3 +32,19 @@ export type TemplateResult = {
   };
   extractUnit: (ts: number) => number;
 };
+
+export interface IPlugin {
+  name: string;
+  calendar: CalHeatmap;
+  options: pluginOptions;
+
+  setup: (options?: PluginOptions) => void;
+  paint: () => Promise<unknown>;
+  destroy: () => Promise<unknown>;
+}
+export interface IPluginContructor {
+  new (calendar: CalHeatmap): IPlugin;
+}
+
+export interface PluginOptions {}
+export type PluginDefinition = [IPluginContructor, PluginOptions?];

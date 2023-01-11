@@ -2,22 +2,23 @@ import { createPopper } from '@popperjs/core';
 
 import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
+import type { IPlugin, PluginOptions } from '../index';
 
 const BASE_CLASSNAME = 'ch-tooltip';
 
-type PopperOptions = {
+interface PopperOptions {
   placement: any;
   modifiers: any[];
   strategy: any;
   onFirstUpdate?: any;
-};
+}
 
-type TooltipOptions = {
+interface TooltipOptions extends PluginOptions, PopperOptions {
   enabled: boolean;
   text: (timestamp: number, value: number, moment: any) => string;
-} & PopperOptions;
+}
 
-const defaultOptions = {
+const defaultOptions: PluginOptions = {
   enabled: true,
 
   // Expecting a function, which will return the tooltip content
@@ -54,7 +55,7 @@ const virtualElement: VirtualElement = {
   },
 };
 
-export default class Tooltip {
+export default class Tooltip implements IPlugin {
   name = 'Tooltip';
 
   calendar: CalHeatmap;
@@ -77,7 +78,7 @@ export default class Tooltip {
     this.listenerAttached = false;
   }
 
-  setup(pluginOptions: Partial<TooltipOptions>): void {
+  setup(pluginOptions?: Partial<TooltipOptions>): void {
     this.options = { ...defaultOptions, ...pluginOptions };
     const event = this.calendar.eventEmitter;
 

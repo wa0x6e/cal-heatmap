@@ -3,13 +3,14 @@ import { select } from 'd3-selection';
 import { legend } from '@observablehq/plot';
 
 import type CalHeatmap from '../CalHeatmap';
+import type { IPlugin, PluginOptions } from '../index';
 
-type LegendOptions = {
+interface LegendOptions extends PluginOptions {
   enabled: boolean;
   itemSelector: string | null;
   label: string | null;
   width: number;
-};
+}
 
 const DEFAULT_CLASSNAME = '.graph-legend';
 
@@ -24,7 +25,7 @@ const defaultOptions: LegendOptions = {
   width: 130,
 };
 
-export default class Legend {
+export default class Legend implements IPlugin {
   name = 'Legend';
 
   calendar: CalHeatmap;
@@ -42,7 +43,7 @@ export default class Legend {
     this.options = defaultOptions;
   }
 
-  setup(pluginOptions: Partial<LegendOptions>): void {
+  setup(pluginOptions?: Partial<LegendOptions>): void {
     this.options = { ...defaultOptions, ...pluginOptions };
   }
 

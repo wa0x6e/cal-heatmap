@@ -17,7 +17,7 @@ import './cal-heatmap.scss';
 import TemplateCollection from './calendar/TemplateCollection';
 
 import type { OptionsType } from './options/Options';
-import type { Template, Dimensions } from './index';
+import type { Template, Dimensions, PluginDefinition } from './index';
 
 import { ScrollDirection } from './constant';
 
@@ -93,7 +93,7 @@ export default class CalHeatmap {
    */
   paint(
     options?: DeepPartial<OptionsType>,
-    plugins?: Array<[any, any?]> | [any, any?],
+    plugins?: PluginDefinition[] | PluginDefinition,
   ): Promise<unknown> {
     this.options.init(options);
     this.dateHelper.setup(this.options);
@@ -107,7 +107,7 @@ export default class CalHeatmap {
     }
 
     if (plugins) {
-      this.pluginManager.add(castArray(plugins));
+      this.pluginManager.add(castArray(plugins) as PluginDefinition[]);
     }
 
     this.calendarPainter.setup();

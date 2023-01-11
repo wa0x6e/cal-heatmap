@@ -1,18 +1,24 @@
 import type CalHeatmap from '../CalHeatmap';
+import type { IPlugin, PluginOptions } from '../index';
 
-export default class Timezone {
+interface TimezoneOptions extends PluginOptions {
+  moment?: any;
+  timezone?: string;
+}
+
+export default class Timezone implements IPlugin {
   name = 'Timezone';
 
   calendar: CalHeatmap;
 
-  options: any;
+  options: TimezoneOptions;
 
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.options = {};
   }
 
-  setup(pluginOptions?: any): void {
+  setup(pluginOptions?: Partial<TimezoneOptions>): void {
     const moment = pluginOptions?.moment || window.moment;
     const timezone = pluginOptions?.timezone || moment.tz.guess();
 
