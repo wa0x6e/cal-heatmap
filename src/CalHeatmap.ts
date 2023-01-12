@@ -14,7 +14,7 @@ import VERSION from './version';
 
 import './cal-heatmap.scss';
 
-import TemplateCollection from './calendar/TemplateCollection';
+import TemplateCollection from './TemplateCollection';
 
 import type { OptionsType } from './options/Options';
 import type { Template, Dimensions, PluginDefinition } from './index';

@@ -1,5 +1,5 @@
-import type DateHelper from '../../helpers/DateHelper';
-import type { Template, TemplateResult } from '../../index';
+import type DateHelper from '../helpers/DateHelper';
+import type { Template, TemplateResult } from '../index';
 
 const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
   const COLUMNS_COUNT = 10;

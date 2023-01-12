@@ -1,7 +1,7 @@
-import TemplateCollection from '../../src/calendar/TemplateCollection';
-import DateHelper from '../../src/helpers/DateHelper';
-import Options from '../../src/options/Options';
-import type { TemplateResult } from '../../src/index';
+import TemplateCollection from '../src/TemplateCollection';
+import DateHelper from '../src/helpers/DateHelper';
+import Options from '../src/options/Options';
+import type { TemplateResult } from '../src/index';
 
 describe('TemplateCollection', () => {
   let t: TemplateCollection;

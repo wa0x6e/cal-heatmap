@@ -1,6 +1,6 @@
-import type DateHelper from '../../helpers/DateHelper';
-import type { DomainOptions } from '../../options/Options';
-import type { Template, TemplateResult, SubDomain } from '../../index';
+import type DateHelper from '../helpers/DateHelper';
+import type { DomainOptions } from '../options/Options';
+import type { Template, TemplateResult, SubDomain } from '../index';
 
 const hourTemplate: Template = (
   DateHelper: DateHelper,

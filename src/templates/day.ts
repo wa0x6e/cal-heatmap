@@ -1,6 +1,6 @@
-import type DateHelper from '../../helpers/DateHelper';
-import type { OptionsType, DomainOptions } from '../../options/Options';
-import type { Template, TemplateResult } from '../../index';
+import type DateHelper from '../helpers/DateHelper';
+import type { OptionsType, DomainOptions } from '../options/Options';
+import type { Template, TemplateResult } from '../index';
 
 const dayTemplate: Template = (
   DateHelper: DateHelper,

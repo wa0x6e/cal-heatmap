@@ -1,4 +1,4 @@
-import type TemplateCollection from '../calendar/TemplateCollection';
+import type TemplateCollection from '../TemplateCollection';
 import type { DomainOptions, SubDomainOptions, DataOptions } from './Options';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];

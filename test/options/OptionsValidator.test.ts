@@ -1,5 +1,5 @@
 import validate from '../../src/options/OptionsValidator';
-import TemplateCollection from '../../src/calendar/TemplateCollection';
+import TemplateCollection from '../../src/TemplateCollection';
 import Options from '../../src/options/Options';
 
 import type { TemplateResult } from '../../src/index';
