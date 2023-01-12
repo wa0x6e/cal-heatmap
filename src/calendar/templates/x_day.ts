@@ -18,7 +18,6 @@ const dayTemplate: Template = (
 
   return {
     name: 'x_day',
-    level: 30,
     rowsCount(ts: number) {
       switch (domainType) {
         case 'month':

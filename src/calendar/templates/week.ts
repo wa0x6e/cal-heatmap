@@ -10,7 +10,6 @@ const weekTemplate: Template = (
 
   return {
     name: 'week',
-    level: 40,
     rowsCount() {
       return 1;
     },

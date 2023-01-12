@@ -7,7 +7,6 @@ const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
 
   return {
     name: 'minute',
-    level: 10,
     rowsCount() {
       return COLUMNS_COUNT;
     },

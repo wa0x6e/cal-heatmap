@@ -2,7 +2,6 @@ import type DateHelper from '../../src/helpers/DateHelper';
 
 const quarterTemplate = (DateHelper: DateHelper) => ({
   name: 'quarter',
-  level: 50,
   rowsCount() {
     return 1;
   },

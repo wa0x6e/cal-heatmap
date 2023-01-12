@@ -7,7 +7,6 @@ const data = {
       setup: (cal) => {
         const template = (DateHelper) => ({
           name: 'quarter',
-          level: 50,
           rowsCount() {
             return 1;
           },

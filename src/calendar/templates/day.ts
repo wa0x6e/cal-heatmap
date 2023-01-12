@@ -18,7 +18,6 @@ const dayTemplate: Template = (
 
   return {
     name: 'day',
-    level: 30,
     rowsCount() {
       return domainType === 'week' ? 1 : ROWS_COUNT;
     },

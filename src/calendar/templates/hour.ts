@@ -13,7 +13,6 @@ const hourTemplate: Template = (
 
   return {
     name: 'hour',
-    level: 20,
     rowsCount() {
       return ROWS_COUNT;
     },

@@ -19,28 +19,10 @@ describe('OptionsValidator', () => {
 
   const validSubDomainTemplate = new TemplateCollection(dateHelper, options);
   validSubDomainTemplate.settings = new Map([
-    ['day', { level: 10 } as TemplateResult],
-    ['x_day', { level: 10 } as TemplateResult],
-    ['month', { level: 100 } as TemplateResult],
+    ['day', { } as TemplateResult],
+    ['x_day', { } as TemplateResult],
+    ['month', { } as TemplateResult],
   ]);
-
-  it('throws when the subDomain level is not lower than domain', () => {
-    expect(() => {
-      validate(validSubDomainTemplate, {
-        domain: { type: 'day' },
-        subDomain: { type: 'month' },
-        data: { type: 'json' },
-      });
-    }).toThrow();
-
-    expect(() => {
-      validate(validSubDomainTemplate, {
-        domain: { type: 'day' },
-        subDomain: { type: 'x_day' },
-        data: { type: 'json' },
-      });
-    }).toThrow();
-  });
 
   it('returns true when all domain/subDomain are valid', () => {
     expect(validate(validSubDomainTemplate, options.options)).toBe(true);

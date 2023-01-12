@@ -32,15 +32,6 @@ export default function validate(
     throw new Error(`'${subDomainType}' is not a valid domain type'`);
   }
 
-  if (
-    templateCollection.get(domainType)!.level <=
-    templateCollection.get(subDomainType)!.level
-  ) {
-    throw new Error(
-      `'${subDomainType}' is not a valid subDomain to '${domainType}'`,
-    );
-  }
-
   if (data.type && !ALLOWED_DATA_TYPES.includes(data.type)) {
     throw new Error(`The data type '${data.type}' is not valid data type`);
   }
