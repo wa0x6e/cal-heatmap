@@ -59,7 +59,8 @@ export default class Navigator {
         }
         return templatesClt
           .get(options.subDomain.type)!
-          .mapping(domainKey, subDomainEndDate! - 1000, { v: null });
+          .mapping(domainKey, subDomainEndDate! - 1000)
+          .map((d) => ({ ...d, v: null }));
       },
     );
 

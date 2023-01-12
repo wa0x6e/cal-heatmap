@@ -43,11 +43,7 @@ const dayTemplate: Template = (
           return ROWS_COUNT;
       }
     },
-    mapping: (
-      startTimestamp: number,
-      endTimestamp: number,
-      defaultValues: any = {},
-    ) => {
+    mapping: (startTimestamp: number, endTimestamp: number) => {
       let weekNumber = 0;
       let x = -1;
 
@@ -79,7 +75,6 @@ const dayTemplate: Template = (
           t: ts,
           x,
           y: domainType === 'week' ? 0 : date.weekday(),
-          ...defaultValues,
         };
       });
     },

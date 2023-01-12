@@ -1,6 +1,6 @@
 import type DateHelper from '../../helpers/DateHelper';
 import type { DomainOptions } from '../../options/Options';
-import type { Template, TemplateResult } from '../../index';
+import type { Template, TemplateResult, SubDomain } from '../../index';
 
 const hourTemplate: Template = (
   DateHelper: DateHelper,
@@ -11,21 +11,6 @@ const hourTemplate: Template = (
 
   const domainType = domain.type;
 
-  function getTotalColNumber(ts: number) {
-    switch (domainType) {
-      case 'week':
-        return (TOTAL_ITEMS / ROWS_COUNT) * 7;
-      case 'month':
-        return (
-          (TOTAL_ITEMS / ROWS_COUNT) *
-          (domain.dynamicDimension ? DateHelper.date(ts).daysInMonth() : 31)
-        );
-      case 'day':
-      default:
-        return TOTAL_ITEMS / ROWS_COUNT;
-    }
-  }
-
   return {
     name: 'hour',
     level: 20,
@@ -33,13 +18,20 @@ const hourTemplate: Template = (
       return ROWS_COUNT;
     },
     columnsCount(ts: number) {
-      return getTotalColNumber(ts);
+      switch (domainType) {
+        case 'week':
+          return (TOTAL_ITEMS / ROWS_COUNT) * 7;
+        case 'month':
+          return (
+            (TOTAL_ITEMS / ROWS_COUNT) *
+            (domain.dynamicDimension ? DateHelper.date(ts).daysInMonth() : 31)
+          );
+        case 'day':
+        default:
+          return TOTAL_ITEMS / ROWS_COUNT;
+      }
     },
-    mapping: (
-      startTimestamp: number,
-      endTimestamp: number,
-      defaultValues: any = {},
-    ) =>
+    mapping: (startTimestamp: number, endTimestamp: number): SubDomain[] =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'hour',
@@ -63,7 +55,6 @@ const hourTemplate: Template = (
           t: ts,
           x: baseX,
           y: Math.floor(hour % ROWS_COUNT),
-          ...defaultValues,
         };
       }),
 

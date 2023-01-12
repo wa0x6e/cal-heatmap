@@ -14,11 +14,7 @@ const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
     columnsCount() {
       return ROWS_COUNT;
     },
-    mapping: (
-      startTimestamp: number,
-      endTimestamp: number,
-      defaultValues: any = {},
-    ) =>
+    mapping: (startTimestamp: number, endTimestamp: number) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'minute',
@@ -31,7 +27,6 @@ const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
           t: ts,
           x: Math.floor(minute / COLUMNS_COUNT),
           y: minute % COLUMNS_COUNT,
-          ...defaultValues,
         };
       }),
     format: {

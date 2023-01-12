@@ -10,11 +10,7 @@ const monthTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
   columnsCount() {
     return 12;
   },
-  mapping: (
-    startTimestamp: number,
-    endTimestamp: number,
-    defaultValues: any = {},
-  ) =>
+  mapping: (startTimestamp: number, endTimestamp: number) =>
     // eslint-disable-next-line implicit-arrow-linebreak
     DateHelper.intervals(
       'month',
@@ -24,7 +20,6 @@ const monthTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
       t: ts,
       x: DateHelper.date(ts).month(),
       y: 0,
-      ...defaultValues,
     })),
 
   format: {

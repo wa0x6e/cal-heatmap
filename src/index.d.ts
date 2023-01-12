@@ -22,11 +22,7 @@ export type TemplateResult = {
   level: number;
   rowsCount: (ts: number) => number;
   columnsCount: (ts: number) => number;
-  mapping: (
-    startTimestamp: number,
-    endTimestamp: number,
-    defaultValues: any,
-  ) => SubDomain[];
+  mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[];
   format: {
     domainLabel: string;
   };

@@ -10,11 +10,7 @@ const yearTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
   columnsCount() {
     return 1;
   },
-  mapping: (
-    startTimestamp: number,
-    endTimestamp: number,
-    defaultValues: any = {},
-  ) =>
+  mapping: (startTimestamp: number, endTimestamp: number) =>
     // eslint-disable-next-line implicit-arrow-linebreak
     DateHelper.intervals(
       'year',
@@ -24,7 +20,6 @@ const yearTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
       t: ts,
       x: index,
       y: 0,
-      ...defaultValues,
     })),
 
   format: {

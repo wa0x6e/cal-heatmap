@@ -46,11 +46,7 @@ const dayTemplate: Template = (
       }
       return COLUMNS_COUNT;
     },
-    mapping: (
-      startTimestamp: number,
-      endTimestamp: number,
-      defaultValues: any = {},
-    ) =>
+    mapping: (startTimestamp: number, endTimestamp: number) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'day',
@@ -82,7 +78,6 @@ const dayTemplate: Template = (
           t: ts,
           y: x,
           x: domainType === 'week' ? 0 : date.weekday(),
-          ...defaultValues,
         };
       }),
     format: {

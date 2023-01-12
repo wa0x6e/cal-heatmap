@@ -8,21 +8,6 @@ const weekTemplate: Template = (
 ): TemplateResult => {
   const { dynamicDimension } = domain;
 
-  function getTotalColNumber(ts: number) {
-    switch (domain.type) {
-      case 'year':
-        return dynamicDimension ?
-          DateHelper.date(ts).endOf('year').weeksInYear() :
-          53;
-      case 'month':
-        return dynamicDimension ?
-          DateHelper.getMonthWeekNumber(DateHelper.date(ts).endOf('month')) :
-          5;
-      default:
-        return 1;
-    }
-  }
-
   return {
     name: 'week',
     level: 40,
@@ -30,13 +15,20 @@ const weekTemplate: Template = (
       return 1;
     },
     columnsCount(ts: number) {
-      return getTotalColNumber(ts);
+      switch (domain.type) {
+        case 'year':
+          return dynamicDimension ?
+            DateHelper.date(ts).endOf('year').weeksInYear() :
+            53;
+        case 'month':
+          return dynamicDimension ?
+            DateHelper.getMonthWeekNumber(DateHelper.date(ts).endOf('month')) :
+            5;
+        default:
+          return 1;
+      }
     },
-    mapping: (
-      startTimestamp: number,
-      endTimestamp: number,
-      defaultValues: any = {},
-    ) =>
+    mapping: (startTimestamp: number, endTimestamp: number) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'week',
@@ -46,7 +38,6 @@ const weekTemplate: Template = (
         t: ts,
         x: i,
         y: 0,
-        ...defaultValues,
       })),
     format: {
       domainLabel: 'wo [week] Y',
