@@ -8,7 +8,7 @@ grand_parent: Options
 
 # label
 
-Defines all options related to the domain's label
+Specify all options related to the domain's label configuration
 {: .fs-6 }
 
 ```js
@@ -20,15 +20,17 @@ type LabelOptions: {
     x: number,
     y: number,
   },
-  rotate?: null | 'left' | 'right',
+  rotate: null | 'left' | 'right',
   width: number,
-  height: null | number,
+  height: number,
 }
 ```
 
+<hr />
+
 ## text
 
-Defines the text of the domain's label
+Specify the label's content
 
 ```js
 label?: string | null | ((timestamp: number, element: SVGElement) => string);
@@ -36,19 +38,23 @@ label?: string | null | ((timestamp: number, element: SVGElement) => string);
 
 Default: `undefined`
 
-| Value       | Description                                                                                                               | Example Value                                                   | Example output             |
-| :---------- | :------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------- |
-| `undefined` | Display the domain default label, relative to the chosen `type`                                                           |                                                                 | `March`                    |
-| `string`    | Pass the string to [momentJS `format()`](https://momentjs.com/docs/#/displaying/format/), and display its result          | `MMMM`                                                          | `March`                    |
-| `null`      | Do not show any label                                                                                                     | `null`                                                          |                            |
-| `function`  | Display the function's return value. The function receives the domain's timestamp and the label's SVG Element as argument | `function (timestamp) { return new Date(date).toISOString(); }` | `2022-12-06T20:01:51.290Z` |
+This option accepts different value's type, see table below for usage.
+
+| Value type  | Description                                                                                                            | Example Value                                                   | Example output             |
+| :---------- | :--------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | -------------------------- |
+| `undefined` | Let the calendar decides, based on the chosen `type`                                                                   |                                                                 | `March`                    |
+| `string`    | Pass the string to [momentJS `format()`](https://momentjs.com/docs/#/displaying/format/), and display its result       | `MMMM`                                                          | `March`                    |
+| `null`      | Do not show any label                                                                                                  | `null`                                                          |                            |
+| `function`  | Display the function's return value. The function takes the domain's timestamp and the label's SVG Element as argument | `function (timestamp) { return new Date(date).toISOString(); }` | `2022-12-06T20:01:51.290Z` |
 
 {: .note}
-momentJS `format()` is [`locale`](/options/date.html#locale) and [`timezone`](/options/date.html#timezone) aware.
+momentJS `format()` is [`locale`](/options/date.html#locale) aware.
+
+{: .mt-8}
 
 ## position
 
-Position of the label, relative to each domain
+Position of the label, relative to its domain
 
 ```js
 position: 'top' | 'right' | 'bottom' | 'left',
@@ -56,7 +62,7 @@ position: 'top' | 'right' | 'bottom' | 'left',
 
 Default: `bottom`
 
-#### Example
+#### Example with each possible values
 
 <div class="code-example">
   <span id="label-example-1" style="display: inline-block; outline: 1px dotted gray;margin-right: 10px;"></span>
@@ -77,9 +83,11 @@ Default: `bottom`
   </script>
 </div>
 
+{: .mt-8}
+
 ## textAlign
 
-Horizontal alignement of the label
+Horizontal alignment of the label
 
 ```js
 textAlign: 'start' | 'middle' | 'end',
@@ -87,7 +95,7 @@ textAlign: 'start' | 'middle' | 'end',
 
 Default: `middle`
 
-#### Example
+#### Example with each possible values
 
 <div class="code-example">
   <span id="label-example-11" style="display: inline-block"></span>
@@ -105,26 +113,32 @@ Default: `middle`
   </script>
 </div>
 
+{: .mt-8}
+
 ## offset
+
+Further customize the label placement along its x and y axis
 
 ```js
 offset: {
-    x: number,
-    y: number,
+    x: number, // in pixels
+    y: number, // in pixels
   },
 ```
 
+{: .mt-8}
+
 ## rotate
 
-Rotate to obtain a vertical label, used in conjuction when the `position` is `start|end`.
+Rotate to obtain a vertical label
 
 ```js
-rotate?: null | 'left' | 'right',
+rotate: null | 'left' | 'right',
 ```
 
 Default: `null`
 
-#### Example
+#### Example with left and right
 
 <div class="code-example">
   <span id="label-example-5" style="display: inline-block; outline: 1px dotted gray;margin-right: 10px;"></span>
@@ -139,7 +153,11 @@ Default: `null`
   </script>
 </div>
 
+{: .mt-8}
+
 ## width
+
+Width of the label, in pixel
 
 ```js
 width: number,
@@ -151,7 +169,7 @@ Default: `100`
 Ignored when `position` is set to `top` or `bottom`.
 In these cases, the width is capped to the domain width.
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -161,7 +179,7 @@ In these cases, the width is capped to the domain width.
   </style>
   <div id="width-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Width:
     <input type="range" min="50" max="300" value="100" class="slider" id="width-slider" >
@@ -178,10 +196,14 @@ In these cases, the width is capped to the domain width.
   </script>
 </div>
 
+{: .mt-8}
+
 ## height
 
+Height of the label, in pixel
+
 ```js
-height: null | number,
+height: number,
 ```
 
 Default: `25`
@@ -190,7 +212,7 @@ Default: `25`
 Ignored when `position` is set to `left` or `right`.
 In these cases, the height is capped to the domain height.
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -200,7 +222,7 @@ In these cases, the height is capped to the domain height.
   </style>
   <div id="height-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Height:
     <input type="range" min="0" max="50" value="25" class="slider" id="height-slider" >

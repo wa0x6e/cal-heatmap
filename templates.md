@@ -1,107 +1,168 @@
 ---
 layout: default
-title: SubDomain Templates
+title: Templates
 nav_order: 10
 ---
 
-# SubDomain Templates
+# Templates
 
-Generate and map content of a sudDomain type.
+Defines the structure and content of a subDomain
 {: .fs-6}
 
-{: .warning}
-Documention for this option is still work in progress, and is incomplete
+## Introduction
 
-Previously a static internal function, templates have been extracted as
-a customizable module since v4, to allow developers to inject their own
-templates, and create their own subDomains content, when the default
-subDomain does not achieve what they seek.
+A subDomain is a time range, each represented by a cell in the calendar.
 
-By default, CalHeatmap ship with the `year`, `month`, `week`, `day`, `hour` and `minute` templates.
+<div id="example-1"></div>
+<script>
+  const cal = new CalHeatmap();
+  cal.paint({range: 6, itemSelector: '#example-1', domain: {type: 'month'}, subDomain: {type: 'day'}});
+</script>
 
-Example of custom templates:
+Taking the `month/day` example above, there is 6 `month` domains, each having
+a varying number of `days` subDomain, months having a different number of days.
 
-- days subdomain, but only show weekdays (only 5 subdomains instead of 7)
-- minutes subdomain, but grouped by 15 minutes (only 4 subdomains instead of 60)
+Given a domain type and a time window, a Template generates a collection
+of subDomains, and defines how they are arranged on a x/y axis.
 
-{: .note}
-You can add your custom templates with the [`addTemplates()`](/methods/addTemplates) method.
+This template is then consumed by the calendar in order to draw the
+given subDomain cells.
+
+## When to use
+
+By default, CalHeatmap ships with the `year`, `month`, `week`, `day`, `x_day`,
+`hour` and `minute` templates.
+
+Each of these templates are pretty basic, but will be enough for most use cases.
+
+You can create and use a custom template if you wish to:
+
+- change the number of columns and rows (ex: all subDomains on same row)
+- change the time interval of a subDomain (ex: each subDomain equal 5min)
+- exclude some time window (ex: showing only weekdays)
+
+## How to use
+
+- Creates a template
+- Register the template using [`addTemplates()`](/methods/addTemplates)
+
+### Creating a template
+
+A template is a javascript function taking 2 arguments
+and returning a `TemplateResult`.
 
 ```js
-type Template = function(helpers, Options) {
+type Template = function(DateHelper: DateHelper, options: Options) {
   return TemplateResult;
 }
 ```
 
-A `Template` is a javascript function accepting 2 arguments
-and returning a `TemplateResult`
+### Arguments
 
-## Arguments
+- `DateHelper`: a [Datehelper](https://github.com/wa0x6e/cal-heatmap/blob/master/src/helpers/DateHelper.ts) object, also used internally by the calendar for all date related computation. You should always rely on this helper whenever possible for date computation consistency.
+- `Options`: the [Options](/options) object
 
-`helpers`
-
-`Options`
-
-The full [options](/options) passed to the calendar.
-
-## Return value
+### Return value
 
 ```js
 type TemplateResult = {
   name: string,
-  level: number,
-  rowsCount: function(): number,
-  columnsCount: function(): number,
-  mapping: function(startTimestamp: number, endTimestamp: number, defaultvalues: {}),
-  format: {
-    date: string,
-    legend: string
-  },
-  extractUnit: function(timestamp: number): number
-}
+  rowsCount: (ts: number) => number,
+  columnsCount: (ts: number) => number,
+  mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[],
+  extractUnit: (ts: number) => number,
+};
 ```
 
 ### name
 
 Name of the subDomain type.
 
-Will be used by `subDomain.type` options.
-
-### level
+Will be used by [`subDomain.type`](/options/subDomain.html#type) options.
 
 ### rowsCount
 
-Number of rows
+Total number of rows
+
+This number may vary depending on the `domain` type.
+
+#### Example from the hour template
+
+```js
+rowsCount: ts => {
+  const TOTAL_ITEMS = 24;
+  const ROWS_COUNT = 6;
+  const { domain } = options;
+
+  switch (domain.type) {
+    case 'week':
+      return (TOTAL_ITEMS / ROWS_COUNT) * 7;
+    case 'month':
+      return (
+        (TOTAL_ITEMS / ROWS_COUNT) *
+        (domain.dynamicDimension ? DateHelper.date(ts).daysInMonth() : 31)
+      );
+    case 'day':
+    default:
+      return TOTAL_ITEMS / ROWS_COUNT;
+  }
+};
+```
 
 ### columnsCount
 
-Number of columns
+Total number of columns
+
+This number may vary depending on the `domain` type.
 
 ### mapping
 
+Function returning an array of `SubDomain`, used to populate each domain in the calendar.
+
+A subDomain have 3 main properties:
+
 ```js
-{
+type SubDomain = {
   t: number,
   x: number,
   y: number,
-  ...defaultValues,
-}
+};
 ```
 
-### format
+- `t`: the subDomain timestamp, rounded to the start of the time range
+- `x`: the row index of the cell
+- `y`: the column index of the cell
+
+- Rows are indexed from top to bottom, with the top one being 0.
+- Columns are indexed from left to right, with the left one being 0.
 
 ### extractUnit
 
-Given a timestamp, this function should return the timestamp related to
-the subdomain.
+Function returning the start of the subDomain time range.
 
-## Example
+This function is used to bind your data to a subDomain
+
+#### Example
+
+- If each subDomain is a 5min range, the timestamp for `9:18AM` should return
+  the timestamp for `9:15AM`
+- If each subDomain is a weekday, the function should return the timestamp for the start of that day (`00:00AM`), and return `null` for a weekend.
+
+{: .highlight}
+Take a look at the built-in templates on the [github](https://github.com/wa0x6e/cal-heatmap/tree/master/src/calendar/templates) repository, for real-world examples.
+
+<hr/>
+
+## Real world Example
+
+Following is a template for a Quarter subDomain: each subDomain represent 3 months.
+
+You can see a the final result [here](/methods/addTemplates)
 
 ```js
-const quarterTemplate = function (helpers) {
+const quarterTemplate = function (DateHelper) {
   return {
     name: 'quarter',
-    level: 50,
     rowsCount() {
       return 1;
     },
@@ -109,27 +170,20 @@ const quarterTemplate = function (helpers) {
       return 4;
     },
     mapping: (startDate, endDate, defaultValues) =>
-      helpers.DateHelper.intervals(
-        'quarter',
-        startDate,
-        helpers.DateHelper.date(endDate)
-      ).map((d, index) => ({
-        t: d,
-        x: index,
-        y: 0,
-        ...defaultValues,
-      })),
-
-    format: {
-      date: 'Q',
-      legend: 'Q',
-    },
+      DateHelper.intervals('quarter', startDate, DateHelper.date(endDate)).map(
+        (d, index) => ({
+          t: d,
+          x: index,
+          y: 0,
+          ...defaultValues,
+        })
+      ),
     extractUnit(d) {
-      return helpers.DateHelper.date(d).startOf('quarter').valueOf();
+      return DateHelper.date(d).startOf('quarter').valueOf();
     },
   };
 };
 ```
 
-{: .note}
-You can see all default templates on the [github](https://github.com/wa0x6e/cal-heatmap/tree/master/src/calendar/templates).
+{: .important}
+This example make full use of the provided DateHelper class, which uses momentjs for date computation

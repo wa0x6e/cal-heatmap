@@ -11,12 +11,17 @@ Destroy the calendar
 {: .fs-6 }
 
 ```js
+const cal = new CalHeatmap();
 cal.destroy(): Promise<unknown>
 ```
 
 ### Return
 
-Return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), which will resolve when the calendar finished destroying (after all animations completed).
+Return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), which will resolve once the calendar finished destroying (after all animations completed).
+
+<hr/>
+
+## Usage
 
 #### Example
 
@@ -25,5 +30,5 @@ const cal = new CalHeatmap();
 cal.paint({ ... });
 
 // Destroy it
-cal.destroy().then(() => { console.log('destroy complete!') });
+cal.destroy().then(() => { console.log('Destroy complete!') });
 ```

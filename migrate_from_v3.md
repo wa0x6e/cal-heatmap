@@ -1,29 +1,38 @@
 ---
 layout: default
 title: Migrating from 3.x
-nav_order: 20
+nav_order: 25
 ---
 
 # Migrating from 3.x
 
-{: .warning}
-Documention for this option is still work in progress, and is incomplete
-
 The current v4 release is rewritten from the ground up, and have a _lot of major breaking changes_.
+{: .fs-6}
 
-The last release of the 3.x version was released on October 2016,
+The last 3.x release was from October 2016,
 and was built on top of a vanilla JS codebase from 2012.
+
 After 7 years, the javascript scene has seen some changes,
 such as the maturity of ECMAScript, babel, and other various bundler tools,
 as well as newer versions of the underlying d3.js libraries used by Cal-Heatmap.
 
-Aside from the bugfixes and new features, the v4 branch has been rewritten
+Aside from some bugfixes and new features, the v4 branch has been rewritten
 from the ground up as ES modules,
 and transpiled to support older browsers.
 This direction allows an easier code maintainability and readability
 than the previous single file 3k lines codebase.
 
 Most of the breaking changes come from the settings renaming, and methods removal.
+
+## Major changes
+
+- All functions using callbacks have been migrated to use a Promise instead
+- Code base rewritten in Typescript, and ESnext (babel transpiled for older browser support)
+- New plugin system to extend/modify calendar capabilities
+- New Template system to use user-created calendar layout
+- All dates handling delegated to MomentJS
+- Bundles for ESM, UMD
+- Support for D3.js v6 and v7
 
 ## Default settings update
 
@@ -41,9 +50,19 @@ Set a custom momentJS locale. Default to `en`
 
 ### `data.x`
 
+Instruct the calendar how to extract the date from your dataset
+
 ### `data.y`
 
+Instruct the calendar how to extract the value from your dataset
+
 ### `data.groupY`
+
+Instruct the calendar how to aggregate values from same time range
+
+### `data.subLabel`
+
+Still experimental option, add a customizable secondary label to domain
 
 ### `subDomain.color`
 
@@ -51,16 +70,9 @@ Dynamically color the subDomain's label
 
 ### `scale`
 
+New option, grouping previous functions from `legend` and `legendColors`, to control how to colorize your dataset
+
 ## Renamed/moved settings
-
-### `legend`
-
-`legend` is now a namespace, grouping all the settings related to the legend.
-Data color definition has been moved to `scale`
-
-### `displayLegend`
-
-`displayLegend` has been renamed to just `show`, and is nested inside `legend`
 
 ### `label.align`
 
@@ -73,7 +85,7 @@ Moved inside the `domain` namespace.
 ### `date`
 
 `date` is now a namespace, grouping all date related options.
-Date definition has been moved to `date.start`
+Old `date` option has been moved to `date.start`
 
 ### `minDate`
 
@@ -90,7 +102,7 @@ Moved to `date.highlight`
 ### `data`
 
 `data` is now a namespace, grouping all data related options.
-Data source definition has been moved to `data.source`
+Old `data` option has been moved to `data.source`
 
 ### `dataType`
 
@@ -99,7 +111,7 @@ Moved to `data.type`
 ### `domain`
 
 `domain` is now a namespace, grouping all domain related options.
-SubDomain type definition has been moved to `subDomain.type`
+Old `doamin` option has been moved to `subDomain.type`
 
 ### `domainGutter`
 
@@ -120,7 +132,7 @@ Moved to `domain.label`
 ### `subDomain`
 
 `subDomain` is now a namespace, grouping all subDomain related options.
-Domain type definition has been moved to `domain.type`
+Old `subDomain` option has been moved to `subDomain.type`
 
 ### `cellSize`
 
@@ -138,40 +150,23 @@ Moved to `subDomain.gutter`
 
 Moved to `subDomain.label`
 
-### `subDomainTitleFormat`
-
-Moved to `subDomain.title`
-
 ## Removed settings
 
 ### `weekStartOnMonday`
 
-Use a custom `date.locale`, or a custom subDomain Template.
+Use a custom `date.locale`, or a custom Template.
 
-### `legendCellSize`
+### `legend`, `displayLegend`, `legendCellSize`, `legendCellPadding`, `legendCellMargin`, `legendVerticalPosition`, `legendHorizontalPosition`, `legendOrientation`, `legendTitleFormat`
 
-Use the new `legend.height` to control the height of the entire legend element.
-
-### `legendCellPadding`
-
-Legend does not have a cell concept anymore, as it can be linear.
-
-### `legendCellMargin`, `legendVerticalPosition`, `legendHorizontalPosition`, `legendOrientation`
-
-To control spacing and other styling, render the legend inside your desired DOM Element,
-and style it with CSS.
+Removed, migrated to [Legend](/plugins/Legend) plugin
 
 ### `legendColors`
 
-See `scale` instead.
+Moved to a new option inside `scale`.
 
-### `legendTitleFormat`
+### `subDomainDateFormat`, `subDomainTitleFormat`, `itemName`
 
-The title concept has been removed, legend is now showing ticks by default
-
-### `subDomainDateFormat` and `itemName`
-
-Removed, use `domain.title` directly.
+Removed, use Tooltip `text`
 
 ### `tooltip`
 
@@ -180,16 +175,16 @@ Removed, migrated to [Tooltip](/plugins/tooltip.html) plugin.
 ### `afterLoadData`
 
 CalHeatmap is not expecting a strict opinionated data structure anymore,
-and accept an array of object, just like d3.js
+and accept an array of object, just like d3.js. See `data.x`, `data.y` and `data.groupY`
 
 `colLimit`, `rowLimit`
 
-To customize the layout of the subDomains, a new [`subDomainTemplate`](/templates.html) has been introduced
+To customize the layout of the subDomains, a new [`Template`](/templates.html) system has been introduced
 
 `nextSelector`, `previousSelector`
 
 The same objective can be achieved by adding an `onClick()` event on
-your desired DOM Element, and call `next()` or `previous()` on your calendar instance.
+your desired DOM Element, and call `next()` or `previous()` on the calendar instance.
 
 `considerMissingDataAsZero`
 
@@ -213,29 +208,21 @@ These events are now obsolete, as all methods now return a promise.
 
 - `init(options)` renamed to `paint(options)`. This method can now be called multiple times with new options, and will update the calendar dynamically, instead of redrawing it from scratch.
 - `update(data, afterLoad, updateMode)` renamed to `fill(data)`, to reflect that it's for updating data only, and not the options. It now accepts only `data` as its only argument, all other arguments can be set via `paint()`
-- `destroy(callback)` do not any argument anymore, and returns a Promise.
+- `destroy(callback)` do not take a callback argument anymore, and returns a Promise.
 
 ## Removed methods
 
 ### `rewind()`
 
-The same objective can be achieved by calling `jumpTo()` with your initial start date on your calendar instance.
+The same objective can be achieved by calling `jumpTo()` with your initial start date on the calendar instance.
 
-### `showLegend()`
+### `showLegend()`, `removeLegend()`, `setLegend()`
 
-The same objective can achieved by calling `paint({ legend: { show: true } })` on your calendar instance.
-
-### `removeLegend()`
-
-The same objective can achieved by calling `paint({ legend: { show: false } })` on your calendar instance.
-
-### `setLegend()`
-
-The same objective can be achieved by calling `paint({ legend: { YOUR_NEW_OPTIONS } })` on your calendar instance.
+The same objective can be achieved by calling `paint({}, [[Legend, LEGEND_OPTIONS]])` on the calendar instance.
 
 ### `highlight`
 
-The same objective can be achieved by calling `paint({ date: { highlight: [YOUR_DATES] } })` on your calendar instance.
+The same objective can be achieved by calling `paint({ date: { highlight: [YOUR_DATES] } })` on the calendar instance.
 
 ### `getSVG`
 
@@ -244,7 +231,6 @@ Delegated to a plugin
 ## Over changes
 
 - All the CSS classes used for data coloring have been removed. The `scale` option allow a more precise color customization.
-- All the `x_` subDomains variants aside from `x_day` have been removed. You can re-created them with a custom subDomain template.
-- All functions using callbacks have been migrated to use Promise
-- Code base rewritten in Typescript
-- The mouse cursor do not change to `pointer` when hovering on a subDomain cell automatically when there is an `onClick` event registered, since there is no reliable way to detect the onClick event anymore.
+- All the `x_` subDomains variants aside from `x_day` have been removed. You can re-created them with a custom template.
+- The mouse cursor do not change to `pointer` when hovering on a subDomain cell automatically when there is an `onClick` event registered, since there is no reliable way to detect if an onClick listener is registered anymore.
+- Test suite migrated to Jest, and start testing on browserstack against a matrix of browsers.

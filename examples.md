@@ -1,12 +1,213 @@
 ---
 layout: default
 title: Examples
-nav_order: 11
+nav_order: 18
 ---
 
-## Examples
+# Examples
 
-### Seattle max daily temperature by year
+### hour/minute (default) layout
+
+<div class="code-example">
+  <div id="d-options"></div>
+  <script>
+    const cal10 = new CalHeatmap();
+    cal10.paint({ itemSelector: '#d-options' });
+  </script>
+</div>
+
+### day/hour layout
+
+<div class="code-example">
+  <div id="d2-options"></div>
+  <script>
+    const cal11 = new CalHeatmap();
+    cal11.paint({ 
+      domain: { type: 'day' }, 
+      subDomain:{ type: 'hour' },
+      itemSelector: '#d2-options' });
+  </script>
+</div>
+
+### month/day layout
+
+<div class="code-example">
+  <div id="d3-options"></div>
+  <script>
+    const cal12 = new CalHeatmap();
+    cal12.paint({ 
+      data: {
+        source: '/fixtures/seattle-weather.csv',
+        type: 'csv',
+        x: 'date',
+        y: 'temp_max',
+      },
+      date: {
+        start: new Date(2012,0,1),
+        min: new Date(2012,0,1),
+        max: new Date(2015,11,1)
+      },
+      scale: {
+        type: 'linear',
+        scheme: 'Greens',
+        domain: [0, 40]
+      },
+      domain: { type: 'month' }, 
+      subDomain:{ type: 'day' },
+      itemSelector: '#d3-options' });
+  </script>
+</div>
+
+### year/month layout
+
+<div class="code-example">
+  <div id="d4-options"></div>
+  <script>
+    const cal13 = new CalHeatmap();
+    cal13.paint({ 
+      data: {
+        source: '/fixtures/seattle-weather.csv',
+        type: 'csv',
+        x: 'date',
+        y: 'temp_max',
+        groupY: 'max'
+      },
+      date: {
+        start: new Date(2012,0,1),
+        min: new Date(2012,0,1),
+        max: new Date(2015,11,1)
+      },
+      scale: {
+        type: 'linear',
+        scheme: 'Turbo',
+        domain: [0, 40]
+      },
+      domain: { type: 'year',  label: { textAlign: 'start' } }, 
+      subDomain:{ type: 'month', radius: 15 },
+      itemSelector: '#d4-options' });
+  </script>
+</div>
+
+### year/day layout
+
+<div class="code-example">
+  <div id="d5-options"></div>
+  <script>
+    const cal14 = new CalHeatmap();
+    cal14.paint({ 
+      data: {
+        source: '/fixtures/seattle-weather.csv',
+        type: 'csv',
+        x: 'date',
+        y: 'temp_max',
+        groupY: 'max'
+      },
+      date: {
+        start: new Date(2012,0,1),
+      },
+      range: 1,
+      scale: {
+        type: 'linear',
+        scheme: 'PRGn',
+        domain: [0, 40]
+      },
+      domain: { 
+        type: 'year', 
+        label: { text: null },
+        subLabel: {
+          width: 30,
+          textAlign: 'start',
+          text: (moment) => moment.weekdaysShort(true).map((d, i) => i % 2 == 0 ? '' : d),
+        }
+      }, 
+      subDomain:{ type: 'day', radius: 2 },
+      itemSelector: '#d5-options' });
+  </script>
+</div>
+
+<div class="code-example">
+  <div id="d55-options"></div>
+  <script>
+    const cal24 = new CalHeatmap();
+    cal24.paint({ 
+      data: {
+        source: '/fixtures/seattle-weather.csv',
+        type: 'csv',
+        x: 'date',
+        y: 'temp_max',
+        groupY: 'max'
+      },
+      date: {
+        start: new Date(2012,0,1),
+      },
+      range: 1,
+      scale: {
+        type: 'linear',
+        scheme: 'PRGn',
+        domain: [0, 40]
+      },
+      domain: { 
+        type: 'year', 
+        label: { text: null },
+        subLabel: {
+          width: 30,
+          textAlign: 'start',
+          text: (moment) => moment.weekdaysShort(true).map((d, i) => i % 2 == 0 ? '' : d),
+        }
+      }, 
+      subDomain:{ type: 'day', radius: 0, gutter: 0 },
+      itemSelector: '#d55-options' });
+  </script>
+</div>
+
+<hr/>
+
+### Seattle daily min temperature
+
+<div class="code-example">
+  <style>
+    #d6-options .domain-background {
+      fill: rgb(246, 245, 249);
+    }
+    #d6-options .graph-label { 
+      
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+  <div id="d6-options"></div>
+  <script>
+    const cal15 = new CalHeatmap();
+    cal15.paint({ 
+      data: {
+        source: '/fixtures/seattle-weather.csv',
+        type: 'csv',
+        x: 'date',
+        y: 'temp_min',
+        groupY: 'min'
+      },
+      verticalOrientation: true,
+      range: 5,
+      date: {
+        start: new Date(2012,0,1),
+      },
+      scale: {
+        type: 'diverging',
+        scheme: 'PRGn',
+        domain: [-10, 10]
+      },
+      domain: { type: 'month', padding: [10,10,10,10], label: { position: 'top' } }, 
+      subDomain:{ type: 'x_day', radius: 2, width: 15, height: 15, label: 'D' },
+      itemSelector: '#d6-options' }, [[Tooltip, {
+        text: function (date, value) {
+          return value + '°C on ' + cal1.dateHelper.format(date, 'LL')
+        }
+      }]]);
+  </script>
+</div>
+
+### Seattle daily average precipitation
 
 <div class="code-example">
   <style>
@@ -71,7 +272,7 @@ nav_order: 11
           source: '/fixtures/seattle-weather.csv',
           type: 'csv',
           x: 'date',
-          y: 'temp_max',
+          y: 'precipitation',
         },
         domain: { type: "month", gutter: 5 },
         label: {
@@ -93,13 +294,13 @@ nav_order: 11
         },
         scale: {
           type: 'linear',
-          scheme: 'Greens',
-          domain: [0, 40]
+          scheme: 'Purples',
+          domain: [0, 35]
         },
         itemSelector: '#example-3',
       }, [[Tooltip, {
         text: function (date, value) {
-          return value + '°C on ' + cal1.dateHelper.format(date, 'LL')
+          return value + 'cm on ' + cal1.dateHelper.format(date, 'LL')
         }
       }]]);
 
@@ -110,7 +311,7 @@ nav_order: 11
   </div>
 </div>
 
-### Down Jones Industrial Average
+### Dow Jones Industrial Trading volume
 
 Data from [Yahoo Finance](https://finance.yahoo.com/quote/%5EDJI/history/).
 Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bostok.
@@ -131,7 +332,7 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
       cal2.paint({
         range: 5,
         date: {
-          start: new Date(2010,0,1),
+          start: new Date(2007,0,1),
           min: new Date(2000,5,1),
           max: new Date(2020, 5, 1)
         },
@@ -139,19 +340,19 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
           source: '/fixtures/DJIA.csv',
           type: 'csv',
           x: 'Date',
-          y: (datum, i, data) => {
-            console.log(datum);
-            console.log(i);
-            console.log(data);
+          y: 'Volume',
+          Grouppy: (datum, i, data) => {
             return i > 0 ? (datum.Close - data[i - 1].Close) / data[i - 1].Close : NaN
           }
         },
-        domain: { type: "year" },
-        label: {
-          position: "left",
-          textAlign: "end",
-          width: 50,
-          offset: { x: -10, y: 5 }
+        domain: { 
+          type: "year",
+          label: {
+            position: "left",
+            textAlign: "end",
+            width: 50,
+            offset: { x: -10, y: 5 }
+          },
         },
         legend: {
           show: true,
@@ -167,19 +368,19 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
           type: "day"
         },
         scale: {
-          type: 'diverging',
-          domain: [-0.06, 0.06],
-          scheme: 'PuOr'
+          type: 'linear',
+          domain: [50000000, 500000000],
+          scheme: 'YlOrRd'
         },
         itemSelector: '#example-4',
       }, [[Tooltip, {
         text: function (date, value) {
-          return (value ? d3.format('+.2%')(value) : 'No value') + ' on ' + cal2.dateHelper.format(date, 'LL')
+          return (value ? d3.format(',')(value) : 'No value') + ' on ' + cal2.dateHelper.format(date, 'LL')
         }
       }]]);
 
   </script>
-  <div class="fs-3">
+  <div class="fs-3 mt-3">
     <div class="btn btn-blue" onClick="cal2.previous(); return false">Previous</div>
     <div class="btn btn-blue" onClick="cal2.next(); return false">Next</div>
   </div>

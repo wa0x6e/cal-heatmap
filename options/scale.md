@@ -23,7 +23,11 @@ type scaleOptions = {
 };
 ```
 
+<hr />
+
 ## as
+
+Specify the type of color type
 
 ```js
 as: 'color' | 'opacity',

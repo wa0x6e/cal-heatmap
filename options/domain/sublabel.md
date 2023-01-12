@@ -14,7 +14,7 @@ grand_parent: Options
 
 # subLabel
 
-Defines all options related to the domain's subLabel
+Specify all options related to the domain's subLabel configuration
 {: .fs-6 }
 
 ```js
@@ -34,18 +34,21 @@ It its current form, this option is only used to show weekdays label
 when the subDomain is set to `day`.
 Future updates will allow more customization, and broaden the scope of application.
 
+<hr/>
+{: .mt-8}
+
 ## text
 
-A function that should return an array of string labels.
-
-A `moment` object is provided as the function first argument, and can be used
-to extract locale aware data.
+A function which return an array of labels.
 
 ```js
 text: (moment: Moment) => string[],
 ```
 
-The number of returned result is up to the developer, and generally
+A `moment` object is provided as the function first argument, and can be used
+to extract locale aware data.
+
+The number of returned result is up to you, and generally
 depends on the subDomain's type.
 
 #### Example
@@ -84,6 +87,8 @@ cal.paint({
   subDomain: { type: 'day' },
 })
 ````
+
+{: .mt-6}
 
 #### Example
 
@@ -127,7 +132,11 @@ cal.paint({
 })
 ````
 
+{: .mt-8}
+
 ## radius
+
+Border radius of the subLabel's background, in pixel
 
 ```js
 radius?: number,
@@ -135,7 +144,7 @@ radius?: number,
 
 Default: `0`
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -148,7 +157,7 @@ Default: `0`
   </style>
   <div id="radius-example-2" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Radius:
     <input type="range" min="0" max="15" value="0" class="slider" id="radius-slider" >
@@ -167,8 +176,11 @@ Default: `0`
 
 {: .note}
 By default, the background is transparent. Use the CSS class `.sublabel-rect` to style it.
+{: .mt-8}
 
 ## width
+
+Width of the subLabel, in pixel
 
 ```js
 width?: number,
@@ -176,7 +188,7 @@ width?: number,
 
 Default: [subDomain's width](/options/subDomain.html#width)
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -186,7 +198,7 @@ Default: [subDomain's width](/options/subDomain.html#width)
   </style>
   <div id="width-example-2" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Width:
     <input type="range" min="1" max="50" value="10" class="slider" id="width-slider" >
@@ -203,7 +215,11 @@ Default: [subDomain's width](/options/subDomain.html#width)
   </script>
 </div>
 
+{: .mt-8}
+
 ## height
+
+Height of the subLabel, in pixel
 
 ```js
 height?: number,
@@ -211,7 +227,7 @@ height?: number,
 
 Default: [subDomains' height](/options/subDomain.html#height)
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -221,7 +237,7 @@ Default: [subDomains' height](/options/subDomain.html#height)
   </style>
   <div id="height-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Height:
     <input type="range" min="1" max="50" value="10" class="slider" id="height-slider" >
@@ -241,7 +257,11 @@ Default: [subDomains' height](/options/subDomain.html#height)
 {: .warning}
 Total height can no be greater that the domain height
 
+{: .mt-8}
+
 ## gutter
+
+Space between each subLabel, on pixel
 
 ```js
 gutter?: number,
@@ -249,7 +269,7 @@ gutter?: number,
 
 Default: [subDomains' gutter](/options/subDomain.html#gutter)
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -259,7 +279,7 @@ Default: [subDomains' gutter](/options/subDomain.html#gutter)
   </style>
   <div id="gutter-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Gutter:
     <input type="range" min="0" max="10" value="2" class="slider" id="gutter-slider" >
@@ -276,7 +296,11 @@ Default: [subDomains' gutter](/options/subDomain.html#gutter)
   </script>
 </div>
 
+{: .mt-8}
+
 ## textAlign
+
+Horizontal alignment of the subLabel
 
 ```js
 textAlign?: 'start' | 'middle' | 'end',
@@ -284,7 +308,7 @@ textAlign?: 'start' | 'middle' | 'end',
 
 Default: `middle`
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -303,10 +327,10 @@ Default: `middle`
       });
   </script>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <div class="fs-3">
-    <div class="btn" onClick="cal8.paint({ domain: { subLabel: { textAlign: 'start'} }  }); return false;">Left</div>
-    <div class="btn" onClick="cal8.paint({ domain: { subLabel: { textAlign: 'middle'} }  }); return false;">Middle</div>
-    <div class="btn" onClick="cal8.paint({ domain: { subLabel: { textAlign: 'end'} }  }); return false;">Right</div>
+    <div class="btn btn-blue" onClick="cal8.paint({ domain: { subLabel: { textAlign: 'start'} }  }); return false;">Left</div>
+    <div class="btn btn-blue" onClick="cal8.paint({ domain: { subLabel: { textAlign: 'middle'} }  }); return false;">Middle</div>
+    <div class="btn btn-blue" onClick="cal8.paint({ domain: { subLabel: { textAlign: 'end'} }  }); return false;">Right</div>
   </div>
 </div>

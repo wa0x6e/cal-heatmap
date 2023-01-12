@@ -7,19 +7,30 @@ parent: Options
 
 # range
 
-Defines the number of shown domains
+Specify the number of domains
 {: .fs-6 }
 
 ```js
 range: number; // must be >= 1
 ```
 
-#### Example
+Default: `12`
+
+<hr />
+
+## Usage
+
+```js
+const cal = new CalHeatmap();
+cal.paint({ range: 8 });
+```
+
+#### Playground
 
 <div class="code-example">
   <div id="range-example-1"></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Range:
     <input type="range" min="1" max="10" value="3" class="slider" id="range-slider" >

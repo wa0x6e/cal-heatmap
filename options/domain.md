@@ -8,7 +8,7 @@ has_children: true
 
 # domain
 
-Defines all options related to the domain
+Specify all options related to the domain configuration
 {: .fs-6}
 
 ```js
@@ -23,15 +23,17 @@ type DomainOptions: {
 }
 ```
 
+<hr />
+
 ## type
 
-Defines the domain's type interval
+Domain's type, representing a time unit
 
 ```js
 type: string;
 ```
 
-A domain type represents a time interval.
+Default: `hour`
 
 ### Available default domains type
 
@@ -40,6 +42,8 @@ A domain type represents a time interval.
 - `week`
 - `day`
 - `hour`
+
+{: .mt-8}
 
 ## gutter
 
@@ -51,20 +55,19 @@ gutter: number;
 
 Default: `4`
 
-#### Interactive Example
+#### Playground
 
 <div class="code-example" >
   <style>
-    #domainGutter-example-1 {
-      background: greenyellow;
-    }
     #domainGutter-example-1 .domain-background {
-      fill: white;
+      stroke: gray;
+      stroke-width:1px;
+      stroke-dasharray: 2 2;
     }
   </style>
   <div id="domainGutter-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Gutter:
     <input type="range" min="0" max="100" value="4" class="slider" id="gutter-slider" >
@@ -80,6 +83,8 @@ Default: `4`
   </script>
 </div>
 
+{: .mt-8}
+
 ## padding
 
 Padding inside each domain, in pixel
@@ -92,7 +97,7 @@ Expect an array of 4 numbers, in the same order as CSS padding property (top, ri
 
 Default: `[0, 0, 0, 0]`
 
-#### Interactive Example
+#### Playground
 
 <div class="code-example" >
   <style>
@@ -104,7 +109,7 @@ Default: `[0, 0, 0, 0]`
   </style>
   <div id="padding-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Padding top:
     <input type="range" min="0" max="20" value="0" class="slider" id="padding-top" >
@@ -156,6 +161,8 @@ Default: `[0, 0, 0, 0]`
   </script>
 </div>
 
+{: .mt-8}
+
 ## dynamicDimension
 
 Whether the domain's should be resized to fit its content.
@@ -164,10 +171,10 @@ Whether the domain's should be resized to fit its content.
 dynamicDimension: boolean;
 ```
 
-The domain dimension depends on the chosen subDomain, more precisely on the
-number of columns and rows of the subDomains.
+The domain dimension depends on the chosen subDomain type,
+which each have a different number of columns and rows count.
 
-Some of the subDomains such as `day` do not have a fixed number of items,
+Some of the subDomain type, such as `day`, do not have a fixed number of items,
 as there can be 28, 29, 30 or 31 days in a `month`.
 
 This leads to different domains having different sizes, and
@@ -175,13 +182,13 @@ may cause the calendar total dimension to change on navigation.
 
 When disabled, the domains will all take the same maximum size
 as defined by the subDomain template,
-and some blank space may appear between domain.
+and some blank space may appear between domains.
 
 Usually, only either the width or the height will by dynamic.
 
 Default: `true`
 
-#### Interactive Example
+#### Playground
 
 <div class="code-example" >
   <div id="domainDynamicDimension-example-1" style="display: inline-block; outline: 1px dotted gray;margin-bottom: 10px;"></div>
@@ -192,8 +199,10 @@ Default: `true`
 
   </script>
   <br>
-  <a href="#" class="btn btn-blue" onClick="cal3.previous(); return false;">Previous</a>
-  <a href="#" class="btn btn-blue" onClick="cal3.next(); return false;">Next</a>
+  <div class="fs-3">
+    <a href="#" class="btn btn-blue" onClick="cal3.previous(); return false;">Previous</a>
+    <a href="#" class="btn btn-blue" onClick="cal3.next(); return false;">Next</a>
+  </div>
 
 </div>
 ```markdown
@@ -209,23 +218,29 @@ When set to true, notice how the calendar may resize on navigation
 
   </script>
   <br>
-  <a href="#" class="btn btn-blue" onClick="cal2.previous(); return false;">Previous</a>
+  <div class="fs-3">
+    <a href="#" class="btn btn-blue" onClick="cal2.previous(); return false;">Previous</a>
     <a href="#" class="btn btn-blue" onClick="cal2.next(); return false;">Next</a>
-
+  </div>
 </div>
 ```markdown
-When set to false, notice how the calendar never resize on navigation, but some white space may appear between domains
+When set to false, notice how the calendar never resize on navigation, 
+but some white space may appear between the domains
 ```
+
+{: .mt-8}
 
 ## label
 
-Defines all options related to the domain’s label
+Specify all options related to the domain’s label
 
 ```js
 label: LabelOptions;
 ```
 
 See the [Domain Label section](/options/domain/label.html)
+
+{: .mt-8}
 
 ## sort
 
@@ -238,18 +253,20 @@ sort: 'asc' | 'desc';
 Default: `asc`
 
 {: .note }
-This only affect the domain order, not the subDomain.
+This only affect the domain's order, not the subDomain.
 
-#### Example
+#### Playground
 
 <div class="code-example">
   <div id="reversedDirection-example-1"></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <script>
       let sortOrder = 'asc';
       const cal5 = new CalHeatmap();
       cal5.paint({ domain: { type: 'month', sort: sortOrder }, subDomain: { type: 'day' }, range: 7, itemSelector: '#reversedDirection-example-1'});
   </script>
-  <div class="btn btn-blue" onClick="sortOrder = (sortOrder === 'asc' ? 'desc' : 'asc'); cal5.paint({ domain: { sort: sortOrder } }); return false">Toggle sort order</div>
+  <div class="fs-3">
+    <div class="btn btn-blue" onClick="sortOrder = (sortOrder === 'asc' ? 'desc' : 'asc'); cal5.paint({ domain: { sort: sortOrder } }); return false">Toggle sort order</div>
+  </div>
 </div>

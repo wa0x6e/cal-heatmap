@@ -46,3 +46,6 @@ cal.paint({
 
 You can customize the calendar by passing an [`Options`](/options/) object and/or
 a [Plugins list](/plugins/) to [`paint()`](/methods/paint.html).
+
+{: .note}
+See the [Examples](/examples) section for more examples.

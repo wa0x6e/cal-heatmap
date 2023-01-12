@@ -12,7 +12,7 @@ Paint the calendar using the given Options and Plugins.
 
 ```js
 const cal = new CalHeatmap();
-cal.paint(options: Options, plugins? any);
+cal.paint(options: Options, plugins? PluginDefinition[] | PluginDefinition);
 ```
 
 This is the core method, used to setup and paint the calendar.
@@ -20,7 +20,7 @@ This is the core method, used to setup and paint the calendar.
 ### Arguments:
 
 - `options`: An [`Options`](/options) object.
-- `plugins`: An array of [plugins](/plugins/) definition.
+- `plugins`: An array of [Plugin Definition](/plugins/) definition.
 
 ### Return
 
@@ -28,3 +28,24 @@ This is the core method, used to setup and paint the calendar.
 
 {: .note}
 The calendar can be updated dynamically by calling this method with new `Options`.
+
+<hr/>
+
+## Usage
+
+#### Example with random options
+
+```js
+const cal = new CalHeatmap();
+cal.paint({
+  range: 1,
+  date: { start: new Date(2020, 0, 1) },
+});
+```
+
+#### Example with no options, and random plugins
+
+```js
+const cal = new CalHeatmap();
+cal.paint({}, [[Timezone, { timezone: 'Europe/Paris' }]]);
+```

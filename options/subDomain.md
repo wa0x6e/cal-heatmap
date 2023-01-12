@@ -7,6 +7,8 @@ parent: Options
 
 # subDomain
 
+Specify all options related to the subDomain configuration
+
 ```js
 type subDomain: {
   type: string,
@@ -24,9 +26,11 @@ type subDomain: {
 }
 ```
 
+<hr/>
+
 ## type
 
-Defines the subDomain's type interval
+SubDomain's type, representing a time unit
 
 ```js
 type: string,
@@ -44,11 +48,13 @@ The `subDomain` should always be smaller than the `domain` type.
 - `minute`
 
 {: .note}
-You can add your own custom subDomain, see the [`Templates section`](/templates)
+You can create and add your own custom subDomain, see the [`Templates`](/templates) section.
+
+{: .mt-8}
 
 ## gutter
 
-Space between each subdomain, in pixel
+Space between each subDomain, in pixel
 
 ```js
 gutter: number,
@@ -56,12 +62,12 @@ gutter: number,
 
 Default: `2`
 
-#### Example
+#### Playground
 
 <div class="code-example" >
   <div id="subdomainGutter-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Gutter:
     <input type="range" min="0" max="100" value="4" class="slider" id="gutter-slider" >
@@ -77,6 +83,8 @@ Default: `2`
   </script>
 </div>
 
+{: .mt-8}
+
 ## width
 
 Width of each subDomain cell, in pixel
@@ -87,10 +95,12 @@ width: number,
 
 Default: `10`
 
+#### Playground
+
 <div class="code-example" >
   <div id="width-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Width:
     <input type="range" min="2" max="50" value="10" class="slider" id="width-slider" >
@@ -106,6 +116,8 @@ Default: `10`
   </script>
 </div>
 
+{: .mt-8}
+
 ## height
 
 Height of each subDomain cell, in pixel
@@ -116,10 +128,12 @@ height: number,
 
 Default: `10`
 
+#### Playground
+
 <div class="code-example" >
   <div id="height-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Height:
     <input type="range" min="2" max="50" value="10" class="slider" id="height-slider" >
@@ -135,9 +149,11 @@ Default: `10`
   </script>
 </div>
 
+{: .mt-8}
+
 ## radius
 
-Radius of each subDomain cell, in pixel
+Border radius of each subDomain cell, in pixel
 
 ```js
 radius: number,
@@ -148,7 +164,7 @@ Default: `0`
 <div class="code-example" >
   <div id="radius-example-1" style="display: inline-block; "></div>
 </div>
-<div class="highlighter-rouge">
+<div class="highlighter-rouge p-3">
   <label>
     Radius:
     <input type="range" min="0" max="10" value="0" class="slider" id="radius-slider" >
@@ -164,9 +180,11 @@ Default: `0`
   </script>
 </div>
 
+{: .mt-8}
+
 ## label
 
-Format the subDomain's label
+Label of the subDomain
 
 ```js
 label:
@@ -177,14 +195,16 @@ label:
 
 Default: `null`
 
-| Value      | Description                                                                                                                           | Example Value                                                                                     | Example output                         |
+This option accepts different value's type, see table below for usage.
+
+| Value Type | Description                                                                                                                           | Example Value                                                                                     | Example output                         |
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | -------------------------------------- |
 | `string`   | Pass the string to [momentJS `format()`](https://momentjs.com/docs/#/displaying/format/), and display its result. _(not value aware)_ | `MMMM`                                                                                            | `March`                                |
 | `null`     | Do not show any label                                                                                                                 | `null`                                                                                            |                                        |
-| `function` | Display the function's return value. The function receives the subDomain's timestamp, value and the label's SVG Element as argument   | `` function (timestamp, value) { return `${value} items on ${new Date(date).toISOString()}`; } `` | `50 items on 2022-12-06T20:01:51.290Z` |
+| `function` | Display the function's return value. The function takes the subDomain's timestamp, value and the label's SVG Element as argument      | `` function (timestamp, value) { return `${value} items on ${new Date(date).toISOString()}`; } `` | `50 items on 2022-12-06T20:01:51.290Z` |
 
 {: .note}
-momentJS `format()` is [`locale`](/options/date.html#locale) and [`timezone`](/options/date.html#timezone) aware.
+momentJS `format()` is [`locale`](/options/date.html#locale) aware.
 
 {: .note }
 Depending on your chosen cell size, subDomain label may overflow
@@ -192,21 +212,25 @@ Depending on your chosen cell size, subDomain label may overflow
 You can customize the style of the subDomain label text via css, or by
 manipulating the `SVGElement` given as argument when using a `function`.
 
+#### Example
+
 <div class="code-example" >
   <div id="subdomainlabel-example-1" style="display: inline-block; "></div>
   <script>
       const cal5 = new CalHeatmap();
-      cal5.paint({ domain: { type: 'month' }, subDomain: { type: 'day', label: 'D' , width: 20, height: 20}, range: 3, itemSelector: '#subdomainlabel-example-1'});
+      cal5.paint({ domain: { type: 'month' }, subDomain: { type: 'day', label: 'D' , width: 20, height: 20, color: '#000'}, range: 3, itemSelector: '#subdomainlabel-example-1'});
   </script>
 </div>
 ```js
 const cal = new CalHeatmap();
 cal.paint({
   domain: { type: 'month' },
-  subDomain: { type: 'day', label: 'D', width: 20, height: 20 },
+  subDomain: { type: 'day', label: 'D', width: 20, height: 20, color: '#000' },
   range: 3
 });
 ```
+
+{: .mt-8}
 
 ## color
 
@@ -224,17 +248,19 @@ Default:
 d3.hcl(backgroundColor).l > 60 ? 'black' : 'white';
 ```
 
-| Value      | Description                                                                                                                                      | Example Value                                                                                                  | Example Output |
-| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------- |
-| `string`   | A hexadecimal color code                                                                                                                         | `#000`                                                                                                         | `#000`         |
-| `function` | Use the hexadecimal color code returned by the function. The function receives the subDomain's timestamp, value and background color as argument | `function (timestamp, value, backgroundColor) { return d3.hcl(backgroundColor).l > 60 ? 'black' : 'white' ; }` | `#000`         |
+This option accepts different value's type, see table below for usage.
+
+| Value Type | Description                                                                                                                                   | Example Value                                                                                                  | Example Output |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------- |
+| `string`   | A hexadecimal color code                                                                                                                      | `#000`                                                                                                         | `#000`         |
+| `function` | Use the hexadecimal color code returned by the function. The function takes the subDomain's timestamp, value and background color as argument | `function (timestamp, value, backgroundColor) { return d3.hcl(backgroundColor).l > 60 ? 'black' : 'white' ; }` | `#000`         |
 
 Using the `string` value, the same color will be applied to the whole calendar,
 regardless of the subDomain's background color. Depending on your color scale,
-the label color may not be visible.
+the label color may not be readable.
 
-The `function` will allow more fine-tuning of the label color, by using:
+Using a `function` will allow more fine-tuning of the label color, as you can use:
 
 - a [d3-color scale](https://github.com/d3/d3-scale-chromatic)
 - a range of static colors (i.e `['#fff', '#eee', '#000']`, matching the [`scale's range`](/options/scale.html))
-- a custom function returning a color, depending on the background color (like the default value)
+- a custom function returning a color, computed from the background color (like the default value)

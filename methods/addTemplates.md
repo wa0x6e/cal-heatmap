@@ -2,7 +2,7 @@
 layout: default
 title: addTemplates()
 parent: Methods
-nav_order: 4
+nav_order: 6
 ---
 
 # addTemplates()
@@ -10,17 +10,18 @@ nav_order: 4
 Add a new subDomain template
 {: .fs-6}
 
-{: .warning}
-Documention for this option is still work in progress, and is incomplete
-
 ```js
 addTemplates(Template[] | Template): void;
 ```
 
 {: .warning}
-This function have to be called before you call `init()`.
+This method have to be called before you call `paint()`.
 
-See [SubDomain Templates section](/templates) for more details about the `Template` type.
+See the [SubDomain Templates](/templates) for more informations about the `Template`.
+
+<hr/>
+
+## Usage
 
 #### Example
 
@@ -29,7 +30,7 @@ Injecting a custom quarter subDomain template.
 <div class="code-example">
   <div id="template-example-2"></div>
   <script>
-    const quarterTemplate = function (helpers) {
+    const quarterTemplate = function (dateHelper) {
       return {
         name: 'quarter',
         level: 50,
@@ -39,24 +40,24 @@ Injecting a custom quarter subDomain template.
         columnsCount() {
           return 4;
         },
-        mapping: (startDate, endDate, defaultValues) =>
-          helpers.DateHelper.intervals(
+        mapping: function (startDate, endDate, defaultValues) {
+          return dateHelper.intervals(
             'quarter',
             startDate,
-            helpers.DateHelper.date(endDate)
+            dateHelper.date(endDate)
           ).map((d, index) => ({
             t: d,
             x: index,
             y: 0,
             ...defaultValues,
-          })),
-
+          }));
+        },
         format: {
           date: 'Q',
           legend: 'Q',
         },
         extractUnit(d) {
-          return helpers.DateHelper.date(d).startOf('quarter').valueOf();
+          return dateHelper.date(d).startOf('quarter').valueOf();
         }
       }
     };
@@ -65,56 +66,32 @@ Injecting a custom quarter subDomain template.
     cal.addTemplates(quarterTemplate);
     cal.paint({
       range: 2,
-      domain: { type: 'year', gutter: 10 },
-      label: { textAlign: 'start' },
-      subDomain: { type: 'quarter', width: 60, height: 15 },
-      formatter: { subDomainLabel: '[Quarter] Q' }
+      itemSelector: '#template-example-2',
+      domain: { type: 'year', gutter: 10, label: { textAlign: 'start' } },
+      subDomain: { type: 'quarter', width: 60, height: 15, label: '[Quarter] Q', radius: 3 },
     });
 
   </script>
 </div>
+
 ```js
-const quarterTemplate = (helpers) => ({
-  name: 'quarter',
-  level: 50,
-  rowsCount() {
-    return 1;
-  },
-  columnsCount() {
-    return 4;
-  },
-  mapping: (startDate, endDate, defaultValues) =>  {
-     return helpers.DateHelper.intervals(
-      'quarter',
-      startDate,
-      helpers.DateHelper.date(endDate)
-    ).map((d, index) => ({
-      t: d,
-      x: index,
-      y: 0,
-      ...defaultValues,
-    }));
-  },
-  format: {
-    date: 'Q',
-    legend: 'Q',
-  },
-  extractUnit(d) {
-    return helpers.DateHelper.date(d).startOf('quarter').valueOf();
-  }
-});
+// Create a quarter Template
+// Content skipped here, see the Templates section for full template example
+const quarterTemplate = () => {};
 
 const cal = new CalHeatmap();
+// Add the template
 cal.addTemplates(quarterTemplate);
+
 cal.paint({
-range: 2,
-domain: { type: 'year', gutter: 10 },
-label: { textAlign: 'start' },
-subDomain: { type: 'quarter', width: 60, height: 15 },
-formatter: { subDomainLabel: '[Quarter] Q' },
-itemSelector: '#template-example-2'
+  range: 2,
+  domain: { type: 'year', gutter: 10, label: { textAlign: 'start' } },
+  subDomain: {
+    type: 'quarter',
+    width: 60,
+    height: 15,
+    label: '[Quarter] Q',
+    radius: 3,
+  },
 });
-
-```
-
 ```

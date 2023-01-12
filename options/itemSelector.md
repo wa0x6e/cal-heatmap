@@ -7,7 +7,7 @@ parent: Options
 
 # itemSelector
 
-Defines where the calendar should be rendered
+Specify where the calendar should be rendered
 {: .fs-6 }
 
 ```js
@@ -18,7 +18,31 @@ Accepts either an [Element](https://developer.mozilla.org/en-US/docs/Web/API/Ele
 
 Default: `#cal-heatmap`
 
-#### Example
+<hr />
+
+## Usage
+
+#### Example with the _default_ itemselector
+
+```html
+// Insert the following element somewhere in your page at the place you want to
+// insert the calendar
+<div id="cal-heatmap"></div>
+```
+
+```js
+const cal = new CalHeatmap();
+cal.paint(); // itemSelector can be omitted when using the default selector
+```
+
+{: .mt-8}
+
+#### Example with a _custom_ itemselector
+
+```html
+// Assuming you have the following element somewhere in your page
+<div id="my-node"></div>
+```
 
 ```js
 const cal = new CalHeatmap();
@@ -27,5 +51,5 @@ cal.paint({ itemSelector: '#my-node' });
 cal.paint({ itemSelector: document.getElementById('my-node') });
 ```
 
-{: .note}
-If the chosen DOM node is not empty, the calendar will be inserted after the existing children.
+{: .note .mt-8}
+If the DOM node is not empty, the calendar will be inserted after the existing children.
