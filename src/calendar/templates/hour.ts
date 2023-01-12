@@ -49,14 +49,14 @@ const hourTemplate: Template = (
         const date = DateHelper.date(ts);
         const hour = date.hour();
         const monthDate = date.date();
-        const baseX = Math.floor(hour / ROWS_COUNT);
+        let baseX = Math.floor(hour / ROWS_COUNT);
         const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
         if (domainType === 'month') {
-          return baseX + (monthDate - 1) * columnOffset;
+          baseX += (monthDate - 1) * columnOffset;
         }
         if (domainType === 'week') {
-          return baseX + (date.isoWeekday() - 1) * columnOffset;
+          baseX += (date.isoWeekday() - 1) * columnOffset;
         }
 
         return {
