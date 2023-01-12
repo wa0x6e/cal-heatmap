@@ -7,9 +7,9 @@ export type Template = {
 
 export type SubDomain = {
   t: number;
+  x: number;
+  y: number;
   v?: number | null;
-  x?: number;
-  y?: number;
 };
 
 export type Dimensions = {

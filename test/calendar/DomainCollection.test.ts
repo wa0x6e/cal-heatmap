@@ -149,11 +149,31 @@ describe('DomainCollection', () => {
         [
           1,
           [
-            { t: 1, v: 100 },
-            { t: 3, v: 100 },
+            {
+              t: 1,
+              x: 0,
+              y: 0,
+              v: 100,
+            },
+            {
+              t: 3,
+              x: 0,
+              y: 0,
+              v: 100,
+            },
           ],
         ],
-        [2, [{ t: 4, v: 100 }]],
+        [
+          2,
+          [
+            {
+              t: 4,
+              x: 0,
+              y: 0,
+              v: 100,
+            },
+          ],
+        ],
       ]);
       filledDomainCollection.keys = [1, 2];
 
@@ -172,10 +192,21 @@ describe('DomainCollection', () => {
 
     it('resets all values to null', () => {
       expect(filledDomainCollection.get(1)).toEqual([
-        { t: 1, v: null },
-        { t: 3, v: null },
+        {
+          t: 1, x: 0, y: 0, v: null,
+        },
+        {
+          t: 3, x: 0, y: 0, v: null,
+        },
       ]);
-      expect(filledDomainCollection.get(2)).toEqual([{ t: 4, v: null }]);
+      expect(filledDomainCollection.get(2)).toEqual([
+        {
+          t: 4,
+          x: 0,
+          y: 0,
+          v: null,
+        },
+      ]);
     });
 
     it.todo('parse a date field as timestamp');
