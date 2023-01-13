@@ -1,4 +1,5 @@
 import { Position } from '../constant';
+import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 
 import type CalHeatmap from '../CalHeatmap';
 
@@ -20,7 +21,7 @@ export default class DomainLabelPainter {
     }
 
     if (typeof format === 'undefined') {
-      format = this.calendar.templateCollection.get(type)!.format.domainLabel;
+      format = DOMAIN_FORMAT[type];
     }
 
     root

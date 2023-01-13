@@ -56,10 +56,6 @@ const hourTemplate: Template = (
           y: Math.floor(hour % ROWS_COUNT),
         };
       }),
-
-    format: {
-      domainLabel: 'HH:00',
-    },
     extractUnit(ts: number) {
       return DateHelper.date(ts).startOf('hour').valueOf();
     },

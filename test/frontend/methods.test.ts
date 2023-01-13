@@ -26,6 +26,7 @@ describe('Methods', () => {
     });
 
     it('returns a rejected Promise on options critical error', async () => {
+      // @ts-ignore
       await expect(cal.paint({ domain: { type: 'hello' } })).rejects.toThrow();
     });
 

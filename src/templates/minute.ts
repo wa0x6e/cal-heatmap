@@ -28,9 +28,6 @@ const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
           y: minute % COLUMNS_COUNT,
         };
       }),
-    format: {
-      domainLabel: '',
-    },
     extractUnit(ts: number) {
       return DateHelper.date(ts).startOf('minute').valueOf();
     },

@@ -20,10 +20,6 @@ const yearTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
       x: index,
       y: 0,
     })),
-
-  format: {
-    domainLabel: 'Y',
-  },
   extractUnit(ts: number) {
     return DateHelper.date(ts).startOf('year').valueOf();
   },

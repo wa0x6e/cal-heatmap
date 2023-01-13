@@ -38,9 +38,6 @@ const weekTemplate: Template = (
         x: i,
         y: 0,
       })),
-    format: {
-      domainLabel: 'wo [week] Y',
-    },
     extractUnit(ts: number) {
       return DateHelper.date(ts).startOf('week').valueOf();
     },

@@ -4,11 +4,12 @@ import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import type { Moment } from 'moment';
+import type { DomainType } from '../index';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
 export type DomainOptions = {
-  type: string;
+  type: DomainType;
   gutter: number;
   padding: [number, number, number, number];
   dynamicDimension: boolean;

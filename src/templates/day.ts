@@ -77,9 +77,6 @@ const dayTemplate: Template = (
         };
       });
     },
-    format: {
-      domainLabel: 'Do MMM',
-    },
     extractUnit(ts: number) {
       return DateHelper.date(ts).startOf('day').valueOf();
     },

@@ -1,6 +1,8 @@
 import type { OptionsType } from './options/Options';
 import type DateHelper from './helpers/DateHelper';
 
+export type DomainType = 'year' | 'month' | 'week' | 'x_day' | 'day' | 'hour';
+
 export type Template = {
   (dateHelper: DateHelper, options: OptionsType): TemplateResult;
 };
@@ -22,9 +24,6 @@ export type TemplateResult = {
   rowsCount: (ts: number) => number;
   columnsCount: (ts: number) => number;
   mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[];
-  format: {
-    domainLabel: string;
-  };
   extractUnit: (ts: number) => number;
 };
 

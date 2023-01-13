@@ -10,6 +10,16 @@ import type {
   DataGroupType,
   DataRecord,
 } from '../options/Options';
+import { DomainType } from '../index';
+
+export const DOMAIN_FORMAT: Record<DomainType, string> = {
+  year: 'Y',
+  month: 'MMMM',
+  week: 'wo [week] Y',
+  x_day: 'Do MMM',
+  day: 'Do MMM',
+  hour: 'HH:00',
+};
 
 export default class DomainCollection {
   collection: Map<number, SubDomain[]>;

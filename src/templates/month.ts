@@ -20,10 +20,6 @@ const monthTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
       x: DateHelper.date(ts).month(),
       y: 0,
     })),
-
-  format: {
-    domainLabel: 'MMMM',
-  },
   extractUnit(ts: number) {
     return DateHelper.date(ts).startOf('month').valueOf();
   },

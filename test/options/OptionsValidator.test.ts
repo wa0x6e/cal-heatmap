@@ -31,6 +31,7 @@ describe('OptionsValidator', () => {
   it('throws when domain type does not exists', () => {
     expect(() => {
       validate(validSubDomainTemplate, {
+        // @ts-ignore
         domain: { type: 'test' },
         subDomain: { type: 'month' },
         data: { type: 'json' },

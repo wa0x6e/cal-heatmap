@@ -79,9 +79,6 @@ const dayTemplate: Template = (
           x: domainType === 'week' ? 0 : date.weekday(),
         };
       }),
-    format: {
-      domainLabel: 'Do MMM',
-    },
     extractUnit(ts: number) {
       return DateHelper.date(ts).startOf('day').valueOf();
     },

@@ -6,6 +6,7 @@ import merge from 'lodash-es/merge';
  */
 
 import CalHeatmap from '../../src/CalHeatmap';
+import type { OptionsType } from '../../src/options/Options';
 
 describe('DomainLabelPainter', () => {
   const defaultOptions = {
@@ -29,7 +30,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'top', textAlign: 'start' } },
-        }),
+        }) as OptionsType,
       );
 
       expect(select('.graph-label').attr('x')).toBe('0');
@@ -40,7 +41,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'top', textAlign: 'middle' } },
-        }),
+        }) as OptionsType,
       );
       const width: number = +select('.graph-domain').attr('width');
 
@@ -52,7 +53,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'top', textAlign: 'end' } },
-        }),
+        }) as OptionsType,
       );
       const width: number = +select('.graph-domain').attr('width');
 
@@ -67,7 +68,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'bottom', textAlign: 'start' } },
-        }),
+        }) as OptionsType,
       );
 
       expect(select('.graph-label').attr('x')).toBe('0');
@@ -79,7 +80,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'bottom', textAlign: 'middle' } },
-        }),
+        }) as OptionsType,
       );
       const width = select('.graph-domain').attr('width');
 
@@ -91,7 +92,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'bottom', textAlign: 'end' } },
-        }),
+        }) as OptionsType,
       );
       const width = select('.graph-domain').attr('width');
 
@@ -108,7 +109,7 @@ describe('DomainLabelPainter', () => {
           domain: {
             label: { position: 'left', textAlign: 'start', width: 50 },
           },
-        }),
+        }) as OptionsType,
       );
 
       expect(select('.graph-label').attr('x')).toBe('0');
@@ -124,7 +125,7 @@ describe('DomainLabelPainter', () => {
           domain: {
             label: { position: 'left', textAlign: 'middle', width: 50 },
           },
-        }),
+        }) as OptionsType,
       );
 
       expect(select('.graph-label').attr('x')).toBe('25');
@@ -137,7 +138,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'left', textAlign: 'end', width: 50 } },
-        }),
+        }) as OptionsType,
       );
 
       expect(select('.graph-label').attr('x')).toBe('50');
@@ -157,7 +158,7 @@ describe('DomainLabelPainter', () => {
           domain: {
             label: { position: 'right', textAlign: 'start', width: 50 },
           },
-        }),
+        }) as OptionsType,
       );
 
       const width: number = +select('.graph-domain').attr('width');
@@ -173,7 +174,7 @@ describe('DomainLabelPainter', () => {
           domain: {
             label: { position: 'right', textAlign: 'middle', width: 50 },
           },
-        }),
+        }) as OptionsType,
       );
 
       const width: number = +select('.graph-domain').attr('width');
@@ -187,7 +188,7 @@ describe('DomainLabelPainter', () => {
       cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'right', textAlign: 'end', width: 50 } },
-        }),
+        }) as OptionsType,
       );
 
       const width: number = +select('.graph-domain').attr('width');
