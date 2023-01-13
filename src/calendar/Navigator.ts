@@ -18,7 +18,7 @@ export default class Navigator {
 
   loadNewDomains(
     newDomainCollection: DomainCollection,
-    direction: ScrollDirection = ScrollDirection.SCROLL_FORWARD,
+    direction: ScrollDirection = ScrollDirection.SCROLL_NONE,
   ): ScrollDirection {
     const { options } = this.calendar.options;
     const templatesClt = this.calendar.templateCollection;
@@ -41,9 +41,11 @@ export default class Navigator {
       return ScrollDirection.SCROLL_NONE;
     }
 
-    newDomainCollection
-      .clamp(minDate, maxDate)
-      .slice(options.range, direction === ScrollDirection.SCROLL_FORWARD);
+    if (direction !== ScrollDirection.SCROLL_NONE) {
+      newDomainCollection
+        .clamp(minDate, maxDate)
+        .slice(options.range, direction === ScrollDirection.SCROLL_FORWARD);
+    }
 
     domainCollection.merge(
       newDomainCollection,
