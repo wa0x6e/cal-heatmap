@@ -269,5 +269,6 @@ cal.paint({
 });
 ```
 
-{: .important}
-These example make full use of the provided DateHelper class, which uses momentjs for date computation
+### Days subDomain, showinng only the weekdays
+
+See [Example](examples.html#dow-jones-industrial-trading-volume)

@@ -328,7 +328,38 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
   <div id="example-4"></div>
   <div id="example-legend-4"></div>
   <script>
+      const weekDaysTemplate = (DateHelper, options) => ({
+        name: 'weekday',
+        parent: 'day',
+        rowsCount: () => 5,
+        columnsCount: () => 54,
+        mapping: (startTimestamp, endTimestamp) => {
+          let weekNumber = 0;
+          let x = -1;
+          const domainType = options.domain.type;
+
+          return DateHelper.intervals(
+            'day',
+            startTimestamp,
+            DateHelper.date(endTimestamp),
+          ).map((ts) => {
+            const date = DateHelper.date(ts);
+
+            if (weekNumber !== date.week()) {
+                weekNumber = date.week();
+                x += 1;
+              }
+
+            return {
+              t: ts,
+              x,
+              y: (date.isoWeekday() == 6 || date.isoWeekday() === 7) ? -1 : date.isoWeekday() - 1,
+            };
+          }).filter(n => n.y >= 0);
+        },
+      });
       const cal2 = new CalHeatmap();
+      cal2.addTemplates(weekDaysTemplate);
       cal2.paint({
         range: 5,
         date: {
@@ -345,7 +376,7 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
             return i > 0 ? (datum.Close - data[i - 1].Close) / data[i - 1].Close : NaN
           }
         },
-        domain: { 
+        domain: {
           type: "year",
           label: {
             position: "left",
@@ -365,7 +396,7 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
         },
         verticalOrientation: true,
         subDomain: {
-          type: "day"
+          type: "weekday"
         },
         scale: {
           type: 'linear',
