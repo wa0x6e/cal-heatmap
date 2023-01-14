@@ -29,7 +29,7 @@ export default function validate(
   }
 
   if (!templateCollection.has(subDomainType)) {
-    throw new Error(`'${subDomainType}' is not a valid domain type'`);
+    throw new Error(`'${subDomainType}' is not a valid subDomain type'`);
   }
 
   if (data.type && !ALLOWED_DATA_TYPES.includes(data.type)) {

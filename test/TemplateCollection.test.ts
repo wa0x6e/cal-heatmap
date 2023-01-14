@@ -32,6 +32,13 @@ describe('TemplateCollection', () => {
     expect(t.has('day')).toBe(true);
   });
 
+  it('init() the default templates before adding custom', () => {
+    expect(t.initiated).toBe(false);
+    t.add(() => ({ name: 'custom' } as TemplateResult));
+
+    expect(t.initiated).toBe(true);
+  });
+
   it('can add a single template', () => {
     const name = 'test_year';
 
@@ -50,11 +57,9 @@ describe('TemplateCollection', () => {
       () => ({ name: nameB } as TemplateResult),
     ]);
 
-    expect(Array.from(t.settings.entries())).toEqual([
-      ['test_day', template],
-      ['test_year', { name }],
-      ['test_year2', { name: nameB }],
-    ]);
+    expect(t.has('test_day')).toBe(true);
+    expect(t.has('test_year')).toBe(true);
+    expect(t.has('test_year2')).toBe(true);
   });
 
   it('keeps the existing templates', () => {
@@ -70,5 +75,45 @@ describe('TemplateCollection', () => {
     ]);
 
     expect(t.settings.size).toBe(count + 2);
+  });
+
+  it('can init templates with default template as parent', () => {
+    const name = 'quarter';
+    t.init();
+
+    t.add(
+      () => ({
+        name,
+        parent: 'year',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        columnsCount: (ts: number) => 50,
+      } as TemplateResult),
+    );
+    expect(t.get(name).rowsCount(0)).toBe(t.get('year').rowsCount(0));
+    expect(t.get(name).columnsCount(0)).toBe(50);
+    expect(t.get(name)).toHaveProperty('rowsCount');
+    expect(t.get(name)).toHaveProperty('mapping');
+  });
+
+  it('can init templates with custom template as parent', () => {
+    t.add([
+      () => ({
+        name: 'children',
+        parent: 'parent',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        columnsCount: (ts: number) => 10,
+      } as TemplateResult),
+      () => ({
+        name: 'parent',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        columnsCount: (ts: number) => 50,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        rowsCount: (ts: number) => 11,
+      } as TemplateResult),
+    ]);
+
+    expect(t.get('children').columnsCount(0)).toBe(10);
+    expect(t.get('children').rowsCount(0)).toBe(11);
+    expect(t.get('parent').columnsCount(0)).toBe(50);
   });
 });

@@ -21,6 +21,7 @@ export type Dimensions = {
 
 export type TemplateResult = {
   name: string;
+  parent?: string;
   rowsCount: (ts: number) => number;
   columnsCount: (ts: number) => number;
   mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[];
