@@ -1,19 +1,14 @@
-import type DateHelper from '../helpers/DateHelper';
-import type { Template, TemplateResult } from '../index';
+import type { Template } from '../index';
 
-const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
+const minuteTemplate: Template = (DateHelper) => {
   const COLUMNS_COUNT = 10;
   const ROWS_COUNT = 6;
 
   return {
     name: 'minute',
-    rowsCount() {
-      return COLUMNS_COUNT;
-    },
-    columnsCount() {
-      return ROWS_COUNT;
-    },
-    mapping: (startTimestamp: number, endTimestamp: number) =>
+    rowsCount: () => COLUMNS_COUNT,
+    columnsCount: () => ROWS_COUNT,
+    mapping: (startTimestamp, endTimestamp) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'minute',
@@ -28,9 +23,7 @@ const minuteTemplate: Template = (DateHelper: DateHelper): TemplateResult => {
           y: minute % COLUMNS_COUNT,
         };
       }),
-    extractUnit(ts: number) {
-      return DateHelper.date(ts).startOf('minute').valueOf();
-    },
+    extractUnit: (ts) => DateHelper.date(ts).startOf('minute').valueOf(),
   };
 };
 

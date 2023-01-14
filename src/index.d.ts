@@ -3,8 +3,19 @@ import type DateHelper from './helpers/DateHelper';
 
 export type DomainType = 'year' | 'month' | 'week' | 'x_day' | 'day' | 'hour';
 
+// Template
+
 export type Template = {
   (dateHelper: DateHelper, options: OptionsType): TemplateResult;
+};
+
+export type TemplateResult = {
+  name: string;
+  parent?: string;
+  rowsCount: (ts: number) => number;
+  columnsCount: (ts: number) => number;
+  mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[];
+  extractUnit: (ts: number) => number;
 };
 
 export type SubDomain = {
@@ -19,14 +30,7 @@ export type Dimensions = {
   height: number;
 };
 
-export type TemplateResult = {
-  name: string;
-  parent?: string;
-  rowsCount: (ts: number) => number;
-  columnsCount: (ts: number) => number;
-  mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[];
-  extractUnit: (ts: number) => number;
-};
+// Plugin
 
 export interface IPlugin {
   name: string;

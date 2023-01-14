@@ -1,11 +1,10 @@
-import type DateHelper from '../helpers/DateHelper';
 import type { DomainOptions } from '../options/Options';
-import type { Template, TemplateResult, SubDomain } from '../index';
+import type { Template } from '../index';
 
 const hourTemplate: Template = (
-  DateHelper: DateHelper,
+  DateHelper,
   { domain }: { domain: DomainOptions },
-): TemplateResult => {
+) => {
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
 
@@ -13,10 +12,8 @@ const hourTemplate: Template = (
 
   return {
     name: 'hour',
-    rowsCount() {
-      return ROWS_COUNT;
-    },
-    columnsCount(ts: number) {
+    rowsCount: () => ROWS_COUNT,
+    columnsCount: (ts) => {
       switch (domainType) {
         case 'week':
           return (TOTAL_ITEMS / ROWS_COUNT) * 7;
@@ -30,7 +27,7 @@ const hourTemplate: Template = (
           return TOTAL_ITEMS / ROWS_COUNT;
       }
     },
-    mapping: (startTimestamp: number, endTimestamp: number): SubDomain[] =>
+    mapping: (startTimestamp, endTimestamp) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'hour',
@@ -56,9 +53,7 @@ const hourTemplate: Template = (
           y: Math.floor(hour % ROWS_COUNT),
         };
       }),
-    extractUnit(ts: number) {
-      return DateHelper.date(ts).startOf('hour').valueOf();
-    },
+    extractUnit: (ts) => DateHelper.date(ts).startOf('hour').valueOf(),
   };
 };
 

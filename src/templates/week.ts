@@ -1,19 +1,16 @@
-import type DateHelper from '../helpers/DateHelper';
 import type { DomainOptions } from '../options/Options';
-import type { Template, TemplateResult } from '../index';
+import type { Template } from '../index';
 
 const weekTemplate: Template = (
-  DateHelper: DateHelper,
+  DateHelper,
   { domain }: { domain: DomainOptions },
-): TemplateResult => {
+) => {
   const { dynamicDimension } = domain;
 
   return {
     name: 'week',
-    rowsCount() {
-      return 1;
-    },
-    columnsCount(ts: number) {
+    rowsCount: () => 1,
+    columnsCount: (ts) => {
       switch (domain.type) {
         case 'year':
           return dynamicDimension ?
@@ -27,7 +24,7 @@ const weekTemplate: Template = (
           return 1;
       }
     },
-    mapping: (startTimestamp: number, endTimestamp: number) =>
+    mapping: (startTimestamp, endTimestamp) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       DateHelper.intervals(
         'week',
@@ -38,9 +35,7 @@ const weekTemplate: Template = (
         x: i,
         y: 0,
       })),
-    extractUnit(ts: number) {
-      return DateHelper.date(ts).startOf('week').valueOf();
-    },
+    extractUnit: (ts) => DateHelper.date(ts).startOf('week').valueOf(),
   };
 };
 

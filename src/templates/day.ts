@@ -1,9 +1,8 @@
-import type DateHelper from '../helpers/DateHelper';
 import type { OptionsType, DomainOptions } from '../options/Options';
-import type { Template, TemplateResult } from '../index';
+import type { Template } from '../index';
 
 const dayTemplate: Template = (
-  DateHelper: DateHelper,
+  DateHelper,
   {
     domain,
     verticalOrientation,
@@ -11,17 +10,15 @@ const dayTemplate: Template = (
     domain: DomainOptions;
     verticalOrientation: OptionsType['verticalOrientation'];
   },
-): TemplateResult => {
+) => {
   const ROWS_COUNT = 7;
   const domainType = domain.type;
   const { dynamicDimension } = domain;
 
   return {
     name: 'day',
-    rowsCount() {
-      return domainType === 'week' ? 1 : ROWS_COUNT;
-    },
-    columnsCount(ts: number) {
+    rowsCount: () => (domainType === 'week' ? 1 : ROWS_COUNT),
+    columnsCount: (ts) => {
       switch (domainType) {
         case 'month':
           return Math.ceil(
@@ -42,7 +39,10 @@ const dayTemplate: Template = (
           return ROWS_COUNT;
       }
     },
-    mapping: (startTimestamp: number, endTimestamp: number) => {
+    mapping: (
+      startTimestamp,
+      endTimestamp,
+    ) => {
       let weekNumber = 0;
       let x = -1;
 
@@ -77,9 +77,7 @@ const dayTemplate: Template = (
         };
       });
     },
-    extractUnit(ts: number) {
-      return DateHelper.date(ts).startOf('day').valueOf();
-    },
+    extractUnit: (ts) => DateHelper.date(ts).startOf('day').valueOf(),
   };
 };
 

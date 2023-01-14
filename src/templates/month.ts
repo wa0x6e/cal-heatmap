@@ -1,15 +1,10 @@
-import type DateHelper from '../helpers/DateHelper';
-import type { Template, TemplateResult } from '../index';
+import type { Template } from '../index';
 
-const monthTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
+const monthTemplate: Template = (DateHelper) => ({
   name: 'month',
-  rowsCount() {
-    return 1;
-  },
-  columnsCount() {
-    return 12;
-  },
-  mapping: (startTimestamp: number, endTimestamp: number) =>
+  rowsCount: () => 1,
+  columnsCount: () => 12,
+  mapping: (startTimestamp, endTimestamp) =>
     // eslint-disable-next-line implicit-arrow-linebreak
     DateHelper.intervals(
       'month',
@@ -20,9 +15,7 @@ const monthTemplate: Template = (DateHelper: DateHelper): TemplateResult => ({
       x: DateHelper.date(ts).month(),
       y: 0,
     })),
-  extractUnit(ts: number) {
-    return DateHelper.date(ts).startOf('month').valueOf();
-  },
+  extractUnit: (ts) => DateHelper.date(ts).startOf('month').valueOf(),
 });
 
 export default monthTemplate;
