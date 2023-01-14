@@ -193,10 +193,16 @@ describe('DomainCollection', () => {
     it('resets all values to null', () => {
       expect(filledDomainCollection.get(1)).toEqual([
         {
-          t: 1, x: 0, y: 0, v: null,
+          t: 1,
+          x: 0,
+          y: 0,
+          v: null,
         },
         {
-          t: 3, x: 0, y: 0, v: null,
+          t: 3,
+          x: 0,
+          y: 0,
+          v: null,
         },
       ]);
       expect(filledDomainCollection.get(2)).toEqual([

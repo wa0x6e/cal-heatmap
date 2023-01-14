@@ -19,9 +19,9 @@ describe('OptionsValidator', () => {
 
   const validSubDomainTemplate = new TemplateCollection(dateHelper, options);
   validSubDomainTemplate.settings = new Map([
-    ['day', { } as TemplateResult],
-    ['x_day', { } as TemplateResult],
-    ['month', { } as TemplateResult],
+    ['day', {} as TemplateResult],
+    ['x_day', {} as TemplateResult],
+    ['month', {} as TemplateResult],
   ]);
 
   it('returns true when all domain/subDomain are valid', () => {

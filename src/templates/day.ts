@@ -39,10 +39,7 @@ const dayTemplate: Template = (
           return ROWS_COUNT;
       }
     },
-    mapping: (
-      startTimestamp,
-      endTimestamp,
-    ) => {
+    mapping: (startTimestamp, endTimestamp) => {
       let weekNumber = 0;
       let x = -1;
 
