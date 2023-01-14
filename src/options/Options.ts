@@ -8,6 +8,12 @@ import type { DomainType } from '../index';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
+type DeepPartial<T> = T extends object
+  ? {
+    [P in keyof T]?: DeepPartial<T[P]>;
+  }
+  : T;
+
 export type DomainOptions = {
   type: DomainType;
   gutter: number;
@@ -281,7 +287,7 @@ export default class Options {
     return true;
   }
 
-  init(opts: any): void {
+  init(opts?: DeepPartial<OptionsType>): void {
     this.options = {
       // eslint-disable-next-line arrow-body-style
       ...mergeWith(this.options, opts, (objValue, srcValue) => {

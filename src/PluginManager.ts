@@ -67,10 +67,10 @@ export default class PluginManager {
   }
 
   paintAll(): Promise<unknown>[] {
-    return Array.from(this.plugins.values()).map((p: any) => p.paint());
+    return Array.from(this.plugins.values()).map((p: IPlugin) => p.paint());
   }
 
   destroyAll(): Promise<unknown>[] {
-    return Array.from(this.plugins.values()).map((p: any) => p.destroy());
+    return Array.from(this.plugins.values()).map((p: IPlugin) => p.destroy());
   }
 }
