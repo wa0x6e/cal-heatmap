@@ -47,6 +47,8 @@ The `subDomain` should always be smaller than the `domain` type.
 - `hour`
 - `minute`
 
+See [Examples](/examples)
+
 {: .note}
 You can create and add your own custom subDomain, see the [`Templates`](/templates) section.
 

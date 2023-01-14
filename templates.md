@@ -67,6 +67,7 @@ type Template = function(DateHelper: DateHelper, options: Options) {
 ```js
 type TemplateResult = {
   name: string,
+  parent?: string,
   rowsCount: (ts: number) => number,
   columnsCount: (ts: number) => number,
   mapping: (startTimestamp: number, endTimestamp: number) => SubDomain[],
@@ -78,7 +79,16 @@ type TemplateResult = {
 
 Name of the subDomain type.
 
-Will be used by [`subDomain.type`](/options/subDomain.html#type) options.
+Will be used by [`subDomain.type`](/options/subDomain.html#type) options, and child template.
+
+{: .highlight}
+Name should be unique
+
+### parent
+
+Parent template's name
+
+Optional, set the name of another template to inherit its options.
 
 ### rowsCount
 
@@ -155,7 +165,9 @@ Take a look at the built-in templates on the [github](https://github.com/wa0x6e/
 
 ## Real world Example
 
-Following is a template for a Quarter subDomain: each subDomain represent 3 months.
+### Quarter subDomain template
+
+Each subDomain represent 3 months.
 
 You can see a the final result [here](/methods/addTemplates)
 
@@ -185,5 +197,77 @@ const quarterTemplate = function (DateHelper) {
 };
 ```
 
+### Days subDomain, with all days on the same row
+
+Using `day` template as `parent`.
+
+<div class="code-example">
+  <div id="example-2"></div>
+  <script>
+    const cal2 = new CalHeatmap();
+    const sameRowDayTemplate = function (DateHelper) {
+      return {
+        name: 'day_same_row',
+        parent: 'day',
+        rowsCount() {
+          return 1;
+        },
+        columnsCount() {
+          return 31;
+        },
+        mapping: (startDate, endDate, defaultValues) =>
+          DateHelper.intervals('day', startDate, DateHelper.date(endDate)).map(
+            (d, index) => ({
+              t: d,
+              x: index,
+              y: 0,
+              ...defaultValues,
+            })
+          ),
+        };
+    };
+    cal2.addTemplates(sameRowDayTemplate);
+    cal2.paint({
+      range: 1,
+      itemSelector: '#example-2',
+      domain: { type: 'month' },
+      subDomain: { type: 'day_same_row' },
+    });
+
+  </script>
+</div>
+
+```js
+const sameRowDayTemplate = function (DateHelper) {
+  return {
+    name: 'day_same_row',
+    parent: 'day',
+    rowsCount() {
+      return 1;
+    },
+    columnsCount() {
+      return 31;
+    },
+    mapping: (startDate, endDate, defaultValues) =>
+      DateHelper.intervals('day', startDate, DateHelper.date(endDate)).map(
+        (d, index) => ({
+          t: d,
+          x: index,
+          y: 0,
+          ...defaultValues,
+        })
+      ),
+    // Missing extractUnit property, will be inherit from parent
+  };
+};
+const cal = new CalHeatmap();
+call.addTemplates(sameRowDayTemplate);
+cal.paint({
+  range: 1,
+  domain: { type: 'month' },
+  subDomain: { type: 'day_same_row' },
+});
+```
+
 {: .important}
-This example make full use of the provided DateHelper class, which uses momentjs for date computation
+These example make full use of the provided DateHelper class, which uses momentjs for date computation

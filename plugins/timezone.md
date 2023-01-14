@@ -17,7 +17,7 @@ This plugin adds timezone support
 The plugin is built-in in the core CalHeatmap, just import the module with
 
 ```js
-// Coming soon
+import { Timezone } from 'cal-heatmap';
 ```
 
 ### CDN

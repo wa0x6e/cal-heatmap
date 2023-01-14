@@ -17,7 +17,7 @@ This plugin adds a tooltip when hovering over a subDomain's cell
 The plugin is built-in in CalHeatmap, just import the module with
 
 ```js
-// Coming soon
+import { Tooltip } from 'cal-heatmap';
 ```
 
 ### CDN

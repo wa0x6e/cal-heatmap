@@ -43,6 +43,8 @@ Default: `hour`
 - `day`
 - `hour`
 
+See [Examples](/examples)
+
 {: .mt-8}
 
 ## gutter

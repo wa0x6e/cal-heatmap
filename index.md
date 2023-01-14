@@ -14,6 +14,16 @@ You can see documentation for v3 at [/v3](/v3/)
 
 Cal-Heatmap is a javascript module to create a calendar heatmap.
 
+### Why?
+
+- Timezone support
+- Navigation
+- Various layout and time range
+- Full color customisation
+- Animation
+- Evented
+- Extendable via plugins
+
 ### Browsers support
 
 Coming soon...
