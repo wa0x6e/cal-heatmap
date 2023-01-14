@@ -29,7 +29,7 @@ import { Legend } from 'cal-heatmap';
 Add the legend plugin in your page's `<head>`
 
 ```html
-<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/plugins/Legend.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/plugins/Legend.min.js"></script>
 ```
 
 <hr />

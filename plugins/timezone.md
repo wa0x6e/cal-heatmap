@@ -25,7 +25,7 @@ import { Timezone } from 'cal-heatmap';
 Add the timezone plugin script and its dependencies in your page's `<head>`
 
 ```html
-<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/plugins/Timezone.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/plugins/Timezone.min.js"></script>
 <script src="https://momentjs.com/downloads/moment.min.js"></script>
 // Choose one of the following choices, depending on your need
 <script src="https://momentjs.com/downloads/moment-timezone-with-data.min.js"></script>
