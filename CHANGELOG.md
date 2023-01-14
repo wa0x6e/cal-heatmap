@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.0.0-beta.3 [2023-01-14]
+
+### Bug Fixes
+
+- [fix] Fix #293 Tooltip default date should use same timezone as calendar
+- [fix] Fix #297 Ignore date.min and date.max when invalid
+
+### Features
+
+- Template can now inherit from another template via `parent` property
+
+### Chores
+
+- [chores] Dependencies update
+- [chores] Add more typescript
+- [tests] Refactor JSDom tests to be compatible with real browsers
+- [tests] Tests with various browsers (version/os/device), via browserstack, see browser-support.md for browsers matrix
+
 ## v4.0.0-beta.2 [2023-01-05]
 
 ### Bug Fixes
