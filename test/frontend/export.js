@@ -13,6 +13,9 @@ import subDomainLabel from './subDomainLabel';
 import domainDynamicDimension from './domainDynamicDimension';
 import domainSort from './domainSort';
 import data from './data';
+import date from './date';
+import verticalOrientation from './verticalOrientation';
+import legend from './legend';
 import tooltip from './tooltip';
 
 export default [
@@ -30,5 +33,8 @@ export default [
   domainDynamicDimension,
   domainSort,
   data,
+  date,
+  legend,
+  verticalOrientation,
   tooltip,
 ];

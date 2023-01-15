@@ -129,6 +129,9 @@ const Runner = (
                   if (e.expected) {
                     expect(current).toBe(e.expected(executeReturn));
                   }
+                  if (e.expectedContain) {
+                    expect(current).toContain(e.expectedContain(executeReturn));
+                  }
                 });
 
                 return Promise.allSettled(results).then(() => {
