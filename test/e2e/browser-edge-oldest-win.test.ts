@@ -3,7 +3,7 @@ import Runner from './Runner';
 
 Runner(
   'Win7 / Edge Oldest',
-  'https://cal-heatmap.com/tests/index-d3v7-umd.html',
+  'index-d3v7-umd.html',
   {
     'bstack:options': {
       os: 'Windows',

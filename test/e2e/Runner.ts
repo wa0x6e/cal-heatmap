@@ -76,7 +76,12 @@ const Runner = (
     }, 20000);
 
     beforeEach(async () => {
-      await driver.get(file);
+      let prefix = 'https://cal-heatmap.com/tests/';
+      if (process.env.LOCAL === '1') {
+        prefix = 'http://localhost:3003/test/e2e/';
+      }
+
+      await driver.get(`${prefix}${file}`);
       await driver.executeScript(
         `window.defaultOptions = {
           animationDuration: 100,
