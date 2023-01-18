@@ -9,7 +9,7 @@ const data = {
           range: 2,
           domain: { type: 'month', dynamicDimension: false },
           subDomain: { type: 'day', gutter: 0, width: 10 },
-          date: { start: new Date(2021, 0, 15) },
+          date: { start: new Date('2021-01-15') },
         });
       },
       expectations: [
@@ -34,7 +34,7 @@ const data = {
           range: 2,
           domain: { type: 'month', dynamicDimension: true },
           subDomain: { type: 'day', gutter: 0, width: 10 },
-          date: { start: new Date(2021, 0, 15) },
+          date: { start: new Date('2021-01-15') },
         });
       },
       expectations: [

@@ -82,7 +82,7 @@ const data = {
       title: 'formats the text with the user given function',
       setup: (cal) => {
         return cal.paint(
-          { ...window.defaultOptions, date: { start: new Date(2000, 0, 5) } },
+          { ...window.defaultOptions, date: { start: new Date('2000-01-05') } },
           [
             [
               Tooltip,
@@ -100,7 +100,7 @@ const data = {
           {
             target: d3.select('.graph-rect').node(),
           },
-          +new Date(2000, 0, 5),
+          +new Date('2000-01-05'),
           10,
         );
       },
@@ -117,7 +117,7 @@ const data = {
       title: 'honors the locale',
     },
     {
-      title: 'honors the timezone when enabled',
+      title: 'honors the timezone',
     },
   ],
 };

@@ -26,8 +26,8 @@ describe('DomainLabelPainter', () => {
   });
 
   describe('when positionned on top', () => {
-    it('aligns the text on the left', () => {
-      cal.paint(
+    it('aligns the text on the left', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'top', textAlign: 'start' } },
         }) as OptionsType,
@@ -37,8 +37,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('y')).toBe(`${25 / 2}`);
       expect(select('.graph-label').attr('text-anchor')).toBe('start');
     });
-    it('aligns the text on the middle', () => {
-      cal.paint(
+    it('aligns the text on the middle', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'top', textAlign: 'middle' } },
         }) as OptionsType,
@@ -49,8 +49,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('y')).toBe(`${25 / 2}`);
       expect(select('.graph-label').attr('text-anchor')).toBe('middle');
     });
-    it('aligns the text on the right', () => {
-      cal.paint(
+    it('aligns the text on the right', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'top', textAlign: 'end' } },
         }) as OptionsType,
@@ -64,8 +64,8 @@ describe('DomainLabelPainter', () => {
   });
 
   describe('when positionned on bottom', () => {
-    it('aligns the text on the left', () => {
-      cal.paint(
+    it('aligns the text on the left', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'bottom', textAlign: 'start' } },
         }) as OptionsType,
@@ -76,8 +76,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('text-anchor')).toBe('start');
     });
 
-    it('aligns the text on the middle', () => {
-      cal.paint(
+    it('aligns the text on the middle', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'bottom', textAlign: 'middle' } },
         }) as OptionsType,
@@ -88,8 +88,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('y')).toBe(`${10 + 25 / 2}`);
       expect(select('.graph-label').attr('text-anchor')).toBe('middle');
     });
-    it('aligns the text on the right', () => {
-      cal.paint(
+    it('aligns the text on the right', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'bottom', textAlign: 'end' } },
         }) as OptionsType,
@@ -103,8 +103,8 @@ describe('DomainLabelPainter', () => {
   });
 
   describe('when positionned on the left', () => {
-    it('aligns the text on the left', () => {
-      cal.paint(
+    it('aligns the text on the left', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: {
             label: { position: 'left', textAlign: 'start', width: 50 },
@@ -119,8 +119,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-subdomain-group').attr('x')).toBe('50');
     });
 
-    it('aligns the text on the middle', () => {
-      cal.paint(
+    it('aligns the text on the middle', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: {
             label: { position: 'left', textAlign: 'middle', width: 50 },
@@ -134,8 +134,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
       expect(select('.graph-subdomain-group').attr('x')).toBe('50');
     });
-    it('aligns the text on the right', () => {
-      cal.paint(
+    it('aligns the text on the right', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'left', textAlign: 'end', width: 50 } },
         }) as OptionsType,
@@ -152,8 +152,8 @@ describe('DomainLabelPainter', () => {
   });
 
   describe('when positionned on the right', () => {
-    it('aligns the text on the left', () => {
-      cal.paint(
+    it('aligns the text on the left', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: {
             label: { position: 'right', textAlign: 'start', width: 50 },
@@ -168,8 +168,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
       expect(select('.graph-subdomain-group').attr('x')).toBe('0');
     });
-    it('aligns the text on the middle', () => {
-      cal.paint(
+    it('aligns the text on the middle', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: {
             label: { position: 'right', textAlign: 'middle', width: 50 },
@@ -184,8 +184,8 @@ describe('DomainLabelPainter', () => {
       expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
       expect(select('.graph-subdomain-group').attr('x')).toBe('0');
     });
-    it('aligns the text on the right', () => {
-      cal.paint(
+    it('aligns the text on the right', async () => {
+      await cal.paint(
         merge(defaultOptions, {
           domain: { label: { position: 'right', textAlign: 'end', width: 50 } },
         }) as OptionsType,

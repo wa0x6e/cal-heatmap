@@ -1,4 +1,6 @@
-import moment from 'moment-timezone';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
+import locale_fr from 'dayjs/locale/fr';
 
 import DateHelper from '../../src/helpers/DateHelper';
 import weekData from '../fixtures/weekNumberDates';
@@ -12,47 +14,59 @@ describe('DateHelper', () => {
   let options: Options;
   let dateHelper: DateHelper;
 
-  beforeEach(() => {
+  const loadLocaleMock = jest
+    .spyOn(DateHelper.prototype, 'loadLocale')
+    .mockImplementation(() => Promise.resolve(locale_fr));
+
+  beforeEach(async () => {
     options = new Options();
     dateHelper = new DateHelper();
-    dateHelper.setup(options);
-    dateHelper.setMoment(moment);
-    dateHelper.date = (d: number | Date | string = new Date()) =>
-      // eslint-disable-next-line implicit-arrow-linebreak
-      moment.tz(d, 'utc');
+    await dateHelper.setup(options);
   });
 
   describe('setup()', () => {
-    ['en', 'fr'].forEach((locale) => {
-      describe(`when passing locale ${locale}`, () => {
-        it(`instantiate moment with the ${locale} locale`, () => {
-          options.init({ date: { locale } });
-          dateHelper.setup(options);
-          expect(dateHelper.momentInstance.locale()).toEqual(locale);
-        });
+    describe('when using the default locale', () => {
+      it('instantiate dayjs with the default locale', async () => {
+        options.init({ date: { locale: 'en' } });
+        await dateHelper.setup(options);
+        expect(dateHelper.date().locale()).toEqual('en');
+        expect(loadLocaleMock).not.toHaveBeenCalled();
+        expect(dateHelper.locale).toBe('en');
       });
+    });
 
-      describe('when passing no locale value', () => {
-        it('instantiate moment with default EN locale', () => {
-          expect(dateHelper.momentInstance.locale()).toEqual('en');
-        });
+    describe('when using no locale value', () => {
+      it('instantiate dayjs with default EN locale', () => {
+        expect(loadLocaleMock).not.toHaveBeenCalled();
+        expect(dateHelper.date().locale()).toEqual('en');
+        expect(dateHelper.locale).toBe('en');
+      });
+    });
+
+    describe('when using locale FR', () => {
+      it('instantiate dayjs with the FR locale', async () => {
+        options.init({ date: { locale: 'fr' } });
+        await dateHelper.setup(options);
+        expect(loadLocaleMock).toHaveBeenCalledTimes(1);
+        expect(dateHelper.date().locale()).toEqual('fr');
+        expect(dateHelper.locale).toHaveProperty('name');
       });
     });
   });
 
-  describe('moment()', () => {
+  describe('dayjs()', () => {
     describe('is locale aware', () => {
-      it('returns monday as first week day on FR locale', () => {
-        options.init({ date: { locale: 'fr' } });
-        dateHelper.setup(options);
+      it('returns monday as first week day on FR locale', async () => {
+        options.init({ date: { locale: 'fr', timezone: 'utc' } });
+        await dateHelper.setup(options);
         expect(dateHelper.date().startOf('week').format('dddd')).toEqual(
           'lundi',
         );
       });
 
-      it('returns sunday as first week day on EN locale', () => {
-        options.init({ date: { locale: 'en' } });
-        dateHelper.setup(options);
+      it('returns sunday as first week day on EN locale', async () => {
+        options.init({ date: { locale: 'en', timezone: 'utc' } });
+        await dateHelper.setup(options);
         expect(dateHelper.date().startOf('week').format('dddd')).toEqual(
           'Sunday',
         );
@@ -66,10 +80,12 @@ describe('DateHelper', () => {
       // eslint-disable-next-line @typescript-eslint/no-loop-func
       value.forEach((key, index) => {
         key.forEach((monthDate) => {
-          it(`assigns ${monthDate} to the week ${index + 1}`, () => {
-            options.init({ date: { locale } });
-            dateHelper.setup(options);
-            expect(dateHelper.getMonthWeekNumber(monthDate)).toEqual(index + 1);
+          it(`assigns ${monthDate} to the week ${index + 1}`, async () => {
+            options.init({ date: { locale, timezone: 'utc' } });
+            await dateHelper.setup(options);
+            expect(dateHelper.getMonthWeekNumber(+monthDate)).toEqual(
+              index + 1,
+            );
           });
         });
       });
@@ -87,7 +103,7 @@ describe('DateHelper', () => {
       ).toEqual(`${date}-hello`);
     });
 
-    it('returns the value given by the moment format', () => {
+    it('returns the value given by the dayjs format', () => {
       expect(dateHelper.format(+date, 'YYYY', 'hello')).toEqual('2020');
     });
   });
@@ -98,10 +114,10 @@ describe('DateHelper', () => {
     const testRun = (interval: string, locale: string) => {
       const toDates = (a: number[]) => a.map((k: number) => new Date(k));
 
-      describe(`With moment [${locale}] locale`, () => {
-        beforeEach(() => {
-          options.init({ date: { locale } });
-          dateHelper.setup(options);
+      describe(`With dayjs [${locale}] locale`, () => {
+        beforeEach(async () => {
+          options.init({ date: { locale, timezone: 'utc' } });
+          await dateHelper.setup(options);
         });
 
         let intervalKey = interval;
@@ -185,6 +201,7 @@ describe('DateHelper', () => {
                   date,
                   expectations[intervalKey][0],
                 );
+
                 expect(toDates(intervals)).toEqual([
                   expectations[intervalKey][0],
                 ]);
@@ -195,7 +212,7 @@ describe('DateHelper', () => {
           describe(
             'when range args is a future date, ' +
               //
-              '4 intervals in the future',
+              '3 intervals in the future',
             () => {
               it(`returns [${interval}](3)`, () => {
                 const intervals = dateHelper.intervals(
@@ -204,7 +221,9 @@ describe('DateHelper', () => {
                   expectations[intervalKey][3],
                 );
 
-                expect(toDates(intervals)).toEqual(expectations[intervalKey]);
+                expect(toDates(intervals)).toEqual(
+                  expectations[intervalKey].slice(0, 3),
+                );
               });
             },
           );

@@ -6,7 +6,7 @@ const data = {
       title: 'populates from a JSON object directly',
       setup: (cal) => {
         const dd = [];
-        const date = new Date(2000, 0, 1);
+        const date = new Date('2000-01-01');
         dd.push({
           time: +date,
           value: 10,

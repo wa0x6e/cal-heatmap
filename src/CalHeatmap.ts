@@ -17,7 +17,12 @@ import './cal-heatmap.scss';
 import TemplateCollection from './TemplateCollection';
 
 import type { OptionsType } from './options/Options';
-import type { Template, Dimensions, PluginDefinition } from './index';
+import type {
+  Template,
+  Dimensions,
+  PluginDefinition,
+  Timestamp,
+} from './index';
 
 import { ScrollDirection } from './constant';
 
@@ -69,7 +74,7 @@ export default class CalHeatmap {
   }
 
   createDomainCollection(
-    startDate: number | Date,
+    startDate: Timestamp | Date,
     range: number | Date,
   ): DomainCollection {
     return new DomainCollection(
@@ -91,12 +96,12 @@ export default class CalHeatmap {
    * @return A Promise, which will fulfill once all the underlying asynchronous
    * tasks settle, whether resolved or rejected.
    */
-  paint(
+  async paint(
     options?: DeepPartial<OptionsType>,
     plugins?: PluginDefinition[] | PluginDefinition,
   ): Promise<unknown> {
     this.options.init(options);
-    this.dateHelper.setup(this.options);
+    await this.dateHelper.setup(this.options);
 
     this.templateCollection.init();
 

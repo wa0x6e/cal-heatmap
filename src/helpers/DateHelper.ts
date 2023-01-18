@@ -1,36 +1,62 @@
-import isString from 'lodash-es/isString';
-import isFunction from 'lodash-es/isFunction';
-import moment from 'moment';
-import MomentRange from 'moment-range';
+import dayjs from 'dayjs';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import dayOfYear from 'dayjs/plugin/dayOfYear';
+import weekday from 'dayjs/plugin/weekday';
+import minMax from 'dayjs/plugin/minMax';
+import isoWeeksInYear from 'dayjs/plugin/isoWeeksInYear';
+import isLeapYear from 'dayjs/plugin/isLeapYear';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
-import type Options from '../options/Options';
+import type { ManipulateType, PluginFunc } from 'dayjs';
+import type { OptionsType } from '../options/Options';
+import type { Timestamp } from '../index';
+
+dayjs.extend(weekOfYear);
+dayjs.extend(isoWeeksInYear);
+dayjs.extend(isLeapYear);
+dayjs.extend(dayOfYear);
+dayjs.extend(weekday);
+dayjs.extend(minMax);
+dayjs.extend(advancedFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const DEFAULT_LOCALE = 'en';
 
 export default class DateHelper {
-  locale: string;
+  locale: any;
 
-  momentInstance: any;
+  timezone: string;
 
   constructor() {
-    this.locale = 'en';
+    this.locale = DEFAULT_LOCALE;
+    this.timezone = dayjs.tz.guess();
   }
 
-  setup(options: Options) {
-    this.locale = options.options.date.locale || this.locale;
-    this.setMoment(window.moment || moment);
+  async setup({ options }: { options: OptionsType }) {
+    this.locale = options.date.locale;
+    this.timezone = options.date.timezone || dayjs.tz.guess();
+
+    if (this.locale !== DEFAULT_LOCALE) {
+      const locale = await this.loadLocale();
+      this.locale = locale;
+    }
   }
 
-  setMoment(customMoment: any) {
-    this.momentInstance = MomentRange.extendMoment(customMoment);
-    this.momentInstance.locale(this.locale);
+  // eslint-disable-next-line class-methods-use-this
+  extend(dayjsPlugin: PluginFunc): dayjs.Dayjs {
+    return dayjs.extend(dayjsPlugin);
   }
 
   /**
    * Return the week number, relative to its month
    *
    * @param  {number|Date} d Date or timestamp in milliseconds
-   * @returns {number} Thw week number, relative to the month [0-5]
+   * @returns {number} The week number, relative to the month [0-5]
    */
-  getMonthWeekNumber(d: number | Date): number {
+  getMonthWeekNumber(d: Timestamp | dayjs.Dayjs): number {
     const date = this.date(d).startOf('day');
     const endOfWeek = this.date(d).startOf('month').endOf('week');
 
@@ -40,20 +66,20 @@ export default class DateHelper {
     return Math.ceil(date.diff(endOfWeek, 'weeks', true)) + 1;
   }
 
-  date(d: number | Date | string = new Date()) {
-    return this.momentInstance(d);
+  date(d: Timestamp | Date | dayjs.Dayjs | string = new Date()): dayjs.Dayjs {
+    return dayjs(d).tz(this.timezone).utcOffset(0).locale(this.locale);
   }
 
   format(
-    timestamp: number,
+    timestamp: Timestamp,
     formatter: null | string | Function,
     ...args: any
   ): string | null {
-    if (isFunction(formatter)) {
+    if (typeof formatter === 'function') {
       return formatter(timestamp, ...args);
     }
 
-    if (isString(formatter)) {
+    if (typeof formatter === 'string') {
       return this.date(timestamp).format(formatter);
     }
 
@@ -64,73 +90,51 @@ export default class DateHelper {
    * Return an array of time interval
    *
    * @param  {number|Date} date A random date included in the wanted interval
-   * @param  {number|Date} range Length of the wanted interval, or a stop date
+   * @param  {number|Date} range Length of the wanted interval, or a stop date.
+   *                             Stop date is always excluded
    * @returns {Array<number>} Array of unix timestamp, in milliseconds
    */
   intervals(
     interval: string,
-    date: number | Date,
-    range: number | Date,
-  ): number[] {
-    return this.#generateInterval(interval, date, range);
-  }
-
-  /**
-   * Returns whether dateA is less than or equal to dateB.
-   * This function is subdomain aware.
-   * Performs automatic conversion of values.
-   * @param dateA may be a number or a Date
-   * @param dateB may be a number or a Date
-   * @returns {boolean}
-   */
-  dateFromPreviousInterval(
-    interval: string,
-    dateA: number | Date,
-    dateB: number | Date,
-  ): boolean {
-    return this.date(dateA).isBefore(this.date(dateB), interval);
-  }
-
-  /**
-   * Return whether 2 dates belongs to the same time interval
-   *
-   * @param  Date dateA First date to compare
-   * @param  Date dateB Second date to compare
-   * @returns {boolean} true if the 2 dates belongs to the same time interval
-   */
-  datesFromSameInterval(
-    interval: string,
-    dateA: number | Date,
-    dateB: number | Date,
-  ): boolean {
-    return this.date(dateA).isSame(this.date(dateB), interval);
-  }
-
-  #generateInterval(
-    interval: string,
-    date: number | Date,
-    range: number | Date,
-  ): number[] {
-    let dateRange;
-
-    const start = this.date(date);
-
+    date: Timestamp | Date,
+    range: number | Date | dayjs.Dayjs,
+  ): Timestamp[] {
+    let end: dayjs.Dayjs;
     if (typeof range === 'number') {
-      dateRange = this.momentInstance.rangeFromInterval(
-        interval,
-        range >= 0 ? range - 1 : range,
-        start,
-      );
+      end = this.date(date).add(range, interval as ManipulateType);
     } else {
-      dateRange = this.momentInstance.range(start, this.date(range));
+      end = this.date(range);
     }
 
-    dateRange = dateRange.snapTo(interval);
+    const start = this.date(date).startOf(interval as ManipulateType);
 
-    return Array.from(
-      dateRange.by(interval, {
-        excludeEnd: typeof range === 'number' && range < 0,
-      }),
-    ).map((d: any) => d.valueOf());
+    end = end.startOf(interval as ManipulateType);
+    let pivot = dayjs.min(start, end);
+    end = dayjs.max(start, end);
+    const result: Timestamp[] = [];
+
+    do {
+      result.push(+pivot);
+      pivot = pivot.add(1, interval as ManipulateType);
+    } while (pivot < end);
+
+    return result;
+  }
+
+  // this function will work cross-browser for loading scripts asynchronously
+  loadLocale(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = `https://cdn.jsdelivr.net/npm/dayjs@1/locale/${this.locale}.js`;
+      s.onerror = (err) => {
+        reject(err);
+      };
+      s.onload = () => {
+        resolve((window as any)[`dayjs_locale_${this.locale}`]);
+      };
+      document.head.appendChild(s);
+    });
   }
 }

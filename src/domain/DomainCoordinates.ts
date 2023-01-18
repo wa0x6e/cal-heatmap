@@ -3,7 +3,7 @@ import { ScrollDirection, Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
 import type DomainPainter from './DomainPainter';
 import type DomainCollection from '../calendar/DomainCollection';
-import type { SubDomain, Dimensions } from '../index';
+import type { SubDomain, Dimensions, Timestamp } from '../index';
 
 type SubDomainWithCoordinates = Required<SubDomain> & {
   pre_x: number;
@@ -19,7 +19,7 @@ export default class DomainCoordinates {
 
   domainPainter: DomainPainter;
 
-  collection: Map<number, SubDomainWithCoordinates>;
+  collection: Map<Timestamp, SubDomainWithCoordinates>;
 
   scrollDirection: ScrollDirection;
 
@@ -30,7 +30,7 @@ export default class DomainCoordinates {
     this.scrollDirection = ScrollDirection.SCROLL_FORWARD;
   }
 
-  get(domainKey: number): SubDomainWithCoordinates | undefined {
+  get(domainKey: Timestamp): SubDomainWithCoordinates | undefined {
     return this.collection.get(domainKey);
   }
 
@@ -51,13 +51,13 @@ export default class DomainCoordinates {
       scrollFactor *= -1;
     }
 
-    collection.yankedDomains.forEach((domainKey: number) => {
+    collection.yankedDomains.forEach((domainKey: Timestamp) => {
       exitingTotal +=
         this.collection.get(domainKey)![
           verticalOrientation ? 'height' : 'width'
         ];
     });
-    collection.yankedDomains.forEach((domainKey: number) => {
+    collection.yankedDomains.forEach((domainKey: Timestamp) => {
       const coor = this.collection.get(domainKey)!;
       this.collection.set(domainKey, {
         ...coor,
@@ -66,7 +66,7 @@ export default class DomainCoordinates {
       });
     });
 
-    keys.forEach((domainKey: number) => {
+    keys.forEach((domainKey: Timestamp) => {
       const w = this.#getWidth(domainKey);
       const h = this.#getHeight(domainKey);
       if (verticalOrientation) {
@@ -103,7 +103,7 @@ export default class DomainCoordinates {
    * including all padding and gutter
    * Used to compute the x position of the domains on the x axis
    */
-  #getWidth(d: number): number {
+  #getWidth(d: Timestamp): number {
     const {
       domain, subDomain, x, verticalOrientation,
     } =
@@ -131,7 +131,7 @@ export default class DomainCoordinates {
    * including all paddings and gutter.
    * Used to compute the y position of the domains on the y axis
    */
-  #getHeight(d: number): number {
+  #getHeight(d: Timestamp): number {
     const {
       domain, subDomain, x, verticalOrientation,
     } =

@@ -133,10 +133,4 @@ export default [
   ...exportConfig('src/plugins/Legend.ts', 'Legend', 'plugins/Legend', {
     external: ['d3-selection', 'd3'],
   }),
-  ...exportConfig(
-    'src/plugins/Timezone.ts',
-    'Timezone',
-    'plugins/Timezone',
-    {},
-  ),
 ];

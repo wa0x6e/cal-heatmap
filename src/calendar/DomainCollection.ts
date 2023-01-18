@@ -10,35 +10,35 @@ import type {
   DataGroupType,
   DataRecord,
 } from '../options/Options';
-import { DomainType } from '../index';
+import { DomainType, Timestamp } from '../index';
 
 export const DOMAIN_FORMAT: Record<DomainType, string> = {
-  year: 'Y',
+  year: 'YYYY',
   month: 'MMMM',
-  week: 'wo [week] Y',
+  week: 'wo [week] YYYY',
   x_day: 'Do MMM',
   day: 'Do MMM',
   hour: 'HH:00',
 };
 
 export default class DomainCollection {
-  collection: Map<number, SubDomain[]>;
+  collection: Map<Timestamp, SubDomain[]>;
 
   dateHelper: any;
 
-  min: number;
+  min: Timestamp;
 
-  max: number;
+  max: Timestamp;
 
-  keys: number[];
+  keys: Timestamp[];
 
-  yankedDomains: number[];
+  yankedDomains: Timestamp[];
 
   constructor(
     dateHelper: any,
     interval?: string,
-    start?: Date | number,
-    range?: Date | number,
+    start?: Date | Timestamp,
+    range?: Date | Timestamp,
   ) {
     this.collection = new Map();
     this.dateHelper = dateHelper;
@@ -47,7 +47,7 @@ export default class DomainCollection {
       this.collection = new Map(
         this.dateHelper
           .intervals(interval, start, range)
-          .map((d: number) => castArray(d)),
+          .map((d: Timestamp) => castArray(d)),
       );
     }
 
@@ -61,11 +61,11 @@ export default class DomainCollection {
     }
   }
 
-  has(key: number): boolean {
+  has(key: Timestamp): boolean {
     return this.collection.has(key);
   }
 
-  get(key: number) {
+  get(key: Timestamp) {
     return this.collection.get(key);
   }
 
@@ -73,11 +73,11 @@ export default class DomainCollection {
     return this.collection.forEach(callback);
   }
 
-  at(index: number): number {
+  at(index: number): Timestamp {
     return this.keys[index];
   }
 
-  clamp(minDate?: number, maxDate?: number): DomainCollection {
+  clamp(minDate?: Timestamp, maxDate?: Timestamp): DomainCollection {
     if (minDate && this.min! < minDate) {
       this.keys
         .filter((key) => key < minDate)
@@ -151,15 +151,15 @@ export default class DomainCollection {
       y: DataOptions['y'];
       groupY: DataOptions['groupY'];
     },
-    startDate: Date | number,
-    endDate: Date | number,
+    startDate: Date | Timestamp,
+    endDate: Date | Timestamp,
     domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
   ): void {
-    const cleanedData: Map<number, Map<number, DataRecord[]>> = group(
+    const cleanedData: Map<Timestamp, Map<Timestamp, DataRecord[]>> = group(
       data,
-      (d): number => this.#extractTimestamp(d, x, domainKeyExtractor),
-      (d): number => this.#extractTimestamp(d, x, subDomainKeyExtractor),
+      (d): Timestamp => this.#extractTimestamp(d, x, domainKeyExtractor),
+      (d): Timestamp => this.#extractTimestamp(d, x, subDomainKeyExtractor),
     );
 
     this.keys.forEach((domainKey) => {
@@ -220,8 +220,8 @@ export default class DomainCollection {
     datum: DataRecord,
     x: string | Function,
     extractorFn: Function,
-  ): number {
-    let timestamp: string | number =
+  ): Timestamp {
+    let timestamp: string | Timestamp =
       typeof x === 'function' ? x(datum) : datum[x];
 
     if (typeof timestamp === 'string') {
@@ -235,7 +235,7 @@ export default class DomainCollection {
     return extractorFn(timestamp);
   }
 
-  #refreshKeys(): number[] {
+  #refreshKeys(): Timestamp[] {
     this.keys = Array.from(this.collection.keys())
       .map((d: any) => parseInt(d, 10))
       .sort((a, b) => a - b);

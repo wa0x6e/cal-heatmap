@@ -1,5 +1,21 @@
 # Changelog
 
+## v4.0.0-beta.4 []
+
+### BREAKING CHANGES
+
+#### Replace momentjs by dayjs
+
+Momentjs have been replaced by the more lighter day.js, slimming down
+the bundle by 75%. Timezone support is now a built-in function, instead
+of a plugin.
+
+### Features
+
+- Locales will be loaded asynchronously by the calendar itself
+
+This migration required further tests, to ensure listed browser support is met.
+
 ## v4.0.0-beta.3 [2023-01-14]
 
 ### Bug Fixes

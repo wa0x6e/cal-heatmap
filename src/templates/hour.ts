@@ -8,13 +8,11 @@ const hourTemplate: Template = (
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
 
-  const domainType = domain.type;
-
   return {
     name: 'hour',
     rowsCount: () => ROWS_COUNT,
     columnsCount: (ts) => {
-      switch (domainType) {
+      switch (domain.type) {
         case 'week':
           return (TOTAL_ITEMS / ROWS_COUNT) * 7;
         case 'month':
@@ -40,11 +38,11 @@ const hourTemplate: Template = (
         let baseX = Math.floor(hour / ROWS_COUNT);
         const columnOffset = TOTAL_ITEMS / ROWS_COUNT;
 
-        if (domainType === 'month') {
+        if (domain.type === 'month') {
           baseX += (monthDate - 1) * columnOffset;
         }
-        if (domainType === 'week') {
-          baseX += (date.isoWeekday() - 1) * columnOffset;
+        if (domain.type === 'week') {
+          baseX += (+date.format('d')) * columnOffset;
         }
 
         return {

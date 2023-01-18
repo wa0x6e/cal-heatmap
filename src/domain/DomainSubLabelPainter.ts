@@ -50,7 +50,7 @@ export default class DomainSubLabel {
       textAlign = 'start';
     }
 
-    const labels = text(this.calendar.dateHelper.momentInstance).map(
+    const labels = text().map(
       (t: string, i: number) => `${i}${SEP}${t}`,
     );
 

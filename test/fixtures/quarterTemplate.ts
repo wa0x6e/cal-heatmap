@@ -1,3 +1,4 @@
+import type { OpUnitType } from 'dayjs';
 import type DateHelper from '../../src/helpers/DateHelper';
 
 const quarterTemplate = (DateHelper: DateHelper) => ({
@@ -18,12 +19,8 @@ const quarterTemplate = (DateHelper: DateHelper) => ({
         ...defaultValues,
       }),
     ),
-
-  format: {
-    domainLabel: 'Q',
-  },
   extractUnit(ts: number) {
-    return DateHelper.date(ts).startOf('quarter').valueOf();
+    return DateHelper.date(ts).startOf('quarter' as OpUnitType).valueOf();
   },
 });
 

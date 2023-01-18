@@ -1,5 +1,6 @@
 import { Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
+import type { Timestamp } from '../index';
 
 const BASE_CLASSNAME = 'graph-subdomain-group';
 
@@ -107,14 +108,17 @@ export default class SubDomainPainter {
    * @param  {number} timestamp Unix timestamp of the current subDomain
    * @return {String} the highlight class
    */
-  #classname(timestamp: number, ...otherClasses: any): string {
+  #classname(timestamp: Timestamp, ...otherClasses: any): string {
     const { date, subDomain } = this.calendar.options.options;
-    const { dateHelper } = this.calendar;
     let classname = '';
 
     if (date.highlight.length > 0) {
       date.highlight.forEach((d) => {
-        if (dateHelper.datesFromSameInterval(subDomain.type, +d, timestamp)) {
+        const unitFn = this.calendar.templateCollection.get(
+          subDomain.type,
+        ).extractUnit;
+
+        if (unitFn(+d) === unitFn(timestamp)) {
           classname = 'highlight';
         }
       });

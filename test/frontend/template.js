@@ -1,3 +1,5 @@
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+
 /* eslint-disable arrow-body-style */
 const data = {
   title: 'Destroy() methods',
@@ -5,6 +7,7 @@ const data = {
     {
       title: 'adds the given template',
       setup: (cal) => {
+        cal.dateHelper.extend(quarterOfYear);
         const template = (DateHelper) => ({
           name: 'quarter',
           rowsCount() {
@@ -25,10 +28,6 @@ const data = {
               y: 0,
               ...defaultValues,
             })),
-
-          format: {
-            domainLabel: 'Q',
-          },
           extractUnit(ts) {
             return DateHelper.date(ts).startOf('quarter').valueOf();
           },
@@ -36,7 +35,7 @@ const data = {
         cal.addTemplates(template);
         return cal.paint({
           range: 1,
-          date: { start: new Date(2020, 3, 5, 3, 6) },
+          date: { start: new Date('2020-04-05T03:06') },
           domain: { type: 'year' },
           subDomain: { type: 'quarter', label: 'Q' },
         });

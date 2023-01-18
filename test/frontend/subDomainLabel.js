@@ -41,7 +41,7 @@ const data = {
       setup: (cal) => {
         return cal.paint({
           range: 1,
-          date: { start: new Date(2020, 0, 1) },
+          date: { start: new Date('2020-01-01'), timezone: 'utc' },
           domain: { type: 'year' },
           subDomain: { type: 'month', label: 'MMMM YYYY' },
         });
@@ -68,7 +68,7 @@ const data = {
     {
       title: 'formats the label from a function',
       setup: (cal) => {
-        const date = new Date(2020, 0, 1);
+        const date = new Date('2020-01-01');
         const dd = [];
         dd.push({
           time: +date,

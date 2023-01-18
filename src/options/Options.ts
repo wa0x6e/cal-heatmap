@@ -3,8 +3,7 @@ import isEqual from 'lodash-es/isEqual';
 import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
-import type { Moment } from 'moment';
-import type { DomainType } from '../index';
+import type { DomainType, Timestamp } from '../index';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
@@ -25,7 +24,10 @@ export type DomainOptions = {
 };
 
 type LabelOptions = {
-  text?: string | null | ((timestamp: number, element: SVGElement) => string);
+  text?:
+  | string
+  | null
+  | ((timestamp: Timestamp, element: SVGElement) => string);
   position: 'top' | 'right' | 'bottom' | 'left';
   textAlign: 'start' | 'middle' | 'end';
   offset: {
@@ -38,7 +40,7 @@ type LabelOptions = {
 };
 
 type SubLabelOptions = {
-  text: (moment: Moment) => string[];
+  text: () => string[];
   radius?: number;
   width?: number;
   height?: number;
@@ -55,10 +57,14 @@ export type SubDomainOptions = {
   label:
   | string
   | null
-  | ((timestamp: number, value: number, element: SVGElement) => string);
+  | ((timestamp: Timestamp, value: number, element: SVGElement) => string);
   color?:
   | string
-  | ((timestamp: number, value: number, backgroundColor: string) => string);
+  | ((
+    timestamp: Timestamp,
+    value: number,
+    backgroundColor: string,
+  ) => string);
 };
 
 export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'median';
@@ -69,6 +75,7 @@ type DateOptions = {
   max?: Date;
   highlight: Date[];
   locale: string;
+  timezone?: string;
 };
 
 export type DataRecord = Record<string, string | number>;
@@ -144,11 +151,11 @@ export default class Options {
           // Formatting of the domain label
           // @default: undefined, will use the formatting
           // according to domain type
-          // Accept a string used as specifier by moment().format()
+          // Accept any string accepted by dayjs.format()
           // or a function
           //
-          // Refer to https://momentjs.com/docs/#/displaying/
-          // for accepted date formatting used by moment().format()
+          // Refer to https://day.js.org/docs/en/display/format
+          // for list of accepted string tokens used by dayjs.format()
           text: undefined,
 
           // valid: top, right, bottom, left
@@ -192,11 +199,11 @@ export default class Options {
 
         // Formatting of the text inside each subDomain cell
         // @default: null, no text
-        // Accept a string used as specifier by moment().format()
+        // Accept any string accepted by dayjs.format()
         // or a function
         //
-        // Refer to https://momentjs.com/docs/#/displaying/
-        // for accepted date formatting used by moment().format()
+        // Refer to https://day.js.org/docs/en/display/format
+        // for list of accepted string tokens used by dayjs.format()
         label: null,
 
         color: undefined,
@@ -217,8 +224,9 @@ export default class Options {
         // - an array of Date objects: highlight the specified dates
         highlight: [],
 
-        // MomentJS locale
         locale: 'en',
+
+        timezone: undefined,
       },
 
       // Calendar orientation

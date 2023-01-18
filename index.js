@@ -1,7 +1,6 @@
 import CalHeatmap from './src/CalHeatmap';
 import Tooltip from './src/plugins/Tooltip';
-import Timezone from './src/plugins/Timezone';
 import Legend from './src/plugins/Legend';
 import VERSION from './src/version';
 
-export { CalHeatmap as default, Tooltip, Timezone, Legend, VERSION };
+export { CalHeatmap as default, Tooltip, Legend, VERSION };

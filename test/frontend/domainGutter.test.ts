@@ -20,10 +20,10 @@ describe('on horizontal scroll', () => {
 
   [0, 50].forEach((gutter) => {
     describe(`on domain gutter = ${gutter}`, () => {
-      it('renders the given domain gutter', () => {
+      it('renders the given domain gutter', async () => {
         const baseWidth = 120;
 
-        cal.paint({
+        await cal.paint({
           range: 2,
           domain: { type: 'year', gutter, label: { text: null } },
           subDomain: { type: 'month', gutter: 0, width: 10 },
@@ -57,10 +57,10 @@ describe('on horizontal scroll', () => {
         ).toBe(`${baseWidth}`);
       });
 
-      it('does not affect the domain height', () => {
+      it('does not affect the domain height', async () => {
         const baseHeight = 10;
 
-        cal.paint({
+        await cal.paint({
           range: 2,
           domain: { type: 'year', gutter, label: { text: null } },
           subDomain: { type: 'month', gutter: 0, width: 10 },
@@ -108,10 +108,10 @@ describe('on vertical scroll', () => {
         document.getElementsByTagName('html')[0].innerHTML = '';
       });
 
-      it('renders the given domain gutter', () => {
+      it('renders the given domain gutter', async () => {
         const baseHeight = 10;
 
-        cal.paint({
+        await cal.paint({
           range: 2,
           verticalOrientation: true,
           domain: { type: 'year', gutter, label: { text: null } },
@@ -135,10 +135,10 @@ describe('on vertical scroll', () => {
         ).toBe(`${baseHeight}`);
       });
 
-      it('does not affect the domain width', () => {
+      it('does not affect the domain width', async () => {
         const baseWidth = 120;
 
-        cal.paint({
+        await cal.paint({
           range: 2,
           verticalOrientation: true,
           domain: { type: 'year', gutter, label: { text: null } },

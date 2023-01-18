@@ -2,7 +2,7 @@ import DomainCoordinates from './DomainCoordinates';
 
 import type CalHeatmap from '../CalHeatmap';
 import type { ScrollDirection } from '../constant';
-import type { Dimensions } from '../index';
+import type { Dimensions, Timestamp } from '../index';
 
 const DEFAULT_CLASSNAME = 'graph-domain';
 
@@ -46,7 +46,7 @@ export default class DomainPainter {
     this.root = calendarNode
       .select('.graph')
       .selectAll(`.${DEFAULT_CLASSNAME}`)
-      .data(this.calendar.domainCollection.keys, (d: number) => d)
+      .data(this.calendar.domainCollection.keys, (d: Timestamp) => d)
       .join(
         (enter: any) => enter
           .append('svg')
@@ -98,7 +98,7 @@ export default class DomainPainter {
     return promises;
   }
 
-  #getClassName(d: number): string {
+  #getClassName(d: Timestamp): string {
     let classname = DEFAULT_CLASSNAME;
     const helper = this.calendar.dateHelper.date(d);
 
@@ -107,7 +107,7 @@ export default class DomainPainter {
         classname += ` h_${helper.hour()}`;
         break;
       case 'day':
-        classname += ` d_${helper.date()} dy_${helper.isoWeekday()}`;
+        classname += ` d_${helper.date()} dy_${helper.format('d') + 1}`;
         break;
       case 'week':
         classname += ` w_${helper.week()}`;

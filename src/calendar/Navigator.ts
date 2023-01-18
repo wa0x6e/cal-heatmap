@@ -2,6 +2,7 @@ import { ScrollDirection } from '../constant';
 
 import type CalHeatmap from '../CalHeatmap';
 import type DomainCollection from './DomainCollection';
+import type { Timestamp } from '../index';
 
 export default class Navigator {
   calendar: CalHeatmap;
@@ -50,7 +51,7 @@ export default class Navigator {
     domainCollection.merge(
       newDomainCollection,
       options.range,
-      (domainKey: number, index: number) => {
+      (domainKey: Timestamp, index: number) => {
         let subDomainEndDate = null;
         if (newDomainCollection.at(index + 1)) {
           subDomainEndDate = newDomainCollection.at(index + 1);
@@ -61,7 +62,7 @@ export default class Navigator {
         }
         return templatesClt
           .get(options.subDomain.type)!
-          .mapping(domainKey, subDomainEndDate! - 1000)
+          .mapping(domainKey, subDomainEndDate!)
           .map((d) => ({ ...d, v: null }));
       },
     );
@@ -114,8 +115,8 @@ export default class Navigator {
 
   #isDomainBoundaryReached(
     newDomainCollection: DomainCollection,
-    minDate?: number,
-    maxDate?: number,
+    minDate?: Timestamp,
+    maxDate?: Timestamp,
     direction?: ScrollDirection,
   ): boolean {
     if (
@@ -140,10 +141,10 @@ export default class Navigator {
   }
 
   #setDomainsBoundaryReached(
-    lowerBound: number,
-    upperBound: number,
-    min?: number,
-    max?: number,
+    lowerBound: Timestamp,
+    upperBound: Timestamp,
+    min?: Timestamp,
+    max?: Timestamp,
   ): void {
     if (min) {
       const reached = lowerBound <= min;

@@ -12,7 +12,7 @@ const data = {
             type: 'day',
             label: (ts) => new Date(ts).toISOString(),
           },
-          date: { start: new Date(2020, 6, 15, 2, 6) },
+          date: { start: new Date('2020-07-15T02:06'), timezone: 'utc' },
         });
       },
       expectations: [
@@ -20,7 +20,7 @@ const data = {
           current: (d3) => {
             return d3.select(d3.select('.subdomain-text').nodes()[0]).html();
           },
-          expected: () => new Date(2020, 6, 1, 0, 0).toISOString(),
+          expected: () => new Date('2020-07-01T00:00Z').toISOString(),
         },
       ],
     },
@@ -34,7 +34,11 @@ const data = {
             type: 'day',
             label: (ts) => new Date(ts).toISOString(),
           },
-          date: { start: new Date(2020, 0, 15, 2, 6), locale: 'fr' },
+          date: {
+            start: new Date('2020-01-15T02:06'),
+            locale: 'fr',
+            timezone: 'utc',
+          },
         });
       },
       expectations: [
@@ -56,7 +60,7 @@ const data = {
             type: 'day',
             label: (ts) => new Date(ts).toISOString(),
           },
-          date: { start: new Date(2020, 0, 15, 2, 6) },
+          date: { start: new Date('2020-01-15T02:06'), timezone: 'utc' },
         });
       },
       expectations: [
@@ -80,7 +84,11 @@ const data = {
             type: 'day',
             label: (ts) => new Date(ts).toISOString(),
           },
-          date: { start: new Date(2020, 0, 15, 2, 6), locale: 'fr' },
+          date: {
+            start: new Date('2020-01-15T02:06'),
+            locale: 'fr',
+            timezone: 'utc',
+          },
         });
       },
       expectations: [
@@ -105,8 +113,9 @@ const data = {
             label: (ts) => new Date(ts).toISOString(),
           },
           date: {
-            start: new Date(2020, 0, 15, 2, 6),
-            highlight: [new Date(2020, 0, 15), new Date(2020, 0, 25)],
+            start: new Date('2020-01-15T02:06'),
+            highlight: [new Date('2020-01-15'), new Date('2020-01-25')],
+            timezone: 'utc',
           },
         });
       },

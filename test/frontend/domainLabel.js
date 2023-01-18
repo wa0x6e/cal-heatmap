@@ -43,7 +43,7 @@ const data = {
           range: 1,
           domain: { type: 'month', label: undefined },
           subDomain: { type: 'week' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15') },
         });
       },
       expectations: [
@@ -65,7 +65,7 @@ const data = {
             label: { text: (ts) => `${new Date(ts).getMonth()};` },
           },
           subDomain: { type: 'week' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15') },
         });
       },
       expectations: [
@@ -84,7 +84,7 @@ const data = {
           range: 1,
           domain: { type: 'month', label: { text: 'MMM' } },
           subDomain: { type: 'week' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15') },
         });
       },
       expectations: [

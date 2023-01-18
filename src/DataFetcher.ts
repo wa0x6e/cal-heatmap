@@ -4,11 +4,12 @@ import {
 
 import type { DataOptions, DataRecord } from './options/Options';
 import type Options from './options/Options';
+import type { Timestamp } from './index';
 
 const parseURI = (
   str: string,
-  startTimestamp: number,
-  endTimestamp: number,
+  startTimestamp: Timestamp,
+  endTimestamp: Timestamp,
 ): string => {
   // Use a timestamp in seconds
   let newUri = str.replace(/\{\{t:start\}\}/g, `${startTimestamp / 1000}`);
@@ -45,8 +46,8 @@ export default class DataFetcher {
    */
   async getDatas(
     source: DataOptions['source'],
-    startTimestamp: number,
-    endTimestamp: number,
+    startTimestamp: Timestamp,
+    endTimestamp: Timestamp,
   ): Promise<unknown> {
     if (typeof source === 'string' && source.length > 0) {
       return this.#fetch(source, startTimestamp, endTimestamp);
@@ -64,8 +65,8 @@ export default class DataFetcher {
 
   #fetch(
     source: DataOptions['source'],
-    startTimestamp: number,
-    endTimestamp: number,
+    startTimestamp: Timestamp,
+    endTimestamp: Timestamp,
   ): Promise<unknown> {
     const { type, requestInit } = this.options.options.data;
 

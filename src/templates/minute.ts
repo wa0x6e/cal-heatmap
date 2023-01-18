@@ -14,15 +14,11 @@ const minuteTemplate: Template = (DateHelper) => {
         'minute',
         startTimestamp,
         DateHelper.date(endTimestamp),
-      ).map((ts) => {
-        const minute = DateHelper.date(ts).minute();
-
-        return {
-          t: ts,
-          x: Math.floor(minute / COLUMNS_COUNT),
-          y: minute % COLUMNS_COUNT,
-        };
-      }),
+      ).map((ts, index: number) => ({
+        t: ts,
+        x: Math.floor(index / COLUMNS_COUNT),
+        y: index % COLUMNS_COUNT,
+      })),
     extractUnit: (ts) => DateHelper.date(ts).startOf('minute').valueOf(),
   };
 };

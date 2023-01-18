@@ -2,7 +2,7 @@ import { createPopper } from '@popperjs/core';
 
 import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
-import type { IPlugin, PluginOptions } from '../index';
+import type { IPlugin, PluginOptions, Timestamp } from '../index';
 
 const BASE_CLASSNAME = 'ch-tooltip';
 
@@ -15,16 +15,16 @@ interface PopperOptions {
 
 interface TooltipOptions extends PluginOptions, PopperOptions {
   enabled: boolean;
-  text: (timestamp: number, value: number, moment: any) => string;
+  text: (timestamp: Timestamp, value: number) => string;
 }
 
 const defaultOptions: PluginOptions = {
   enabled: true,
 
   // Expecting a function, which will return the tooltip content
-  text: (timestamp: number, value: number, moment: any): string =>
+  text: (timestamp: Timestamp, value: number): string =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    `${value} - ${moment(timestamp).format('LLLL')}`,
+    `${value} - ${new Date(timestamp)}`,
 };
 
 const DEFAULT_POPPER_OPTIONS = {
@@ -122,7 +122,7 @@ export default class Tooltip implements IPlugin {
     }
   }
 
-  mouseOverCallback(e: PointerEvent, timestamp: number, value: number) {
+  mouseOverCallback(e: PointerEvent, timestamp: Timestamp, value: number) {
     this.#show(e.target, timestamp, value);
   }
 
@@ -143,10 +143,10 @@ export default class Tooltip implements IPlugin {
     return Promise.resolve();
   }
 
-  #show(e: any, timestamp: number, value: number): void {
+  #show(e: any, timestamp: Timestamp, value: number): void {
     const formatter = this.options.text;
     const title = formatter ?
-      formatter(timestamp, value, this.calendar.dateHelper.momentInstance) :
+      formatter(timestamp, value) :
       null;
 
     if (!title) {

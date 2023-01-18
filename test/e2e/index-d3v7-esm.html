@@ -27,7 +27,9 @@
 		<script type="module">
 			import CalHeatmap from "../../dist/cal-heatmap.esm.js";
 			import Tooltip from "../../dist/plugins/Tooltip.esm.js";
+			import legend from "../../dist/plugins/Legend.esm.js";
 			window.Tooltip = Tooltip;
+			window.Legend = Legend;
 
 			cal = new CalHeatmap();
 			cal.paint();

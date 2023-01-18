@@ -12,16 +12,14 @@ const dayTemplate: Template = (
   },
 ) => {
   const COLUMNS_COUNT = 7;
-  const domainType = domain.type;
-  const { dynamicDimension } = domain;
 
   return {
     name: 'x_day',
     rowsCount: (ts) => {
-      switch (domainType) {
+      switch (domain.type) {
         case 'month':
           return Math.ceil(
-            dynamicDimension && !verticalOrientation ?
+            domain.dynamicDimension && !verticalOrientation ?
               DateHelper.getMonthWeekNumber(
                 DateHelper.date(ts).endOf('month'),
               ) :
@@ -29,7 +27,7 @@ const dayTemplate: Template = (
           );
         case 'year':
           return Math.ceil(
-            dynamicDimension ?
+            domain.dynamicDimension ?
               DateHelper.date(ts).endOf('year').dayOfYear() / COLUMNS_COUNT :
               54,
           );
@@ -39,7 +37,7 @@ const dayTemplate: Template = (
       }
     },
     columnsCount: () => {
-      if (domainType === 'week') {
+      if (domain.type === 'week') {
         return 1;
       }
       return COLUMNS_COUNT;
@@ -55,7 +53,7 @@ const dayTemplate: Template = (
         const endWeekNumber = DateHelper.date(ts).endOf('year').week();
         let x = 0;
 
-        switch (domainType) {
+        switch (domain.type) {
           case 'month':
             x = DateHelper.getMonthWeekNumber(ts) - 1;
             break;
@@ -75,7 +73,7 @@ const dayTemplate: Template = (
         return {
           t: ts,
           y: x,
-          x: domainType === 'week' ? 0 : date.weekday(),
+          x: domain.type === 'week' ? 0 : date.weekday(),
         };
       }),
     extractUnit: (ts) => DateHelper.date(ts).startOf('day').valueOf(),

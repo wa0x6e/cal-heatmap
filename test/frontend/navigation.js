@@ -9,7 +9,7 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
@@ -57,7 +57,7 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
@@ -105,7 +105,7 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
@@ -153,7 +153,7 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
@@ -201,7 +201,11 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15), min: new Date(2015, 0, 15) },
+          date: {
+            start: new Date('2020-01-15'),
+            min: new Date('2015-01-15'),
+            timezone: 'utc',
+          },
         });
       },
       execute: (cal) => {
@@ -249,7 +253,11 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15), max: new Date(2025, 0, 15) },
+          date: {
+            start: new Date('2020-01-15'),
+            max: new Date('2025-01-15'),
+            timezone: 'utc',
+          },
         });
       },
       execute: (cal) => {
@@ -297,11 +305,11 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
-        return cal.jumpTo(new Date(2015, 6, 3));
+        return cal.jumpTo(new Date('2015-07-03'));
       },
       preExpectations: [
         {
@@ -345,11 +353,11 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
-        return cal.jumpTo(new Date(2025, 6, 3));
+        return cal.jumpTo(new Date('2025-07-03'));
       },
       preExpectations: [
         {
@@ -393,11 +401,11 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
-        return cal.jumpTo(new Date(2025, 6, 3), true);
+        return cal.jumpTo(new Date('2025-07-03'), true);
       },
       preExpectations: [
         {
@@ -441,11 +449,11 @@ const data = {
           range: 2,
           domain: { type: 'year' },
           subDomain: { type: 'month' },
-          date: { start: new Date(2020, 0, 15) },
+          date: { start: new Date('2020-01-15'), timezone: 'utc' },
         });
       },
       execute: (cal) => {
-        return cal.jumpTo(new Date(2020, 6, 3));
+        return cal.jumpTo(new Date('2020-07-03'));
       },
       preExpectations: [
         {

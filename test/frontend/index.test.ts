@@ -1,7 +1,6 @@
 /* eslint-disable jest/no-conditional-expect */
 /* eslint-disable jest/valid-title */
 import { select, selectAll } from 'd3-selection';
-
 /**
  * @jest-environment jsdom
  */
