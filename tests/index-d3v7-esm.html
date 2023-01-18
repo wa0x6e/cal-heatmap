@@ -3,7 +3,7 @@
 		<script src="https://d3js.org/d3.v7.min.js"></script>
 		<link
 			rel="stylesheet"
-			href="https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/cal-heatmap.css"
+			href="https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/cal-heatmap.css"
 		/>
 		<script src="https://unpkg.com/@popperjs/core@2"></script>
 		<link
@@ -32,9 +32,11 @@
 			let cal;
 		</script>
 		<script type="module">
-			import CalHeatmap from 'https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/cal-heatmap.esm.js';
-			import Tooltip from 'https://unpkg.com/cal-heatmap@4.0.0-beta.2/dist/plugins/Tooltip.esm.js';
+			import CalHeatmap from 'https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/cal-heatmap.esm.js';
+			import Tooltip from 'https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/plugins/Tooltip.esm.js';
+			import Legend from 'https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/plugins/Legend.esm.js';
 			window.Tooltip = Tooltip;
+			window.Legend = Legend;
 
 			cal = new CalHeatmap();
 			cal.paint();
