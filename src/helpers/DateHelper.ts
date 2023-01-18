@@ -40,6 +40,7 @@ export default class DateHelper {
     this.timezone = options.date.timezone || dayjs.tz.guess();
 
     if (this.locale !== DEFAULT_LOCALE) {
+      (window as any).dayjs ||= dayjs;
       const locale = await this.loadLocale();
       this.locale = locale;
     }

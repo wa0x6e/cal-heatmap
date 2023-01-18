@@ -1,5 +1,7 @@
 import EventEmmiter from 'eventemitter3';
 import castArray from 'lodash-es/castArray';
+import type { PluginFunc } from 'dayjs';
+import type dayjs from 'dayjs';
 
 import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
@@ -269,5 +271,9 @@ export default class CalHeatmap {
    */
   destroy(): Promise<unknown> {
     return this.calendarPainter.destroy();
+  }
+
+  extendDayjs(plugin: PluginFunc): dayjs.Dayjs {
+    return this.dateHelper.extend(plugin);
   }
 }

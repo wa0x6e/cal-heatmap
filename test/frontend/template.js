@@ -1,37 +1,41 @@
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
 
+window.dayjs_plugin_quarterOfYear = quarterOfYear;
+
 /* eslint-disable arrow-body-style */
 const data = {
-  title: 'Destroy() methods',
+  title: 'addTemplates() methods',
   tests: [
     {
       title: 'adds the given template',
       setup: (cal) => {
-        cal.dateHelper.extend(quarterOfYear);
-        const template = (DateHelper) => ({
-          name: 'quarter',
-          rowsCount() {
-            return 1;
-          },
-          columnsCount() {
-            return 4;
-          },
-          mapping: (startDate, endDate, defaultValues) =>
-            // eslint-disable-next-line implicit-arrow-linebreak
-            DateHelper.intervals(
-              'quarter',
-              startDate,
-              DateHelper.date(endDate),
-            ).map((d, index) => ({
-              t: d,
-              x: index,
-              y: 0,
-              ...defaultValues,
-            })),
-          extractUnit(ts) {
-            return DateHelper.date(ts).startOf('quarter').valueOf();
-          },
-        });
+        cal.extendDayjs(window.dayjs_plugin_quarterOfYear);
+        const template = (DateHelper) => {
+          return {
+            name: 'quarter',
+            rowsCount() {
+              return 1;
+            },
+            columnsCount() {
+              return 4;
+            },
+            mapping: (startDate, endDate, defaultValues) =>
+              // eslint-disable-next-line implicit-arrow-linebreak
+              DateHelper.intervals(
+                'quarter',
+                startDate,
+                DateHelper.date(endDate),
+              ).map((d, index) => ({
+                t: d,
+                x: index,
+                y: 0,
+                ...defaultValues,
+              })),
+            extractUnit(ts) {
+              return DateHelper.date(ts).startOf('quarter').valueOf();
+            },
+          };
+        };
         cal.addTemplates(template);
         return cal.paint({
           range: 1,

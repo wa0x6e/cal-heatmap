@@ -3,6 +3,7 @@
 		<script src="https://d3js.org/d3.v7.min.js"></script>
 		<link rel="stylesheet" href="../../dist/cal-heatmap.css" />
 		<script src="https://unpkg.com/@popperjs/core@2"></script>
+		<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/quarterOfYear.js"></script>
 		<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 		<title>CalHeatmap E2E test with ESM d3v7</title>
 	</head>
@@ -29,7 +30,6 @@
 			import Tooltip from "../../dist/plugins/Tooltip.esm.js";
 			import legend from "../../dist/plugins/Legend.esm.js";
 			window.Tooltip = Tooltip;
-			window.Legend = Legend;
 
 			cal = new CalHeatmap();
 			cal.paint();
