@@ -20,7 +20,9 @@ const quarterTemplate = (DateHelper: DateHelper) => ({
       }),
     ),
   extractUnit(ts: number) {
-    return DateHelper.date(ts).startOf('quarter' as OpUnitType).valueOf();
+    return DateHelper.date(ts)
+      .startOf('quarter' as OpUnitType)
+      .valueOf();
   },
 });
 

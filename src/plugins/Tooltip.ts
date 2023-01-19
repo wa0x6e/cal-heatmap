@@ -145,9 +145,7 @@ export default class Tooltip implements IPlugin {
 
   #show(e: any, timestamp: Timestamp, value: number): void {
     const formatter = this.options.text;
-    const title = formatter ?
-      formatter(timestamp, value) :
-      null;
+    const title = formatter ? formatter(timestamp, value) : null;
 
     if (!title) {
       return;

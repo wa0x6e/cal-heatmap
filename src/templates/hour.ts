@@ -42,7 +42,7 @@ const hourTemplate: Template = (
           baseX += (monthDate - 1) * columnOffset;
         }
         if (domain.type === 'week') {
-          baseX += (+date.format('d')) * columnOffset;
+          baseX += +date.format('d') * columnOffset;
         }
 
         return {

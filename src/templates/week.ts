@@ -22,7 +22,7 @@ const weekTemplate: Template = (
     }
   },
   mapping: (startTimestamp, endTimestamp) =>
-  // eslint-disable-next-line implicit-arrow-linebreak
+    // eslint-disable-next-line implicit-arrow-linebreak
     DateHelper.intervals(
       'week',
       startTimestamp,

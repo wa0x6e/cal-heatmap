@@ -50,9 +50,7 @@ export default class DomainSubLabel {
       textAlign = 'start';
     }
 
-    const labels = text().map(
-      (t: string, i: number) => `${i}${SEP}${t}`,
-    );
+    const labels = text().map((t: string, i: number) => `${i}${SEP}${t}`);
 
     this.dimensions = {
       width: width + gutter,
