@@ -1,3 +1,7 @@
+import locale_fr from 'dayjs/locale/fr';
+
+window.dayjs_locale_fr = locale_fr;
+
 /* eslint-disable arrow-body-style */
 const data = {
   title: 'Options: date',

@@ -90,7 +90,7 @@ export default class Navigator {
 
     if (date < minDate) {
       return this.loadNewDomains(
-        this.calendar.createDomainCollection(date, minDate),
+        this.calendar.createDomainCollection(date, minDate, false),
         ScrollDirection.SCROLL_BACKWARD,
       );
     }
@@ -105,7 +105,7 @@ export default class Navigator {
 
     if (date > maxDate) {
       return this.loadNewDomains(
-        this.calendar.createDomainCollection(maxDate, date),
+        this.calendar.createDomainCollection(maxDate, date, false),
         ScrollDirection.SCROLL_FORWARD,
       );
     }

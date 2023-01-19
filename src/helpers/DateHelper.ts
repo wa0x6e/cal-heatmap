@@ -41,7 +41,9 @@ export default class DateHelper {
 
     if (this.locale !== DEFAULT_LOCALE) {
       (window as any).dayjs ||= dayjs;
-      const locale = await this.loadLocale();
+      const locale =
+        (window as any)[`dayjs_locale_${this.locale}`] ||
+        (await this.loadLocale());
       this.locale = locale;
     }
   }
@@ -92,13 +94,15 @@ export default class DateHelper {
    *
    * @param  {number|Date} date A random date included in the wanted interval
    * @param  {number|Date} range Length of the wanted interval, or a stop date.
-   *                             Stop date is always excluded
+   * @param  {boolean} range Whether the end date should be excluded
+   *                         from the result
    * @returns {Array<number>} Array of unix timestamp, in milliseconds
    */
   intervals(
     interval: string,
     date: Timestamp | Date,
     range: number | Date | dayjs.Dayjs,
+    excludeEnd: boolean = true,
   ): Timestamp[] {
     let end: dayjs.Dayjs;
     if (typeof range === 'number') {
@@ -113,6 +117,10 @@ export default class DateHelper {
     let pivot = dayjs.min(start, end);
     end = dayjs.max(start, end);
     const result: Timestamp[] = [];
+
+    if (!excludeEnd) {
+      end = end.add(1, 'second');
+    }
 
     do {
       result.push(+pivot);

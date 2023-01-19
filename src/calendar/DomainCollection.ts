@@ -39,6 +39,7 @@ export default class DomainCollection {
     interval?: string,
     start?: Date | Timestamp,
     range?: Date | Timestamp,
+    excludeEnd: boolean = false,
   ) {
     this.collection = new Map();
     this.dateHelper = dateHelper;
@@ -46,7 +47,7 @@ export default class DomainCollection {
     if (interval && start && range) {
       this.collection = new Map(
         this.dateHelper
-          .intervals(interval, start, range)
+          .intervals(interval, start, range, excludeEnd)
           .map((d: Timestamp) => castArray(d)),
       );
     }

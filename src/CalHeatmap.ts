@@ -78,12 +78,14 @@ export default class CalHeatmap {
   createDomainCollection(
     startDate: Timestamp | Date,
     range: number | Date,
+    excludeEnd: boolean = true,
   ): DomainCollection {
     return new DomainCollection(
       this.dateHelper,
       this.options.options.domain.type,
       startDate,
       range,
+      excludeEnd,
     );
   }
 
