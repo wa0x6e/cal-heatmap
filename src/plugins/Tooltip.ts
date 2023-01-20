@@ -1,5 +1,6 @@
 import { createPopper } from '@popperjs/core';
 
+import type dayjs from 'dayjs';
 import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
 import type { IPlugin, PluginOptions, Timestamp } from '../index';
@@ -15,16 +16,16 @@ interface PopperOptions {
 
 interface TooltipOptions extends PluginOptions, PopperOptions {
   enabled: boolean;
-  text: (timestamp: Timestamp, value: number) => string;
+  text: (timestamp: Timestamp, value: number, dayjsDate: dayjs.Dayjs) => string;
 }
 
-const defaultOptions: PluginOptions = {
+const defaultOptions: Partial<TooltipOptions> = {
   enabled: true,
 
   // Expecting a function, which will return the tooltip content
-  text: (timestamp: Timestamp, value: number): string =>
+  text: (timestamp, value, dayjsDate): string =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    `${value} - ${new Date(timestamp)}`,
+    `${value} - ${dayjsDate.format('LLLL')}`,
 };
 
 const DEFAULT_POPPER_OPTIONS = {
@@ -145,7 +146,9 @@ export default class Tooltip implements IPlugin {
 
   #show(e: any, timestamp: Timestamp, value: number): void {
     const formatter = this.options.text;
-    const title = formatter ? formatter(timestamp, value) : null;
+    const title = formatter ?
+      formatter(timestamp, value, this.calendar.dateHelper.date(timestamp)) :
+      null;
 
     if (!title) {
       return;
