@@ -33,6 +33,7 @@ export default class DateHelper {
   constructor() {
     this.locale = DEFAULT_LOCALE;
     this.timezone = dayjs.tz.guess();
+    (window as any).dayjs ||= dayjs;
   }
 
   async setup({ options }: { options: OptionsType }) {
@@ -40,10 +41,10 @@ export default class DateHelper {
     this.timezone = options.date.timezone || dayjs.tz.guess();
 
     if (this.locale !== DEFAULT_LOCALE) {
-      (window as any).dayjs ||= dayjs;
       const locale =
         (window as any)[`dayjs_locale_${this.locale}`] ||
         (await this.loadLocale());
+      dayjs.locale(this.locale);
       this.locale = locale;
     }
   }
