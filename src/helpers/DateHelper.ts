@@ -8,6 +8,8 @@ import isLeapYear from 'dayjs/plugin/isLeapYear';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import localeData from 'dayjs/plugin/localeData';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 import type { ManipulateType, PluginFunc } from 'dayjs';
 import type { OptionsType } from '../options/Options';
@@ -22,6 +24,8 @@ dayjs.extend(minMax);
 dayjs.extend(advancedFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(localeData);
+dayjs.extend(localizedFormat);
 
 const DEFAULT_LOCALE = 'en';
 
