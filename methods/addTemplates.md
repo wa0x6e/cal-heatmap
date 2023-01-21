@@ -2,7 +2,7 @@
 layout: default
 title: addTemplates()
 parent: Methods
-nav_order: 6
+nav_order: 10
 ---
 
 # addTemplates()
