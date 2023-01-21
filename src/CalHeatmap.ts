@@ -233,8 +233,6 @@ export default class CalHeatmap {
           this.domainCollection.fill(
             data,
             options.data,
-            this.domainCollection.min,
-            endDate,
             template.get(options.domain.type)!.extractUnit,
             template.get(options.subDomain.type)!.extractUnit,
           );

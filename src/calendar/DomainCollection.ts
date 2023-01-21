@@ -152,28 +152,32 @@ export default class DomainCollection {
       y: DataOptions['y'];
       groupY: DataOptions['groupY'];
     },
-    startDate: Date | Timestamp,
-    endDate: Date | Timestamp,
     domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
   ): void {
-    const cleanedData: Map<Timestamp, Map<Timestamp, DataRecord[]>> = group(
-      data,
-      (d): Timestamp => this.#extractTimestamp(d, x, domainKeyExtractor),
-      (d): Timestamp => this.#extractTimestamp(d, x, subDomainKeyExtractor),
-    );
+    const clampedData: Map<Timestamp, DataRecord[]> = new Map();
+    data.forEach((d) => {
+      const timestamp = this.#extractTimestamp(d, x, domainKeyExtractor);
+
+      if (this.collection.has(timestamp)) {
+        const records = clampedData.get(timestamp) || [];
+        clampedData.set(timestamp, [...records, d]);
+      }
+    });
 
     this.keys.forEach((domainKey) => {
+      const records = group(
+        clampedData.get(domainKey) || [],
+        (d): Timestamp => this.#extractTimestamp(d, x, subDomainKeyExtractor),
+      );
+
       this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
         let value: number | null = null;
 
-        if (
-          cleanedData.has(domainKey) &&
-          cleanedData.get(domainKey)!.has(subDomain.t)
-        ) {
+        if (records.has(subDomain.t)) {
           value = this.#groupValues(
             this.#extractValues(
-              cleanedData.get(domainKey)!.get(subDomain.t)!,
+              records.get(subDomain.t)!,
               y,
             ),
             groupY,
