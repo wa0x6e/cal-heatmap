@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.0.0-beta.4 []
+## v4.0.0-beta.4 [2023-01-21]
 
 ### BREAKING CHANGES
 
@@ -10,11 +10,22 @@ Momentjs have been replaced by the more lighter day.js, slimming down
 the bundle by 75%. Timezone support is now a built-in function, instead
 of a plugin.
 
+### Refactor/Performance
+
+- Some refactoring, so that `d3-array` is not a required depency anymore
+- Avoid redundant calls to dayjs initializer
+- Do not process data irrelevant to the calendar current time window
+
 ### Features
 
 - Locales will be loaded asynchronously by the calendar itself
+- Add new `extendDayjs()` method to extend dayjs with a plugin, as it's built-in with the minimum number of plugins
 
 This migration required further tests, to ensure listed browser support is met.
+
+### Pending issues
+
+- Dayjs is having some performance issues when using the timezone plugin (https://github.com/iamkun/dayjs/pull/2019).
 
 ## v4.0.0-beta.3 [2023-01-14]
 
