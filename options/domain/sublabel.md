@@ -19,7 +19,7 @@ Specify all options related to the domain's subLabel configuration
 
 ```js
 type SubLabelOptions = {
-  text: (moment: Moment) => string[],
+  text: () => string[],
   radius?: number,
   width?: number,
   height?: number,
@@ -42,11 +42,8 @@ Future updates will allow more customization, and broaden the scope of applicati
 A function which return an array of labels.
 
 ```js
-text: (moment: Moment) => string[],
+text: () => string[],
 ```
-
-A `moment` object is provided as the function first argument, and can be used
-to extract locale aware data.
 
 The number of returned result is up to you, and generally
 depends on the subDomain's type.
@@ -66,7 +63,7 @@ depends on the subDomain's type.
           text: null
         },
         subLabel: {
-          text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()),
+          text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()),
         }
       },
       subDomain: { type: 'day' },
@@ -81,7 +78,7 @@ cal.paint({
     type: 'year',
     subLabel: {
       // Following function returns a list of locale aware weekdays
-      text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()),
+      text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()),
     }
   },
   subDomain: { type: 'day' },
@@ -109,7 +106,7 @@ Reproducing the day labels from github contribution heatmap
         subLabel: {
           width: 30,
           textAlign: 'start',
-          text: (moment) => moment.weekdaysShort(true).map((d, i) => i % 2 == 0 ? '' : d),
+          text: () => dayjs.weekdaysShort().map((d, i) => i % 2 == 0 ? '' : d),
         }
       },
       subDomain: { type: 'day' },
@@ -125,7 +122,7 @@ cal.paint({
     subLabel: {
       width: 30,
       textAlign: 'start',
-      text: (moment) => moment.weekdaysShort(true).map((d, i) => i % 2 == 0 ? '' : d),
+      text: () => dayjs.weekdaysShort().map((d, i) => i % 2 == 0 ? '' : d),
     }
   },
   subDomain: { type: 'day' },
@@ -166,7 +163,7 @@ Default: `0`
   <script>
       const cal4 = new CalHeatmap();
       let radius = 0;
-      cal4.paint({ domain: { type: 'month', subLabel: { radius: radius, text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#radius-example-2'});
+      cal4.paint({ domain: { type: 'month', subLabel: { radius: radius, text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#radius-example-2'});
       d3.select("#radius-slider").on("input", function() {
         cal4.paint({ domain: { subLabel: { radius: +this.value } } });
         d3.select("#radius-value").html(+this.value);
@@ -207,7 +204,7 @@ Default: [subDomain's width](/options/subDomain.html#width)
   <script>
       const cal5 = new CalHeatmap();
       let width = 10;
-      cal5.paint({ domain: { type: 'month', subLabel: { width: width, text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#width-example-2'});
+      cal5.paint({ domain: { type: 'month', subLabel: { width: width, text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#width-example-2'});
       d3.select("#width-slider").on("input", function() {
         cal5.paint({ domain: { subLabel: { width: +this.value } } });
         d3.select("#width-value").html(+this.value);
@@ -246,7 +243,7 @@ Default: [subDomains' height](/options/subDomain.html#height)
   <script>
       const cal6 = new CalHeatmap();
       let height = 10;
-      cal6.paint({ domain: { type: 'month', height: 10, subLabel: { height: height, text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#height-example-1'});
+      cal6.paint({ domain: { type: 'month', height: 10, subLabel: { height: height, text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#height-example-1'});
       d3.select("#height-slider").on("input", function() {
         cal6.paint({ domain: { subLabel: { height: +this.value } } });
         d3.select("#height-value").html(+this.value);
@@ -288,7 +285,7 @@ Default: [subDomains' gutter](/options/subDomain.html#gutter)
   <script>
       const cal7 = new CalHeatmap();
       let gutter = 2;
-      cal7.paint({ domain: { type: 'month', subLabel: { gutter: gutter, text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#gutter-example-1'});
+      cal7.paint({ domain: { type: 'month', subLabel: { gutter: gutter, text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#gutter-example-1'});
       d3.select("#gutter-slider").on("input", function() {
         cal7.paint({ domain: { subLabel: { gutter: +this.value } } });
         d3.select("#gutter-value").html(+this.value);
@@ -320,7 +317,7 @@ Default: `middle`
   <script>
       const cal8 = new CalHeatmap();
       let textAlign ='middle';
-      cal8.paint({ domain: { type: 'month', subLabel: { width: 35, textAlign: textAlign, text: (moment) => moment.weekdays(true).map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#textAlign-example-1'});
+      cal8.paint({ domain: { type: 'month', subLabel: { width: 35, textAlign: textAlign, text: () => dayjs.weekdays().map((d) => d[0].toUpperCase()) } }, subDomain: { type: 'day' } , range: 3, itemSelector: '#textAlign-example-1'});
       d3.select("#textAlign-slider").on("input", function() {
         cal8.paint({ domain: { subLabel: { textAlign: this.value } } });
         d3.select("#textAlign-value").html(+this.value);

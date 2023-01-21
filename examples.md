@@ -43,9 +43,9 @@ nav_order: 18
         y: 'temp_max',
       },
       date: {
-        start: new Date(2012,0,1),
-        min: new Date(2012,0,1),
-        max: new Date(2015,11,1)
+        start: new Date('2012-01-01'),
+        min: new Date('2012-01-01'),
+        max: new Date('2015-12-01'),
       },
       scale: {
         type: 'linear',
@@ -73,9 +73,9 @@ nav_order: 18
         groupY: 'max'
       },
       date: {
-        start: new Date(2012,0,1),
-        min: new Date(2012,0,1),
-        max: new Date(2015,11,1)
+        start: new Date('2012-01-01'),
+        min: new Date('2012-01-01'),
+        max: new Date('2015-12-01'),
       },
       scale: {
         type: 'linear',
@@ -103,7 +103,7 @@ nav_order: 18
         groupY: 'max'
       },
       date: {
-        start: new Date(2012,0,1),
+        start: new Date('2012-01-01'),
       },
       range: 1,
       scale: {
@@ -117,7 +117,7 @@ nav_order: 18
         subLabel: {
           width: 30,
           textAlign: 'start',
-          text: (moment) => moment.weekdaysShort(true).map((d, i) => i % 2 == 0 ? '' : d),
+          text: () => dayjs.weekdaysShort().map((d, i) => i % 2 == 0 ? '' : d),
         }
       }, 
       subDomain:{ type: 'day', radius: 2 },
@@ -138,7 +138,7 @@ nav_order: 18
         groupY: 'max'
       },
       date: {
-        start: new Date(2012,0,1),
+        start: new Date('2012-01-01'),
       },
       range: 1,
       scale: {
@@ -152,7 +152,7 @@ nav_order: 18
         subLabel: {
           width: 30,
           textAlign: 'start',
-          text: (moment) => moment.weekdaysShort(true).map((d, i) => i % 2 == 0 ? '' : d),
+          text: () => dayjs.weekdaysShort().map((d, i) => i % 2 == 0 ? '' : d),
         }
       }, 
       subDomain:{ type: 'day', radius: 0, gutter: 0 },
@@ -190,7 +190,7 @@ nav_order: 18
       verticalOrientation: true,
       range: 5,
       date: {
-        start: new Date(2012,0,1),
+        start: new Date('2012-01-01'),
       },
       scale: {
         type: 'diverging',
@@ -264,9 +264,9 @@ nav_order: 18
       cal1.paint({
         range: 6,
         date: {
-          start: new Date(2012,0,1),
-          min: new Date(2012,0,1),
-          max: new Date(2015,11,1)
+          start: new Date('2012-01-01'),
+          min: new Date('2012-01-01'),
+          max: new Date('2015-12-01')
         },
         data: {
           source: '/fixtures/seattle-weather.csv',
@@ -353,7 +353,7 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
             return {
               t: ts,
               x,
-              y: (date.isoWeekday() == 6 || date.isoWeekday() === 7) ? -1 : date.isoWeekday() - 1,
+              y: (date.format('d') == 0 || date.format('d') === 6) ? -1 : date.format('d') - 1,
             };
           }).filter(n => n.y >= 0);
         },
@@ -363,9 +363,10 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
       cal2.paint({
         range: 5,
         date: {
-          start: new Date(2007,0,1),
-          min: new Date(2000,5,1),
-          max: new Date(2020, 5, 1)
+          start: new Date('2007-01-01'),
+          min: new Date('200-05-01'),
+          max: new Date('2020-05-01'),
+          timezone: 'utc'
         },
         data: {
           source: '/fixtures/DJIA.csv',
@@ -406,7 +407,7 @@ Inspired by [this article](https://observablehq.com/@d3/calendar) from Mike Bost
         itemSelector: '#example-4',
       }, [[Tooltip, {
         text: function (date, value) {
-          return (value ? d3.format(',')(value) : 'No value') + ' on ' + cal2.dateHelper.format(date, 'LL')
+          return (value ? d3.format(',')(value) : 'No value') + ' on ' + cal2.dateHelper.format(date, 'dddd LL')
         }
       }]]);
 

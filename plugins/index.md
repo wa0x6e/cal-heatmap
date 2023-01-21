@@ -14,7 +14,6 @@ Below are the built-in plugins shipped with Cal-Heatmap
 
 - [Tooltip](/plugins/tooltip): add tooltip support
 - [Legend](/plugins/legend): add legend support
-- [Timezone](/plugins/timezone): add timezone support
 
 These plugins are not included in the main bundled, and have to be loaded
 separatly, alongside their dependencies. See each plugin documentation for details.
@@ -35,10 +34,7 @@ cal.paint(options: Options, plugins?: PluginDefinition[] | PluginDefinition),
 
 ```js
 const cal = new CalHeatmap();
-cal.paint({}, [
-  [Timezone { timezone: 'Europe/Paris' }],
-  [Tooltip { text: (t) => `${new Date(t)}` }],
-]);
+cal.paint({}, [[Legend], [Tooltip, { text: t => `${new Date(t)}` }]]);
 ```
 
 See each plugin documentation for install and usage details.

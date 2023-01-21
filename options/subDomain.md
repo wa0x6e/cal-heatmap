@@ -199,14 +199,14 @@ Default: `null`
 
 This option accepts different value's type, see table below for usage.
 
-| Value Type | Description                                                                                                                           | Example Value                                                                                     | Example output                         |
-| :--------- | :------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `string`   | Pass the string to [momentJS `format()`](https://momentjs.com/docs/#/displaying/format/), and display its result. _(not value aware)_ | `MMMM`                                                                                            | `March`                                |
-| `null`     | Do not show any label                                                                                                                 | `null`                                                                                            |                                        |
-| `function` | Display the function's return value. The function takes the subDomain's timestamp, value and the label's SVG Element as argument      | `` function (timestamp, value) { return `${value} items on ${new Date(date).toISOString()}`; } `` | `50 items on 2022-12-06T20:01:51.290Z` |
+| Value Type | Description                                                                                                                      | Example Value                                                                                     | Example output                         |
+| :--------- | :------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `string`   | Pass the string to [dayjs `format()`](https://day.js.org/docs/en/display/format), and display its result. _(not value aware)_    | `MMMM`                                                                                            | `March`                                |
+| `null`     | Do not show any label                                                                                                            | `null`                                                                                            |                                        |
+| `function` | Display the function's return value. The function takes the subDomain's timestamp, value and the label's SVG Element as argument | `` function (timestamp, value) { return `${value} items on ${new Date(date).toISOString()}`; } `` | `50 items on 2022-12-06T20:01:51.290Z` |
 
 {: .note}
-momentJS `format()` is [`locale`](/options/date.html#locale) aware.
+dayjs `format()` is [`locale`](/options/date.html#locale) and timezone aware.
 
 {: .note }
 Depending on your chosen cell size, subDomain label may overflow

@@ -16,6 +16,7 @@ type DateOptions: {
   max?: Date;
   highlight?: Date[];
   locale: string;
+  timezone?: string
 }
 ```
 
@@ -153,23 +154,22 @@ See the `highlight` class in the CSS to customize its style
 
 ## locale
 
-MomentJS locale.
+Date locale.
 
 ```js
 locale: string;
 ```
 
-`locale` is used by the underlying MomentJS library to set the language and format of the dates,
-as well as the first day of the week (monday/sunday).
+`locale` is used by the underlying Day.js library to set the language
+and locale specific function, such as the first day of the week (monday/sunday).
 
 Default: `en`
 
-For performance reasons, only the `en` locale is included by default.
+See the [list of supported locale](https://github.com/iamkun/dayjs/tree/dev/src/locale) on day.js repository.
 
-To add more locales, you can either:
-
-- Add `<script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>` in your page `<head>`
-- Add your chosen locale manually, via [`moment.locale(LOCALE)`](https://momentjs.com/docs/#/i18n/loading-into-nodejs/)
+For performance reasons, only the `en` locale is included by default, and
+all other locales are loaded on-demand. You can save a few milliseconds by
+including the dayjs locale script directly in your `<head>`, e.g. `<script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/zh-cn.js"></script>`
 
 #### Example with the french locale
 
@@ -180,3 +180,13 @@ To add more locales, you can either:
     cal2.paint({ range: 6, itemSelector: '#locale-example-1', domain: { type: 'month' }, subDomain: { type: 'day' }, date: { locale: 'fr' } });
   </script>
 </div>
+
+## timezone
+
+Date timezone.
+
+```js
+timezone?: string;
+```
+
+Default: guessed from user browser.

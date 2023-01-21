@@ -26,7 +26,7 @@ Add the tooltip plugin script and its dependencies in your page's `<head>`
 
 ```html
 <script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.3/dist/plugins/Tooltip.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.0.0-beta.4/dist/plugins/Tooltip.min.js"></script>
 ```
 
 <hr/>
@@ -44,7 +44,7 @@ cal.paint({}, [[Tooltip, TOOLTIP_OPTIONS]]);
 // PopperOptions, see https://popper.js.org/docs/v2/constructors/#options
 interface TooltipOptions extends PluginOptions, PopperOptions {
   enabled: boolean;
-  text: (timestamp: number, value: number, moment: any) => string;
+  text: (timestamp: number, value: number, dayjsDate: dayjs.Dayjs) => string;
 }
 ```
 
@@ -75,14 +75,14 @@ To customize the tooltip's UI, look for `#ch-tooltip` in the CSS.
 A function returning the content of the tooltip
 
 ```js
-text: (timestamp: number, value: number, moment: any) => string;
+text: (timestamp: number, value: number, dayjsDate: dayjs.Dayjs) => string;
 ```
 
 Default:
 
 ```js
-function (timestamp, value, moment) {
-  return `${value} - ${moment(timestamp).format('LLLL')}`;
+function (timestamp, value, dayjsDate) {
+  return `${value} - ${dayjsDate.toString()}`;
 }
 ```
 
@@ -90,7 +90,7 @@ function (timestamp, value, moment) {
 
 - `timestamp`: The timestamp of the current subDomain, in ms, rounded to the start of the subDomain
 - `value`: The value of the current subDomain, from your data set
-- `moment`: A locale-aware `moment` object, provided for easier date manipulation and formatting. When enabling the [`Timezone`](/plugins/timezone.html) plugin, the `.tz()` method will automatically be available to format the date in different timezone.
+- `dayjsDate`: A locale/timezone aware `dayjs` object, provided for easier date manipulation and formatting.
 
 ### Additional Popper options
 

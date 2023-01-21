@@ -30,7 +30,7 @@ Most of the breaking changes come from the settings renaming, and methods remova
 - Code base rewritten in Typescript, and ESnext (babel transpiled for older browser support)
 - New plugin system to extend/modify calendar capabilities
 - New Template system to use user-created calendar layout
-- All dates handling delegated to MomentJS
+- All dates handling delegated to dayjs
 - Bundles for ESM, UMD
 - Support for D3.js v6 and v7
 
@@ -46,7 +46,7 @@ Control the sort order of the domains
 
 ### `date.locale`
 
-Set a custom momentJS locale. Default to `en`
+Set a custom date locale. Default to `en`
 
 ### `data.x`
 
