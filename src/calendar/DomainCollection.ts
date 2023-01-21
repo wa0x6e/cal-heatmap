@@ -1,8 +1,5 @@
 import castArray from 'lodash-es/castArray';
-
-import {
-  group, sum, count, min, max, median,
-} from 'd3-array';
+import groupBy from 'lodash-es/groupBy';
 
 import type { SubDomain } from '../index';
 import type {
@@ -166,7 +163,7 @@ export default class DomainCollection {
     });
 
     this.keys.forEach((domainKey) => {
-      const records = group(
+      const records = groupBy(
         clampedData.get(domainKey) || [],
         (d): Timestamp => this.#extractTimestamp(d, x, subDomainKeyExtractor),
       );
@@ -174,12 +171,9 @@ export default class DomainCollection {
       this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
         let value: number | null = null;
 
-        if (records.has(subDomain.t)) {
+        if (records.hasOwnProperty(subDomain.t)) {
           value = this.#groupValues(
-            this.#extractValues(
-              records.get(subDomain.t)!,
-              y,
-            ),
+            this.#extractValues(records[subDomain.t], y),
             groupY,
           );
         }
@@ -202,15 +196,17 @@ export default class DomainCollection {
     if (typeof groupFn === 'string') {
       switch (groupFn) {
         case 'sum':
-          return sum(values);
+          return values.reduce((a, b) => a + b, 0);
         case 'count':
-          return count(values);
+          return values.length;
         case 'min':
-          return min(values) || null;
+          return Math.min(...values) || null;
         case 'max':
-          return max(values) || null;
-        case 'median':
-          return median(values) || null;
+          return Math.max(...values) || null;
+        case 'average':
+          return values.length > 0 ?
+            values.reduce((a, b) => a + b, 0) / values.length :
+            null;
         default:
           return null;
       }

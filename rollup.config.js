@@ -53,7 +53,6 @@ const globals = {
   '@popperjs/core': 'Popper',
   'd3-selection': 'd3',
   d3: 'd3',
-  'd3-array': 'd3',
   'd3-color': 'd3',
   'd3-fetch': 'd3',
   'd3-selection': 'd3',
@@ -118,7 +117,6 @@ export default [
   ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name, {
     external: [
       'd3',
-      'd3-array',
       'd3-color',
       'd3-fetch',
       'd3-format',

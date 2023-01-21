@@ -67,7 +67,7 @@ export type SubDomainOptions = {
   ) => string);
 };
 
-export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'median';
+export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'average';
 
 type DateOptions = {
   start: Date;
