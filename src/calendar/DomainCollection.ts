@@ -226,8 +226,9 @@ export default class DomainCollection {
       typeof x === 'function' ? x(datum) : datum[x];
 
     if (typeof timestamp === 'string') {
-      if (this.dateHelper.date(timestamp).isValid()) {
-        timestamp = this.dateHelper.date(timestamp).valueOf();
+      const date = this.dateHelper.date(timestamp);
+      if (date.isValid()) {
+        timestamp = +date;
       } else {
         return 0;
       }

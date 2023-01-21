@@ -50,7 +50,7 @@ const dayTemplate: Template = (
         DateHelper.date(endTimestamp),
       ).map((ts) => {
         const date = DateHelper.date(ts);
-        const endWeekNumber = DateHelper.date(ts).endOf('year').week();
+        const endWeekNumber = date.endOf('year').week();
         let x = 0;
 
         switch (domain.type) {
@@ -59,7 +59,7 @@ const dayTemplate: Template = (
             break;
           case 'year':
             if (endWeekNumber === 1 && date.week() === endWeekNumber) {
-              x = DateHelper.date(ts).subtract(1, 'week').week() + 1;
+              x = date.subtract(1, 'week').week() + 1;
             }
 
             x = date.week() - 1;

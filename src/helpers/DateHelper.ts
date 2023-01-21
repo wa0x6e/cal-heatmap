@@ -65,8 +65,9 @@ export default class DateHelper {
    * @returns {number} The week number, relative to the month [0-5]
    */
   getMonthWeekNumber(d: Timestamp | dayjs.Dayjs): number {
-    const date = this.date(d).startOf('day');
-    const endOfWeek = this.date(d).startOf('month').endOf('week');
+    const dayjsDate = this.date(d);
+    const date = dayjsDate.startOf('day');
+    const endOfWeek = dayjsDate.startOf('month').endOf('week');
 
     if (date <= endOfWeek) {
       return 1;
@@ -75,6 +76,7 @@ export default class DateHelper {
   }
 
   date(d: Timestamp | Date | dayjs.Dayjs | string = new Date()): dayjs.Dayjs {
+    console.count();
     return dayjs(d).tz(this.timezone).utcOffset(0).locale(this.locale);
   }
 
@@ -109,14 +111,17 @@ export default class DateHelper {
     range: number | Date | dayjs.Dayjs,
     excludeEnd: boolean = true,
   ): Timestamp[] {
+    let start = this.date(date);
     let end: dayjs.Dayjs;
     if (typeof range === 'number') {
-      end = this.date(date).add(range, interval as ManipulateType);
+      end = start.add(range, interval as ManipulateType);
+    } else if (dayjs.isDayjs(range)) {
+      end = range;
     } else {
       end = this.date(range);
     }
 
-    const start = this.date(date).startOf(interval as ManipulateType);
+    start = start.startOf(interval as ManipulateType);
 
     end = end.startOf(interval as ManipulateType);
     let pivot = dayjs.min(start, end);
