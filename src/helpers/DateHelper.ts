@@ -76,7 +76,10 @@ export default class DateHelper {
   }
 
   date(d: Timestamp | Date | dayjs.Dayjs | string = new Date()): dayjs.Dayjs {
-    console.count();
+    if (dayjs.isDayjs(d)) {
+      return d;
+    }
+
     return dayjs(d).tz(this.timezone).utcOffset(0).locale(this.locale);
   }
 
