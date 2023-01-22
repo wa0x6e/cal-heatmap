@@ -21,6 +21,11 @@ Cal-Heatmap is a javascript library to create a calendar heatmap.
 
 <hr/>
 
+![Day/Year Calendar Heatmap](/assets/example1.png)
+![Day/Month Calendar Heatmap](/assets/example2.png)
+
+<hr/>
+
 ### Features
 
 - Date locale and timezone support
