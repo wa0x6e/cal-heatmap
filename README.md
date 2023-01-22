@@ -4,6 +4,7 @@
 
 This module will help you to create a calendar, like the _[contribution calendar](https://github.com/blog/1360-introducing-contributions)_ appearing on each github user's page, but with navigation and more controls on the data formatting.
 
-![image](https://raw.github.com/wa0x6e/cal-heatmap/gh-pages/img/screenshot.png)
+![Day/Year Calendar Heatmap example](https://cal-heatmap.com/assets/example1.png)
+![Day/Month Calendar Heatmap example](https://cal-heatmap.com/assets/example2.png)
 
 See [documentation](http://cal-heatmap.com) for examples.
