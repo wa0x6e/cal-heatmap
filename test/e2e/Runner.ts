@@ -1,6 +1,8 @@
 /* eslint-disable jest/no-conditional-expect */
 /* eslint-disable jest/valid-title */
 import { Builder } from 'selenium-webdriver';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jest } from '@jest/globals';
 
 // @ts-ignore
 import suite from '../frontend/export';
@@ -28,7 +30,7 @@ function getArrowFunctionBody(f: any) {
 const Runner = (
   name: string,
   file: string,
-  customCapabilities: any = { 'bstack:options': {} },
+  customCapabilities: any = { 'bstack:options': {}, browserName: 'Chrome' },
 ) => {
   if (
     process.env.LOCAL === '1' &&
@@ -37,6 +39,12 @@ const Runner = (
     // eslint-disable-next-line jest/no-disabled-tests, jest/expect-expect
     it.skip('is skipped on local', () => {});
     return;
+  }
+
+  let timeout = 2000;
+  if (process.env.LOCAL !== '1') {
+    jest.retryTimes(2);
+    timeout = 10000;
   }
 
   describe(name, () => {
@@ -54,6 +62,7 @@ const Runner = (
         'bstack:options': {
           projectName: 'Testing CalHeatmap and d3js on browsers matrix',
           local: false,
+          // timezone: 'Paris',
           ...customCapabilities['bstack:options'],
         },
       };
@@ -62,7 +71,6 @@ const Runner = (
         .usingServer(
           `https://${username}:${accesskey}@hub-cloud.browserstack.com/wd/hub`,
         )
-        .forBrowser('chrome')
         .withCapabilities(capabilities)
         .build();
     }
@@ -90,7 +98,7 @@ const Runner = (
           range: 1,
         };`,
       );
-    }, 10000);
+    }, timeout);
 
     suite.forEach((testSuite: any) => {
       describe(testSuite.title, () => {
@@ -146,7 +154,7 @@ const Runner = (
                   );
                 });
               },
-              5000,
+              timeout,
             );
           } else {
             it.todo(test.title);
