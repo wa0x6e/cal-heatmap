@@ -39,9 +39,8 @@ export default class Populator {
           .select('text')
           .attr('style', (d: any) => {
             let color =
-              options.subDomain.color || hcl(colorScale?.apply(d.v)).l > 60 ?
-                'black' :
-                'white';
+              options.subDomain.color ||
+              (hcl(colorScale?.apply(d.v)).l > 60 ? 'black' : 'white');
 
             if (isFunction(color)) {
               color = color(d.t, d.v, colorScale?.apply(d.v));

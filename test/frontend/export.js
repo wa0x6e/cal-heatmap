@@ -10,6 +10,7 @@ import template from './template';
 import domainLabel from './domainLabel';
 import domainPadding from './domainPadding';
 import subDomainLabel from './subDomainLabel';
+import subDomainColor from './subDomainColor';
 import domainDynamicDimension from './domainDynamicDimension';
 import domainSort from './domainSort';
 import data from './data';
@@ -26,6 +27,7 @@ export default [
   itemSelector,
   subDomainRadius,
   subDomainGutter,
+  subDomainColor,
   template,
   domainLabel,
   domainPadding,
