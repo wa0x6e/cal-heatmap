@@ -38,12 +38,16 @@ export default class Populator {
         element
           .select('text')
           .attr('style', (d: any) => {
-            let color =
-              options.subDomain.color ||
-              (hcl(colorScale?.apply(d.v)).l > 60 ? 'black' : 'white');
+            const defaultColor =
+              hcl(colorScale?.apply(d.v)).l > 60 ? '#000' : '#fff';
+            let color = options.subDomain.color || (d.v ? defaultColor : null);
 
             if (isFunction(color)) {
               color = color(d.t, d.v, colorScale?.apply(d.v));
+            }
+
+            if (!color) {
+              return null;
             }
 
             return `fill: ${color};`;
