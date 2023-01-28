@@ -46,7 +46,10 @@ if (!process.env.ROLLUP_WATCH) {
 
 writeFileSync(
   './src/version.ts',
-  `const VERSION = '${pkg.version.replace(/^v/, '')}'; export default VERSION;\n`,
+  `const VERSION = '${pkg.version.replace(
+    /^v/,
+    '',
+  )}';\nexport default VERSION;\n`,
 );
 
 const globals = {
