@@ -9,6 +9,7 @@ const data = {
           range: 12,
           domain: { type: 'month' },
           subDomain: { type: 'day' },
+          date: { start: new Date('2020-01-01') },
         });
       },
       expectations: [
@@ -39,6 +40,7 @@ const data = {
           range: 12,
           domain: { type: 'month', sort: 'desc' },
           subDomain: { type: 'day' },
+          date: { start: new Date('2020-01-01') },
         });
       },
       expectations: [
