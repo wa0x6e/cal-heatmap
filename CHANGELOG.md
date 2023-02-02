@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.0.0-beta.5 [2023-02-02]
+
+## Bugfixes
+
+- [fix] keep default text color when subDomain do not have value
+- [fix] fix ignored subDomain.color option
+
+## Features
+
+- [feat] add CSS support for dark theme
+
+## Chores
+
+- [tests] Refactor tests to test only against the minimum browser version
+
 ## v4.0.0-beta.4 [2023-01-21]
 
 ### BREAKING CHANGES
