@@ -18,6 +18,7 @@ import date from './date';
 import verticalOrientation from './verticalOrientation';
 import legend from './legend';
 import tooltip from './tooltip';
+import fill from './fill';
 
 export default [
   range,
@@ -39,4 +40,5 @@ export default [
   legend,
   verticalOrientation,
   tooltip,
+  fill,
 ];

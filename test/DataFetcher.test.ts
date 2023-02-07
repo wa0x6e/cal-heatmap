@@ -9,7 +9,14 @@ describe('DataFetcher', () => {
       const data = [{ time: 1, value: 0 }];
       await expect(fetcher.getDatas(data, 0, 0)).resolves.toBe(data);
     });
-    it.todo('returns an empty object when source is not valid');
+    it('returns an empty object when source is not valid', async () => {
+      const options = new Options();
+      // @ts-ignore
+      options.init({ data: { type: 'test', source: 'test' } });
+      const fetcher = new DataFetcher(options);
+
+      await expect(fetcher.getDatas('', 0, 0)).resolves.toStrictEqual([]);
+    });
 
     it.todo('interpolate the url with the dates');
   });
