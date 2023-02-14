@@ -10,8 +10,9 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import localeData from 'dayjs/plugin/localeData';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import updateLocale from 'dayjs/plugin/updateLocale';
 
-import type { ManipulateType, PluginFunc } from 'dayjs';
+import type { ManipulateType, PluginFunc, Ls } from 'dayjs';
 import type { OptionsType } from '../options/Options';
 import type { Timestamp } from '../index';
 
@@ -26,11 +27,12 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(localeData);
 dayjs.extend(localizedFormat);
+dayjs.extend(updateLocale);
 
 const DEFAULT_LOCALE = 'en';
 
 export default class DateHelper {
-  locale: any;
+  locale: OptionsType['date']['locale'];
 
   timezone: string;
 
@@ -41,15 +43,24 @@ export default class DateHelper {
   }
 
   async setup({ options }: { options: OptionsType }) {
-    this.locale = options.date.locale;
     this.timezone = options.date.timezone || dayjs.tz.guess();
+    const userLocale = options.date.locale;
 
-    if (this.locale !== DEFAULT_LOCALE) {
+    if (typeof userLocale === 'string' && userLocale !== DEFAULT_LOCALE) {
       const locale =
-        (window as any)[`dayjs_locale_${this.locale}`] ||
+        (window as any)[`dayjs_locale_${userLocale}`] ||
         (await this.loadLocale());
-      dayjs.locale(this.locale);
+      dayjs.locale(userLocale);
       this.locale = locale;
+    }
+
+    if (typeof userLocale === 'object') {
+      if (userLocale.hasOwnProperty('name')) {
+        dayjs.locale(userLocale.name, userLocale);
+        this.locale = userLocale;
+      } else {
+        this.locale = dayjs.updateLocale(DEFAULT_LOCALE, userLocale);
+      }
     }
   }
 
@@ -80,7 +91,10 @@ export default class DateHelper {
       return d;
     }
 
-    return dayjs(d).tz(this.timezone).utcOffset(0).locale(this.locale);
+    return dayjs(d)
+      .tz(this.timezone)
+      .utcOffset(0)
+      .locale(this.locale as (typeof Ls)[0] | string);
   }
 
   format(

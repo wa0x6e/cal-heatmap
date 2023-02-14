@@ -3,6 +3,7 @@ import isEqual from 'lodash-es/isEqual';
 import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
+import type { Ls } from 'dayjs';
 import type { DomainType, Timestamp } from '../index';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
@@ -74,7 +75,7 @@ type DateOptions = {
   min?: Date;
   max?: Date;
   highlight: Date[];
-  locale: string;
+  locale: string | Partial<typeof Ls[0]>;
   timezone?: string;
 };
 
