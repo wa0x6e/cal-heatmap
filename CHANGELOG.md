@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.0-beta.6 [2023-02-14]
+
+## Features
+
+- [feat] add API to extend/inject custom dayjs locale
+
 ## v4.0.0-beta.5 [2023-02-02]
 
 ## Bugfixes
