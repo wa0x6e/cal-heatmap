@@ -154,7 +154,7 @@ export default class DomainCollection {
   ): void {
     const clampedData: Map<Timestamp, DataRecord[]> = new Map();
     data.forEach((d) => {
-      const timestamp = this.#extractTimestamp(d, x, domainKeyExtractor);
+      const timestamp = this.extractTimestamp(d, x, domainKeyExtractor);
 
       if (this.collection.has(timestamp)) {
         const records = clampedData.get(timestamp) || [];
@@ -165,7 +165,7 @@ export default class DomainCollection {
     this.keys.forEach((domainKey) => {
       const records = groupBy(
         clampedData.get(domainKey) || [],
-        (d): Timestamp => this.#extractTimestamp(d, x, subDomainKeyExtractor),
+        (d): Timestamp => this.extractTimestamp(d, x, subDomainKeyExtractor),
       );
 
       this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
@@ -217,7 +217,8 @@ export default class DomainCollection {
     return null;
   }
 
-  #extractTimestamp(
+  // eslint-disable-next-line class-methods-use-this
+  extractTimestamp(
     datum: DataRecord,
     x: string | Function,
     extractorFn: Function,
@@ -226,12 +227,7 @@ export default class DomainCollection {
       typeof x === 'function' ? x(datum) : datum[x];
 
     if (typeof timestamp === 'string') {
-      const date = this.dateHelper.date(timestamp);
-      if (date.isValid()) {
-        timestamp = +date;
-      } else {
-        return 0;
-      }
+      timestamp = +new Date(timestamp);
     }
 
     return extractorFn(timestamp);

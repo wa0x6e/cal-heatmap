@@ -218,4 +218,54 @@ describe('DomainCollection', () => {
     it.todo('groups the value using a string argument');
     it.todo('groups the value using a function');
   });
+
+  describe('#extractTimestamp()', () => {
+    it('extracts the timestamp from a timestamp', () => {
+      const result = d.extractTimestamp(
+        { date: 1577836800000 },
+        'date',
+        (a: any) => a,
+      );
+
+      expect(result).toBe(1577836800000);
+    });
+    it('extracts the timestamp from a date without timezone', () => {
+      const result = d.extractTimestamp(
+        { date: '2020-01-01' },
+        'date',
+        (a: any) => a,
+      );
+
+      expect(result).toBe(1577836800000);
+    });
+    it('extracts the timestamp from a date with UTC timezone', () => {
+      const result = d.extractTimestamp(
+        { date: '2020-01-01T00:00:00.000Z' },
+        'date',
+        (a: any) => a,
+      );
+
+      expect(result).toBe(1577836800000);
+    });
+
+    it('extracts the timestamp from a date with a custom timezone', () => {
+      const result = d.extractTimestamp(
+        { date: 'Wed Jan 01 2020 04:00:00 GMT+0400 (Gulf Standard Time)' },
+        'date',
+        (a: any) => a,
+      );
+
+      expect(result).toBe(1577836800000);
+    });
+
+    it('extracts the timestamp from a date with a custom timezone 2', () => {
+      const result = d.extractTimestamp(
+        { date: '2020-01-01 04:00:00.000+04:00' },
+        'date',
+        (a: any) => a,
+      );
+
+      expect(result).toBe(1577836800000);
+    });
+  });
 });
