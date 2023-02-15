@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.0.0-beta.7 [2023-02-15]
+
+## Bugfixes
+
+- [fix] fix dataset shifted by one day due to timezone
+
+## Chores
+
+- Dependencies update
+
 ## v4.0.0-beta.6 [2023-02-14]
 
 ## Features
