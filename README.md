@@ -6,16 +6,16 @@
 
 This library will help you to chart a calendar heatmap, like the _[Github contribution calendar](https://github.com/blog/1360-introducing-contributions)_ appearing on each github user's page, but with more features like:
 
-- animated date navigation
-- time interval customisation
-- full controls on the layout/UI
-- locale and timezone support
-- plugins system
-- broad browsers support
-- and many more...
+- 🔀 animated date navigation
+- ⏳ time interval customisation
+- 🗓️ full controls on the layout/UI
+- 🌐 locale and timezone support
+- ⚡ plugins system
+- 🖥️ broad browsers support
+- ♾️ and many more...
 
-![Day/Year Calendar Heatmap example](https://cal-heatmap.com/assets/example1.png)
-![Day/Month Calendar Heatmap example](https://cal-heatmap.com/assets/example2.png)
+![Day/Year Calendar Heatmap example](http://wa0x6e.github.io/cal-heatmap/assets/example1.png)
+![Day/Month Calendar Heatmap example](http://wa0x6e.github.io/cal-heatmap/assets/example2.png)
 
 See [documentation website](http://cal-heatmap.com) for full documentation and examples.
 
