@@ -40,6 +40,10 @@
   }
 }
 
+.graph-legend > svg {
+  background: transparent;
+}
+
 #ch-tooltip {
   $arrow-size: 8px;
 
