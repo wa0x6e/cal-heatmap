@@ -75,7 +75,7 @@ type DateOptions = {
   min?: Date;
   max?: Date;
   highlight: Date[];
-  locale: string | Partial<typeof Ls[0]>;
+  locale: string | Partial<(typeof Ls)[0]>;
   timezone?: string;
 };
 
@@ -90,8 +90,18 @@ export type DataOptions = {
 };
 
 type ScaleOptions = {
-  as: 'color' | 'opacity';
-  [key: string]: any;
+  opacity?: {
+    domain: number[];
+    type?: string;
+    baseColor: string;
+  };
+  color?: {
+    domain: number[];
+    scheme?: string;
+    range?: string[];
+    interpolate?: any;
+    type?: string;
+  };
 };
 
 export type OptionsType = {
@@ -101,7 +111,7 @@ export type OptionsType = {
   subDomain: SubDomainOptions;
   date: DateOptions;
   data: DataOptions;
-  scale: ScaleOptions;
+  scale?: ScaleOptions;
   animationDuration: number;
   verticalOrientation: boolean;
 };
@@ -256,12 +266,7 @@ export default class Options {
         groupY: 'sum',
       },
 
-      scale: {
-        as: 'color',
-        type: 'quantize',
-        domain: [0, 100],
-        scheme: 'YlOrBr',
-      },
+      scale: undefined,
 
       // Animation duration, in ms
       animationDuration: 200,
@@ -310,6 +315,10 @@ export default class Options {
       set(options, key, get(this.preProcessors, key)(get(options, key)));
     });
 
+    if (typeof options.scale === 'undefined') {
+      this.initScale();
+    }
+
     options.x.domainVerticalLabelHeight = options.domain.label.height;
 
     // When the label is affecting the height
@@ -330,5 +339,15 @@ export default class Options {
       options.x.domainVerticalLabelHeight = 0;
       options.x.domainHorizontalLabelWidth = 0;
     }
+  }
+
+  initScale() {
+    this.options.scale = {
+      color: {
+        scheme: 'YlOrBr',
+        type: 'quantize',
+        domain: [0, 100],
+      },
+    };
   }
 }

@@ -16,13 +16,7 @@ export default class Populator {
     const { calendar } = this;
     const { options } = calendar.options;
 
-    let colorScale: any = null;
-    try {
-      const scaleOptions = options.scale;
-      colorScale = scale({ [scaleOptions.as]: scaleOptions });
-    } catch (error) {
-      // Do nothing
-    }
+    const colorScale: any = this.initColorScale();
 
     calendar.calendarPainter.root
       .selectAll('.graph-domain')
@@ -30,9 +24,17 @@ export default class Populator {
       .selectAll('g')
       .data((d: any) => calendar.domainCollection.get(d) || [])
       .call((element: any) => {
-        element
-          .select('rect')
-          .style('fill', (d: any) => colorScale?.apply(d.v));
+        const styles: { fill?: Function; 'fill-opacity'?: Function } = {};
+        if (options.scale!.hasOwnProperty('opacity')) {
+          styles.fill = () => options.scale!.opacity!.baseColor || 'red';
+          styles['fill-opacity'] = (d: any) => colorScale?.apply(d.v);
+        } else {
+          styles.fill = (d: any) => colorScale?.apply(d.v);
+        }
+
+        Object.entries(styles).forEach(([prop, val]) =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+          element.select('rect').style(prop, (d: any) => val(d)));
       })
       .call((element: any) => {
         element
@@ -64,5 +66,13 @@ export default class Populator {
       .call(() => {
         calendar.eventEmitter.emit('fill');
       });
+  }
+
+  initColorScale(): any {
+    try {
+      return scale(this.calendar.options.options.scale);
+    } catch (error) {
+      return null;
+    }
   }
 }

@@ -70,7 +70,7 @@ export default class Legend implements IPlugin {
     }
 
     const node = legend({
-      [scaleOptions.as]: scaleOptions,
+      ...scaleOptions,
       ...this.options,
     });
 

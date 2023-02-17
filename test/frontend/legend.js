@@ -85,8 +85,11 @@ const data = {
             ...window.defaultOptions,
             range: 1,
             scale: {
-              as: 'color',
-              range: ['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494'],
+              color: {
+                domain: [0, 100],
+                type: 'quantize',
+                range: ['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494'],
+              },
             },
           },
           [[Legend, { itemSelector: '#legend' }]],
