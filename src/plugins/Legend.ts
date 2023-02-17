@@ -63,7 +63,7 @@ export default class Legend implements IPlugin {
 
     if (this.root.select(DEFAULT_CLASSNAME).empty()) {
       this.root = this.root
-        .append('svg')
+        .append('div')
         .attr('class', DEFAULT_CLASSNAME.slice(1));
     } else {
       this.root = this.root.select(DEFAULT_CLASSNAME);
