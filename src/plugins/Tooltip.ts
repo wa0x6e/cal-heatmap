@@ -110,6 +110,8 @@ export default class Tooltip implements IPlugin {
       this.root = document.body.appendChild(tooltipElem);
     }
 
+    this.root.setAttribute('data-theme', this.calendar.options.options.theme);
+
     this.popperInstance = createPopper<StrictModifiers>(
       virtualElement,
       this.root,

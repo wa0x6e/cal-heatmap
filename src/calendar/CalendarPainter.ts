@@ -38,11 +38,12 @@ export default class CalendarPainter {
   }
 
   setup(): boolean {
-    const { itemSelector } = this.calendar.options.options;
+    const { itemSelector, theme } = this.calendar.options.options;
 
     if (!this.root) {
       this.root = select(itemSelector)
         .append('svg')
+        .attr('data-theme', theme)
         .attr('class', 'cal-heatmap-container');
       this.root
         .attr('x', 0)

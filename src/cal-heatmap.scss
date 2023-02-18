@@ -25,7 +25,7 @@
     stroke-width: 1px;
   }
 
-  @media (prefers-color-scheme: dark) {
+  &[data-theme='dark'] {
     .graph-rect {
       fill: #2d333b;
     }
@@ -98,7 +98,7 @@
     left: calc($arrow-size / -2);
   }
 
-  @media (prefers-color-scheme: dark) {
+  &[data-theme='dark'] {
     background: #636e7b;
     color: #cdd9e5;
   }

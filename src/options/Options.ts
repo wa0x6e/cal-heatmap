@@ -114,6 +114,7 @@ export type OptionsType = {
   scale?: ScaleOptions;
   animationDuration: number;
   verticalOrientation: boolean;
+  theme: 'light' | 'dark';
 };
 
 type InternalOptionsType = {
@@ -270,6 +271,9 @@ export default class Options {
 
       // Animation duration, in ms
       animationDuration: 200,
+
+      // Theme mode: dark/light
+      theme: 'light',
 
       // Internally used options, do not edit not set
       x: {
