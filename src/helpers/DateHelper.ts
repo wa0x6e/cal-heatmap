@@ -49,7 +49,7 @@ export default class DateHelper {
     if (typeof userLocale === 'string' && userLocale !== DEFAULT_LOCALE) {
       const locale =
         (window as any)[`dayjs_locale_${userLocale}`] ||
-        (await this.loadLocale());
+        (await this.loadLocale(userLocale));
       dayjs.locale(userLocale);
       this.locale = locale;
     }
@@ -158,17 +158,18 @@ export default class DateHelper {
   }
 
   // this function will work cross-browser for loading scripts asynchronously
-  loadLocale(): Promise<any> {
+  // eslint-disable-next-line class-methods-use-this
+  loadLocale(userLocale: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const s = document.createElement('script');
       s.type = 'text/javascript';
       s.async = true;
-      s.src = `https://cdn.jsdelivr.net/npm/dayjs@1/locale/${this.locale}.js`;
+      s.src = `https://cdn.jsdelivr.net/npm/dayjs@1/locale/${userLocale}.js`;
       s.onerror = (err) => {
         reject(err);
       };
       s.onload = () => {
-        resolve((window as any)[`dayjs_locale_${this.locale}`]);
+        resolve((window as any)[`dayjs_locale_${userLocale}`]);
       };
       document.head.appendChild(s);
     });
