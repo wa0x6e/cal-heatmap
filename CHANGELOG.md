@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.0.0-beta.8 [2023-02-18]
+
+## Bugfixes
+
+- [fix] fix legend UI, where dimension where bigger than expected
+- [fix] remove legend background to support dark/light mode
+
+## Features
+
+- [feat] add support for opacity scale 
+
 ## v4.0.0-beta.7 [2023-02-15]
 
 ## Bugfixes
