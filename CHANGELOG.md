@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.0-beta.10 [2023-02-19]
+
+## Bugfixes
+
+- [fix] fix en locale always loaded instead of user defined custom locale
+
 ## v4.0.0-beta.9 [2023-02-18]
 
 ## Features
