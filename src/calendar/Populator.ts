@@ -70,7 +70,15 @@ export default class Populator {
 
   initColorScale(): any {
     try {
-      return scale(this.calendar.options.options.scale);
+      const scaleOptions = this.calendar.options.options.scale;
+      const scaleType = Object.keys(scaleOptions!)[0];
+
+      return scale({
+        [scaleType]: {
+          ...scaleOptions![scaleType as 'color' | 'opacity'],
+          clamp: true,
+        },
+      });
     } catch (error) {
       return null;
     }
