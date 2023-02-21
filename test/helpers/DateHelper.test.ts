@@ -92,6 +92,29 @@ describe('DateHelper', () => {
     }
   });
 
+  describe('getWeeksCountInMonth()', () => {
+    const weeksCount = [
+      [new Date('2020-01-15'), 5],
+      [new Date('2020-02-15'), 4],
+      [new Date('2020-03-15'), 4],
+      [new Date('2020-04-15'), 5],
+      [new Date('2020-05-15'), 4],
+      [new Date('2020-06-15'), 4],
+      [new Date('2020-07-15'), 5],
+      [new Date('2020-08-15'), 4],
+      [new Date('2020-09-15'), 4],
+    ];
+
+    it('returns the number of weeks', async () => {
+      options.init({ domain: { type: 'month' } });
+      await dateHelper.setup(options);
+
+      return weeksCount.forEach((data) => {
+        expect(dateHelper.getWeeksCountInMonth(+data[0])).toBe(data[1]);
+      });
+    });
+  });
+
   describe('format()', () => {
     it('returns the value returned by the given function', () => {
       expect(

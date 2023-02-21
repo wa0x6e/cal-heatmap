@@ -4,6 +4,7 @@ import dayOfYear from 'dayjs/plugin/dayOfYear';
 import weekday from 'dayjs/plugin/weekday';
 import minMax from 'dayjs/plugin/minMax';
 import isoWeeksInYear from 'dayjs/plugin/isoWeeksInYear';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import isLeapYear from 'dayjs/plugin/isLeapYear';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import utc from 'dayjs/plugin/utc';
@@ -18,6 +19,7 @@ import type { Timestamp } from '../index';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeeksInYear);
+dayjs.extend(isoWeek);
 dayjs.extend(isLeapYear);
 dayjs.extend(dayOfYear);
 dayjs.extend(weekday);
@@ -86,6 +88,64 @@ export default class DateHelper {
     return Math.ceil(date.diff(endOfWeek, 'weeks', true)) + 1;
   }
 
+  /**
+   * Return the number of weeks in the given month
+   *
+   * As there is no fixed standard to specify which month a partial week should
+   * belongs to, the ISO week date standard is used, where:
+   * - the first week of the month should have at least 4 days
+   * - 1st day of the week is thursday of before
+   *
+   *  Computation are based on week starting on monday
+   *  @see https://en.wikipedia.org/wiki/ISO_week_date
+   *
+   * @param  {Timestamp | dayjs.Dayjs} d Datejs object or timestamp
+   * @return {number}         The number of weeks
+   */
+  getWeeksCountInMonth(d: Timestamp | dayjs.Dayjs): any {
+    const pivotDate = this.date(d);
+
+    return (
+      this.getLastWeekOfMonth(pivotDate).diff(
+        this.getFirstWeekOfMonth(pivotDate),
+        'week',
+      ) + 1
+    );
+  }
+
+  /**
+   * Return the start of the first week of the month
+   *
+   * @see getWeeksCountInMonth() about standard warning
+   * @return {dayjs.Dayjs} A dayjs object representing the start of the
+   * first week
+   */
+  getFirstWeekOfMonth(d: Timestamp | dayjs.Dayjs): dayjs.Dayjs {
+    const startOfMonth = this.date(d).startOf('month');
+    let startOfFirstWeek = startOfMonth.startOf('isoWeek');
+    if (startOfMonth.isoWeekday() > 4) {
+      startOfFirstWeek = startOfFirstWeek.add(1, 'week');
+    }
+
+    return startOfFirstWeek;
+  }
+
+  /**
+   * Return the end of the last week of the month
+   *
+   * @see getWeeksCountInMonth() about standard warning
+   * @return {dayjs.Dayjs} A dayjs object representing the end of the last week
+   */
+  getLastWeekOfMonth(d: Timestamp | dayjs.Dayjs): dayjs.Dayjs {
+    const endOfMonth = this.date(d).endOf('month');
+    let endOfLastWeek = endOfMonth.endOf('isoWeek');
+    if (endOfMonth.isoWeekday() < 4) {
+      endOfLastWeek = endOfLastWeek.subtract(1, 'week');
+    }
+
+    return endOfLastWeek;
+  }
+
   date(d: Timestamp | Date | dayjs.Dayjs | string = new Date()): dayjs.Dayjs {
     if (dayjs.isDayjs(d)) {
       return d;
@@ -124,7 +184,7 @@ export default class DateHelper {
    */
   intervals(
     interval: string,
-    date: Timestamp | Date,
+    date: Timestamp | Date | dayjs.Dayjs,
     range: number | Date | dayjs.Dayjs,
     excludeEnd: boolean = true,
   ): Timestamp[] {

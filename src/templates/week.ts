@@ -15,23 +15,22 @@ const weekTemplate: Template = (
           53;
       case 'month':
         return domain.dynamicDimension ?
-          DateHelper.getMonthWeekNumber(DateHelper.date(ts).endOf('month')) :
+          DateHelper.getWeeksCountInMonth(ts) :
           5;
       default:
         return 1;
     }
   },
-  mapping: (startTimestamp, endTimestamp) =>
-    // eslint-disable-next-line implicit-arrow-linebreak
-    DateHelper.intervals(
-      'week',
-      startTimestamp,
-      DateHelper.date(endTimestamp),
-    ).map((ts, i) => ({
+  mapping: (startTimestamp, endTimestamp) => {
+    const clampStart = DateHelper.getFirstWeekOfMonth(startTimestamp);
+    const clampEnd = DateHelper.getFirstWeekOfMonth(endTimestamp);
+
+    return DateHelper.intervals('week', clampStart, clampEnd).map((ts, i) => ({
       t: ts,
       x: i,
       y: 0,
-    })),
+    }));
+  },
   extractUnit: (ts) => DateHelper.date(ts).startOf('week').valueOf(),
 });
 
