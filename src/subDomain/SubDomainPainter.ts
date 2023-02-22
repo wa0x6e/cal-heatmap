@@ -1,6 +1,6 @@
 import { Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
-import type { Timestamp } from '../index';
+import type { Timestamp, SubDomain } from '../index';
 
 const BASE_CLASSNAME = 'graph-subdomain-group';
 
@@ -35,13 +35,28 @@ export default class SubDomainPainter {
       );
 
     const {
-      subDomain: { radius, width, height },
+      subDomain: {
+        radius, width, height, sort,
+      },
     } = this.calendar.options.options;
     const evt = this.calendar.eventEmitter;
 
     subDomainSvgGroup
       .selectAll('g')
-      .data((d: any) => this.calendar.domainCollection.get(d))
+      .data((d: any) => {
+        const subDomainsCollection: SubDomain[] =
+          this.calendar.domainCollection.get(d)!;
+        if (sort === 'desc') {
+          const max = Math.max(
+            ...subDomainsCollection.map((s: SubDomain) => s.x),
+          );
+          subDomainsCollection.forEach((s: SubDomain, i: number) => {
+            subDomainsCollection[i].x = Math.abs(s.x - max);
+          });
+        }
+
+        return subDomainsCollection;
+      })
       .join(
         (enter: any) => enter
           .append('g')

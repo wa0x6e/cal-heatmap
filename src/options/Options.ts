@@ -66,6 +66,7 @@ export type SubDomainOptions = {
     value: number,
     backgroundColor: string,
   ) => string);
+  sort: 'asc' | 'desc';
 };
 
 export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'average';
@@ -219,6 +220,8 @@ export default class Options {
         label: null,
 
         color: undefined,
+
+        sort: 'asc',
       },
 
       date: {
