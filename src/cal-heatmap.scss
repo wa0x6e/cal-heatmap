@@ -1,5 +1,10 @@
 .cal-heatmap-container {
   display: block;
+  overflow: visible;
+
+  svg {
+    overflow: visible;
+  }
 
   .graph-label, .sublabel-text {
     fill: currentColor;
@@ -36,6 +41,14 @@
 
     rect.highlight {
       stroke: #768390;
+    }
+  }
+
+  &.transition {
+    overflow: hidden;
+
+    svg {
+      overflow: hidden;
     }
   }
 }

@@ -60,6 +60,7 @@ export default class CalendarPainter {
 
   paint(navigationDir: ScrollDirection = ScrollDirection.SCROLL_NONE) {
     this.domainSubLabelPainter.paint(this.root);
+    this.root.classed('transition', true);
     this.root
       .select('.graph')
       .transition()
@@ -73,6 +74,10 @@ export default class CalendarPainter {
     transitions = transitions.concat(this.calendar.pluginManager.paintAll());
 
     this.#resize();
+
+    Promise.allSettled(transitions).then(() => {
+      this.root.classed('transition', false);
+    });
 
     return Promise.allSettled(transitions);
   }
