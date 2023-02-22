@@ -142,6 +142,7 @@ export default class CalendarPainter {
 
     result.push(
       this.root
+        .classed('transition', true)
         .transition()
         .duration(this.calendar.options.options.animationDuration)
         .attr('width', 0)
