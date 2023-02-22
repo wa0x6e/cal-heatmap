@@ -12,6 +12,7 @@ This library will help you to chart a calendar heatmap, like the _[Github contri
 - 🌐 locale and timezone support
 - ⚡ plugins system
 - 🖥️ broad browsers support
+- 🔚 right-to-left support
 - ♾️ and many more...
 
 ![Day/Year Calendar Heatmap example](http://wa0x6e.github.io/cal-heatmap/assets/example1.png)
