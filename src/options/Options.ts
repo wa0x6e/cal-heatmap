@@ -8,11 +8,7 @@ import type { DomainType, Timestamp } from '../index';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
-type DeepPartial<T> = T extends object
-  ? {
-    [P in keyof T]?: DeepPartial<T[P]>;
-  }
-  : T;
+type SortOrder = 'asc' | 'desc';
 
 export type DomainOptions = {
   type: DomainType;
@@ -21,7 +17,7 @@ export type DomainOptions = {
   dynamicDimension: boolean;
   label: LabelOptions;
   subLabel?: SubLabelOptions;
-  sort: 'asc' | 'desc';
+  sort: SortOrder
 };
 
 type LabelOptions = {
@@ -66,7 +62,7 @@ export type SubDomainOptions = {
     value: number,
     backgroundColor: string,
   ) => string);
-  sort: 'asc' | 'desc';
+  sort: SortOrder
 };
 
 export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'average';
@@ -308,7 +304,7 @@ export default class Options {
     return true;
   }
 
-  init(opts?: DeepPartial<OptionsType>): void {
+  init(opts?: CalHeatmap.DeepPartial<OptionsType>): void {
     this.options = {
       // eslint-disable-next-line arrow-body-style
       ...mergeWith(this.options, opts, (objValue, srcValue) => {

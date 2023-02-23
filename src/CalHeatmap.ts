@@ -28,10 +28,6 @@ import type {
 
 import { ScrollDirection } from './constant';
 
-type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
-
 export default class CalHeatmap {
   static VERSION = VERSION;
 
@@ -101,7 +97,7 @@ export default class CalHeatmap {
    * tasks settle, whether resolved or rejected.
    */
   async paint(
-    options?: DeepPartial<OptionsType>,
+    options?: CalHeatmap.DeepPartial<OptionsType>,
     plugins?: PluginDefinition[] | PluginDefinition,
   ): Promise<unknown> {
     this.options.init(options);

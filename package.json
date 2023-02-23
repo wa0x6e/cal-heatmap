@@ -73,6 +73,7 @@
     "sass": "^1.56.1",
     "selenium-webdriver": "^4.7.1",
     "ts-jest": "^29.0.3",
+    "tsd": "^0.25.0",
     "typescript": "^4.9.4"
   },
   "scripts": {
@@ -82,7 +83,8 @@
     "dev": "rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/",
     "test:e2e": "node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/",
-    "test:e2e:local": "LOCAL=1 node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/"
+    "test:e2e:local": "LOCAL=1 node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/",
+    "tsd": "npx tsd --files test/index.test-d.ts"
   },
   "repository": {
     "type": "git",
