@@ -184,7 +184,6 @@ describe('DomainCollection', () => {
           y: '',
         } as DataOptions,
         () => {},
-        () => {},
       );
     });
 

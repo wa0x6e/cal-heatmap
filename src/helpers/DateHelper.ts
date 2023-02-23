@@ -94,9 +94,7 @@ export default class DateHelper {
    * As there is no fixed standard to specify which month a partial week should
    * belongs to, the ISO week date standard is used, where:
    * - the first week of the month should have at least 4 days
-   * - 1st day of the week is thursday of before
    *
-   *  Computation are based on week starting on monday
    *  @see https://en.wikipedia.org/wiki/ISO_week_date
    *
    * @param  {Timestamp | dayjs.Dayjs} d Datejs object or timestamp
@@ -122,8 +120,8 @@ export default class DateHelper {
    */
   getFirstWeekOfMonth(d: Timestamp | dayjs.Dayjs): dayjs.Dayjs {
     const startOfMonth = this.date(d).startOf('month');
-    let startOfFirstWeek = startOfMonth.startOf('isoWeek');
-    if (startOfMonth.isoWeekday() > 4) {
+    let startOfFirstWeek = startOfMonth.startOf('week');
+    if (startOfMonth.weekday() > 4) {
       startOfFirstWeek = startOfFirstWeek.add(1, 'week');
     }
 
@@ -138,8 +136,8 @@ export default class DateHelper {
    */
   getLastWeekOfMonth(d: Timestamp | dayjs.Dayjs): dayjs.Dayjs {
     const endOfMonth = this.date(d).endOf('month');
-    let endOfLastWeek = endOfMonth.endOf('isoWeek');
-    if (endOfMonth.isoWeekday() < 4) {
+    let endOfLastWeek = endOfMonth.endOf('week');
+    if (endOfMonth.weekday() < 4) {
       endOfLastWeek = endOfLastWeek.subtract(1, 'week');
     }
 

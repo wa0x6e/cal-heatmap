@@ -79,6 +79,166 @@ const data = {
       ],
     },
     {
+      title:
+        'fills the calendar with the provided data, when subDomain ' +
+        'interval overflow the domain on week starting on sunday',
+      setup: (cal) => {
+        return cal.paint({
+          range: 1,
+          domain: { type: 'month' },
+          subDomain: { label: (t, v) => v, type: 'week' },
+          date: {
+            start: new Date('2020-01-01'),
+            timezone: 'utc',
+            locale: { weekStart: 0 },
+          },
+          data: { x: 't', y: 'value' },
+        });
+      },
+      execute: (cal) => {
+        return cal.fill([
+          { t: '2019-12-29', value: 1 },
+          { t: '2019-12-30', value: 1 },
+          { t: '2020-01-01', value: 1 },
+          { t: '2020-01-05', value: 1 },
+          { t: '2020-01-06', value: 1 },
+          { t: '2020-01-13', value: 1 },
+          { t: '2020-01-20', value: 1 },
+          { t: '2020-01-26', value: 1 },
+          { t: '2020-01-27', value: 1 },
+          { t: '2020-02-01', value: 1 },
+          { t: '2020-02-02', value: 1 },
+        ]);
+      },
+      expectations: [
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(1) text')
+              .html();
+          },
+          expected: () => '3',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(2) text')
+              .html();
+          },
+          expected: () => '2',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(3) text')
+              .html();
+          },
+          expected: () => '1',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(4) text')
+              .html();
+          },
+          expected: () => '1',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(5) text')
+              .html();
+          },
+          expected: () => '3',
+        },
+      ],
+    },
+    {
+      title:
+        'fills the calendar with the provided data, when subDomain ' +
+        'interval overflow the domain on week starting on monday',
+      setup: (cal) => {
+        return cal.paint({
+          range: 1,
+          domain: { type: 'month' },
+          subDomain: { label: (t, v) => v, type: 'week' },
+          date: {
+            start: new Date('2020-01-01'),
+            timezone: 'utc',
+            locale: { weekStart: 1 },
+          },
+          data: { x: 't', y: 'value' },
+        });
+      },
+      execute: (cal) => {
+        return cal.fill([
+          { t: '2019-12-29', value: 1 },
+          { t: '2019-12-30', value: 1 },
+          { t: '2020-01-01', value: 1 },
+          { t: '2020-01-05', value: 1 },
+          { t: '2020-01-06', value: 1 },
+          { t: '2020-01-13', value: 1 },
+          { t: '2020-01-20', value: 1 },
+          { t: '2020-01-26', value: 1 },
+          { t: '2020-01-27', value: 1 },
+          { t: '2020-02-01', value: 1 },
+          { t: '2020-02-02', value: 1 },
+        ]);
+      },
+      expectations: [
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(1) text')
+              .html();
+          },
+          expected: () => '3',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(2) text')
+              .html();
+          },
+          expected: () => '1',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(3) text')
+              .html();
+          },
+          expected: () => '1',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(4) text')
+              .html();
+          },
+          expected: () => '2',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(5) text')
+              .html();
+          },
+          expected: () => '3',
+        },
+      ],
+    },
+    {
       title: 'paints the data with the expected opacity',
       setup: (cal) => {
         return cal.paint({

@@ -1,5 +1,4 @@
 import castArray from 'lodash-es/castArray';
-import groupBy from 'lodash-es/groupBy';
 
 import type { SubDomain } from '../index';
 import type {
@@ -17,6 +16,8 @@ export const DOMAIN_FORMAT: Record<DomainType, string> = {
   day: 'Do MMM',
   hour: 'HH:00',
 };
+
+type GroupedRecords = Map<Timestamp, { [key: Timestamp]: DataRecord[] }>;
 
 export default class DomainCollection {
   collection: Map<Timestamp, SubDomain[]>;
@@ -149,38 +150,66 @@ export default class DomainCollection {
       y: DataOptions['y'];
       groupY: DataOptions['groupY'];
     },
-    domainKeyExtractor: Function,
     subDomainKeyExtractor: Function,
   ): void {
-    const clampedData: Map<Timestamp, DataRecord[]> = new Map();
-    data.forEach((d) => {
-      const timestamp = this.extractTimestamp(d, x, domainKeyExtractor);
+    const groupedRecords: GroupedRecords = this.#groupRecords(
+      data,
+      x,
+      subDomainKeyExtractor,
+    );
 
-      if (this.collection.has(timestamp)) {
-        const records = clampedData.get(timestamp) || [];
-        clampedData.set(timestamp, [...records, d]);
+    this.keys.forEach((domainKey) => {
+      const records = groupedRecords.get(domainKey) || {};
+      this.#setSubDomainValues(domainKey, records, y, groupY);
+    });
+  }
+
+  #setSubDomainValues(
+    domainKey: Timestamp,
+    records: { [key: string]: DataRecord[] },
+    y: DataOptions['y'],
+    groupY: DataOptions['groupY'],
+  ): void {
+    this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
+      let value: number | null = null;
+      if (records.hasOwnProperty(subDomain.t)) {
+        value = this.#groupValues(
+          this.#extractValues(records[subDomain.t], y),
+          groupY,
+        );
+      }
+
+      this.get(domainKey)![index].v = value;
+    });
+  }
+
+  #groupRecords(
+    data: DataRecord[],
+    x: DataOptions['x'],
+    subDomainKeyExtractor: Function,
+  ): GroupedRecords {
+    const results: GroupedRecords = new Map();
+    const validSubDomainTimestamp: Map<Timestamp, Timestamp> = new Map();
+    this.keys.forEach((domainKey) => {
+      this.get(domainKey)!.forEach((subDomain: SubDomain) => {
+        validSubDomainTimestamp.set(subDomain.t, domainKey);
+      });
+    });
+
+    data.forEach((d) => {
+      const timestamp = this.extractTimestamp(d, x, subDomainKeyExtractor);
+
+      if (validSubDomainTimestamp.has(timestamp)) {
+        const domainKey = validSubDomainTimestamp.get(timestamp)!;
+        const records = results.get(domainKey) || {};
+        records[timestamp] ||= [];
+        records[timestamp].push(d);
+
+        results.set(domainKey, records);
       }
     });
 
-    this.keys.forEach((domainKey) => {
-      const records = groupBy(
-        clampedData.get(domainKey) || [],
-        (d): Timestamp => this.extractTimestamp(d, x, subDomainKeyExtractor),
-      );
-
-      this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
-        let value: number | null = null;
-
-        if (records.hasOwnProperty(subDomain.t)) {
-          value = this.#groupValues(
-            this.#extractValues(records[subDomain.t], y),
-            groupY,
-          );
-        }
-
-        this.get(domainKey)![index].v = value;
-      });
-    });
+    return results;
   }
 
   // eslint-disable-next-line class-methods-use-this
