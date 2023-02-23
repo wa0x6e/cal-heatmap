@@ -79,9 +79,7 @@ declare class CalHeatmap {
 
   jumpTo(date: Date, reset?: boolean): Promise<unknown>;
 
-  fill(
-    dataSource?: string | import('./options/Options').DataRecord[],
-  ): Promise<unknown>;
+  fill(dataSource?: OptionsType['data']['source']): Promise<unknown>;
 
   on(name: string, fn: () => any): void;
 
