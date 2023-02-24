@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.0.0-beta.11 [2023-02-25]
+
+## Features
+
+- [feat] data source URI now accepts dayjs format token (BREAKING CHANGES)
+- [feat] add support for RTL
+
+## Bugfixes
+
+- [fix] fix missing data when subDomain range is overflow the domain range 
+- [fix] fix cells stroke cut off on calendar edge
+- [fix] week subDomain where first and last week not assigned to correct month
+- [fix] scale color and opacity should always be clamped to the domain 
+
+## Chores
+
+- Improve typescript d.ts
+
 ## v4.0.0-beta.10 [2023-02-19]
 
 ## Bugfixes
