@@ -61,8 +61,7 @@ export default class CalHeatmap {
       this.dateHelper,
       this.options,
     );
-    this.dataFetcher = new DataFetcher(this.options);
-
+    this.dataFetcher = new DataFetcher(this);
     this.navigator = new Navigator(this);
     this.populator = new Populator(this);
 

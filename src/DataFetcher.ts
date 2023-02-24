@@ -3,36 +3,14 @@ import {
 } from 'd3-fetch';
 
 import type { DataOptions, DataRecord } from './options/Options';
-import type Options from './options/Options';
 import type { Timestamp } from './index';
-
-const parseURI = (
-  str: string,
-  startTimestamp: Timestamp,
-  endTimestamp: Timestamp,
-): string => {
-  // Use a timestamp in seconds
-  let newUri = str.replace(/\{\{t:start\}\}/g, `${startTimestamp / 1000}`);
-  newUri = newUri.replace(/\{\{t:end\}\}/g, `${endTimestamp / 1000}`);
-
-  // Use a string date, following the ISO-8601
-  newUri = newUri.replace(
-    /\{\{d:start\}\}/g,
-    new Date(startTimestamp).toISOString(),
-  );
-  newUri = newUri.replace(
-    /\{\{d:end\}\}/g,
-    new Date(endTimestamp).toISOString(),
-  );
-
-  return newUri;
-};
+import type CalHeatmap from './CalHeatmap';
 
 export default class DataFetcher {
-  options: Options;
+  calendar: CalHeatmap;
 
-  constructor(options: Options) {
-    this.options = options;
+  constructor(calendar: CalHeatmap) {
+    this.calendar = calendar;
   }
 
   /**
@@ -63,14 +41,29 @@ export default class DataFetcher {
     });
   }
 
+  parseURI(
+    str: string,
+    startTimestamp: Timestamp,
+    endTimestamp: Timestamp,
+  ): string {
+    let newUri = str.replace(/\{\{start=(.*)\}\}/g, (a, format) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      this.calendar.dateHelper.date(startTimestamp).format(format));
+    newUri = newUri.replace(/\{\{end=(.*)\}\}/g, (a, format) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      this.calendar.dateHelper.date(endTimestamp).format(format));
+
+    return newUri;
+  }
+
   #fetch(
     source: DataOptions['source'],
     startTimestamp: Timestamp,
     endTimestamp: Timestamp,
   ): Promise<unknown> {
-    const { type, requestInit } = this.options.options.data;
+    const { type, requestInit } = this.calendar.options.options.data;
 
-    const url = parseURI(source as string, startTimestamp, endTimestamp);
+    const url = this.parseURI(source as string, startTimestamp, endTimestamp);
 
     switch (type) {
       case 'json':
