@@ -10,3 +10,9 @@ export enum Position {
   BOTTOM,
   LEFT,
 }
+
+export const OPTIONS_DEFAULT_SUBDOMAIN_WIDTH = 10;
+export const OPTIONS_DEFAULT_SUBDOMAIN_HEIGHT = 10;
+export const OPTIONS_DEFAULT_SUBDOMAIN_GUTTER = 2;
+export const OPTIONS_DEFAULT_SUBDOMAIN_RADIUS = 0;
+export const SCALE_BASE_OPACITY_COLOR = 'red';

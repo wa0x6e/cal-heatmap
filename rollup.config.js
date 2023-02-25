@@ -134,4 +134,7 @@ export default [
   ...exportConfig('src/plugins/Legend.ts', 'Legend', 'plugins/Legend', {
     external: ['d3-selection', 'd3'],
   }),
+  ...exportConfig('src/plugins/LegendLite.ts', 'LegendLite', 'plugins/LegendLite', {
+    external: ['d3-selection', 'd3'],
+  }),
 ];
