@@ -5,6 +5,12 @@ import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import type { Ls } from 'dayjs';
 import type { DomainType, Timestamp } from '../index';
+import {
+  OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
+  OPTIONS_DEFAULT_SUBDOMAIN_HEIGHT,
+  OPTIONS_DEFAULT_SUBDOMAIN_GUTTER,
+  OPTIONS_DEFAULT_SUBDOMAIN_RADIUS,
+} from '../constant';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
@@ -17,7 +23,7 @@ export type DomainOptions = {
   dynamicDimension: boolean;
   label: LabelOptions;
   subLabel?: SubLabelOptions;
-  sort: SortOrder
+  sort: SortOrder;
 };
 
 type LabelOptions = {
@@ -62,7 +68,7 @@ export type SubDomainOptions = {
     value: number,
     backgroundColor: string,
   ) => string);
-  sort: SortOrder
+  sort: SortOrder;
 };
 
 export type DataGroupType = 'sum' | 'count' | 'min' | 'max' | 'average';
@@ -195,16 +201,16 @@ export default class Options {
         type: 'minute',
 
         // Width of each subDomain cell, in pixel
-        width: 10,
+        width: OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
 
         // Height of each subDomain cell, in pixel
-        height: 10,
+        height: OPTIONS_DEFAULT_SUBDOMAIN_HEIGHT,
 
         // Space between each subDomain cell, in pixel
-        gutter: 2,
+        gutter: OPTIONS_DEFAULT_SUBDOMAIN_GUTTER,
 
         // Radius of each subDomain cell, in pixel
-        radius: 0,
+        radius: OPTIONS_DEFAULT_SUBDOMAIN_RADIUS,
 
         // Formatting of the text inside each subDomain cell
         // @default: null, no text
