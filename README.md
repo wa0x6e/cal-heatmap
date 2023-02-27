@@ -15,10 +15,13 @@ This library will help you to chart a calendar heatmap, like the _[Github contri
 - 🔚 right-to-left support
 - ♾️ and many more...
 
-![Day/Year Calendar Heatmap example](http://wa0x6e.github.io/cal-heatmap/assets/example1.png)
-![Day/Month Calendar Heatmap example](http://wa0x6e.github.io/cal-heatmap/assets/example2.png)
+![Github like Calendar Heatmap example](https://cal-heatmap.com/examples/1.png)
+![Year/Day linear scale with legend Calendar Heatmap example](https://cal-heatmap.com/examples/2.png)
+![Year/Day threshold scale with legend Calendar Heatmap example](https://cal-heatmap.com/examples/3.png)
+![Month/Day alternate layout Calendar Heatmap example](https://cal-heatmap.com/examples/4.png)
+![Month/Day weekdays only Calendar Heatmap example](https://cal-heatmap.com/examples/5.png)
 
-See [documentation website](http://cal-heatmap.com) for full documentation and examples.
+See [documentation website](http://cal-heatmap.com) for full documentation and more examples.
 
 ## License
 
