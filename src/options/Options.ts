@@ -6,10 +6,20 @@ import set from 'lodash-es/set';
 import type { Ls } from 'dayjs';
 import type { DomainType, Timestamp } from '../index';
 import {
+  OPTIONS_DEFAULT_DOMAIN_TYPE,
+  OPTIONS_DEFAULT_SUBDOMAIN_TYPE,
   OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
   OPTIONS_DEFAULT_SUBDOMAIN_HEIGHT,
   OPTIONS_DEFAULT_SUBDOMAIN_GUTTER,
   OPTIONS_DEFAULT_SUBDOMAIN_RADIUS,
+  OPTIONS_DEFAULT_THEME,
+  OPTIONS_DEFAULT_ANIMATION_DURATION,
+  OPTIONS_DEFAULT_ITEM_SELECTOR,
+  OPTIONS_DEFAULT_RANGE,
+  SCALE_BASE_COLOR_SCHEME,
+  SCALE_BASE_COLOR_TYPE,
+  SCALE_BASE_COLOR_DOMAIN,
+  OPTIONS_DEFAULT_LOCALE,
 } from '../constant';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
@@ -141,13 +151,13 @@ export default class Options {
       // selector string of the container to append the graph to
       // Accept any string value accepted by document.querySelector or CSS3
       // or an Element object
-      itemSelector: '#cal-heatmap',
+      itemSelector: OPTIONS_DEFAULT_ITEM_SELECTOR,
 
       // Number of domain to display on the graph
-      range: 12,
+      range: OPTIONS_DEFAULT_RANGE,
 
       domain: {
-        type: 'hour',
+        type: OPTIONS_DEFAULT_DOMAIN_TYPE,
 
         // Space between each domain, in pixel
         gutter: 4,
@@ -198,7 +208,7 @@ export default class Options {
       },
 
       subDomain: {
-        type: 'minute',
+        type: OPTIONS_DEFAULT_SUBDOMAIN_TYPE,
 
         // Width of each subDomain cell, in pixel
         width: OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
@@ -241,7 +251,7 @@ export default class Options {
         // - an array of Date objects: highlight the specified dates
         highlight: [],
 
-        locale: 'en',
+        locale: OPTIONS_DEFAULT_LOCALE,
 
         timezone: undefined,
       },
@@ -275,10 +285,10 @@ export default class Options {
       scale: undefined,
 
       // Animation duration, in ms
-      animationDuration: 200,
+      animationDuration: OPTIONS_DEFAULT_ANIMATION_DURATION,
 
       // Theme mode: dark/light
-      theme: 'light',
+      theme: OPTIONS_DEFAULT_THEME,
 
       // Internally used options, do not edit not set
       x: {
@@ -353,9 +363,9 @@ export default class Options {
   initScale() {
     this.options.scale = {
       color: {
-        scheme: 'YlOrBr',
-        type: 'quantize',
-        domain: [0, 100],
+        scheme: SCALE_BASE_COLOR_SCHEME,
+        type: SCALE_BASE_COLOR_TYPE,
+        domain: SCALE_BASE_COLOR_DOMAIN,
       },
     };
   }

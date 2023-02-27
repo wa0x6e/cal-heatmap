@@ -3,6 +3,7 @@ import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp, SubDomain } from '../index';
 
 const BASE_CLASSNAME = 'graph-subdomain-group';
+const HIGHLIGHT_CLASSNAME = 'highlight';
 
 export default class SubDomainPainter {
   calendar: CalHeatmap;
@@ -134,7 +135,7 @@ export default class SubDomainPainter {
         ).extractUnit;
 
         if (unitFn(+d) === unitFn(timestamp)) {
-          classname = 'highlight';
+          classname = HIGHLIGHT_CLASSNAME;
         }
       });
     }
