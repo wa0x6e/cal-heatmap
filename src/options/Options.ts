@@ -65,7 +65,7 @@ export type SubDomainOptions = {
   | string
   | ((
     timestamp: Timestamp,
-    value: number,
+    value: number | string | null | undefined,
     backgroundColor: string,
   ) => string);
   sort: SortOrder;

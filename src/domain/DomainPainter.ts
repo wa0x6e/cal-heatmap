@@ -50,46 +50,46 @@ export default class DomainPainter {
       .join(
         (enter: any) => enter
           .append('svg')
-          .attr('x', (d: any) => coor.get(d)!.pre_x)
-          .attr('y', (d: any) => coor.get(d)!.pre_y)
-          .attr('width', (d: any) => coor.get(d)!.inner_width)
-          .attr('height', (d: any) => coor.get(d)!.inner_height)
-          .attr('class', (d: any) => this.#getClassName(d))
+          .attr('x', (d: Timestamp) => coor.get(d)!.pre_x)
+          .attr('y', (d: Timestamp) => coor.get(d)!.pre_y)
+          .attr('width', (d: Timestamp) => coor.get(d)!.inner_width)
+          .attr('height', (d: Timestamp) => coor.get(d)!.inner_height)
+          .attr('class', (d: Timestamp) => this.#getClassName(d))
           .call((enterSelection: any) => enterSelection
             .append('rect')
-            .attr('width', (d: any) => coor.get(d)!.inner_width)
-            .attr('height', (d: any) => coor.get(d)!.inner_height)
+            .attr('width', (d: Timestamp) => coor.get(d)!.inner_width)
+            .attr('height', (d: Timestamp) => coor.get(d)!.inner_height)
             .attr('class', 'domain-background'))
           .call((enterSelection: any) => promises.push(
             enterSelection
               .transition(t)
-              .attr('x', (d: any) => coor.get(d)!.x)
-              .attr('y', (d: any) => coor.get(d)!.y)
+              .attr('x', (d: Timestamp) => coor.get(d)!.x)
+              .attr('y', (d: Timestamp) => coor.get(d)!.y)
               .end(),
           )),
         (update: any) => update
           .call((updateSelection: any) => promises.push(
             updateSelection
               .transition(t)
-              .attr('x', (d: any) => coor.get(d)!.x)
-              .attr('y', (d: any) => coor.get(d)!.y)
-              .attr('width', (d: any) => coor.get(d)!.inner_width)
-              .attr('height', (d: any) => coor.get(d)!.inner_height)
+              .attr('x', (d: Timestamp) => coor.get(d)!.x)
+              .attr('y', (d: Timestamp) => coor.get(d)!.y)
+              .attr('width', (d: Timestamp) => coor.get(d)!.inner_width)
+              .attr('height', (d: Timestamp) => coor.get(d)!.inner_height)
               .end(),
           ))
           .call((updateSelection: any) => promises.push(
             updateSelection
               .selectAll('.domain-background')
               .transition(t)
-              .attr('width', (d: any) => coor.get(d)!.inner_width)
-              .attr('height', (d: any) => coor.get(d)!.inner_height)
+              .attr('width', (d: Timestamp) => coor.get(d)!.inner_width)
+              .attr('height', (d: Timestamp) => coor.get(d)!.inner_height)
               .end(),
           )),
         (exit: any) => exit.call((exitSelection: any) => promises.push(
           exitSelection
             .transition(t)
-            .attr('x', (d: any) => coor.get(d)!.x)
-            .attr('y', (d: any) => coor.get(d)!.y)
+            .attr('x', (d: Timestamp) => coor.get(d)!.x)
+            .attr('y', (d: Timestamp) => coor.get(d)!.y)
             .remove()
             .end(),
         )),

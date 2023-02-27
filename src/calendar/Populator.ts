@@ -3,6 +3,7 @@ import { hcl } from 'd3-color';
 import { normalizedScale, applyScaleStyle } from '../scale';
 
 import type CalHeatmap from '../CalHeatmap';
+import type { SubDomain, Timestamp } from '../index';
 
 export default class Populator {
   calendar: CalHeatmap;
@@ -16,11 +17,11 @@ export default class Populator {
     const { scale, subDomain } = calendar.options.options;
     const colorScale = normalizedScale(scale);
 
-    calendar.calendarPainter.root
+    calendar.calendarPainter.root!
       .selectAll('.graph-domain')
       .selectAll('svg')
       .selectAll('g')
-      .data((d: any) => calendar.domainCollection.get(d) || [])
+      .data((d: Timestamp) => calendar.domainCollection.get(d) || [])
       .call((element: any) => {
         applyScaleStyle(
           element.select('rect'),
@@ -32,7 +33,7 @@ export default class Populator {
       .call((element: any) => {
         element
           .select('text')
-          .attr('style', (d: any) => {
+          .attr('style', (d: SubDomain) => {
             const defaultColor =
               hcl(colorScale?.apply(d.v)).l > 60 ? '#000' : '#fff';
             let color = subDomain.color || (d.v ? defaultColor : null);
@@ -47,7 +48,7 @@ export default class Populator {
 
             return `fill: ${color};`;
           })
-          .text((d: any, i: number, nodes: any) =>
+          .text((d: SubDomain, i: number, nodes: any[]) =>
             // eslint-disable-next-line implicit-arrow-linebreak
             calendar.dateHelper.format(
               d.t,

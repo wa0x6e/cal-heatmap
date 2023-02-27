@@ -94,7 +94,7 @@ describe('DomainCollection', () => {
   });
 
   it('creates an empty collection when no intervals params', () => {
-    const h = new DomainCollection({ DateHelper: dummyDateHelper });
+    const h = new DomainCollection(dummyDateHelper);
     expect(h.keys.length).toBe(0);
   });
 

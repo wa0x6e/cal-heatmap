@@ -2,6 +2,7 @@ import { Position } from '../constant';
 import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 
 import type CalHeatmap from '../CalHeatmap';
+import type { Timestamp } from '../index';
 
 const DEFAULT_CLASSNAME = 'graph-label';
 
@@ -27,31 +28,31 @@ export default class DomainLabelPainter {
     root
       .selectAll(`.${DEFAULT_CLASSNAME}`)
       .data(
-        (d: any) => [d],
-        (d: any) => d,
+        (d: Timestamp) => [d],
+        (d: Timestamp) => d,
       )
       .join(
         (enter: any) => enter
           .append('text')
           .attr('class', DEFAULT_CLASSNAME)
-          .attr('x', (d: any) => this.#getX(d))
-          .attr('y', (d: any) => this.#getY(d))
+          .attr('x', (d: Timestamp) => this.#getX(d))
+          .attr('y', (d: Timestamp) => this.#getY(d))
           .attr('text-anchor', label.textAlign)
           .attr('dominant-baseline', () => this.#textVerticalAlign())
-          .text((d: any, i: number, nodes: any[]) =>
+          .text((d: Timestamp, i: number, nodes: any[]) =>
           // eslint-disable-next-line implicit-arrow-linebreak
             dateHelper.format(d, format!, nodes[i]))
-          .call((s: any) => this.#domainRotate(s)),
+          .call((selection: any) => this.#domainRotate(selection)),
         (update: any) => {
           update
-            .attr('x', (d: any) => this.#getX(d))
-            .attr('y', (d: any) => this.#getY(d))
+            .attr('x', (d: Timestamp) => this.#getX(d))
+            .attr('y', (d: Timestamp) => this.#getY(d))
             .attr('text-anchor', label.textAlign)
             .attr('dominant-baseline', () => this.#textVerticalAlign())
-            .text((d: any, i: number, nodes: any[]) =>
+            .text((d: Timestamp, i: number, nodes: any[]) =>
               // eslint-disable-next-line implicit-arrow-linebreak
               dateHelper.format(d, format!, nodes[i]))
-            .call((s: any) => this.#domainRotate(s));
+            .call((selection: any) => this.#domainRotate(selection));
         },
       );
   }
@@ -73,7 +74,7 @@ export default class DomainLabelPainter {
     return 'hanging';
   }
 
-  #getX(d: any): number {
+  #getX(d: Timestamp): number {
     const {
       padding,
       label: { position, textAlign, offset },
@@ -105,7 +106,7 @@ export default class DomainLabelPainter {
     return x + offset.x;
   }
 
-  #getY(d: any): number {
+  #getY(d: Timestamp): number {
     const {
       domain: {
         label: { position, offset },
@@ -123,7 +124,7 @@ export default class DomainLabelPainter {
     return y + offset.y;
   }
 
-  #getDomainInsideWidth(d: number): number {
+  #getDomainInsideWidth(d: Timestamp): number {
     const {
       domain: { padding },
       x,
@@ -137,7 +138,7 @@ export default class DomainLabelPainter {
     );
   }
 
-  #getDomainInsideHeight(d: number): number {
+  #getDomainInsideHeight(d: Timestamp): number {
     const {
       x,
       domain: { padding },
@@ -163,7 +164,7 @@ export default class DomainLabelPainter {
     switch (rotate) {
       // Rotating the text clockwise
       case 'right':
-        selection.attr('transform', (d: any) => {
+        selection.attr('transform', (d: Timestamp) => {
           const domainWidth = this.#getDomainInsideWidth(d);
           const domainHeight = this.#getDomainInsideHeight(d);
           const s = [
@@ -195,7 +196,7 @@ export default class DomainLabelPainter {
         break;
       // Rotating the text anticlockwise
       case 'left':
-        selection.attr('transform', (d: any) => {
+        selection.attr('transform', (d: Timestamp) => {
           const domainWidth = this.#getDomainInsideWidth(d);
           const domainHeight = this.#getDomainInsideHeight(d);
           const s = [

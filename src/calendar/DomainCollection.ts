@@ -7,6 +7,7 @@ import type {
   DataRecord,
 } from '../options/Options';
 import { DomainType, Timestamp } from '../index';
+import type DateHelper from '../helpers/DateHelper';
 
 export const DOMAIN_FORMAT: Record<DomainType, string> = {
   year: 'YYYY',
@@ -22,7 +23,7 @@ type GroupedRecords = Map<Timestamp, { [key: Timestamp]: DataRecord[] }>;
 export default class DomainCollection {
   collection: Map<Timestamp, SubDomain[]>;
 
-  dateHelper: any;
+  dateHelper: DateHelper;
 
   min: Timestamp;
 
@@ -33,7 +34,7 @@ export default class DomainCollection {
   yankedDomains: Timestamp[];
 
   constructor(
-    dateHelper: any,
+    dateHelper: DateHelper,
     interval?: string,
     start?: Date | Timestamp,
     range?: Date | Timestamp,
@@ -43,11 +44,12 @@ export default class DomainCollection {
     this.dateHelper = dateHelper;
 
     if (interval && start && range) {
-      this.collection = new Map(
-        this.dateHelper
-          .intervals(interval, start, range, excludeEnd)
-          .map((d: Timestamp) => castArray(d)),
-      );
+      const ts = this.dateHelper
+        .intervals(interval, start, range, excludeEnd)
+        .map((d: Timestamp) => castArray(d));
+
+      // @ts-ignore
+      this.collection = new Map(ts);
     }
 
     this.min = 0;

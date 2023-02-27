@@ -20,8 +20,8 @@ export default class SubDomainPainter {
     const subDomainSvgGroup = this.root
       .selectAll(`.${BASE_CLASSNAME}`)
       .data(
-        (d: any) => [d],
-        (d: any) => d,
+        (d: Timestamp) => [d],
+        (d: Timestamp) => d,
       )
       .join(
         (enter: any) => enter
@@ -43,7 +43,7 @@ export default class SubDomainPainter {
 
     subDomainSvgGroup
       .selectAll('g')
-      .data((d: any) => {
+      .data((d: Timestamp) => {
         const subDomainsCollection: SubDomain[] =
           this.calendar.domainCollection.get(d)!;
         if (sort === 'desc') {
@@ -62,18 +62,18 @@ export default class SubDomainPainter {
           .append('g')
           .call((selection: any) => selection
             .insert('rect')
-            .attr('class', (d: any) => this.#classname(d.t, 'graph-rect'))
+            .attr('class', (d: SubDomain) => this.#classname(d.t, 'graph-rect'))
             .attr('width', width)
             .attr('height', height)
-            .attr('x', (d: any) => this.#getX(d))
-            .attr('y', (d: any) => this.#getY(d))
-            .on('click', (ev: PointerEvent, d: any) =>
+            .attr('x', (d: SubDomain) => this.#getX(d))
+            .attr('y', (d: SubDomain) => this.#getY(d))
+            .on('click', (ev: PointerEvent, d: SubDomain) =>
             // eslint-disable-next-line implicit-arrow-linebreak
               evt.emit('click', ev, d.t, d.v))
-            .on('mouseover', (ev: PointerEvent, d: any) =>
+            .on('mouseover', (ev: PointerEvent, d: SubDomain) =>
             // eslint-disable-next-line implicit-arrow-linebreak
               evt.emit('mouseover', ev, d.t, d.v))
-            .on('mouseout', (ev: PointerEvent, d: any) =>
+            .on('mouseout', (ev: PointerEvent, d: SubDomain) =>
             // eslint-disable-next-line implicit-arrow-linebreak
               evt.emit('mouseout', ev, d.t, d.v))
             .attr('rx', radius > 0 ? radius : null)
@@ -81,11 +81,11 @@ export default class SubDomainPainter {
           .call((selection: any) => this.#appendText(selection)),
         (update: any) => update
           .selectAll('rect')
-          .attr('class', (d: any) => this.#classname(d.t, 'graph-rect'))
+          .attr('class', (d: SubDomain) => this.#classname(d.t, 'graph-rect'))
           .attr('width', width)
           .attr('height', height)
-          .attr('x', (d: any) => this.#getX(d))
-          .attr('y', (d: any) => this.#getY(d))
+          .attr('x', (d: SubDomain) => this.#getX(d))
+          .attr('y', (d: SubDomain) => this.#getY(d))
           .attr('rx', radius)
           .attr('ry', radius),
       );
@@ -123,7 +123,7 @@ export default class SubDomainPainter {
    * @param  {number} timestamp Unix timestamp of the current subDomain
    * @return {String} the highlight class
    */
-  #classname(timestamp: Timestamp, ...otherClasses: any): string {
+  #classname(timestamp: Timestamp, ...otherClasses: string[]): string {
     const { date, subDomain } = this.calendar.options.options;
     let classname = '';
 
@@ -153,17 +153,17 @@ export default class SubDomainPainter {
 
     return elem
       .append('text')
-      .attr('class', (d: any) => this.#classname(d.t, 'subdomain-text'))
-      .attr('x', (d: any) => this.#getX(d) + options.subDomain.width / 2)
-      .attr('y', (d: any) => this.#getY(d) + options.subDomain.height / 2)
+      .attr('class', (d: SubDomain) => this.#classname(d.t, 'subdomain-text'))
+      .attr('x', (d: SubDomain) => this.#getX(d) + options.subDomain.width / 2)
+      .attr('y', (d: SubDomain) => this.#getY(d) + options.subDomain.height / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .text((d: any, i: number, nodes: any[]) =>
+      .text((d: SubDomain, i: number, nodes: any[]) =>
         // eslint-disable-next-line implicit-arrow-linebreak
         dateFmt.format(d.t, fmt, d.v, nodes[i]));
   }
 
-  #getCoordinates(axis: 'x' | 'y', d: any): number {
+  #getCoordinates(axis: 'x' | 'y', d: SubDomain): number {
     const { subDomain } = this.calendar.options.options;
     return (
       d[axis] *
@@ -171,11 +171,11 @@ export default class SubDomainPainter {
     );
   }
 
-  #getX(d: any): number {
+  #getX(d: SubDomain): number {
     return this.#getCoordinates('x', d);
   }
 
-  #getY(d: any): number {
+  #getY(d: SubDomain): number {
     return this.#getCoordinates('y', d);
   }
 }

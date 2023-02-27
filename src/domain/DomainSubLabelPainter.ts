@@ -130,11 +130,11 @@ export default class DomainSubLabel {
     selection
       .attr('text-anchor', textAlign)
       .attr('x', this.#getX(textAlign, width!))
-      .attr('y', (data: any) => {
+      .attr('y', (data: string) => {
         const i = +data.split(SEP)[0];
         return i * (height! + gutter) + height! / 2;
       })
-      .text((data: any) => data.split(SEP)[1]);
+      .text((data: string) => data.split(SEP)[1]);
   }
 
   // eslint-disable-next-line class-methods-use-this

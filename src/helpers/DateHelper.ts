@@ -100,7 +100,7 @@ export default class DateHelper {
    * @param  {Timestamp | dayjs.Dayjs} d Datejs object or timestamp
    * @return {number}         The number of weeks
    */
-  getWeeksCountInMonth(d: Timestamp | dayjs.Dayjs): any {
+  getWeeksCountInMonth(d: Timestamp | dayjs.Dayjs): number {
     const pivotDate = this.date(d);
 
     return (
