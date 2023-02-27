@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.0-beta.12 [2023-02-27]
+
+## Features
+
+- [feat] add legend lite plugin
+
+## Chores
+
+- [chore] CSS file is not exported from the package
+- [refactor] extract variables to constant file
+- [refactor] improve typescript definition
+
 ## v4.0.0-beta.11 [2023-02-25]
 
 ## Features
