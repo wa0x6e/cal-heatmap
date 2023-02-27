@@ -1,5 +1,6 @@
 import type CalHeatmap from '../CalHeatmap';
 import type { Dimensions } from '../index';
+import { Position } from '../constant';
 
 const BASE_CLASSNAME = 'sublabel';
 const SEP = '||';
@@ -19,8 +20,9 @@ export default class DomainSubLabel {
 
   paint(root: any): Promise<unknown> {
     const {
-      domain: { subLabel },
+      domain: { subLabel, padding, label },
       subDomain,
+      x,
     } = this.calendar.options.options;
 
     if (!subLabel) {
@@ -59,11 +61,16 @@ export default class DomainSubLabel {
 
     let dayLabelSvgGroup = root.select(`.${BASE_CLASSNAME}`);
     if (dayLabelSvgGroup.empty()) {
+      let y = padding[Position.TOP];
+      if (label.position === 'top') {
+        y += x.domainVerticalLabelHeight;
+      }
+
       dayLabelSvgGroup = root
         .append('svg')
         .attr('class', BASE_CLASSNAME)
         .attr('x', 0)
-        .attr('y', 0);
+        .attr('y', y);
     }
 
     dayLabelSvgGroup
