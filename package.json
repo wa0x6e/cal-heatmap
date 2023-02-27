@@ -14,7 +14,8 @@
       "import": "./dist/cal-heatmap.esm.js",
       "require": "./dist/cal-heatmap.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./cal-heatmap.css": "./dist/cal-heatmap.css"
   },
   "directories": {
     "test": "test"
