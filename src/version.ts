@@ -1,2 +1,2 @@
-const VERSION = '4.0.0-beta.12';
+const VERSION = '4.0.0';
 export default VERSION;

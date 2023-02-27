@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.0.0 [2023-02-27]
+
+See all previous changelogs from v4.0.0-beta.1 though 12
+
 ## v4.0.0-beta.12 [2023-02-27]
 
 ## Features
