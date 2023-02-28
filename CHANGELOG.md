@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.1.0 [2023-02-28]
+
+## Features
+
+- [feat] add github-like day subdomain template
+- [feat] add safeguard and error message when Domain/SubDomain couple is not valid
+
+## Bugfixes
+
+- [fix] DomainSubLabel vertical position ignoring padding and label position
+- [fix] rename subDomain template, for consistency
+- [fix] fix plugins export from package.json
+
 ## v4.0.0 [2023-02-27]
 
 See all previous changelogs from v4.0.0-beta.1 though 12
