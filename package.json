@@ -15,7 +15,19 @@
       "require": "./dist/cal-heatmap.js"
     },
     "./package.json": "./package.json",
-    "./cal-heatmap.css": "./dist/cal-heatmap.css"
+    "./cal-heatmap.css": "./dist/cal-heatmap.css",
+    "./plugins/Tooltip": {
+      "import": "./dist/plugins/Tooltip.esm.js",
+      "require": "./dist/plugins/Tooltip.js"
+    },
+    "./plugins/Legend": {
+      "import": "./dist/plugins/Legend.esm.js",
+      "require": "./dist/plugins/Legend.js"
+    },
+    "./plugins/LegendLite": {
+      "import": "./dist/plugins/LegendLite.esm.js",
+      "require": "./dist/plugins/LegendLite.js"
+    }
   },
   "directories": {
     "test": "test"
