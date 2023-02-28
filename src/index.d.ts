@@ -6,7 +6,14 @@ import type DateHelper from './helpers/DateHelper';
 
 declare namespace CalHeatmap {
   export type Timestamp = number;
-  export type DomainType = 'year' | 'month' | 'week' | 'x_day' | 'day' | 'hour';
+  export type DomainType =
+    | 'year'
+    | 'month'
+    | 'week'
+    | 'x_day'
+    | 'day'
+    | 'hour'
+    | 'minute';
 
   export type DeepPartial<T> = T extends object
     ? {
@@ -23,6 +30,7 @@ declare namespace CalHeatmap {
   export type TemplateResult = {
     name: string;
     parent?: string;
+    allowedDomainType: DomainType[];
     rowsCount: (ts: Timestamp) => number;
     columnsCount: (ts: Timestamp) => number;
     mapping: (

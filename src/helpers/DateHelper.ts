@@ -15,7 +15,7 @@ import updateLocale from 'dayjs/plugin/updateLocale';
 
 import type { ManipulateType, PluginFunc, Ls } from 'dayjs';
 import type { OptionsType } from '../options/Options';
-import type { Timestamp } from '../index';
+import type { Timestamp, DomainType } from '../index';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeeksInYear);
@@ -181,7 +181,7 @@ export default class DateHelper {
    * @returns {Array<number>} Array of unix timestamp, in milliseconds
    */
   intervals(
-    interval: string,
+    interval: DomainType,
     date: Timestamp | Date | dayjs.Dayjs,
     range: number | Date | dayjs.Dayjs,
     excludeEnd: boolean = true,

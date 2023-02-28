@@ -1,11 +1,16 @@
-import type { Template } from '../index';
+import type { Template, DomainType } from '../index';
 
 const minuteTemplate: Template = (DateHelper) => {
   const COLUMNS_COUNT = 10;
   const ROWS_COUNT = 6;
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
+    'day',
+    'hour',
+  ];
 
   return {
     name: 'minute',
+    allowedDomainType: ALLOWED_DOMAIN_TYPE,
     rowsCount: () => COLUMNS_COUNT,
     columnsCount: () => ROWS_COUNT,
     mapping: (startTimestamp, endTimestamp) =>

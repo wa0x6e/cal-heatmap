@@ -1,10 +1,14 @@
-import type { Template } from '../index';
+import type { Template, DomainType } from '../index';
 
 const dayTemplate: Template = (DateHelper) => {
   const ROWS_COUNT = 7;
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
+    'month',
+  ];
 
   return {
     name: 'ghDay',
+    allowedDomainType: ALLOWED_DOMAIN_TYPE,
     rowsCount: () => ROWS_COUNT,
     columnsCount: (ts) => DateHelper.getWeeksCountInMonth(ts),
     mapping: (startTimestamp, endTimestamp) => {

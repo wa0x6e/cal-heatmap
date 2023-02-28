@@ -1,5 +1,5 @@
 import type { OptionsType, DomainOptions } from '../options/Options';
-import type { Template } from '../index';
+import type { Template, DomainType } from '../index';
 
 const dayTemplate: Template = (
   DateHelper,
@@ -12,9 +12,15 @@ const dayTemplate: Template = (
   },
 ) => {
   const ROWS_COUNT = 7;
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
+    'year',
+    'month',
+    'week',
+  ];
 
   return {
     name: 'day',
+    allowedDomainType: ALLOWED_DOMAIN_TYPE,
     rowsCount: () => (domain.type === 'week' ? 1 : ROWS_COUNT),
     columnsCount: (ts) => {
       switch (domain.type) {

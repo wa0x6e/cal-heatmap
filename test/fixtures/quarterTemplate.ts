@@ -1,8 +1,10 @@
 import type { OpUnitType } from 'dayjs';
 import type DateHelper from '../../src/helpers/DateHelper';
+import type { DomainType } from '../../src/index';
 
 const quarterTemplate = (DateHelper: DateHelper) => ({
   name: 'quarter',
+  allowedDomainType: ['year'],
   rowsCount() {
     return 1;
   },
@@ -11,14 +13,16 @@ const quarterTemplate = (DateHelper: DateHelper) => ({
   },
   mapping: (startDate: number, endDate: number, defaultValues: any = {}) =>
     // eslint-disable-next-line implicit-arrow-linebreak
-    DateHelper.intervals('quarter', startDate, DateHelper.date(endDate)).map(
-      (d: number, index: number) => ({
-        t: d,
-        x: index,
-        y: 0,
-        ...defaultValues,
-      }),
-    ),
+    DateHelper.intervals(
+      'quarter' as DomainType,
+      startDate,
+      DateHelper.date(endDate),
+    ).map((d: number, index: number) => ({
+      t: d,
+      x: index,
+      y: 0,
+      ...defaultValues,
+    })),
   extractUnit(ts: number) {
     return DateHelper.date(ts)
       .startOf('quarter' as OpUnitType)

@@ -1,5 +1,6 @@
 import type TemplateCollection from '../TemplateCollection';
 import type { DomainOptions, SubDomainOptions, DataOptions } from './Options';
+import type { DomainType } from '../index';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 
@@ -21,7 +22,7 @@ export default function validate(
     data: Partial<DataOptions>;
   },
 ): boolean {
-  const domainType = domain.type as string;
+  const domainType = domain.type as DomainType;
   const subDomainType = subDomain.type as string;
 
   if (!templateCollection.has(domainType)) {
@@ -34,6 +35,17 @@ export default function validate(
 
   if (data.type && !ALLOWED_DATA_TYPES.includes(data.type)) {
     throw new Error(`The data type '${data.type}' is not valid data type`);
+  }
+
+  if (
+    !(templateCollection.get(subDomainType).allowedDomainType || []).includes(
+      domainType,
+    )
+  ) {
+    throw new Error(
+      `The subDomain.type '${subDomainType}' can not be used together ` +
+        `with the domain type ${domainType}`,
+    );
   }
 
   return true;

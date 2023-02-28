@@ -19,9 +19,9 @@ describe('OptionsValidator', () => {
 
   const validSubDomainTemplate = new TemplateCollection(dateHelper, options);
   validSubDomainTemplate.settings = new Map([
-    ['day', {} as TemplateResult],
-    ['x_day', {} as TemplateResult],
-    ['month', {} as TemplateResult],
+    ['day', { allowedDomainType: ['month'] } as TemplateResult],
+    ['x_day', { allowedDomainType: ['month'] } as TemplateResult],
+    ['month', { allowedDomainType: ['month'] } as TemplateResult],
   ]);
 
   it('returns true when all domain/subDomain are valid', () => {
@@ -62,6 +62,42 @@ describe('OptionsValidator', () => {
       validate(validSubDomainTemplate, {
         domain: { type: 'month' },
         subDomain: { type: 'day' },
+        data: { type: 'json' },
+      }),
+    ).toBe(true);
+  });
+
+  it('only accepts valid Domain/SubDomain couple', () => {
+    validSubDomainTemplate.init();
+
+    expect(() => {
+      validate(validSubDomainTemplate, {
+        domain: { type: 'month' },
+        subDomain: { type: 'year' },
+        data: { type: 'json' },
+      });
+    }).toThrow();
+
+    expect(() => {
+      validate(validSubDomainTemplate, {
+        domain: { type: 'hour' },
+        subDomain: { type: 'year' },
+        data: { type: 'json' },
+      });
+    }).toThrow();
+
+    expect(() => {
+      validate(validSubDomainTemplate, {
+        domain: { type: 'year' },
+        subDomain: { type: 'minute' },
+        data: { type: 'json' },
+      });
+    }).toThrow();
+
+    expect(
+      validate(validSubDomainTemplate, {
+        domain: { type: 'year' },
+        subDomain: { type: 'month' },
         data: { type: 'json' },
       }),
     ).toBe(true);

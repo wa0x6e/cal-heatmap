@@ -22,12 +22,12 @@ export default class TemplateCollection {
     this.initiated = false;
   }
 
-  get(domainType: string): TemplateResult {
-    return this.settings.get(domainType)!;
+  get(subDomainType: string): TemplateResult {
+    return this.settings.get(subDomainType)!;
   }
 
-  has(domainType: string): boolean {
-    return this.settings.has(domainType);
+  has(subDomainType: string): boolean {
+    return this.settings.has(subDomainType);
   }
 
   init() {

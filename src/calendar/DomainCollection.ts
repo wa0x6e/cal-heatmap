@@ -16,6 +16,7 @@ export const DOMAIN_FORMAT: Record<DomainType, string> = {
   x_day: 'Do MMM',
   day: 'Do MMM',
   hour: 'HH:00',
+  minute: 'HH:mm',
 };
 
 type GroupedRecords = Map<Timestamp, { [key: Timestamp]: DataRecord[] }>;
@@ -35,7 +36,7 @@ export default class DomainCollection {
 
   constructor(
     dateHelper: DateHelper,
-    interval?: string,
+    interval?: DomainType,
     start?: Date | Timestamp,
     range?: Date | Timestamp,
     excludeEnd: boolean = false,

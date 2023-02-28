@@ -6,6 +6,7 @@ import DateHelper from '../../src/helpers/DateHelper';
 import weekData from '../fixtures/weekNumberDates';
 import dates from '../fixtures/dates';
 import Options from '../../src/options/Options';
+import type { DomainType } from '../../src/index';
 
 const date = new Date('2020-01-02T04:24:25.256+00:00');
 const DEFAULT_LOCALE = 'en';
@@ -134,7 +135,7 @@ describe('DateHelper', () => {
   describe('intervals', () => {
     const expectations: any = dates;
 
-    const testRun = (interval: string, locale: string) => {
+    const testRun = (interval: DomainType, locale: string) => {
       const toDates = (a: number[]) => a.map((k: number) => new Date(k));
 
       describe(`With dayjs [${locale}] locale`, () => {
@@ -143,7 +144,7 @@ describe('DateHelper', () => {
           await dateHelper.setup(options);
         });
 
-        let intervalKey = interval;
+        let intervalKey = interval as string;
         if (locale !== DEFAULT_LOCALE) {
           intervalKey = `${interval}_${locale}`;
         }
@@ -257,7 +258,7 @@ describe('DateHelper', () => {
     Object.keys(expectations).forEach((key) => {
       const [interval, locale] = key.split('_');
 
-      testRun(interval, locale || DEFAULT_LOCALE);
+      testRun(interval as DomainType, locale || DEFAULT_LOCALE);
     });
   });
 });

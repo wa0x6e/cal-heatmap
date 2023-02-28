@@ -13,6 +13,7 @@ const data = {
         const template = (DateHelper) => {
           return {
             name: 'quarter',
+            allowedDomainType: ['year'],
             rowsCount() {
               return 1;
             },
