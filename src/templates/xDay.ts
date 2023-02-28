@@ -19,7 +19,7 @@ const dayTemplate: Template = (
   ];
 
   return {
-    name: 'x_day',
+    name: 'xDay',
     allowedDomainType: ALLOWED_DOMAIN_TYPE,
     rowsCount: (ts) => {
       switch (domain.type) {
