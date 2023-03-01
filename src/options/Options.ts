@@ -99,7 +99,9 @@ export type DataOptions = {
   requestInit: object;
   x: string | ((datum: DataRecord) => number);
   y: string | ((datum: DataRecord) => number);
-  groupY: DataGroupType | ((values: number[]) => number);
+  groupY:
+  | DataGroupType
+  | ((values: (string | number | null)[]) => string | number | null);
 };
 
 type ScaleOptions = {

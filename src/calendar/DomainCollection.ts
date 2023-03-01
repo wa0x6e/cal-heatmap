@@ -20,6 +20,7 @@ export const DOMAIN_FORMAT: Record<DomainType, string> = {
 };
 
 type GroupedRecords = Map<Timestamp, { [key: Timestamp]: DataRecord[] }>;
+type ValueType = string | number | null;
 
 export default class DomainCollection {
   collection: Map<Timestamp, SubDomain[]>;
@@ -155,7 +156,7 @@ export default class DomainCollection {
     },
     subDomainKeyExtractor: Function,
   ): void {
-    const groupedRecords: GroupedRecords = this.#groupRecords(
+    const groupedRecords: GroupedRecords = this.groupRecords(
       data,
       x,
       subDomainKeyExtractor,
@@ -174,9 +175,9 @@ export default class DomainCollection {
     groupY: DataOptions['groupY'],
   ): void {
     this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
-      let value: number | null = null;
+      let value: ValueType = null;
       if (records.hasOwnProperty(subDomain.t)) {
-        value = this.#groupValues(
+        value = this.groupValues(
           this.#extractValues(records[subDomain.t], y),
           groupY,
         );
@@ -186,7 +187,7 @@ export default class DomainCollection {
     });
   }
 
-  #groupRecords(
+  groupRecords(
     data: DataRecord[],
     x: DataOptions['x'],
     subDomainKeyExtractor: Function,
@@ -216,34 +217,46 @@ export default class DomainCollection {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  #extractValues(data: DataRecord[], y: string | Function): number[] {
-    return data.map((d): number => (typeof y === 'function' ? y(d) : d[y]));
+  #extractValues(data: DataRecord[], y: string | Function): ValueType[] {
+    return data.map((d): ValueType => (typeof y === 'function' ? y(d) : d[y]));
   }
 
   // eslint-disable-next-line class-methods-use-this
-  #groupValues(
-    values: number[],
-    groupFn: DataGroupType | ((values: number[]) => number),
-  ): number | null {
+  groupValues(
+    values: ValueType[],
+    groupFn: DataGroupType | ((values: ValueType[]) => ValueType),
+  ): ValueType {
+    const cleanedValues = values.filter((n) => n !== null);
+
     if (typeof groupFn === 'string') {
+      if (cleanedValues.every((n) => typeof n === 'number')) {
+        switch (groupFn) {
+          case 'sum':
+            return (cleanedValues as number[]).reduce((a, b) => a + b, 0);
+          case 'count':
+            return cleanedValues.length;
+          case 'min':
+            return Math.min(...(cleanedValues as number[])) || null;
+          case 'max':
+            return Math.max(...(cleanedValues as number[])) || null;
+          case 'average':
+            return cleanedValues.length > 0 ?
+              (cleanedValues as number[]).reduce((a, b) => a + b, 0) /
+                  cleanedValues.length :
+              null;
+          default:
+            return null;
+        }
+      }
+
       switch (groupFn) {
-        case 'sum':
-          return values.reduce((a, b) => a + b, 0);
         case 'count':
-          return values.length;
-        case 'min':
-          return Math.min(...values) || null;
-        case 'max':
-          return Math.max(...values) || null;
-        case 'average':
-          return values.length > 0 ?
-            values.reduce((a, b) => a + b, 0) / values.length :
-            null;
+          return cleanedValues.length;
         default:
           return null;
       }
     } else if (typeof groupFn === 'function') {
-      return groupFn(values);
+      return groupFn(cleanedValues);
     }
 
     return null;

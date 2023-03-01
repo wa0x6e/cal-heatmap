@@ -44,7 +44,7 @@ declare namespace CalHeatmap {
     t: Timestamp;
     x: number;
     y: number;
-    v?: number | null;
+    v?: number | string | null;
   };
 
   export type Dimensions = {

@@ -218,7 +218,7 @@ describe('DomainCollection', () => {
     it.todo('groups the value using a function');
   });
 
-  describe('#extractTimestamp()', () => {
+  describe('extractTimestamp()', () => {
     it('extracts the timestamp from a timestamp', () => {
       const result = d.extractTimestamp(
         { date: 1577836800000 },
@@ -265,6 +265,31 @@ describe('DomainCollection', () => {
       );
 
       expect(result).toBe(1577836800000);
+    });
+  });
+
+  describe('groupValues()', () => {
+    describe('on number values', () => {
+      it('executes the specified group function name', () => {
+        expect(d.groupValues([10, 20, 30, null], 'sum')).toBe(60);
+      });
+      it('returns the result from the function', () => {
+        expect(d.groupValues([10, 20, 30], (n) => n[0])).toBe(10);
+      });
+    });
+
+    describe('on string values', () => {
+      it('returns the result from the function', () => {
+        expect(d.groupValues(['Asia', 'Europe', 'America'], (n) => n[0])).toBe(
+          'Asia',
+        );
+      });
+
+      it('executes the specified group function name', () => {
+        expect(
+          d.groupValues(['Asia', 'Europe', 'America', null], 'count'),
+        ).toBe(3);
+      });
     });
   });
 });

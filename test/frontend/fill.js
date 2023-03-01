@@ -79,6 +79,83 @@ const data = {
       ],
     },
     {
+      title: 'fills the calendar with the provided data, with string values',
+      setup: (cal) => {
+        return cal.paint({
+          range: 1,
+          domain: { type: 'month' },
+          date: { start: new Date('2020-01-01'), timezone: 'utc' },
+          data: { x: 'ts', y: 'value', groupY: (n) => n[0] },
+          subDomain: { label: (t, v) => v, type: 'day' },
+        });
+      },
+      execute: (cal) => {
+        return cal.fill([
+          { ts: '2020-01-01', value: 'A' },
+          { ts: '2020-01-10', value: 'B' },
+        ]);
+      },
+      expectations: [
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(1) text')
+              .html();
+          },
+          expected: () => 'A',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(10) text')
+              .html();
+          },
+          expected: () => 'B',
+        },
+      ],
+    },
+    {
+      title:
+        'fills the calendar with the provided data, with string grouped values',
+      setup: (cal) => {
+        return cal.paint({
+          range: 1,
+          domain: { type: 'year' },
+          date: { start: new Date('2020-01-01'), timezone: 'utc' },
+          data: { x: 'ts', y: 'value', groupY: 'count' },
+          subDomain: { label: (t, v) => v, type: 'month' },
+        });
+      },
+      execute: (cal) => {
+        return cal.fill([
+          { ts: '2020-01-01', value: 'A' },
+          { ts: '2020-01-10', value: 'B' },
+        ]);
+      },
+      expectations: [
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(1) text')
+              .html();
+          },
+          expected: () => '2',
+        },
+        {
+          current: (d3) => {
+            return d3
+              .select('#cal-heatmap')
+              .select('g:nth-child(2) text')
+              .html();
+          },
+          expected: () => '',
+        },
+      ],
+    },
+    {
       title:
         'fills the calendar with the provided data, when subDomain ' +
         'interval overflow the domain on week starting on sunday',
