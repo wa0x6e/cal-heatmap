@@ -10,7 +10,8 @@ declare namespace CalHeatmap {
     | 'year'
     | 'month'
     | 'week'
-    | 'x_day'
+    | 'xDay'
+    | 'ghDay'
     | 'day'
     | 'hour'
     | 'minute';
