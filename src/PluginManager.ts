@@ -78,27 +78,31 @@ export default class PluginManager {
    * @return {number} Aggregated width of all the plugins
    */
   totalInsideWidth(): number {
-    return this.#allPlugins().map((p: IPlugin) => {
-      const { position, dimensions } = p.options;
+    return this.#allPlugins()
+      .map((p: IPlugin) => {
+        const { position, dimensions } = p.options;
 
-      if (position === 'left' || position === 'right') {
-        return dimensions!.width;
-      }
+        if (position === 'left' || position === 'right') {
+          return dimensions!.width;
+        }
 
-      return 0;
-    }).reduce((a, b) => a + b, 0);
+        return 0;
+      })
+      .reduce((a, b) => a + b, 0);
   }
 
   totalInsideHeight(): number {
-    return this.#allPlugins().map((p: IPlugin) => {
-      const { position, dimensions } = p.options;
+    return this.#allPlugins()
+      .map((p: IPlugin) => {
+        const { position, dimensions } = p.options;
 
-      if (position === 'top' || position === 'bottom') {
-        return dimensions!.height;
-      }
+        if (position === 'top' || position === 'bottom') {
+          return dimensions!.height;
+        }
 
-      return 0;
-    }).reduce((a, b) => a + b, 0);
+        return 0;
+      })
+      .reduce((a, b) => a + b, 0);
   }
 
   destroyAll(): Promise<unknown>[] {
@@ -106,6 +110,6 @@ export default class PluginManager {
   }
 
   #allPlugins() {
-    return Array.from(this.plugins.values())
+    return Array.from(this.plugins.values());
   }
 }

@@ -5,10 +5,7 @@ const weekTemplate: Template = (
   DateHelper,
   { domain }: { domain: DomainOptions },
 ) => {
-  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
-    'year',
-    'month',
-  ];
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = ['year', 'month'];
 
   return {
     name: 'week',

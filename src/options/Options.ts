@@ -26,7 +26,7 @@ import OptionsPreProcessors from './OptionsPreProcessors';
 
 type SortOrder = 'asc' | 'desc';
 export type TextAlign = 'start' | 'middle' | 'end';
-export type Padding = [number, number, number, number]
+export type Padding = [number, number, number, number];
 
 export type DomainOptions = {
   type: DomainType;

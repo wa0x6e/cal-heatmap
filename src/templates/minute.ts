@@ -3,10 +3,7 @@ import type { Template, DomainType } from '../index';
 const minuteTemplate: Template = (DateHelper) => {
   const COLUMNS_COUNT = 10;
   const ROWS_COUNT = 6;
-  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
-    'day',
-    'hour',
-  ];
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = ['day', 'hour'];
 
   return {
     name: 'minute',

@@ -2,9 +2,7 @@ import type { Template, DomainType } from '../index';
 
 const dayTemplate: Template = (DateHelper) => {
   const ROWS_COUNT = 7;
-  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
-    'month',
-  ];
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = ['month'];
 
   return {
     name: 'ghDay',

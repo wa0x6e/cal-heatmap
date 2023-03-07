@@ -1,5 +1,9 @@
 import { Position } from '../constant';
-import { isVertical, verticalPadding, horizontalPadding } from '../helpers/PositionHelper';
+import {
+  isVertical,
+  verticalPadding,
+  horizontalPadding,
+} from '../helpers/PositionHelper';
 import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 
 import type CalHeatmap from '../CalHeatmap';

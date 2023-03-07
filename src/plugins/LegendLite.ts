@@ -116,7 +116,7 @@ export default class LegendLite implements IPlugin {
       .data(localRange)
       .join(
         (enter: any) => enter.append('rect').call((sc: any) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
+        // eslint-disable-next-line implicit-arrow-linebreak
           this.#nodeAttrs(sc, scale)),
         (update: any) => update
           .selectAll('rect')

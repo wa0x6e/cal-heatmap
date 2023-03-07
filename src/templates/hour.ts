@@ -7,11 +7,7 @@ const hourTemplate: Template = (
 ) => {
   const TOTAL_ITEMS = 24;
   const ROWS_COUNT = 6;
-  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
-    'month',
-    'week',
-    'day',
-  ];
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = ['month', 'week', 'day'];
 
   return {
     name: 'hour',

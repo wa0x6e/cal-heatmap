@@ -12,11 +12,7 @@ const dayTemplate: Template = (
   },
 ) => {
   const ROWS_COUNT = 7;
-  const ALLOWED_DOMAIN_TYPE: DomainType[] = [
-    'year',
-    'month',
-    'week',
-  ];
+  const ALLOWED_DOMAIN_TYPE: DomainType[] = ['year', 'month', 'week'];
 
   return {
     name: 'day',

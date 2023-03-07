@@ -17,18 +17,13 @@ export default class Populator {
     const { scale, subDomain } = calendar.options.options;
     const colorScale = normalizedScale(scale);
 
-    calendar.calendarPainter.root!
-      .selectAll('.graph-domain')
+    calendar.calendarPainter
+      .root!.selectAll('.graph-domain')
       .selectAll('svg')
       .selectAll('g')
       .data((d: Timestamp) => calendar.domainCollection.get(d) || [])
       .call((element: any) => {
-        applyScaleStyle(
-          element.select('rect'),
-          colorScale,
-          scale!,
-          'v',
-        );
+        applyScaleStyle(element.select('rect'), colorScale, scale!, 'v');
       })
       .call((element: any) => {
         element
@@ -50,12 +45,7 @@ export default class Populator {
           })
           .text((d: SubDomain, i: number, nodes: any[]) =>
             // eslint-disable-next-line implicit-arrow-linebreak
-            calendar.dateHelper.format(
-              d.t,
-              subDomain.label,
-              d.v,
-              nodes[i],
-            ));
+            calendar.dateHelper.format(d.t, subDomain.label, d.v, nodes[i]));
       })
       .call(() => {
         calendar.eventEmitter.emit('fill');

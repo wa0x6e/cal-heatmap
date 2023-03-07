@@ -49,5 +49,5 @@ export function applyScaleStyle(
     // eslint-disable-next-line implicit-arrow-linebreak
     elem.style(prop, (d: SubDomain | string) =>
       // eslint-disable-next-line implicit-arrow-linebreak
-      val(keyname ? ((d as SubDomain)[keyname as keyof SubDomain]) : d)));
+      val(keyname ? (d as SubDomain)[keyname as keyof SubDomain] : d)));
 }
