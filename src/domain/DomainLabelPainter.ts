@@ -1,4 +1,5 @@
 import { Position } from '../constant';
+import { isVertical, verticalPadding, horizontalPadding } from '../helpers/PositionHelper';
 import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -60,7 +61,7 @@ export default class DomainLabelPainter {
   #textVerticalAlign(): string {
     const { position, rotate } = this.calendar.options.options.domain.label;
 
-    if (['top', 'bottom'].includes(position)) {
+    if (isVertical(position)) {
       return 'middle';
     }
 
@@ -96,7 +97,7 @@ export default class DomainLabelPainter {
     }
 
     if (textAlign === 'end') {
-      if (['top', 'bottom'].includes(position)) {
+      if (isVertical(position)) {
         x += this.#getDomainInsideWidth(d);
       } else {
         x += domainHorizontalLabelWidth;
@@ -133,8 +134,7 @@ export default class DomainLabelPainter {
       this.calendar.calendarPainter.domainPainter.coordinates.get(d)!
         .inner_width -
       x.domainHorizontalLabelWidth -
-      padding[Position.RIGHT] -
-      padding[Position.LEFT]
+      horizontalPadding(padding)
     );
   }
 
@@ -147,8 +147,7 @@ export default class DomainLabelPainter {
       this.calendar.calendarPainter.domainPainter.coordinates.get(d)!
         .inner_height -
       x.domainVerticalLabelHeight -
-      padding[Position.TOP] -
-      padding[Position.BOTTOM]
+      verticalPadding(padding)
     );
   }
 

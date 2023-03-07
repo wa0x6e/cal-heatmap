@@ -25,14 +25,15 @@ import {
 import OptionsPreProcessors from './OptionsPreProcessors';
 
 type SortOrder = 'asc' | 'desc';
+export type TextAlign = 'start' | 'middle' | 'end';
+export type Padding = [number, number, number, number]
 
 export type DomainOptions = {
   type: DomainType;
   gutter: number;
-  padding: [number, number, number, number];
+  padding: Padding;
   dynamicDimension: boolean;
   label: LabelOptions;
-  subLabel?: SubLabelOptions;
   sort: SortOrder;
 };
 
@@ -42,7 +43,7 @@ type LabelOptions = {
   | null
   | ((timestamp: Timestamp, element: SVGElement) => string);
   position: 'top' | 'right' | 'bottom' | 'left';
-  textAlign: 'start' | 'middle' | 'end';
+  textAlign: TextAlign;
   offset: {
     x: number;
     y: number;
@@ -50,15 +51,6 @@ type LabelOptions = {
   rotate: null | 'left' | 'right';
   width: number;
   height: number;
-};
-
-type SubLabelOptions = {
-  text: () => string[];
-  radius?: number;
-  width?: number;
-  height?: number;
-  gutter?: number;
-  textAlign?: 'start' | 'middle' | 'end';
 };
 
 export type SubDomainOptions = {
@@ -205,8 +197,6 @@ export default class Options {
           // Used only on horizontal orientation
           height: 25,
         },
-
-        subLabel: undefined,
       },
 
       subDomain: {

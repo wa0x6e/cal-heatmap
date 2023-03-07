@@ -2,7 +2,6 @@ import { select } from 'd3-selection';
 
 import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
-import DomainSubLabelPainter from '../domain/DomainSubLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -14,6 +13,8 @@ export default class CalendarPainter {
 
   dimensions: Dimensions;
 
+  domainsDimensions: Dimensions;
+
   root: any;
 
   domainPainter: DomainPainter;
@@ -22,11 +23,13 @@ export default class CalendarPainter {
 
   subDomainPainter: SubDomainPainter;
 
-  domainSubLabelPainter: DomainSubLabelPainter;
-
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.dimensions = {
+      width: 0,
+      height: 0,
+    };
+    this.domainsDimensions = {
       width: 0,
       height: 0,
     };
@@ -34,7 +37,6 @@ export default class CalendarPainter {
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.domainLabelPainter = new DomainLabelPainter(calendar);
-    this.domainSubLabelPainter = new DomainSubLabelPainter(calendar);
   }
 
   setup(): boolean {
@@ -59,50 +61,55 @@ export default class CalendarPainter {
   }
 
   paint(navigationDir: ScrollDirection = ScrollDirection.SCROLL_NONE) {
-    this.domainSubLabelPainter.paint(this.root);
-    this.root.classed('transition', true);
-    this.root
-      .select('.graph')
-      .transition()
-      .duration(this.calendar.options.options.animationDuration)
-      .attr('x', this.domainSubLabelPainter.dimensions.width);
+    this.root.select('.graph').classed('transition', true);
 
     let transitions = this.domainPainter.paint(navigationDir, this.root);
     this.subDomainPainter.paint(this.domainPainter.root);
     this.domainLabelPainter.paint(this.domainPainter.root);
+
+    this.#computeDomainsDimensions();
 
     transitions = transitions.concat(this.calendar.pluginManager.paintAll());
 
     this.#resize();
 
     Promise.allSettled(transitions).then(() => {
-      this.root.classed('transition', false);
+      this.root.select('.graph').classed('transition', false);
     });
 
     return Promise.allSettled(transitions);
   }
 
   #getHeight(): number {
-    const { options } = this.calendar.options;
-
     return (
-      this.domainPainter.dimensions.height -
-      (!options.verticalOrientation ? 0 : options.domain.gutter)
+      this.domainsDimensions.height +
+      this.calendar.pluginManager.totalInsideHeight()
     );
   }
 
   #getWidth(): number {
+    return (
+      this.domainsDimensions.width +
+      this.calendar.pluginManager.totalInsideWidth()
+    );
+  }
+
+  #computeDomainsDimensions() {
     const { options } = this.calendar.options;
 
-    const domainsWidth =
-      this.domainPainter.dimensions.width -
-      (options.verticalOrientation ? 0 : options.domain.gutter);
-
-    return domainsWidth + this.domainSubLabelPainter.dimensions.width;
+    this.domainsDimensions = {
+      width:
+        this.domainPainter.dimensions.width -
+        (options.verticalOrientation ? 0 : options.domain.gutter),
+      height:
+        this.domainPainter.dimensions.height -
+        (!options.verticalOrientation ? 0 : options.domain.gutter),
+    };
   }
 
   #resize(): void {
     const { options } = this.calendar.options;
+
     const newWidth = this.#getWidth();
     const newHeight = this.#getHeight();
 

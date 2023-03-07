@@ -67,10 +67,45 @@ export default class PluginManager {
   }
 
   paintAll(): Promise<unknown>[] {
-    return Array.from(this.plugins.values()).map((p: IPlugin) => p.paint());
+    return this.#allPlugins().map((p: IPlugin) => p.paint());
+  }
+
+  /**
+   * Return the total width of all the plugins
+   * Will exclude plugins located outside the calendar,
+   * and not affecting its dimensions
+   *
+   * @return {number} Aggregated width of all the plugins
+   */
+  totalInsideWidth(): number {
+    return this.#allPlugins().map((p: IPlugin) => {
+      const { position, dimensions } = p.options;
+
+      if (position === 'left' || position === 'right') {
+        return dimensions!.width;
+      }
+
+      return 0;
+    }).reduce((a, b) => a + b, 0);
+  }
+
+  totalInsideHeight(): number {
+    return this.#allPlugins().map((p: IPlugin) => {
+      const { position, dimensions } = p.options;
+
+      if (position === 'top' || position === 'bottom') {
+        return dimensions!.height;
+      }
+
+      return 0;
+    }).reduce((a, b) => a + b, 0);
   }
 
   destroyAll(): Promise<unknown>[] {
-    return Array.from(this.plugins.values()).map((p: IPlugin) => p.destroy());
+    return this.#allPlugins().map((p: IPlugin) => p.destroy());
+  }
+
+  #allPlugins() {
+    return Array.from(this.plugins.values())
   }
 }

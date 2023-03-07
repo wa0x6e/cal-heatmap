@@ -137,4 +137,7 @@ export default [
   ...exportConfig('src/plugins/LegendLite.ts', 'LegendLite', 'plugins/LegendLite', {
     external: ['d3-selection', 'd3'],
   }),
+  ...exportConfig('src/plugins/CalendarLabel.ts', 'CalendarLabel', 'plugins/CalendarLabel', {
+    external: ['d3-selection', 'd3'],
+  }),
 ];

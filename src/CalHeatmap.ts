@@ -111,7 +111,7 @@ export default class CalHeatmap {
     }
 
     if (plugins) {
-      this.pluginManager.add(castArray(plugins) as PluginDefinition[]);
+      this.pluginManager.add(castArray(plugins as any) as PluginDefinition[]);
     }
 
     this.calendarPainter.setup();

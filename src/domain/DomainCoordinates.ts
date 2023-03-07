@@ -1,4 +1,5 @@
-import { ScrollDirection, Position } from '../constant';
+import { ScrollDirection } from '../constant';
+import { horizontalPadding, verticalPadding } from '../helpers/PositionHelper';
 
 import type CalHeatmap from '../CalHeatmap';
 import type DomainPainter from './DomainPainter';
@@ -116,11 +117,10 @@ export default class DomainCoordinates {
       (subDomain.width + subDomain.gutter) * columnsCount - subDomain.gutter;
 
     return (
-      domain.padding[Position.LEFT] +
+      horizontalPadding(domain.padding) +
       x.domainHorizontalLabelWidth +
       (verticalOrientation ? 0 : domain.gutter) +
-      subDomainWidth +
-      domain.padding[Position.RIGHT]
+      subDomainWidth
     );
   }
 
@@ -144,11 +144,10 @@ export default class DomainCoordinates {
       (subDomain.height + subDomain.gutter) * rowsCount - subDomain.gutter;
 
     return (
-      domain.padding[Position.TOP] +
+      verticalPadding(domain.padding) +
       subDomainHeight +
       (verticalOrientation ? domain.gutter : 0) +
-      x.domainVerticalLabelHeight +
-      domain.padding[Position.BOTTOM]
+      x.domainVerticalLabelHeight
     );
   }
 }

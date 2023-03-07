@@ -68,8 +68,11 @@ declare namespace CalHeatmap {
     new (calendar: CalHeatmap): IPlugin;
   }
 
-  export interface PluginOptions {}
-  export type PluginDefinition = [IPluginContructor, PluginOptions?];
+  export interface PluginOptions {
+    position?: 'top' | 'right' | 'bottom' | 'left';
+    dimensions?: Dimensions
+  }
+  export type PluginDefinition = [IPluginContructor, Partial<PluginOptions>?];
 }
 
 declare class CalHeatmap {
