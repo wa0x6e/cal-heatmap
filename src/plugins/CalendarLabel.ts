@@ -85,12 +85,10 @@ export default class CalendarLabel implements IPlugin {
 
     const calendarRoot = this.calendar.calendarPainter.root;
 
-    if (calendarRoot.select(DEFAULT_CLASSNAME).empty()) {
+    if (!this.root) {
       this.root = calendarRoot
         .append('svg')
         .attr('class', DEFAULT_CLASSNAME.slice(1));
-    } else {
-      this.root = calendarRoot.select(DEFAULT_CLASSNAME.slice(1));
     }
 
     this.build();

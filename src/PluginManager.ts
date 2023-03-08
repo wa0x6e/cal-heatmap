@@ -32,7 +32,8 @@ export default class PluginManager {
 
   add(plugins: PluginDefinition[]): void {
     plugins.forEach(([PluginClass, pluginOptions]) => {
-      const { name } = PluginClass;
+      const name = this.extractPluginName(PluginClass);
+
       const existingPlugin = this.plugins.get(name);
 
       if (
@@ -111,5 +112,21 @@ export default class PluginManager {
 
   #allPlugins() {
     return Array.from(this.plugins.values());
+  }
+
+  extractPluginName(pluginClass: IPluginContructor): string {
+    let { name } = pluginClass;
+
+    if (!this.plugins.has(name)) {
+      return name;
+    }
+
+    let i = 1;
+    while (this.plugins.has(name)) {
+      name = `${name}${i}`;
+      i += 1;
+    }
+
+    return name;
   }
 }
