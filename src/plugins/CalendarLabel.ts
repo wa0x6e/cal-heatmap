@@ -88,12 +88,12 @@ export default class CalendarLabel implements IPlugin {
     if (!this.root) {
       this.root = calendarRoot
         .append('svg')
-        .attr('class', DEFAULT_CLASSNAME.slice(1));
+        .attr('class', DEFAULT_CLASSNAME.slice(1))
+        .attr('x', 0)
+        .attr('y', 0);
     }
 
     this.build();
-
-    this.#positionInnerCalendar();
 
     return Promise.resolve();
   }
@@ -110,7 +110,6 @@ export default class CalendarLabel implements IPlugin {
   build() {
     this.#buildComputedOptions();
     this.#computeDimensions();
-    this.#positionRoot();
 
     this.root
       .selectAll('g')
@@ -142,22 +141,6 @@ export default class CalendarLabel implements IPlugin {
     return Promise.resolve();
   }
 
-  #positionInnerCalendar() {
-    const { position, dimensions } = this.options;
-
-    this.calendar.calendarPainter.root
-      .select('.graph')
-      .transition()
-      .duration(this.calendar.options.options.animationDuration)
-      .call((selection: any) => {
-        if (position === 'left') {
-          selection.attr('x', dimensions!.width);
-        } else if (position === 'top') {
-          selection.attr('y', dimensions!.height);
-        }
-      });
-  }
-
   #buildComputedOptions() {
     Object.keys(this.computedOptions).forEach((key: string) => {
       if (typeof this.options[key as keyof ComputedOptions] !== 'undefined') {
@@ -185,37 +168,6 @@ export default class CalendarLabel implements IPlugin {
     } else {
       this.options.dimensions.height += (height + gutter) * (labelsCount - 1);
     }
-  }
-
-  /**
-   * Position the current plugin relative to the calendar
-   */
-  #positionRoot() {
-    const {
-      domain: {
-        padding,
-        label: { position: domainLabelPosition },
-      },
-      x: { domainVerticalLabelHeight },
-    } = this.calendar.options.options;
-    const { position } = this.options;
-    const { width: domainsTotalWidth, height: domainsTotalHeight } =
-      this.calendar.calendarPainter.domainsDimensions;
-
-    this.root
-      .attr('x', position === 'right' ? domainsTotalWidth : 0)
-      .attr('y', () => {
-        const y = padding[Position.TOP];
-        if (domainLabelPosition === 'top' && isHorizontal(position!)) {
-          return y + domainVerticalLabelHeight;
-        }
-
-        if (position === 'bottom') {
-          return y + domainsTotalHeight;
-        }
-
-        return y;
-      });
   }
 
   #setRectAttr(selection: any) {

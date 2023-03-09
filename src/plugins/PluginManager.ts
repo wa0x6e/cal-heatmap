@@ -1,12 +1,12 @@
 import isEqual from 'lodash-es/isEqual';
 
-import type CalHeatmap from './CalHeatmap';
+import type CalHeatmap from '../CalHeatmap';
 import {
   PluginDefinition,
   PluginOptions,
   IPluginContructor,
   IPlugin,
-} from './index';
+} from '../index';
 
 type PluginSetting = { options?: PluginOptions; dirty: boolean };
 
@@ -68,49 +68,34 @@ export default class PluginManager {
   }
 
   paintAll(): Promise<unknown>[] {
-    return this.#allPlugins().map((p: IPlugin) => p.paint());
-  }
-
-  /**
-   * Return the total width of all the plugins
-   * Will exclude plugins located outside the calendar,
-   * and not affecting its dimensions
-   *
-   * @return {number} Aggregated width of all the plugins
-   */
-  totalInsideWidth(): number {
-    return this.#allPlugins()
-      .map((p: IPlugin) => {
-        const { position, dimensions } = p.options;
-
-        if (position === 'left' || position === 'right') {
-          return dimensions!.width;
-        }
-
-        return 0;
-      })
-      .reduce((a, b) => a + b, 0);
-  }
-
-  totalInsideHeight(): number {
-    return this.#allPlugins()
-      .map((p: IPlugin) => {
-        const { position, dimensions } = p.options;
-
-        if (position === 'top' || position === 'bottom') {
-          return dimensions!.height;
-        }
-
-        return 0;
-      })
-      .reduce((a, b) => a + b, 0);
+    return this.allPlugins().map((p: IPlugin) => p.paint());
   }
 
   destroyAll(): Promise<unknown>[] {
-    return this.#allPlugins().map((p: IPlugin) => p.destroy());
+    return this.allPlugins().map((p: IPlugin) => p.destroy());
   }
 
-  #allPlugins() {
+  getFromPosition(position: PluginOptions['position']): IPlugin[] {
+    return this.allPlugins().filter(
+      (plugin) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        plugin.options?.position === position,
+    );
+  }
+
+  getHeightFromPosition(position: PluginOptions['position']): number {
+    return this.getFromPosition(position)
+      .map((d) => d.options.dimensions!.height)
+      .reduce((a, b) => a + b, 0);
+  }
+
+  getWidthFromPosition(position: PluginOptions['position']): number {
+    return this.getFromPosition(position)
+      .map((d) => d.options.dimensions!.width)
+      .reduce((a, b) => a + b, 0);
+  }
+
+  allPlugins(): IPlugin[] {
     return Array.from(this.plugins.values());
   }
 

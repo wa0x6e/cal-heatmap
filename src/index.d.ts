@@ -59,6 +59,7 @@ declare namespace CalHeatmap {
     name: string;
     calendar: CalHeatmap;
     options: PluginOptions;
+    root: any;
 
     setup: (options?: PluginOptions) => void;
     paint: () => Promise<unknown>;

@@ -3,6 +3,7 @@ import { select } from 'd3-selection';
 import DomainPainter from '../domain/DomainPainter';
 import DomainLabelPainter from '../domain/DomainLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
+import PluginPainter from '../plugins/PluginPainter';
 
 import type CalHeatmap from '../CalHeatmap';
 import { ScrollDirection } from '../constant';
@@ -23,6 +24,8 @@ export default class CalendarPainter {
 
   subDomainPainter: SubDomainPainter;
 
+  pluginPainter: PluginPainter;
+
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.dimensions = {
@@ -37,6 +40,7 @@ export default class CalendarPainter {
     this.domainPainter = new DomainPainter(calendar);
     this.subDomainPainter = new SubDomainPainter(calendar);
     this.domainLabelPainter = new DomainLabelPainter(calendar);
+    this.pluginPainter = new PluginPainter(calendar);
   }
 
   setup(): boolean {
@@ -69,7 +73,7 @@ export default class CalendarPainter {
 
     this.#computeDomainsDimensions();
 
-    transitions = transitions.concat(this.calendar.pluginManager.paintAll());
+    transitions = transitions.concat(this.pluginPainter.paint());
 
     this.#resize();
 
@@ -81,17 +85,11 @@ export default class CalendarPainter {
   }
 
   #getHeight(): number {
-    return (
-      this.domainsDimensions.height +
-      this.calendar.pluginManager.totalInsideHeight()
-    );
+    return this.domainsDimensions.height + this.pluginPainter.insideHeight();
   }
 
   #getWidth(): number {
-    return (
-      this.domainsDimensions.width +
-      this.calendar.pluginManager.totalInsideWidth()
-    );
+    return this.domainsDimensions.width + this.pluginPainter.insideWidth();
   }
 
   #computeDomainsDimensions() {

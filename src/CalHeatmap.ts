@@ -11,7 +11,7 @@ import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
 import DateHelper from './helpers/DateHelper';
 import validate from './options/OptionsValidator';
-import PluginManager from './PluginManager';
+import PluginManager from './plugins/PluginManager';
 import VERSION from './version';
 
 import './cal-heatmap.scss';
