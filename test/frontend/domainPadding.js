@@ -26,13 +26,13 @@ const data = {
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('width');
+            return d3.select('.graph-domain-bg').attr('width');
           },
           expected: () => '60',
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('height');
+            return d3.select('.graph-domain-bg').attr('height');
           },
           expected: () => '135',
         },
@@ -62,13 +62,13 @@ const data = {
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('width');
+            return d3.select('.graph-domain-bg').attr('width');
           },
           expected: () => '70',
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('height');
+            return d3.select('.graph-domain-bg').attr('height');
           },
           expected: () => '125',
         },
@@ -98,7 +98,7 @@ const data = {
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('width');
+            return d3.select('.graph-domain-bg').attr('width');
           },
           expected: () => '60',
         },
@@ -110,7 +110,7 @@ const data = {
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('height');
+            return d3.select('.graph-domain-bg').attr('height');
           },
           expected: () => '135',
         },
@@ -140,13 +140,13 @@ const data = {
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('width');
+            return d3.select('.graph-domain-bg').attr('width');
           },
           expected: () => '70',
         },
         {
           current: (d3) => {
-            return d3.select('.domain-background').attr('height');
+            return d3.select('.graph-domain-bg').attr('height');
           },
           expected: () => '125',
         },

@@ -20,7 +20,7 @@ interface LegendOptions extends PluginOptions {
   includeBlank: boolean;
 }
 
-const DEFAULT_CLASSNAME = '.graph-legend';
+const DEFAULT_SELECTOR = '.graph-legend';
 
 const defaultOptions: LegendOptions = {
   enabled: true, // Whether to display the legend
@@ -67,12 +67,12 @@ export default class LegendLite implements IPlugin {
       itemSelector || this.calendar.options.options.itemSelector,
     );
 
-    if (this.root.select(DEFAULT_CLASSNAME).empty()) {
+    if (this.root.select(DEFAULT_SELECTOR).empty()) {
       this.root = this.root
         .append('div')
-        .attr('class', DEFAULT_CLASSNAME.slice(1));
+        .attr('class', DEFAULT_SELECTOR.slice(1));
     } else {
-      this.root = this.root.select(DEFAULT_CLASSNAME);
+      this.root = this.root.select(DEFAULT_SELECTOR);
     }
 
     const node = this.#buildLegend();

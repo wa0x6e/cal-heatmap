@@ -9,7 +9,7 @@ import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp } from '../index';
 
-const DEFAULT_CLASSNAME = 'graph-label';
+const DEFAULT_SELECTOR = '.graph-label';
 
 export default class DomainLabelPainter {
   calendar: CalHeatmap;
@@ -31,7 +31,7 @@ export default class DomainLabelPainter {
     }
 
     root
-      .selectAll(`.${DEFAULT_CLASSNAME}`)
+      .selectAll(DEFAULT_SELECTOR)
       .data(
         (d: Timestamp) => [d],
         (d: Timestamp) => d,
@@ -39,7 +39,7 @@ export default class DomainLabelPainter {
       .join(
         (enter: any) => enter
           .append('text')
-          .attr('class', DEFAULT_CLASSNAME)
+          .attr('class', DEFAULT_SELECTOR.slice(1))
           .attr('x', (d: Timestamp) => this.#getX(d))
           .attr('y', (d: Timestamp) => this.#getY(d))
           .attr('text-anchor', label.textAlign)

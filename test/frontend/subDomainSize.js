@@ -49,7 +49,7 @@ import CalHeatmap from '../../src/CalHeatmap';
     });
 
     it('changes the domain dimensions', () => {
-      const selection = select('#cal-heatmap').selectAll('.domain-background');
+      const selection = select('#cal-heatmap').selectAll('.graph-domain-bg');
       // eslint-disable-next-line no-restricted-syntax
       for (const elem of selection) {
         expect(select(elem).attr('width')).toBe(`${size[0] * 12}`);

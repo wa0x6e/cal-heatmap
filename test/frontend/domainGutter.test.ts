@@ -38,7 +38,7 @@ describe('on horizontal scroll', () => {
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .domain-background')
+            .select('.graph-domain:nth-child(1) .graph-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
 
@@ -52,7 +52,7 @@ describe('on horizontal scroll', () => {
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .domain-background')
+            .select('.graph-domain:nth-child(2) .graph-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
       });
@@ -77,12 +77,12 @@ describe('on horizontal scroll', () => {
         ).toBe(`${baseHeight}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .domain-background')
+            .select('.graph-domain:nth-child(1) .graph-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .domain-background')
+            .select('.graph-domain:nth-child(2) .graph-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
       });
@@ -122,7 +122,7 @@ describe('on vertical scroll', () => {
         ).toBe('0');
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .domain-background')
+            .select('.graph-domain:nth-child(1) .graph-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
         expect(
@@ -130,7 +130,7 @@ describe('on vertical scroll', () => {
         ).toBe(`${baseHeight + gutter}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .domain-background')
+            .select('.graph-domain:nth-child(2) .graph-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
       });
@@ -151,7 +151,7 @@ describe('on vertical scroll', () => {
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .domain-background')
+            .select('.graph-domain:nth-child(1) .graph-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
         expect(
@@ -161,7 +161,7 @@ describe('on vertical scroll', () => {
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .domain-background')
+            .select('.graph-domain:nth-child(2) .graph-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
       });

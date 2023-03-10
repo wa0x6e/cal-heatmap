@@ -24,7 +24,7 @@ interface CalendarLabelOptions extends PluginOptions, Partial<ComputedOptions> {
   padding: Padding;
 }
 
-const DEFAULT_CLASSNAME = '.ch-calendar-label';
+const DEFAULT_SELECTOR = '.ch-calendar-label';
 
 const defaultOptions: CalendarLabelOptions = {
   enabled: true,
@@ -55,17 +55,20 @@ export default class CalendarLabel implements IPlugin {
   computedOptions: ComputedOptions;
 
   constructor(calendar: CalHeatmap) {
-    const { subDomain } = calendar.options.options;
+    const {
+      radius, width, height, gutter,
+    } =
+      calendar.options.options.subDomain;
 
     this.calendar = calendar;
     this.root = null;
     this.shown = false;
     this.options = defaultOptions;
     this.computedOptions = {
-      radius: subDomain.radius,
-      width: subDomain.width,
-      height: subDomain.height,
-      gutter: subDomain.gutter,
+      radius,
+      width,
+      height,
+      gutter,
       textAlign: 'start',
     };
   }
@@ -88,7 +91,7 @@ export default class CalendarLabel implements IPlugin {
     if (!this.root) {
       this.root = calendarRoot
         .append('svg')
-        .attr('class', DEFAULT_CLASSNAME.slice(1))
+        .attr('class', DEFAULT_SELECTOR.slice(1))
         .attr('x', 0)
         .attr('y', 0);
     }
@@ -119,12 +122,12 @@ export default class CalendarLabel implements IPlugin {
           .append('g')
           .call((selection: any) => selection
             .append('rect')
-            .attr('class', `${DEFAULT_CLASSNAME.slice(1)}-rect`)
+            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-rect`)
             .attr('style', 'fill: transparent')
             .call((s: any) => this.#setRectAttr(s)))
           .call((selection: any) => selection
             .append('text')
-            .attr('class', `${DEFAULT_CLASSNAME.slice(1)}-text`)
+            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-text`)
             .attr('dominant-baseline', 'central')
             .attr('text-anchor', 'middle')
             .attr('style', 'fill: currentColor; font-size: 10px')

@@ -2,7 +2,7 @@ import { Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp, SubDomain } from '../index';
 
-const BASE_CLASSNAME = 'graph-subdomain-group';
+const BASE_SELECTOR = '.graph-subdomain-group';
 const HIGHLIGHT_CLASSNAME = 'highlight';
 
 export default class SubDomainPainter {
@@ -19,7 +19,7 @@ export default class SubDomainPainter {
     this.root = root || this.root;
 
     const subDomainSvgGroup = this.root
-      .selectAll(`.${BASE_CLASSNAME}`)
+      .selectAll(BASE_SELECTOR)
       .data(
         (d: Timestamp) => [d],
         (d: Timestamp) => d,
@@ -28,7 +28,7 @@ export default class SubDomainPainter {
         (enter: any) => enter
           .append('svg')
           .call((selection: any) => this.#setPositions(selection))
-          .attr('class', BASE_CLASSNAME),
+          .attr('class', BASE_SELECTOR.slice(1)),
 
         (update: any) =>
           // eslint-disable-next-line implicit-arrow-linebreak
@@ -98,8 +98,7 @@ export default class SubDomainPainter {
    */
   #setPositions(selection: any): void {
     const { options } = this.calendar.options;
-    const { padding } = options.domain;
-    const { position } = options.domain.label;
+    const { padding, label: { position } } = options.domain;
 
     selection
       .attr('x', () => {
@@ -125,14 +124,15 @@ export default class SubDomainPainter {
    * @return {String} the highlight class
    */
   #classname(timestamp: Timestamp, ...otherClasses: string[]): string {
-    const { date, subDomain } = this.calendar.options.options;
+    const {
+      date: { highlight },
+      subDomain: { type },
+    } = this.calendar.options.options;
     let classname = '';
 
-    if (date.highlight.length > 0) {
-      date.highlight.forEach((d) => {
-        const unitFn = this.calendar.templateCollection.get(
-          subDomain.type,
-        ).extractUnit;
+    if (highlight.length > 0) {
+      highlight.forEach((d) => {
+        const unitFn = this.calendar.templateCollection.get(type).extractUnit;
 
         if (unitFn(+d) === unitFn(timestamp)) {
           classname = HIGHLIGHT_CLASSNAME;
@@ -144,24 +144,22 @@ export default class SubDomainPainter {
   }
 
   #appendText(elem: any) {
-    const { options } = this.calendar.options;
-    const fmt = options.subDomain.label;
-    const dateFmt = this.calendar.dateHelper;
+    const { width, height, label } = this.calendar.options.options.subDomain;
 
-    if (!fmt) {
+    if (!label) {
       return null;
     }
 
     return elem
       .append('text')
       .attr('class', (d: SubDomain) => this.#classname(d.t, 'subdomain-text'))
-      .attr('x', (d: SubDomain) => this.#getX(d) + options.subDomain.width / 2)
-      .attr('y', (d: SubDomain) => this.#getY(d) + options.subDomain.height / 2)
+      .attr('x', (d: SubDomain) => this.#getX(d) + width / 2)
+      .attr('y', (d: SubDomain) => this.#getY(d) + height / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .text((d: SubDomain, i: number, nodes: any[]) =>
         // eslint-disable-next-line implicit-arrow-linebreak
-        dateFmt.format(d.t, fmt, d.v, nodes[i]));
+        this.calendar.dateHelper.format(d.t, label, d.v, nodes[i]));
   }
 
   #getCoordinates(axis: 'x' | 'y', d: SubDomain): number {
