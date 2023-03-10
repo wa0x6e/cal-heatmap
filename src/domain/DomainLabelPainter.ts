@@ -132,25 +132,29 @@ export default class DomainLabelPainter {
   #getDomainInsideWidth(d: Timestamp): number {
     const {
       domain: { padding },
-      x,
+      x: { domainHorizontalLabelWidth },
     } = this.calendar.options.options;
+    const { coordinates } =
+      this.calendar.calendarPainter.domainsContainerPainter.domainPainter;
+
     return (
-      this.calendar.calendarPainter.domainPainter.coordinates.get(d)!
-        .inner_width -
-      x.domainHorizontalLabelWidth -
+      coordinates.get(d)!.inner_width -
+      domainHorizontalLabelWidth -
       horizontalPadding(padding)
     );
   }
 
   #getDomainInsideHeight(d: Timestamp): number {
     const {
-      x,
+      x: { domainVerticalLabelHeight },
       domain: { padding },
     } = this.calendar.options.options;
+    const { coordinates } =
+      this.calendar.calendarPainter.domainsContainerPainter.domainPainter;
+
     return (
-      this.calendar.calendarPainter.domainPainter.coordinates.get(d)!
-        .inner_height -
-      x.domainVerticalLabelHeight -
+      coordinates.get(d)!.inner_height -
+      domainVerticalLabelHeight -
       verticalPadding(padding)
     );
   }

@@ -20,7 +20,7 @@ class PluginPainter {
   setPluginsPosition(): Promise<unknown>[] {
     const { pluginManager } = this.calendar;
     const { animationDuration } = this.calendar.options.options;
-    const { domainsDimensions } = this.calendar.calendarPainter;
+    const { domainsContainerPainter } = this.calendar.calendarPainter;
 
     const top = pluginManager.getFromPosition('top');
     const right = pluginManager.getFromPosition('right');
@@ -64,12 +64,12 @@ class PluginPainter {
           .transition()
           .duration(animationDuration)
           .attr('x', leftWidth)
-          .attr('y', topHeight + domainsDimensions.height)
+          .attr('y', topHeight + domainsContainerPainter.height())
           .end(),
       );
     });
 
-    leftOffset += domainsDimensions.width;
+    leftOffset += domainsContainerPainter.width();
 
     right.forEach((plugin) => {
       promises.push(

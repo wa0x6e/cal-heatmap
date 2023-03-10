@@ -1,8 +1,6 @@
 import { select } from 'd3-selection';
 
-import DomainPainter from '../domain/DomainPainter';
-import DomainLabelPainter from '../domain/DomainLabelPainter';
-import SubDomainPainter from '../subDomain/SubDomainPainter';
+import DomainsContainerPainter from '../domain/DomainsContainerPainter';
 import PluginPainter from '../plugins/PluginPainter';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -14,15 +12,9 @@ export default class CalendarPainter {
 
   dimensions: Dimensions;
 
-  domainsDimensions: Dimensions;
-
   root: any;
 
-  domainPainter: DomainPainter;
-
-  domainLabelPainter: DomainLabelPainter;
-
-  subDomainPainter: SubDomainPainter;
+  domainsContainerPainter: DomainsContainerPainter;
 
   pluginPainter: PluginPainter;
 
@@ -32,14 +24,8 @@ export default class CalendarPainter {
       width: 0,
       height: 0,
     };
-    this.domainsDimensions = {
-      width: 0,
-      height: 0,
-    };
     this.root = null;
-    this.domainPainter = new DomainPainter(calendar);
-    this.subDomainPainter = new SubDomainPainter(calendar);
-    this.domainLabelPainter = new DomainLabelPainter(calendar);
+    this.domainsContainerPainter = new DomainsContainerPainter(calendar);
     this.pluginPainter = new PluginPainter(calendar);
   }
 
@@ -67,11 +53,10 @@ export default class CalendarPainter {
   paint(navigationDir: ScrollDirection = ScrollDirection.SCROLL_NONE) {
     this.root.select('.graph').classed('transition', true);
 
-    let transitions = this.domainPainter.paint(navigationDir, this.root);
-    this.subDomainPainter.paint(this.domainPainter.root);
-    this.domainLabelPainter.paint(this.domainPainter.root);
-
-    this.#computeDomainsDimensions();
+    let transitions = this.domainsContainerPainter.paint(
+      navigationDir,
+      this.root,
+    );
 
     transitions = transitions.concat(this.pluginPainter.paint());
 
@@ -84,25 +69,16 @@ export default class CalendarPainter {
     return Promise.allSettled(transitions);
   }
 
-  #getHeight(): number {
-    return this.domainsDimensions.height + this.pluginPainter.insideHeight();
+  #getHeight(): Dimensions['height'] {
+    return (
+      this.domainsContainerPainter.height() + this.pluginPainter.insideHeight()
+    );
   }
 
-  #getWidth(): number {
-    return this.domainsDimensions.width + this.pluginPainter.insideWidth();
-  }
-
-  #computeDomainsDimensions() {
-    const { options } = this.calendar.options;
-
-    this.domainsDimensions = {
-      width:
-        this.domainPainter.dimensions.width -
-        (options.verticalOrientation ? 0 : options.domain.gutter),
-      height:
-        this.domainPainter.dimensions.height -
-        (!options.verticalOrientation ? 0 : options.domain.gutter),
-    };
+  #getWidth(): Dimensions['width'] {
+    return (
+      this.domainsContainerPainter.width() + this.pluginPainter.insideWidth()
+    );
   }
 
   #resize(): void {
