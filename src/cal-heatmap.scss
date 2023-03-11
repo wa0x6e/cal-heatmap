@@ -64,7 +64,13 @@
         }
       }
     }
+  }
+}
 
+#ch-plugin-legend {
+  > svg {
+    background: transparent;
+    color: currentColor;
   }
 }
 
