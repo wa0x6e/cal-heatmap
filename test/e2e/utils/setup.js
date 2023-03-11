@@ -2,7 +2,7 @@ import { setup } from 'jest-dev-server';
 import { Local } from 'browserstack-local';
 
 export default async function globalSetup() {
-  await setup({
+  globalThis.servers = await setup({
     command: 'node test/e2e/utils/server.js',
     launchTimeout: 10000,
     usedPortAction: 'kill',

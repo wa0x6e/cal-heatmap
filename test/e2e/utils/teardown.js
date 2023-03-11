@@ -1,7 +1,7 @@
 import { teardown } from 'jest-dev-server';
 
 export default async function globalTeardown() {
-  await teardown();
+  await teardown(globalThis.servers);
 
   async function stop() {
     return new Promise((resolve) => {
