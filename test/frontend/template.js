@@ -48,14 +48,14 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.ch-subdomain g text').nodes().length;
+            return d3.selectAll('.ch-subdomain-container  g text').nodes().length;
           },
           expected: () => 4,
         },
         {
           current: (d3) => {
             return d3
-              .select(d3.selectAll('.ch-subdomain g text').nodes()[0])
+              .select(d3.selectAll('.ch-subdomain-container  g text').nodes()[0])
               .html();
           },
           expected: () => '1',
@@ -63,7 +63,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select(d3.selectAll('.ch-subdomain g text').nodes()[1])
+              .select(d3.selectAll('.ch-subdomain-container  g text').nodes()[1])
               .html();
           },
           expected: () => '2',
@@ -71,7 +71,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select(d3.selectAll('.ch-subdomain g text').nodes()[2])
+              .select(d3.selectAll('.ch-subdomain-container  g text').nodes()[2])
               .html();
           },
           expected: () => '3',
@@ -79,7 +79,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select(d3.selectAll('.ch-subdomain g text').nodes()[3])
+              .select(d3.selectAll('.ch-subdomain-container  g text').nodes()[3])
               .html();
           },
           expected: () => '4',

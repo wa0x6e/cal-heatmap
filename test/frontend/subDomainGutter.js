@@ -11,7 +11,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(1) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(1) .ch-subdomain-bg')
               .attr('x');
           },
           expected: () => '0',
@@ -19,7 +19,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(1) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(1) .ch-subdomain-bg')
               .attr('y');
           },
           expected: () => '0',
@@ -27,7 +27,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(2) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(2) .ch-subdomain-bg')
               .attr('x');
           },
           expected: () => '0',
@@ -35,7 +35,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(2) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(2) .ch-subdomain-bg')
               .attr('y');
           },
           expected: () => '10',
@@ -43,7 +43,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(11) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(11) .ch-subdomain-bg')
               .attr('x');
           },
           expected: () => '10',
@@ -51,7 +51,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(11) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(11) .ch-subdomain-bg')
               .attr('y');
           },
           expected: () => '0',
@@ -67,7 +67,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(1) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(1) .ch-subdomain-bg')
               .attr('x');
           },
           expected: () => '0',
@@ -75,7 +75,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(1) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(1) .ch-subdomain-bg')
               .attr('y');
           },
           expected: () => '0',
@@ -83,7 +83,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(2) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(2) .ch-subdomain-bg')
               .attr('x');
           },
           expected: () => '0',
@@ -91,7 +91,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(2) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(2) .ch-subdomain-bg')
               .attr('y');
           },
           expected: () => '20',
@@ -99,7 +99,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(11) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(11) .ch-subdomain-bg')
               .attr('x');
           },
           expected: () => '20',
@@ -107,7 +107,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(11) .ch-subdomain-bg')
+              .select('.ch-subdomain-container  g:nth-child(11) .ch-subdomain-bg')
               .attr('y');
           },
           expected: () => '0',

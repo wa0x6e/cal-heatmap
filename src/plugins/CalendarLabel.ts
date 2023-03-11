@@ -117,22 +117,20 @@ export default class CalendarLabel implements IPlugin {
     this.root
       .selectAll('g')
       .data(this.options.text)
-      .join(
-        (enter: any) => enter
-          .append('g')
-          .call((selection: any) => selection
-            .append('rect')
-            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-bg`)
-            .attr('style', 'fill: transparent')
-            .call((s: any) => this.#setRectAttr(s)))
-          .call((selection: any) => selection
-            .append('text')
-            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-text`)
-            .attr('dominant-baseline', 'central')
-            .attr('text-anchor', 'middle')
-            .attr('style', 'fill: currentColor; font-size: 10px')
-            .call((s: any) => this.#setTextAttr(s))),
-      );
+      .join((enter: any) => enter
+        .append('g')
+        .call((selection: any) => selection
+          .append('rect')
+          .attr('class', `${DEFAULT_SELECTOR.slice(1)}-bg`)
+          .attr('style', 'fill: transparent')
+          .call((s: any) => this.#setRectAttr(s)))
+        .call((selection: any) => selection
+          .append('text')
+          .attr('class', `${DEFAULT_SELECTOR.slice(1)}-text`)
+          .attr('dominant-baseline', 'central')
+          .attr('text-anchor', 'middle')
+          .attr('style', 'fill: currentColor; font-size: 10px')
+          .call((s: any) => this.#setTextAttr(s))));
 
     return Promise.resolve();
   }

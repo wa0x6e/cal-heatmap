@@ -14,13 +14,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('y');
+            return d3.select('.ch-subdomain-container').attr('y');
           },
           expected: () => '10',
         },
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('x');
+            return d3.select('.ch-subdomain-container').attr('x');
           },
           expected: () => '0',
         },
@@ -50,13 +50,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('y');
+            return d3.select('.ch-subdomain-container').attr('y');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('x');
+            return d3.select('.ch-subdomain-container').attr('x');
           },
           expected: () => '0',
         },
@@ -86,13 +86,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('y');
+            return d3.select('.ch-subdomain-container').attr('y');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('x');
+            return d3.select('.ch-subdomain-container').attr('x');
           },
           expected: () => '0',
         },
@@ -128,13 +128,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('y');
+            return d3.select('.ch-subdomain-container').attr('y');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.ch-subdomain').attr('x');
+            return d3.select('.ch-subdomain-container').attr('x');
           },
           expected: () => '10',
         },

@@ -75,7 +75,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(1) text')
+              .select('.ch-subdomain-container  g:nth-child(1) text')
               .html();
           },
           expected: () => 'Mon',
@@ -143,7 +143,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(1) text')
+              .select('.ch-subdomain-container  g:nth-child(1) text')
               .html();
           },
           expected: () => 'lun.',
@@ -171,7 +171,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(15) rect')
+              .select('.ch-subdomain-container  g:nth-child(15) rect')
               .attr('class');
           },
           expectedContain: () => 'highlight',
@@ -179,7 +179,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.ch-subdomain g:nth-child(25) rect')
+              .select('.ch-subdomain-container  g:nth-child(25) rect')
               .attr('class');
           },
           expectedContain: () => 'highlight',

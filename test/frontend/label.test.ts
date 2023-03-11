@@ -118,7 +118,7 @@ describe('DomainLabelPainter', () => {
       expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
         'hanging',
       );
-      expect(select('.ch-subdomain').attr('x')).toBe('50');
+      expect(select('.ch-subdomain-container').attr('x')).toBe('50');
     });
 
     it('aligns the text on the middle', async () => {
@@ -136,7 +136,7 @@ describe('DomainLabelPainter', () => {
       expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
         'hanging',
       );
-      expect(select('.ch-subdomain').attr('x')).toBe('50');
+      expect(select('.ch-subdomain-container').attr('x')).toBe('50');
     });
     it('aligns the text on the right', async () => {
       await cal.paint(
@@ -151,7 +151,7 @@ describe('DomainLabelPainter', () => {
       expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
         'hanging',
       );
-      expect(select('.ch-subdomain').attr('x')).toBe('50');
+      expect(select('.ch-subdomain-container').attr('x')).toBe('50');
     });
     it.todo('rotate the text left');
     it.todo('rotate the text right');
@@ -174,7 +174,7 @@ describe('DomainLabelPainter', () => {
       expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
         'hanging',
       );
-      expect(select('.ch-subdomain').attr('x')).toBe('0');
+      expect(select('.ch-subdomain-container').attr('x')).toBe('0');
     });
     it('aligns the text on the middle', async () => {
       await cal.paint(
@@ -192,7 +192,7 @@ describe('DomainLabelPainter', () => {
       expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
         'hanging',
       );
-      expect(select('.ch-subdomain').attr('x')).toBe('0');
+      expect(select('.ch-subdomain-container').attr('x')).toBe('0');
     });
     it('aligns the text on the right', async () => {
       await cal.paint(
@@ -208,7 +208,7 @@ describe('DomainLabelPainter', () => {
       expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
         'hanging',
       );
-      expect(select('.ch-subdomain').attr('x')).toBe('0');
+      expect(select('.ch-subdomain-container').attr('x')).toBe('0');
     });
     it.todo('rotate the text left');
     it.todo('rotate the text right');
