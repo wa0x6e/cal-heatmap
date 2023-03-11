@@ -132,13 +132,6 @@ export default class CalendarLabel implements IPlugin {
             .attr('text-anchor', 'middle')
             .attr('style', 'fill: currentColor; font-size: 10px')
             .call((s: any) => this.#setTextAttr(s))),
-        (update: any) => update
-          .call((selection: any) => selection.selectAll('rect').call((s: any) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-            this.#setRectAttr(s)))
-          .call((selection: any) => selection.selectAll('text').call((s: any) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-            this.#setTextAttr(s))),
       );
 
     return Promise.resolve();
