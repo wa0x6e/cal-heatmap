@@ -182,6 +182,7 @@ describe('DomainCollection', () => {
         {
           x: '',
           y: '',
+          defaultValue: null,
         } as DataOptions,
         () => {},
       );
