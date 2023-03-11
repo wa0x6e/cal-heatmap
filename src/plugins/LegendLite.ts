@@ -1,5 +1,10 @@
 import { select, create } from 'd3-selection';
 import { normalizedScale, applyScaleStyle } from '../scale';
+import { DEFAULT_SELECTOR as MAIN_SELECTOR } from '../calendar/CalendarPainter';
+import {
+  // force line break from prettier
+  DEFAULT_SELECTOR as SUBDOMAIN_SELECTOR,
+} from '../subDomain/SubDomainPainter';
 
 import type CalHeatmap from '../CalHeatmap';
 import type { IPlugin, PluginOptions } from '../index';
@@ -20,7 +25,7 @@ interface LegendOptions extends PluginOptions {
   includeBlank: boolean;
 }
 
-const DEFAULT_SELECTOR = '.graph-legend';
+const DEFAULT_SELECTOR = '.ch-plugin-legend-lite';
 
 const defaultOptions: LegendOptions = {
   enabled: true, // Whether to display the legend
@@ -105,6 +110,7 @@ export default class LegendLite implements IPlugin {
     }
 
     node
+      .attr('class', MAIN_SELECTOR.slice(1))
       .attr(
         'width',
         localRange.length * width + (localRange.length - 1) * gutter,
@@ -134,7 +140,7 @@ export default class LegendLite implements IPlugin {
     return selection
       .attr('width', width)
       .attr('height', height)
-      .attr('class', 'graph-rect')
+      .attr('class', `${SUBDOMAIN_SELECTOR.slice(1)}-bg`)
       .attr('rx', radius)
       .attr('ry', radius)
       .attr('x', (d: any, i: number) => i * (width + gutter))

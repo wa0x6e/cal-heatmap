@@ -30,7 +30,7 @@ const data = {
         return cal.eventEmitter.emit(
           'mouseover',
           {
-            target: d3.select('.graph-rect').node(),
+            target: d3.select('.ch-subdomain-bg').node(),
           },
           1,
           1,
@@ -98,7 +98,7 @@ const data = {
         return cal.eventEmitter.emit(
           'mouseover',
           {
-            target: d3.select('.graph-rect').node(),
+            target: d3.select('.ch-subdomain-bg').node(),
           },
           +new Date('2000-01-05'),
           10,

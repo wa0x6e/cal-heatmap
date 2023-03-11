@@ -7,6 +7,8 @@ import type CalHeatmap from '../CalHeatmap';
 import { ScrollDirection } from '../constant';
 import type { Dimensions } from '../index';
 
+export const DEFAULT_SELECTOR = '.ch-container';
+
 export default class CalendarPainter {
   calendar: CalHeatmap;
 
@@ -36,13 +38,8 @@ export default class CalendarPainter {
       this.root = select(itemSelector)
         .append('svg')
         .attr('data-theme', theme)
-        .attr('class', 'cal-heatmap-container');
-      this.root
-        .attr('x', 0)
-        .attr('y', 0)
-        .append('svg')
-        .attr('class', 'graph')
-        .attr('style', 'fill: transparent;');
+        .attr('class', DEFAULT_SELECTOR.slice(1));
+      this.domainsContainerPainter.setup();
     }
 
     this.calendar.pluginManager.setupAll();
@@ -51,20 +48,12 @@ export default class CalendarPainter {
   }
 
   paint(navigationDir: ScrollDirection = ScrollDirection.SCROLL_NONE) {
-    this.root.select('.graph').classed('transition', true);
-
-    let transitions = this.domainsContainerPainter.paint(
-      navigationDir,
-      this.root,
-    );
-
-    transitions = transitions.concat(this.pluginPainter.paint());
+    const transitions = this.domainsContainerPainter
+      .paint(navigationDir)
+      .concat(this.pluginPainter.paint())
+      .concat(this.domainsContainerPainter.updatePosition());
 
     this.#resize();
-
-    Promise.allSettled(transitions).then(() => {
-      this.root.select('.graph').classed('transition', false);
-    });
 
     return Promise.allSettled(transitions);
   }
@@ -113,9 +102,9 @@ export default class CalendarPainter {
   }
 
   destroy(): Promise<unknown> {
-    let result: Promise<unknown>[] = [];
-
-    result = result.concat(this.calendar.pluginManager.destroyAll());
+    const result: Promise<unknown>[] = this.calendar.pluginManager
+      .destroyAll()
+      .concat(this.domainsContainerPainter.destroy());
 
     if (!this.root) {
       return Promise.allSettled(result);
@@ -123,7 +112,6 @@ export default class CalendarPainter {
 
     result.push(
       this.root
-        .classed('transition', true)
         .transition()
         .duration(this.calendar.options.options.animationDuration)
         .attr('width', 0)

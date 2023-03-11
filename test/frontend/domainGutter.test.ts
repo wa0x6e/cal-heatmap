@@ -29,30 +29,30 @@ describe('on horizontal scroll', () => {
           subDomain: { type: 'month', gutter: 0, width: 10 },
         });
         expect(
-          select('#cal-heatmap').select('.graph-domain:nth-child(1)').attr('x'),
+          select('#cal-heatmap').select('.ch-domain:nth-child(1)').attr('x'),
         ).toBe('0');
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1)')
+            .select('.ch-domain:nth-child(1)')
             .attr('width'),
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .graph-domain-bg')
+            .select('.ch-domain:nth-child(1) .ch-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
 
         expect(
-          select('#cal-heatmap').select('.graph-domain:nth-child(2)').attr('x'),
+          select('#cal-heatmap').select('.ch-domain:nth-child(2)').attr('x'),
         ).toBe(`${baseWidth + gutter}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2)')
+            .select('.ch-domain:nth-child(2)')
             .attr('width'),
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .graph-domain-bg')
+            .select('.ch-domain:nth-child(2) .ch-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
       });
@@ -67,22 +67,22 @@ describe('on horizontal scroll', () => {
         });
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1)')
+            .select('.ch-domain:nth-child(1)')
             .attr('height'),
         ).toBe(`${baseHeight}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2)')
+            .select('.ch-domain:nth-child(2)')
             .attr('height'),
         ).toBe(`${baseHeight}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .graph-domain-bg')
+            .select('.ch-domain:nth-child(1) .ch-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .graph-domain-bg')
+            .select('.ch-domain:nth-child(2) .ch-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
       });
@@ -118,19 +118,19 @@ describe('on vertical scroll', () => {
           subDomain: { type: 'month', gutter: 0, width: 10 },
         });
         expect(
-          select('#cal-heatmap').select('.graph-domain:nth-child(1)').attr('y'),
+          select('#cal-heatmap').select('.ch-domain:nth-child(1)').attr('y'),
         ).toBe('0');
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .graph-domain-bg')
+            .select('.ch-domain:nth-child(1) .ch-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
         expect(
-          select('#cal-heatmap').select('.graph-domain:nth-child(2)').attr('y'),
+          select('#cal-heatmap').select('.ch-domain:nth-child(2)').attr('y'),
         ).toBe(`${baseHeight + gutter}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .graph-domain-bg')
+            .select('.ch-domain:nth-child(2) .ch-domain-bg')
             .attr('height'),
         ).toBe(`${baseHeight}`);
       });
@@ -146,22 +146,22 @@ describe('on vertical scroll', () => {
         });
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1)')
+            .select('.ch-domain:nth-child(1)')
             .attr('width'),
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(1) .graph-domain-bg')
+            .select('.ch-domain:nth-child(1) .ch-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2)')
+            .select('.ch-domain:nth-child(2)')
             .attr('width'),
         ).toBe(`${baseWidth}`);
         expect(
           select('#cal-heatmap')
-            .select('.graph-domain:nth-child(2) .graph-domain-bg')
+            .select('.ch-domain:nth-child(2) .ch-domain-bg')
             .attr('width'),
         ).toBe(`${baseWidth}`);
       });

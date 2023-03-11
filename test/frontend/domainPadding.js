@@ -14,25 +14,25 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('y');
+            return d3.select('.ch-subdomain').attr('y');
           },
           expected: () => '10',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('x');
+            return d3.select('.ch-subdomain').attr('x');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('width');
+            return d3.select('.ch-domain-bg').attr('width');
           },
           expected: () => '60',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('height');
+            return d3.select('.ch-domain-bg').attr('height');
           },
           expected: () => '135',
         },
@@ -50,25 +50,25 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('y');
+            return d3.select('.ch-subdomain').attr('y');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('x');
+            return d3.select('.ch-subdomain').attr('x');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('width');
+            return d3.select('.ch-domain-bg').attr('width');
           },
           expected: () => '70',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('height');
+            return d3.select('.ch-domain-bg').attr('height');
           },
           expected: () => '125',
         },
@@ -86,31 +86,31 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('y');
+            return d3.select('.ch-subdomain').attr('y');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('x');
+            return d3.select('.ch-subdomain').attr('x');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('width');
+            return d3.select('.ch-domain-bg').attr('width');
           },
           expected: () => '60',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-label').attr('y');
+            return d3.select('.ch-domain-text').attr('y');
           },
           expected: () => '112.5',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('height');
+            return d3.select('.ch-domain-bg').attr('height');
           },
           expected: () => '135',
         },
@@ -128,25 +128,25 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('y');
+            return d3.select('.ch-subdomain').attr('y');
           },
           expected: () => '0',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-subdomain-group').attr('x');
+            return d3.select('.ch-subdomain').attr('x');
           },
           expected: () => '10',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('width');
+            return d3.select('.ch-domain-bg').attr('width');
           },
           expected: () => '70',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain-bg').attr('height');
+            return d3.select('.ch-domain-bg').attr('height');
           },
           expected: () => '125',
         },

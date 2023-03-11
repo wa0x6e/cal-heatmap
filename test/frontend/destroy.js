@@ -15,7 +15,7 @@ const data = {
           current: (d3) => {
             return d3
               .select('#cal-heatmap')
-              .selectAll('.graph-domain')
+              .selectAll('.ch-domain')
               .size();
           },
           expected: () => 1,

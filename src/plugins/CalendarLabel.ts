@@ -24,7 +24,7 @@ interface CalendarLabelOptions extends PluginOptions, Partial<ComputedOptions> {
   padding: Padding;
 }
 
-const DEFAULT_SELECTOR = '.ch-calendar-label';
+const DEFAULT_SELECTOR = '.ch-plugin-calendar-label';
 
 const defaultOptions: CalendarLabelOptions = {
   enabled: true,
@@ -122,7 +122,7 @@ export default class CalendarLabel implements IPlugin {
           .append('g')
           .call((selection: any) => selection
             .append('rect')
-            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-rect`)
+            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-bg`)
             .attr('style', 'fill: transparent')
             .call((s: any) => this.#setRectAttr(s)))
           .call((selection: any) => selection

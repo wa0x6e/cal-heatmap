@@ -13,7 +13,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('#cal-heatmap .graph-legend').nodes().length;
+            return d3.select('#cal-heatmap #ch-plugin-legend').nodes().length;
           },
           expected: () => 1,
         },
@@ -30,7 +30,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('#cal-heatmap .graph-legend').nodes().length;
+            return d3.select('#cal-heatmap #ch-plugin-legend').nodes().length;
           },
           expected: () => 0,
         },
@@ -53,7 +53,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-legend').nodes().length;
+            return d3.select('#ch-plugin-legend').nodes().length;
           },
           expected: () => 0,
         },
@@ -70,7 +70,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-legend svg > text').html();
+            return d3.select('#ch-plugin-legend svg > text').html();
           },
           expected: () => 'Test',
         },
@@ -128,7 +128,7 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-legend').nodes().length;
+            return d3.selectAll('#ch-plugin-legend').nodes().length;
           },
           expected: () => 1,
         },
@@ -136,7 +136,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-legend').nodes().length;
+            return d3.selectAll('#ch-plugin-legend').nodes().length;
           },
           expected: () => 0,
         },

@@ -33,9 +33,9 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      expect(select('.graph-label').attr('x')).toBe('0');
-      expect(select('.graph-label').attr('y')).toBe(`${25 / 2}`);
-      expect(select('.graph-label').attr('text-anchor')).toBe('start');
+      expect(select('.ch-domain-text').attr('x')).toBe('0');
+      expect(select('.ch-domain-text').attr('y')).toBe(`${25 / 2}`);
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('start');
     });
     it('aligns the text on the middle', async () => {
       await cal.paint(
@@ -43,11 +43,11 @@ describe('DomainLabelPainter', () => {
           domain: { label: { position: 'top', textAlign: 'middle' } },
         }) as OptionsType,
       );
-      const width: number = +select('.graph-domain').attr('width');
+      const width: number = +select('.ch-domain').attr('width');
 
-      expect(select('.graph-label').attr('x')).toBe(`${width / 2}`);
-      expect(select('.graph-label').attr('y')).toBe(`${25 / 2}`);
-      expect(select('.graph-label').attr('text-anchor')).toBe('middle');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${width / 2}`);
+      expect(select('.ch-domain-text').attr('y')).toBe(`${25 / 2}`);
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('middle');
     });
     it('aligns the text on the right', async () => {
       await cal.paint(
@@ -55,11 +55,11 @@ describe('DomainLabelPainter', () => {
           domain: { label: { position: 'top', textAlign: 'end' } },
         }) as OptionsType,
       );
-      const width: number = +select('.graph-domain').attr('width');
+      const width: number = +select('.ch-domain').attr('width');
 
-      expect(select('.graph-label').attr('x')).toBe(`${width}`);
-      expect(select('.graph-label').attr('y')).toBe(`${25 / 2}`);
-      expect(select('.graph-label').attr('text-anchor')).toBe('end');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${width}`);
+      expect(select('.ch-domain-text').attr('y')).toBe(`${25 / 2}`);
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('end');
     });
   });
 
@@ -71,9 +71,9 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      expect(select('.graph-label').attr('x')).toBe('0');
-      expect(select('.graph-label').attr('y')).toBe(`${10 + 25 / 2}`);
-      expect(select('.graph-label').attr('text-anchor')).toBe('start');
+      expect(select('.ch-domain-text').attr('x')).toBe('0');
+      expect(select('.ch-domain-text').attr('y')).toBe(`${10 + 25 / 2}`);
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('start');
     });
 
     it('aligns the text on the middle', async () => {
@@ -82,11 +82,11 @@ describe('DomainLabelPainter', () => {
           domain: { label: { position: 'bottom', textAlign: 'middle' } },
         }) as OptionsType,
       );
-      const width = select('.graph-domain').attr('width');
+      const width = select('.ch-domain').attr('width');
 
-      expect(select('.graph-label').attr('x')).toBe(`${+width / 2}`);
-      expect(select('.graph-label').attr('y')).toBe(`${10 + 25 / 2}`);
-      expect(select('.graph-label').attr('text-anchor')).toBe('middle');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${+width / 2}`);
+      expect(select('.ch-domain-text').attr('y')).toBe(`${10 + 25 / 2}`);
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('middle');
     });
     it('aligns the text on the right', async () => {
       await cal.paint(
@@ -94,11 +94,11 @@ describe('DomainLabelPainter', () => {
           domain: { label: { position: 'bottom', textAlign: 'end' } },
         }) as OptionsType,
       );
-      const width = select('.graph-domain').attr('width');
+      const width = select('.ch-domain').attr('width');
 
-      expect(select('.graph-label').attr('x')).toBe(`${width}`);
-      expect(select('.graph-label').attr('y')).toBe(`${10 + 25 / 2}`);
-      expect(select('.graph-label').attr('text-anchor')).toBe('end');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${width}`);
+      expect(select('.ch-domain-text').attr('y')).toBe(`${10 + 25 / 2}`);
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('end');
     });
   });
 
@@ -112,11 +112,13 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      expect(select('.graph-label').attr('x')).toBe('0');
-      expect(select('.graph-label').attr('y')).toBe('0');
-      expect(select('.graph-label').attr('text-anchor')).toBe('start');
-      expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
-      expect(select('.graph-subdomain-group').attr('x')).toBe('50');
+      expect(select('.ch-domain-text').attr('x')).toBe('0');
+      expect(select('.ch-domain-text').attr('y')).toBe('0');
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('start');
+      expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
+        'hanging',
+      );
+      expect(select('.ch-subdomain').attr('x')).toBe('50');
     });
 
     it('aligns the text on the middle', async () => {
@@ -128,11 +130,13 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      expect(select('.graph-label').attr('x')).toBe('25');
-      expect(select('.graph-label').attr('y')).toBe('0');
-      expect(select('.graph-label').attr('text-anchor')).toBe('middle');
-      expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
-      expect(select('.graph-subdomain-group').attr('x')).toBe('50');
+      expect(select('.ch-domain-text').attr('x')).toBe('25');
+      expect(select('.ch-domain-text').attr('y')).toBe('0');
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('middle');
+      expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
+        'hanging',
+      );
+      expect(select('.ch-subdomain').attr('x')).toBe('50');
     });
     it('aligns the text on the right', async () => {
       await cal.paint(
@@ -141,11 +145,13 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      expect(select('.graph-label').attr('x')).toBe('50');
-      expect(select('.graph-label').attr('y')).toBe('0');
-      expect(select('.graph-label').attr('text-anchor')).toBe('end');
-      expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
-      expect(select('.graph-subdomain-group').attr('x')).toBe('50');
+      expect(select('.ch-domain-text').attr('x')).toBe('50');
+      expect(select('.ch-domain-text').attr('y')).toBe('0');
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('end');
+      expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
+        'hanging',
+      );
+      expect(select('.ch-subdomain').attr('x')).toBe('50');
     });
     it.todo('rotate the text left');
     it.todo('rotate the text right');
@@ -161,12 +167,14 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      const width: number = +select('.graph-domain').attr('width');
-      expect(select('.graph-label').attr('x')).toBe(`${width - 50}`);
-      expect(select('.graph-label').attr('y')).toBe('0');
-      expect(select('.graph-label').attr('text-anchor')).toBe('start');
-      expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
-      expect(select('.graph-subdomain-group').attr('x')).toBe('0');
+      const width: number = +select('.ch-domain').attr('width');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${width - 50}`);
+      expect(select('.ch-domain-text').attr('y')).toBe('0');
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('start');
+      expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
+        'hanging',
+      );
+      expect(select('.ch-subdomain').attr('x')).toBe('0');
     });
     it('aligns the text on the middle', async () => {
       await cal.paint(
@@ -177,12 +185,14 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      const width: number = +select('.graph-domain').attr('width');
-      expect(select('.graph-label').attr('x')).toBe(`${width - 50 + 25}`);
-      expect(select('.graph-label').attr('y')).toBe('0');
-      expect(select('.graph-label').attr('text-anchor')).toBe('middle');
-      expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
-      expect(select('.graph-subdomain-group').attr('x')).toBe('0');
+      const width: number = +select('.ch-domain').attr('width');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${width - 50 + 25}`);
+      expect(select('.ch-domain-text').attr('y')).toBe('0');
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('middle');
+      expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
+        'hanging',
+      );
+      expect(select('.ch-subdomain').attr('x')).toBe('0');
     });
     it('aligns the text on the right', async () => {
       await cal.paint(
@@ -191,12 +201,14 @@ describe('DomainLabelPainter', () => {
         }) as OptionsType,
       );
 
-      const width: number = +select('.graph-domain').attr('width');
-      expect(select('.graph-label').attr('x')).toBe(`${width}`);
-      expect(select('.graph-label').attr('y')).toBe('0');
-      expect(select('.graph-label').attr('text-anchor')).toBe('end');
-      expect(select('.graph-label').attr('dominant-baseline')).toBe('hanging');
-      expect(select('.graph-subdomain-group').attr('x')).toBe('0');
+      const width: number = +select('.ch-domain').attr('width');
+      expect(select('.ch-domain-text').attr('x')).toBe(`${width}`);
+      expect(select('.ch-domain-text').attr('y')).toBe('0');
+      expect(select('.ch-domain-text').attr('text-anchor')).toBe('end');
+      expect(select('.ch-domain-text').attr('dominant-baseline')).toBe(
+        'hanging',
+      );
+      expect(select('.ch-subdomain').attr('x')).toBe('0');
     });
     it.todo('rotate the text left');
     it.todo('rotate the text right');

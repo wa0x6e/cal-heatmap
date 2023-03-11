@@ -1,60 +1,71 @@
-.cal-heatmap-container, .graph-legend {
-  display: block;
-  overflow: visible;
-
-  svg {
+.ch {
+  &-container {
+    display: block;
     overflow: visible;
   }
 
-  .graph-label {
-    fill: currentColor;
-    font-size: 10px;
-  }
+  &-domain {
+    overflow: visible;
 
-  .graph-rect {
-    fill: #ededed;
-  }
+    &-container {
+      overflow: visible;
 
-  .graph-subdomain-group rect:hover {
-    stroke: #000;
-    stroke-width: 1px;
-  }
+      &-animation-wrapper {
+        overflow: visible;
+      }
 
-  .subdomain-text {
-    font-size: 8px;
-    pointer-events: none;
-  }
-
-  rect.highlight {
-    stroke: #444;
-    stroke-width: 1px;
-  }
-
-  &[data-theme='dark'] {
-    .graph-rect {
-      fill: #2d333b;
+      &.in-transition &-animation-wrapper  {
+        overflow: hidden;
+      }
     }
 
-    .graph-subdomain-group rect:hover {
-      stroke: #636e7b;
+    &-bg {
+      fill: transparent;
     }
 
-    rect.highlight {
-      stroke: #768390;
+    &-text {
+      fill: currentColor;
+      font-size: 10px;
     }
   }
 
-  &.transition {
-    overflow: hidden;
+  &-subdomain {
+    overflow: visible;
 
-    svg {
-      overflow: hidden;
+    &-bg {
+      fill: #ededed;
+
+      &.highlight {
+        stroke: #444;
+        stroke-width: 1px;
+      }
+
+      &:hover {
+        stroke: #000;
+        stroke-width: 1px;
+      }
     }
-  }
-}
 
-.graph-legend > svg {
-  background: transparent;
+    &-text {
+      font-size: 8px;
+      pointer-events: none;
+    }
+
+    [data-theme='dark'] & {
+      &-bg {
+        fill: #2d333b;
+
+        &.highlight {
+          stroke: #768390;
+        }
+
+        &:hover {
+          stroke: #636e7b;
+        }
+      }
+    }
+
+  }
 }
 
 #ch-tooltip {

@@ -18,19 +18,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -38,15 +38,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2019',
+          expected: () => 'ch-domain y_2019',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
       ],
     },
@@ -66,19 +66,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -86,15 +86,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2015',
+          expected: () => 'ch-domain y_2015',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2016',
+          expected: () => 'ch-domain y_2016',
         },
       ],
     },
@@ -114,19 +114,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -134,15 +134,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2022',
+          expected: () => 'ch-domain y_2022',
         },
       ],
     },
@@ -162,19 +162,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -182,15 +182,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2025',
+          expected: () => 'ch-domain y_2025',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2026',
+          expected: () => 'ch-domain y_2026',
         },
       ],
     },
@@ -214,19 +214,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -234,15 +234,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2015',
+          expected: () => 'ch-domain y_2015',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2016',
+          expected: () => 'ch-domain y_2016',
         },
       ],
     },
@@ -266,19 +266,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -286,15 +286,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2024',
+          expected: () => 'ch-domain y_2024',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2025',
+          expected: () => 'ch-domain y_2025',
         },
       ],
     },
@@ -314,19 +314,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -334,15 +334,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2015',
+          expected: () => 'ch-domain y_2015',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2016',
+          expected: () => 'ch-domain y_2016',
         },
       ],
     },
@@ -362,19 +362,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -382,15 +382,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2024',
+          expected: () => 'ch-domain y_2024',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2025',
+          expected: () => 'ch-domain y_2025',
         },
       ],
     },
@@ -410,19 +410,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -430,15 +430,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2025',
+          expected: () => 'ch-domain y_2025',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2026',
+          expected: () => 'ch-domain y_2026',
         },
       ],
     },
@@ -458,19 +458,19 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
         {
           current: (d3) => {
-            return d3.selectAll('.graph-domain').nodes().length;
+            return d3.selectAll('.ch-domain').nodes().length;
           },
           expected: () => 2,
         },
@@ -478,15 +478,15 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('class');
+            return d3.select('.ch-domain:nth-child(1)').attr('class');
           },
-          expected: () => 'graph-domain y_2020',
+          expected: () => 'ch-domain y_2020',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('class');
+            return d3.select('.ch-domain:nth-child(2)').attr('class');
           },
-          expected: () => 'graph-domain y_2021',
+          expected: () => 'ch-domain y_2021',
         },
       ],
     },

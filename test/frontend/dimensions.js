@@ -13,13 +13,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return +d3.select('.cal-heatmap-container').attr('width');
+            return +d3.select('.ch-container').attr('width');
           },
           expected: (executeReturn) => executeReturn.width,
         },
         {
           current: (d3) => {
-            return +d3.select('.cal-heatmap-container').attr('height');
+            return +d3.select('.ch-container').attr('height');
           },
           expected: (executeReturn) => executeReturn.height,
         },

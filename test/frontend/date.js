@@ -22,7 +22,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select(d3.select('.subdomain-text').nodes()[0]).html();
+            return d3.select(d3.select('.ch-subdomain-text').nodes()[0]).html();
           },
           expected: () => new Date('2020-07-01T00:00Z').toISOString(),
         },
@@ -48,7 +48,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-label').html();
+            return d3.select('.ch-domain-text').html();
           },
           expected: () => 'janvier',
         },
@@ -75,7 +75,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(1) text')
+              .select('.ch-subdomain g:nth-child(1) text')
               .html();
           },
           expected: () => 'Mon',
@@ -143,7 +143,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(1) text')
+              .select('.ch-subdomain g:nth-child(1) text')
               .html();
           },
           expected: () => 'lun.',
@@ -171,7 +171,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(15) rect')
+              .select('.ch-subdomain g:nth-child(15) rect')
               .attr('class');
           },
           expectedContain: () => 'highlight',
@@ -179,7 +179,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(25) rect')
+              .select('.ch-subdomain g:nth-child(25) rect')
               .attr('class');
           },
           expectedContain: () => 'highlight',

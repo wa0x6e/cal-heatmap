@@ -39,7 +39,7 @@ import CalHeatmap from '../../src/CalHeatmap';
     });
 
     it('renders the given subdomain width and height', () => {
-      const selection = select('#cal-heatmap').selectAll('.graph-rect');
+      const selection = select('#cal-heatmap').selectAll('.ch-subdomain-bg');
 
       // eslint-disable-next-line no-restricted-syntax
       for (const elem of selection) {
@@ -49,16 +49,16 @@ import CalHeatmap from '../../src/CalHeatmap';
     });
 
     it('changes the domain dimensions', () => {
-      const selection = select('#cal-heatmap').selectAll('.graph-domain-bg');
+      const selection = select('#cal-heatmap').selectAll('.ch-domain-bg');
       // eslint-disable-next-line no-restricted-syntax
       for (const elem of selection) {
         expect(select(elem).attr('width')).toBe(`${size[0] * 12}`);
         expect(select(elem).attr('height')).toBe(`${size[1] + 20}`);
       }
-      expect(select('.graph-domain:nth-child(1)').attr('height')).toBe(
+      expect(select('.ch-domain:nth-child(1)').attr('height')).toBe(
         `${size[1] + 20}`,
       );
-      expect(select('.graph-domain:nth-child(1)').attr('width')).toBe(
+      expect(select('.ch-domain:nth-child(1)').attr('width')).toBe(
         `${size[0] * 12}`,
       );
     });

@@ -18,7 +18,7 @@ export default class Populator {
     const colorScale = normalizedScale(scale);
 
     calendar.calendarPainter
-      .root!.selectAll('.graph-domain')
+      .root!.selectAll('.ch-domain')
       .selectAll('svg')
       .selectAll('g')
       .data((d: Timestamp) => calendar.domainCollection.get(d) || [])

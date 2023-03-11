@@ -11,7 +11,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .selectAll('.subdomain-text').nodes().length;
+              .selectAll('.ch-subdomain-text').nodes().length;
           },
           expected: () => 0,
         },
@@ -30,7 +30,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .selectAll('.subdomain-text').nodes().length;
+              .selectAll('.ch-subdomain-text').nodes().length;
           },
           expected: () => 12,
         },
@@ -50,7 +50,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(1) text')
+              .select('.ch-subdomain g:nth-child(1) text')
               .html();
           },
           expected: () => 'January 2020',
@@ -58,7 +58,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(12) text')
+              .select('.ch-subdomain g:nth-child(12) text')
               .html();
           },
           expected: () => 'December 2020',
@@ -89,7 +89,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(1) text')
+              .select('.ch-subdomain g:nth-child(1) text')
               .html();
           },
           expected: () => '0-10',
@@ -97,7 +97,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('.graph-subdomain-group g:nth-child(12) text')
+              .select('.ch-subdomain g:nth-child(12) text')
               .html();
           },
           expected: () => '11-null',

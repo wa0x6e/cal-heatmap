@@ -13,7 +13,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-label').nodes().length;
+            return d3.selectAll('.ch-domain-text').nodes().length;
           },
           expected: () => 0,
         },
@@ -30,7 +30,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-label').nodes().length;
+            return d3.selectAll('.ch-domain-text').nodes().length;
           },
           expected: () => 0,
         },
@@ -49,7 +49,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-label').html();
+            return d3.selectAll('.ch-domain-text').html();
           },
           expected: () => 'January',
         },
@@ -71,7 +71,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-label').html();
+            return d3.selectAll('.ch-domain-text').html();
           },
           expected: () => '0;',
         },
@@ -90,7 +90,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.graph-label').html();
+            return d3.selectAll('.ch-domain-text').html();
           },
           expected: () => 'Jan',
         },

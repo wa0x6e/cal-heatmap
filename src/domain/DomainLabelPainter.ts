@@ -9,7 +9,7 @@ import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp } from '../index';
 
-const DEFAULT_SELECTOR = '.graph-label';
+const DEFAULT_SELECTOR = '.ch-domain-text';
 
 export default class DomainLabelPainter {
   calendar: CalHeatmap;

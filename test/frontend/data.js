@@ -26,7 +26,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1) g text').html();
+            return d3.select('.ch-domain:nth-child(1) g text').html();
           },
           expected: () => '10',
         },

@@ -15,7 +15,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(1)')
+              .select('#cal-heatmap .ch-domain:nth-child(1)')
               .attr('x');
           },
           expected: () => '0',
@@ -23,7 +23,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(1)')
+              .select('#cal-heatmap .ch-domain:nth-child(1)')
               .attr('y');
           },
           expected: () => '0',
@@ -31,7 +31,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(2)')
+              .select('#cal-heatmap .ch-domain:nth-child(2)')
               .attr('x');
           },
           expected: () => '120',
@@ -39,7 +39,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(2)')
+              .select('#cal-heatmap .ch-domain:nth-child(2)')
               .attr('y');
           },
           expected: () => '0',
@@ -60,7 +60,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(1)')
+              .select('#cal-heatmap .ch-domain:nth-child(1)')
               .attr('x');
           },
           expected: () => '0',
@@ -68,7 +68,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(1)')
+              .select('#cal-heatmap .ch-domain:nth-child(1)')
               .attr('y');
           },
           expected: () => '0',
@@ -76,7 +76,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(2)')
+              .select('#cal-heatmap .ch-domain:nth-child(2)')
               .attr('x');
           },
           expected: () => '0',
@@ -84,7 +84,7 @@ const data = {
         {
           current: (d3) => {
             return d3
-              .select('#cal-heatmap .graph-domain:nth-child(2)')
+              .select('#cal-heatmap .ch-domain:nth-child(2)')
               .attr('y');
           },
           expected: () => '35',

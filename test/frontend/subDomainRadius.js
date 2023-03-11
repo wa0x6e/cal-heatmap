@@ -12,7 +12,7 @@ const data = {
           current: (d3) => {
             return d3
               .select('#cal-heatmap')
-              .select('.graph-rect:nth-child(1)')
+              .select('.ch-subdomain-bg:nth-child(1)')
               .attr('rx');
           },
           expected: () => null,
@@ -21,7 +21,7 @@ const data = {
           current: (d3) => {
             return d3
               .select('#cal-heatmap')
-              .select('.graph-rect:nth-child(1)')
+              .select('.ch-subdomain-bg:nth-child(1)')
               .attr('ry');
           },
           expected: () => null,
@@ -41,7 +41,7 @@ const data = {
           current: (d3) => {
             return d3
               .select('#cal-heatmap')
-              .select('.graph-rect:nth-child(1)')
+              .select('.ch-subdomain-bg:nth-child(1)')
               .attr('rx');
           },
           expected: () => '10',
@@ -50,7 +50,7 @@ const data = {
           current: (d3) => {
             return d3
               .select('#cal-heatmap')
-              .select('.graph-rect:nth-child(1)')
+              .select('.ch-subdomain-bg:nth-child(1)')
               .attr('ry');
           },
           expected: () => '10',

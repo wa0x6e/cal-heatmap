@@ -15,19 +15,19 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1) .graph-label').html();
+            return d3.select('.ch-domain:nth-child(1) .ch-domain-text').html();
           },
           expected: () => 'January',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2) .graph-label').html();
+            return d3.select('.ch-domain:nth-child(2) .ch-domain-text').html();
           },
           expected: () => 'February',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(12) .graph-label').html();
+            return d3.select('.ch-domain:nth-child(12) .ch-domain-text').html();
           },
           expected: () => 'December',
         },
@@ -46,19 +46,19 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1) .graph-label').html();
+            return d3.select('.ch-domain:nth-child(1) .ch-domain-text').html();
           },
           expected: () => 'December',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2) .graph-label').html();
+            return d3.select('.ch-domain:nth-child(2) .ch-domain-text').html();
           },
           expected: () => 'November',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(12) .graph-label').html();
+            return d3.select('.ch-domain:nth-child(12) .ch-domain-text').html();
           },
           expected: () => 'January',
         },

@@ -15,13 +15,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('width');
+            return d3.select('.ch-domain:nth-child(1)').attr('width');
           },
           expected: () => '60',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('width');
+            return d3.select('.ch-domain:nth-child(2)').attr('width');
           },
           expected: () => '60',
         },
@@ -40,13 +40,13 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(1)').attr('width');
+            return d3.select('.ch-domain:nth-child(1)').attr('width');
           },
           expected: () => '60',
         },
         {
           current: (d3) => {
-            return d3.select('.graph-domain:nth-child(2)').attr('width');
+            return d3.select('.ch-domain:nth-child(2)').attr('width');
           },
           expected: () => '50',
         },

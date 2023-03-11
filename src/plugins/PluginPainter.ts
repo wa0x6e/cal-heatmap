@@ -12,7 +12,6 @@ class PluginPainter {
 
     promises = promises.concat(this.calendar.pluginManager.paintAll());
     promises = promises.concat(this.setPluginsPosition());
-    promises = promises.concat(this.setDomainsPosition());
 
     return promises;
   }
@@ -84,23 +83,6 @@ class PluginPainter {
     });
 
     return promises;
-  }
-
-  setDomainsPosition(): Promise<unknown>[] {
-    const { animationDuration } = this.calendar.options.options;
-    const topHeight = this.calendar.pluginManager.getHeightFromPosition('top');
-    const leftWidth = this.calendar.pluginManager.getWidthFromPosition('left');
-
-    return [
-      this.calendar.calendarPainter.root
-        .select('.graph')
-        .transition()
-        .duration(animationDuration)
-        .call((selection: any) => {
-          selection.attr('x', leftWidth).attr('y', topHeight);
-        })
-        .end(),
-    ];
   }
 
   insideWidth() {

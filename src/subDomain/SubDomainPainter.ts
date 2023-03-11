@@ -2,7 +2,7 @@ import { Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp, SubDomain } from '../index';
 
-const BASE_SELECTOR = '.graph-subdomain-group';
+export const DEFAULT_SELECTOR = '.ch-subdomain';
 const HIGHLIGHT_CLASSNAME = 'highlight';
 
 export default class SubDomainPainter {
@@ -17,9 +17,10 @@ export default class SubDomainPainter {
 
   paint(root: any): void {
     this.root = root || this.root;
+    const containerClassname = `${DEFAULT_SELECTOR}-container`;
 
     const subDomainSvgGroup = this.root
-      .selectAll(BASE_SELECTOR)
+      .selectAll(containerClassname)
       .data(
         (d: Timestamp) => [d],
         (d: Timestamp) => d,
@@ -28,7 +29,7 @@ export default class SubDomainPainter {
         (enter: any) => enter
           .append('svg')
           .call((selection: any) => this.#setPositions(selection))
-          .attr('class', BASE_SELECTOR.slice(1)),
+          .attr('class', containerClassname.slice(1)),
 
         (update: any) =>
           // eslint-disable-next-line implicit-arrow-linebreak
@@ -63,7 +64,9 @@ export default class SubDomainPainter {
           .append('g')
           .call((selection: any) => selection
             .insert('rect')
-            .attr('class', (d: SubDomain) => this.#classname(d.t, 'graph-rect'))
+            .attr('class', (d: SubDomain) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+              this.#classname(d.t, `${DEFAULT_SELECTOR.slice(1)}-bg`))
             .attr('width', width)
             .attr('height', height)
             .attr('x', (d: SubDomain) => this.#getX(d))
@@ -82,7 +85,9 @@ export default class SubDomainPainter {
           .call((selection: any) => this.#appendText(selection)),
         (update: any) => update
           .selectAll('rect')
-          .attr('class', (d: SubDomain) => this.#classname(d.t, 'graph-rect'))
+          .attr('class', (d: SubDomain) =>
+          // eslint-disable-next-line implicit-arrow-linebreak
+            this.#classname(d.t, `${DEFAULT_SELECTOR.slice(1)}-bg`))
           .attr('width', width)
           .attr('height', height)
           .attr('x', (d: SubDomain) => this.#getX(d))
@@ -98,7 +103,10 @@ export default class SubDomainPainter {
    */
   #setPositions(selection: any): void {
     const { options } = this.calendar.options;
-    const { padding, label: { position } } = options.domain;
+    const {
+      padding,
+      label: { position },
+    } = options.domain;
 
     selection
       .attr('x', () => {
@@ -152,7 +160,9 @@ export default class SubDomainPainter {
 
     return elem
       .append('text')
-      .attr('class', (d: SubDomain) => this.#classname(d.t, 'subdomain-text'))
+      .attr('class', (d: SubDomain) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        this.#classname(d.t, `${DEFAULT_SELECTOR.slice(1)}-text`))
       .attr('x', (d: SubDomain) => this.#getX(d) + width / 2)
       .attr('y', (d: SubDomain) => this.#getY(d) + height / 2)
       .attr('text-anchor', 'middle')

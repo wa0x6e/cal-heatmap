@@ -5,7 +5,7 @@ import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
 import type { IPlugin, PluginOptions, Timestamp } from '../index';
 
-const BASE_SELECTOR = '#ch-tooltip';
+const DEFAULT_SELECTOR = '#ch-tooltip';
 
 interface PopperOptions {
   placement: any;
@@ -97,17 +97,17 @@ export default class Tooltip implements IPlugin {
 
     this.popperOptions = { ...DEFAULT_POPPER_OPTIONS, ...this.options };
 
-    this.root = document.getElementById(BASE_SELECTOR.slice(1));
+    this.root = document.getElementById(DEFAULT_SELECTOR.slice(1));
 
     if (!this.root) {
       const tooltipElem = document.createElement('div');
-      tooltipElem.setAttribute('id', BASE_SELECTOR.slice(1));
+      tooltipElem.setAttribute('id', DEFAULT_SELECTOR.slice(1));
       tooltipElem.setAttribute('role', 'tooltip');
       tooltipElem.innerHTML =
-        `<div id="${BASE_SELECTOR.slice(
+        `<div id="${DEFAULT_SELECTOR.slice(
           1,
         )}-arrow" data-popper-arrow="true"></div>` +
-        `<span id="${BASE_SELECTOR.slice(1)}-body"></span>`;
+        `<span id="${DEFAULT_SELECTOR.slice(1)}-body"></span>`;
 
       this.root = document.body.appendChild(tooltipElem);
     }
@@ -159,7 +159,7 @@ export default class Tooltip implements IPlugin {
     }
 
     virtualElement.getBoundingClientRect = () => e.getBoundingClientRect();
-    document.getElementById(`${BASE_SELECTOR.slice(1)}-body`)!.innerHTML =
+    document.getElementById(`${DEFAULT_SELECTOR.slice(1)}-body`)!.innerHTML =
       title;
 
     this.popperInstance.setOptions(() => ({

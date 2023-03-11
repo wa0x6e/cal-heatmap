@@ -4,7 +4,7 @@ import type CalHeatmap from '../CalHeatmap';
 import type { ScrollDirection } from '../constant';
 import type { Dimensions, Timestamp } from '../index';
 
-const DEFAULT_SELECTOR = '.graph-domain';
+const DEFAULT_SELECTOR = '.ch-domain';
 
 export default class DomainPainter {
   calendar: CalHeatmap;
@@ -28,12 +28,9 @@ export default class DomainPainter {
     };
   }
 
-  paint(
-    scrollDirection: ScrollDirection,
-    calendarNode: any,
-  ): Promise<unknown>[] {
+  paint(scrollDirection: ScrollDirection, rootNode: any): Promise<unknown>[] {
     const { animationDuration } = this.calendar.options.options;
-    const t = calendarNode.transition().duration(animationDuration);
+    const t = rootNode.transition().duration(animationDuration);
     const coor = this.coordinates;
 
     this.dimensions = coor.update(
@@ -43,8 +40,7 @@ export default class DomainPainter {
 
     const promises: Promise<unknown>[] = [];
 
-    this.root = calendarNode
-      .select('.graph')
+    this.root = rootNode
       .selectAll(DEFAULT_SELECTOR)
       .data(this.calendar.domainCollection.keys, (d: Timestamp) => d)
       .join(

@@ -12,7 +12,7 @@ interface LegendOptions extends PluginOptions {
   width: number;
 }
 
-const DEFAULT_SELECTOR = '.graph-legend';
+const DEFAULT_SELECTOR = '#ch-plugin-legend';
 
 const defaultOptions: LegendOptions = {
   // Whether to display the legend
@@ -62,9 +62,7 @@ export default class Legend implements IPlugin {
     );
 
     if (this.root.select(DEFAULT_SELECTOR).empty()) {
-      this.root = this.root
-        .append('div')
-        .attr('class', DEFAULT_SELECTOR.slice(1));
+      this.root = this.root.append('div').attr('id', DEFAULT_SELECTOR.slice(1));
     } else {
       this.root = this.root.select(DEFAULT_SELECTOR);
     }

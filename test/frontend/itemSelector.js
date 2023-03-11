@@ -10,7 +10,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('#cal-heatmap .cal-heatmap-container').node();
+            return d3.select('#cal-heatmap .ch-container').node();
           },
           notExpected: () => '',
         },
@@ -25,7 +25,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.cal-heatmap-container').nodes().length;
+            return d3.selectAll('.ch-container').nodes().length;
           },
           expected: () => 0,
         },
@@ -42,7 +42,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.cal-heatmap-container').nodes().length;
+            return d3.selectAll('.ch-container').nodes().length;
           },
           expected: () => 0,
         },
@@ -62,7 +62,7 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.cal-heatmap-container').nodes().length;
+            return d3.selectAll('.ch-container').nodes().length;
           },
           expected: () => 0,
         },
@@ -70,7 +70,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.select('.cal-heatmap-container').html();
+            return d3.select('.ch-container').html();
           },
           notExpected: () => '',
         },
@@ -96,7 +96,7 @@ const data = {
       preExpectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.cal-heatmap-container').nodes().length;
+            return d3.selectAll('.ch-container').nodes().length;
           },
           expected: () => 0,
         },
@@ -110,7 +110,7 @@ const data = {
       expectations: [
         {
           current: (d3) => {
-            return d3.selectAll('.test-selector .cal-heatmap-container').nodes()
+            return d3.selectAll('.test-selector .ch-container').nodes()
               .length;
           },
           expected: () => 1,
