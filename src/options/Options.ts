@@ -94,6 +94,7 @@ export type DataOptions = {
   groupY:
   | DataGroupType
   | ((values: (string | number | null)[]) => string | number | null);
+  defaultValue: null | number | string;
 };
 
 type ScaleOptions = {
@@ -272,6 +273,8 @@ export default class Options {
 
         // Grouping function of the values
         groupY: 'sum',
+
+        defaultValue: null,
       },
 
       scale: undefined,

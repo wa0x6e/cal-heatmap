@@ -150,10 +150,12 @@ export default class DomainCollection {
       x,
       y,
       groupY,
+      defaultValue,
     }: {
       x: DataOptions['x'];
       y: DataOptions['y'];
       groupY: DataOptions['groupY'];
+      defaultValue: DataOptions['defaultValue'];
     },
     subDomainKeyExtractor: Function,
   ): void {
@@ -165,7 +167,7 @@ export default class DomainCollection {
 
     this.keys.forEach((domainKey) => {
       const records = groupedRecords.get(domainKey) || {};
-      this.#setSubDomainValues(domainKey, records, y, groupY);
+      this.#setSubDomainValues(domainKey, records, y, groupY, defaultValue);
     });
   }
 
@@ -174,9 +176,10 @@ export default class DomainCollection {
     records: { [key: string]: DataRecord[] },
     y: DataOptions['y'],
     groupY: DataOptions['groupY'],
+    defaultValue: DataOptions['defaultValue'],
   ): void {
     this.get(domainKey)!.forEach((subDomain: SubDomain, index: number) => {
-      let value: ValueType = null;
+      let value: ValueType = defaultValue;
       if (records.hasOwnProperty(subDomain.t)) {
         value = this.groupValues(
           this.#extractValues(records[subDomain.t], y),

@@ -63,7 +63,7 @@ export default class Navigator {
         return templatesClt
           .get(options.subDomain.type)!
           .mapping(domainKey, subDomainEndDate!)
-          .map((d) => ({ ...d, v: null }));
+          .map((d) => ({ ...d, v: options.data.defaultValue }));
       },
     );
 
