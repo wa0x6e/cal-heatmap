@@ -72,6 +72,7 @@ declare namespace CalHeatmap {
   export interface PluginOptions {
     position?: 'top' | 'right' | 'bottom' | 'left';
     dimensions?: Dimensions;
+    key?: string;
   }
   export type PluginDefinition = [IPluginContructor, Partial<PluginOptions>?];
 }

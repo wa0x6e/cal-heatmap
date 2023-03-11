@@ -8,13 +8,23 @@ import {
   IPlugin,
 } from '../index';
 
-type PluginSetting = { options?: PluginOptions; dirty: boolean };
+type PluginSetting = {
+  options?: PluginOptions;
+  dirty: boolean;
+};
 
 function createPlugin(
   Creator: IPluginContructor,
   calendar: CalHeatmap,
 ): IPlugin {
   return new Creator(calendar);
+}
+
+function extractPluginName(
+  pluginClass: IPluginContructor,
+  options?: PluginOptions,
+): string {
+  return `${pluginClass.name}${options?.key || ''}`;
 }
 
 export default class PluginManager {
@@ -24,15 +34,18 @@ export default class PluginManager {
 
   plugins: Map<IPlugin['name'], IPlugin>;
 
+  pendingPaint: Set<IPlugin>;
+
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
     this.settings = new Map();
     this.plugins = new Map();
+    this.pendingPaint = new Set();
   }
 
   add(plugins: PluginDefinition[]): void {
     plugins.forEach(([PluginClass, pluginOptions]) => {
-      const name = this.extractPluginName(PluginClass);
+      const name = extractPluginName(PluginClass, pluginOptions);
 
       const existingPlugin = this.plugins.get(name);
 
@@ -44,11 +57,16 @@ export default class PluginManager {
         return;
       }
 
-      this.settings.set(name, { options: pluginOptions, dirty: true });
+      this.settings.set(name, {
+        options: pluginOptions,
+        dirty: true,
+      });
 
       if (!this.plugins.has(name)) {
         this.plugins.set(name, createPlugin(PluginClass, this.calendar));
       }
+
+      this.pendingPaint.add(this.plugins.get(name)!);
     });
   }
 
@@ -68,11 +86,11 @@ export default class PluginManager {
   }
 
   paintAll(): Promise<unknown>[] {
-    return this.allPlugins().map((p: IPlugin) => p.paint());
+    return Array.from(this.pendingPaint.values()).map((p) => p.paint());
   }
 
   destroyAll(): Promise<unknown>[] {
-    return this.allPlugins().map((p: IPlugin) => p.destroy());
+    return this.allPlugins().map((p) => p.destroy());
   }
 
   getFromPosition(position: PluginOptions['position']): IPlugin[] {
@@ -97,21 +115,5 @@ export default class PluginManager {
 
   allPlugins(): IPlugin[] {
     return Array.from(this.plugins.values());
-  }
-
-  extractPluginName(pluginClass: IPluginContructor): string {
-    let { name } = pluginClass;
-
-    if (!this.plugins.has(name)) {
-      return name;
-    }
-
-    let i = 1;
-    while (this.plugins.has(name)) {
-      name = `${name}${i}`;
-      i += 1;
-    }
-
-    return name;
   }
 }
