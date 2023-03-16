@@ -21,10 +21,10 @@ function createPlugin(
 }
 
 function extractPluginName(
-  pluginClass: IPluginContructor,
+  PluginClass: IPluginContructor,
   options?: PluginOptions,
 ): string {
-  return `${pluginClass.name}${options?.key || ''}`;
+  return `${new PluginClass().name}${options?.key || ''}`;
 }
 
 export default class PluginManager {

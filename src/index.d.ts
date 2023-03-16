@@ -66,7 +66,7 @@ declare namespace CalHeatmap {
     destroy: () => Promise<unknown>;
   }
   export interface IPluginContructor {
-    new (calendar: CalHeatmap): IPlugin;
+    new (calendar?: CalHeatmap): IPlugin;
   }
 
   export interface PluginOptions {

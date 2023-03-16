@@ -55,20 +55,17 @@ export default class CalendarLabel implements IPlugin {
   computedOptions: ComputedOptions;
 
   constructor(calendar: CalHeatmap) {
-    const {
-      radius, width, height, gutter,
-    } =
-      calendar.options.options.subDomain;
+    const subDomain = calendar?.options?.options?.subDomain;
 
     this.calendar = calendar;
     this.root = null;
     this.shown = false;
     this.options = defaultOptions;
     this.computedOptions = {
-      radius,
-      width,
-      height,
-      gutter,
+      radius: subDomain?.radius,
+      width: subDomain?.width,
+      height: subDomain?.height,
+      gutter: subDomain?.gutter,
       textAlign: 'start',
     };
   }
