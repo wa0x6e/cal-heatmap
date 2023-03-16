@@ -1,5 +1,26 @@
 # Changelog
 
+## v4.2.0 [2023-03-17]
+
+## Features
+
+- [feat] dataset values should accept string type
+- [feat] extract DomainSubLabel into a plugin
+- [feat] allow multiple instances of same plugin to co-exist
+- [feat] refactor all CSS classnames, for a more consistent naming
+- [feat] add defaultValue option to set a default value for missing values in dataset
+
+## Bugfixes
+
+- [fix] fix remaining wrong templates name, which should be migrated to snakeCase
+- [fix] fix CalendarLabel missing coordinates on repaint
+- [fix] fix missing dark theme style for Legend plugin
+
+### BREAKING CHANGES
+
+- All CSS classname have been refactor, plase update your CSS if required 
+- `domain.subLabel` option has been extracted to `CalendarLabel` plugin
+
 ## v4.1.0 [2023-02-28]
 
 ## Features

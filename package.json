@@ -1,6 +1,6 @@
 {
   "name": "cal-heatmap",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data",
   "keywords": [
     "calendar",
@@ -27,6 +27,10 @@
     "./plugins/LegendLite": {
       "import": "./dist/plugins/LegendLite.esm.js",
       "require": "./dist/plugins/LegendLite.js"
+    },
+    "./plugins/CalendarLabel": {
+      "import": "./dist/plugins/CalendarLabel.esm.js",
+      "require": "./dist/plugins/CalendarLabel.js"
     }
   },
   "directories": {
