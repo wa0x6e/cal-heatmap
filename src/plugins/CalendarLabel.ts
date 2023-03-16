@@ -92,6 +92,7 @@ export default class CalendarLabel implements IPlugin {
       this.root = calendarRoot
         .append('svg')
         .attr('class', DEFAULT_SELECTOR.slice(1))
+        .attr('data-key', this.options.key)
         .attr('x', 0)
         .attr('y', 0);
     }
