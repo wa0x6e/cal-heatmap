@@ -57,18 +57,12 @@ describe('DomainCollection', () => {
       expect(d.slice(4)).toBe(d);
     });
 
-    it('do nothing when the limit is greater than the collection size', () => {
-      d.slice(20);
-      expect(d.keys.length).toBe(6);
-    });
-
-    it('do nothing when the limit is the size of the collection', () => {
-      d.slice(6);
-      expect(d.keys.length).toBe(6);
-    });
-
-    it('do nothing when limit is undefined', () => {
-      d.slice();
+    it.each([
+      { count: 20, title: 'greater than the collection size' },
+      { count: 6, title: 'the size of the collection' },
+      { count: undefined, title: 'undefined' },
+    ])('do nothing when the limit is $title', ({ count, title }) => {
+      d.slice(count);
       expect(d.keys.length).toBe(6);
     });
   });
@@ -220,52 +214,51 @@ describe('DomainCollection', () => {
   });
 
   describe('extractTimestamp()', () => {
-    it('extracts the timestamp from a timestamp', () => {
-      const result = d.extractTimestamp(
-        { date: 1577836800000 },
-        'date',
-        (a: any) => a,
-      );
+    const dd = new DomainCollection(dummyDateHelper, 'day', 1, 1);
 
-      expect(result).toBe(1577836800000);
-    });
-    it('extracts the timestamp from a date without timezone', () => {
-      const result = d.extractTimestamp(
-        { date: '2020-01-01' },
-        'date',
-        (a: any) => a,
-      );
-
-      expect(result).toBe(1577836800000);
-    });
-    it('extracts the timestamp from a date with UTC timezone', () => {
-      const result = d.extractTimestamp(
-        { date: '2020-01-01T00:00:00.000Z' },
-        'date',
-        (a: any) => a,
-      );
-
-      expect(result).toBe(1577836800000);
-    });
-
-    it('extracts the timestamp from a date with a custom timezone', () => {
-      const result = d.extractTimestamp(
-        { date: 'Wed Jan 01 2020 04:00:00 GMT+0400 (Gulf Standard Time)' },
-        'date',
-        (a: any) => a,
-      );
-
-      expect(result).toBe(1577836800000);
-    });
-
-    it('extracts the timestamp from a date with a custom timezone 2', () => {
-      const result = d.extractTimestamp(
-        { date: '2020-01-01 04:00:00.000+04:00' },
-        'date',
-        (a: any) => a,
-      );
-
-      expect(result).toBe(1577836800000);
+    it.each([
+      {
+        param: dd.extractTimestamp(
+          { date: 1577836800000 },
+          'date',
+          (a: any) => a,
+        ),
+        title: 'a timestamp',
+      },
+      {
+        param: dd.extractTimestamp(
+          { date: '2020-01-01' },
+          'date',
+          (a: any) => a,
+        ),
+        title: 'a date without timezone',
+      },
+      {
+        param: dd.extractTimestamp(
+          { date: '2020-01-01T00:00:00.000Z' },
+          'date',
+          (a: any) => a,
+        ),
+        title: 'a date with UTC timezone',
+      },
+      {
+        param: dd.extractTimestamp(
+          { date: 'Wed Jan 01 2020 04:00:00 GMT+0400 (Gulf Standard Time)' },
+          'date',
+          (a: any) => a,
+        ),
+        title: 'a date with a custom timezone',
+      },
+      {
+        param: dd.extractTimestamp(
+          { date: '2020-01-01 04:00:00.000+04:00' },
+          'date',
+          (a: any) => a,
+        ),
+        title: 'a date with a another custom timezone format',
+      },
+    ])('extracts the timestamp from $title', ({ param, title }) => {
+      expect(param).toBe(1577836800000);
     });
   });
 
