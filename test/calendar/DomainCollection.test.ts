@@ -61,6 +61,7 @@ describe('DomainCollection', () => {
       { count: 20, title: 'greater than the collection size' },
       { count: 6, title: 'the size of the collection' },
       { count: undefined, title: 'undefined' },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ])('do nothing when the limit is $title', ({ count, title }) => {
       d.slice(count);
       expect(d.keys.length).toBe(6);
@@ -257,6 +258,7 @@ describe('DomainCollection', () => {
         ),
         title: 'a date with a another custom timezone format',
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ])('extracts the timestamp from $title', ({ param, title }) => {
       expect(param).toBe(1577836800000);
     });

@@ -12,9 +12,27 @@ describe('Options', () => {
     });
 
     const testOptions = [
-      { title: 'sets the new value', key: 'itemSelector', value: 'new Hello', return: true, itemSelector: 'new Hello' },
-      { title: 'ignores if setting an invalid key', key: 'test', value: 0, return: false, itemSelector: defaultValue },
-      { title: 'ignores if setting a key with the same value', key: 'itemSelector', value: defaultValue, return: false, itemSelector: defaultValue },
+      {
+        title: 'sets the new value',
+        key: 'itemSelector',
+        value: 'new Hello',
+        return: true,
+        itemSelector: 'new Hello',
+      },
+      {
+        title: 'ignores if setting an invalid key',
+        key: 'test',
+        value: 0,
+        return: false,
+        itemSelector: defaultValue,
+      },
+      {
+        title: 'ignores if setting a key with the same value',
+        key: 'itemSelector',
+        value: defaultValue,
+        return: false,
+        itemSelector: defaultValue,
+      },
     ];
 
     it.each(testOptions)('$title', ({ title, ...data }) => {
