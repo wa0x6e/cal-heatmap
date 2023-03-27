@@ -41,7 +41,7 @@ export default class DateHelper {
   constructor() {
     this.locale = DEFAULT_LOCALE;
     this.timezone = dayjs.tz.guess();
-    if (typeof window !== undefined) {
+    if (typeof window === 'object') {
       (window as any).dayjs ||= dayjs;
     }
   }
@@ -52,7 +52,7 @@ export default class DateHelper {
 
     if (typeof userLocale === 'string' && userLocale !== DEFAULT_LOCALE) {
       let locale;
-      if (typeof window !== undefined) {
+      if (typeof window === 'object') {
         locale =
           (window as any)[`dayjs_locale_${userLocale}`] ||
           (await this.loadBrowserLocale(userLocale));
@@ -241,6 +241,6 @@ export default class DateHelper {
   }
 
   loadNodeLocale(userLocale: string): Promise<any> {
-    return import(`dayjs/locale/${userLocale}`);
+    return import(`dayjs/locale/${userLocale}.js`);
   }
 }
