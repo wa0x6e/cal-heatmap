@@ -1,8 +1,14 @@
 # Changelog
 
+## v4.2.1 [2023-03-28]
+
+### Fixes
+
+- [fix] - Add support for SSR
+
 ## v4.2.0 [2023-03-17]
 
-## Features
+### Features
 
 - [feat] dataset values should accept string type
 - [feat] extract DomainSubLabel into a plugin
@@ -10,7 +16,7 @@
 - [feat] refactor all CSS classnames, for a more consistent naming
 - [feat] add defaultValue option to set a default value for missing values in dataset
 
-## Bugfixes
+### Bugfixes
 
 - [fix] fix remaining wrong templates name, which should be migrated to snakeCase
 - [fix] fix CalendarLabel missing coordinates on repaint
@@ -23,12 +29,12 @@
 
 ## v4.1.0 [2023-02-28]
 
-## Features
+### Features
 
 - [feat] add github-like day subdomain template
 - [feat] add safeguard and error message when Domain/SubDomain couple is not valid
 
-## Bugfixes
+### Bugfixes
 
 - [fix] DomainSubLabel vertical position ignoring padding and label position
 - [fix] rename subDomain template, for consistency
@@ -40,11 +46,11 @@ See all previous changelogs from v4.0.0-beta.1 though 12
 
 ## v4.0.0-beta.12 [2023-02-27]
 
-## Features
+### Features
 
 - [feat] add legend lite plugin
 
-## Chores
+### Chores
 
 - [chore] CSS file is not exported from the package
 - [refactor] extract variables to constant file
@@ -52,31 +58,31 @@ See all previous changelogs from v4.0.0-beta.1 though 12
 
 ## v4.0.0-beta.11 [2023-02-25]
 
-## Features
+### Features
 
 - [feat] data source URI now accepts dayjs format token (BREAKING CHANGES)
 - [feat] add support for RTL
 
-## Bugfixes
+### Bugfixes
 
 - [fix] fix missing data when subDomain range is overflow the domain range 
 - [fix] fix cells stroke cut off on calendar edge
 - [fix] week subDomain where first and last week not assigned to correct month
 - [fix] scale color and opacity should always be clamped to the domain 
 
-## Chores
+### Chores
 
 - Improve typescript d.ts
 
 ## v4.0.0-beta.10 [2023-02-19]
 
-## Bugfixes
+### Bugfixes
 
 - [fix] fix en locale always loaded instead of user defined custom locale
 
 ## v4.0.0-beta.9 [2023-02-18]
 
-## Features
+### Features
 
 - [feat] dark/Light mode option can be toggled via an option
 
@@ -87,29 +93,29 @@ See all previous changelogs from v4.0.0-beta.1 though 12
 - [fix] fix legend UI, where dimension where bigger than expected
 - [fix] remove legend background to support dark/light mode
 
-## Features
+### Features
 
 - [feat] add support for opacity scale 
 
 ## v4.0.0-beta.7 [2023-02-15]
 
-## Bugfixes
+### Bugfixes
 
 - [fix] fix dataset shifted by one day due to timezone
 
-## Chores
+### Chores
 
 - Dependencies update
 
 ## v4.0.0-beta.6 [2023-02-14]
 
-## Features
+### Features
 
 - [feat] add API to extend/inject custom dayjs locale
 
 ## v4.0.0-beta.5 [2023-02-02]
 
-## Bugfixes
+### Bugfixes
 
 - [fix] keep default text color when subDomain do not have value
 - [fix] fix ignored subDomain.color option
@@ -118,7 +124,7 @@ See all previous changelogs from v4.0.0-beta.1 though 12
 
 - [feat] add CSS support for dark theme
 
-## Chores
+### Chores
 
 - [tests] Refactor tests to test only against the minimum browser version
 
