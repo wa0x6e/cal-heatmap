@@ -15,8 +15,8 @@ describe('DateHelper', () => {
   let options: Options;
   let dateHelper: DateHelper;
 
-  const loadLocaleMock = jest
-    .spyOn(DateHelper.prototype, 'loadLocale')
+  const loadBrowserLocaleMock = jest
+    .spyOn(DateHelper.prototype, 'loadBrowserLocale')
     .mockImplementation(() => Promise.resolve(locale_fr));
 
   beforeEach(async () => {
@@ -31,27 +31,29 @@ describe('DateHelper', () => {
         options.init({ date: { locale: 'en' } });
         await dateHelper.setup(options);
         expect(dateHelper.date().locale()).toEqual('en');
-        expect(loadLocaleMock).not.toHaveBeenCalled();
+        expect(loadBrowserLocaleMock).not.toHaveBeenCalled();
         expect(dateHelper.locale).toBe('en');
       });
     });
 
     describe('when using no locale value', () => {
       it('instantiate dayjs with default EN locale', () => {
-        expect(loadLocaleMock).not.toHaveBeenCalled();
+        expect(loadBrowserLocaleMock).not.toHaveBeenCalled();
         expect(dateHelper.date().locale()).toEqual('en');
         expect(dateHelper.locale).toBe('en');
       });
     });
 
     describe('when using locale FR', () => {
-      it('instantiate dayjs with the FR locale', async () => {
-        options.init({ date: { locale: 'fr' } });
-        await dateHelper.setup(options);
-        expect(loadLocaleMock).toHaveBeenCalledTimes(1);
-        expect(dateHelper.date().locale()).toEqual('fr');
-        expect(dateHelper.locale).toHaveProperty('name');
-      });
+      describe('on browser env', () => {
+        it('instantiate dayjs with the FR locale', async () => {
+          options.init({ date: { locale: 'fr' } });
+          await dateHelper.setup(options);
+          expect(loadBrowserLocaleMock).toHaveBeenCalledTimes(1);
+          expect(dateHelper.date().locale()).toEqual('fr');
+          expect(dateHelper.locale).toHaveProperty('name');
+        });
+      })
     });
   });
 
