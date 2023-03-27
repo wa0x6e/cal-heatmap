@@ -53,7 +53,7 @@ describe('DateHelper', () => {
           expect(dateHelper.date().locale()).toEqual('fr');
           expect(dateHelper.locale).toHaveProperty('name');
         });
-      })
+      });
     });
   });
 

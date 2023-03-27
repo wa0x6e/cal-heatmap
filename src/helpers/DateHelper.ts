@@ -57,7 +57,7 @@ export default class DateHelper {
           (window as any)[`dayjs_locale_${userLocale}`] ||
           (await this.loadBrowserLocale(userLocale));
       } else {
-        locale = await this.loadNodeLocale(userLocale)
+        locale = await this.loadNodeLocale(userLocale);
       }
       dayjs.locale(userLocale);
       this.locale = locale;
@@ -240,6 +240,7 @@ export default class DateHelper {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   loadNodeLocale(userLocale: string): Promise<any> {
     return import(`dayjs/locale/${userLocale}.js`);
   }
