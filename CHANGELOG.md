@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.2.2 [2023-03-28]
+
+### Fixes
+
+- [fix] - fix invalid dayjs locale import from nodejs
+
 ## v4.2.1 [2023-03-28]
 
 ### Fixes
