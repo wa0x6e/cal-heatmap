@@ -79,7 +79,7 @@
     "jest": "^29.3.1",
     "jest-dev-server": "^8.0.0",
     "jest-environment-jsdom": "^29.3.1",
-    "jsdom": "^21.0.0",
+    "jsdom": "^22.0.0",
     "postcss": "^8.4.20",
     "prettier": "^2.7.1",
     "prettier-eslint-cli": "^7.1.0",
