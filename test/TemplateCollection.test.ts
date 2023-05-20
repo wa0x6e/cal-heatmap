@@ -85,6 +85,7 @@ describe('TemplateCollection', () => {
       () => ({
         name,
         parent: 'year',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         columnsCount: (_ts: number) => 50,
       } as TemplateResult),
     );
@@ -99,11 +100,14 @@ describe('TemplateCollection', () => {
       () => ({
         name: 'children',
         parent: 'parent',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         columnsCount: (_ts: number) => 10,
       } as TemplateResult),
       () => ({
         name: 'parent',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         columnsCount: (_ts: number) => 50,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         rowsCount: (_ts: number) => 11,
       } as TemplateResult),
     ]);
