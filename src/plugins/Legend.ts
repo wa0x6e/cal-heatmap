@@ -1,5 +1,4 @@
 import { select } from 'd3-selection';
-// @ts-ignore
 import { legend } from '@observablehq/plot';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -67,6 +66,7 @@ export default class Legend implements IPlugin {
       this.root = this.root.select(DEFAULT_SELECTOR);
     }
 
+    // @ts-ignore
     const node = legend({
       ...scaleOptions,
       ...this.options,
