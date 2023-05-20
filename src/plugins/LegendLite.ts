@@ -143,7 +143,7 @@ export default class LegendLite implements IPlugin {
       .attr('class', `${SUBDOMAIN_SELECTOR.slice(1)}-bg`)
       .attr('rx', radius)
       .attr('ry', radius)
-      .attr('x', (d: any, i: number) => i * (width + gutter))
+      .attr('x', (_d: any, i: number) => i * (width + gutter))
       .attr('y', 0)
       .call((element: any) => {
         applyScaleStyle(element, scale, this.calendar.options.options.scale!);

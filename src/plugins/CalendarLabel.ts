@@ -170,8 +170,8 @@ export default class CalendarLabel implements IPlugin {
       .attr('height', height)
       .attr('rx', radius && radius > 0 ? radius : null)
       .attr('ry', radius && radius > 0 ? radius : null)
-      .attr('x', (d: string, i: number) => this.#getX(i))
-      .attr('y', (d: string, i: number) => this.#getY(i));
+      .attr('x', (_d: string, i: number) => this.#getX(i))
+      .attr('y', (_d: string, i: number) => this.#getY(i));
   }
 
   #setTextAttr(selection: any): void {
@@ -181,9 +181,9 @@ export default class CalendarLabel implements IPlugin {
       .attr('text-anchor', textAlign)
       .attr(
         'x',
-        (d: string, i: number) => this.#getTextXOffset() + this.#getX(i),
+        (_d: string, i: number) => this.#getTextXOffset() + this.#getX(i),
       )
-      .attr('y', (d: string, i: number) => this.#getY(i) + height! / 2)
+      .attr('y', (_d: string, i: number) => this.#getY(i) + height! / 2)
       .text((data: string) => data);
   }
 

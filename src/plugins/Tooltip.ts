@@ -23,7 +23,7 @@ const defaultOptions: Partial<TooltipOptions> = {
   enabled: true,
 
   // Expecting a function, which will return the tooltip content
-  text: (timestamp, value, dayjsDate): string =>
+  text: (_timestamp, value, dayjsDate): string =>
     // eslint-disable-next-line implicit-arrow-linebreak
     `${value} - ${dayjsDate.format('LLLL')}`,
 };

@@ -101,7 +101,8 @@
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/",
     "test:e2e": "node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/",
     "test:e2e:local": "LOCAL=1 node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/",
-    "tsd": "npx tsd --files test/index.test-d.ts"
+    "tsd": "npx tsd --files test/index.test-d.ts",
+    "typecheck": "npx tsc --noEmit"
   },
   "repository": {
     "type": "git",

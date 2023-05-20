@@ -85,8 +85,7 @@ describe('TemplateCollection', () => {
       () => ({
         name,
         parent: 'year',
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        columnsCount: (ts: number) => 50,
+        columnsCount: (_ts: number) => 50,
       } as TemplateResult),
     );
     expect(t.get(name).rowsCount(0)).toBe(t.get('year').rowsCount(0));
@@ -100,15 +99,12 @@ describe('TemplateCollection', () => {
       () => ({
         name: 'children',
         parent: 'parent',
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        columnsCount: (ts: number) => 10,
+        columnsCount: (_ts: number) => 10,
       } as TemplateResult),
       () => ({
         name: 'parent',
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        columnsCount: (ts: number) => 50,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        rowsCount: (ts: number) => 11,
+        columnsCount: (_ts: number) => 50,
+        rowsCount: (_ts: number) => 11,
       } as TemplateResult),
     ]);
 

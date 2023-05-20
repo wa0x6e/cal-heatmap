@@ -318,7 +318,7 @@ export default class Options {
   init(opts?: CalHeatmap.DeepPartial<OptionsType>): void {
     this.options = {
       // eslint-disable-next-line arrow-body-style
-      ...mergeWith(this.options, opts, (objValue, srcValue) => {
+      ...mergeWith(this.options, opts, (_, srcValue) => {
         return Array.isArray(srcValue) ? srcValue : undefined;
       }),
     };

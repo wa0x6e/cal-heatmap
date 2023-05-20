@@ -19,3 +19,5 @@ jobs:
         run: npm install
       - name: Linting files
         run: npm run lint
+      - name: Typechecking typescripts files
+        run: npm run typecheck
