@@ -1,16 +1,26 @@
 # Changelog
 
+## v4.2.3 [2023-05-21]
+
+### Fixes
+
+- [fix] Fix error when using with typescript `noUnusedParameters` options
+
+### Chores
+
+- [chore] Dependencies update
+
 ## v4.2.2 [2023-03-28]
 
 ### Fixes
 
-- [fix] - fix invalid dayjs locale import from nodejs
+- [fix] fix invalid dayjs locale import from nodejs
 
 ## v4.2.1 [2023-03-28]
 
 ### Fixes
 
-- [fix] - Add support for SSR
+- [fix] Add support for SSR
 
 ## v4.2.0 [2023-03-17]
 
