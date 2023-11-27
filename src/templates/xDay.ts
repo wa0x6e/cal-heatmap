@@ -11,7 +11,7 @@ const dayTemplate: Template = (
     verticalOrientation: OptionsType['verticalOrientation'];
   },
 ) => {
-  const COLUMNS_COUNT = 7;
+  const COLUMNS_COUNT = domain.horizontalMonth ? 38 : 7;
   const ALLOWED_DOMAIN_TYPE: DomainType[] = ['year', 'month', 'week'];
 
   return {
@@ -28,7 +28,7 @@ const dayTemplate: Template = (
               6, // In rare case, when the first week contains less than 3 days
           );
         case 'year':
-          return Math.ceil(
+          return domain.horizontalMonth ? 12 : Math.ceil(
             domain.dynamicDimension ?
               DateHelper.date(ts).endOf('year').dayOfYear() / COLUMNS_COUNT :
               54,
@@ -64,7 +64,7 @@ const dayTemplate: Template = (
               x = date.subtract(1, 'week').week() + 1;
             }
 
-            x = date.week() - 1;
+            x = domain.horizontalMonth ? date.month() : date.week() - 1;
             break;
           case 'week':
             x = date.weekday();
@@ -75,7 +75,7 @@ const dayTemplate: Template = (
         return {
           t: ts,
           y: x,
-          x: domain.type === 'week' ? 0 : date.weekday(),
+          x: domain.type === 'week' ? 0 : domain.horizontalMonth ? date.date() + date.subtract(date.date() - 1, 'day').weekday() - 1 : date.weekday(),
         };
       }),
     extractUnit: (ts) => DateHelper.date(ts).startOf('day').valueOf(),
