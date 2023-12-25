@@ -46,10 +46,10 @@ export default class DataFetcher {
     startTimestamp: Timestamp,
     endTimestamp: Timestamp,
   ): string {
-    let newUri = str.replace(/\{\{start=(.*)\}\}/g, (_, format) =>
+    let newUri = str.replace(/\{\{start=(.*?)\}\}/g, (_, format) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       this.calendar.dateHelper.date(startTimestamp).format(format));
-    newUri = newUri.replace(/\{\{end=(.*)\}\}/g, (_, format) =>
+    newUri = newUri.replace(/\{\{end=(.*?)\}\}/g, (_, format) =>
       // eslint-disable-next-line implicit-arrow-linebreak
       this.calendar.dateHelper.date(endTimestamp).format(format));
 

@@ -49,5 +49,19 @@ describe('DataFetcher', () => {
         ),
       ).toBe(`https://test.com/api?start=${+new Date('2020-12-31')}`);
     });
+
+    it('replaces both the start and the end token by a formatted date', () => {
+      expect(
+        fetcher.parseURI(
+          'https://test.com/api?start={{start=x}}&end={{end=x}}',
+          +new Date('2020-01-01'),
+          +new Date('2020-12-31'),
+        ),
+      ).toBe(
+        `https://test.com/api?start=${+new Date('2020-01-01')}&end=${+new Date(
+          '2020-12-31',
+        )}`,
+      );
+    });
   });
 });
