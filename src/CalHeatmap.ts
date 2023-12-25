@@ -248,7 +248,7 @@ export default class CalHeatmap {
    * @param  {function} Callback function to execute on event trigger
    * @return void
    */
-  on(name: string, fn: () => any): void {
+  on(name: string, fn: (...args: any[]) => any): void {
     this.eventEmitter.on(name, fn);
   }
 
