@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install dependencies
         run: npm install
       - name: Build files
