@@ -84,7 +84,7 @@
     "prettier": "^2.7.1",
     "prettier-eslint-cli": "^8.0.0",
     "puppeteer": "^21.0.0",
-    "rollup": "^3.2.5",
+    "rollup": "^4.0.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.56.1",
