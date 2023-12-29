@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.2.4 [2023-12-29]
+
+### Fixes
+
+- [fix] fix call signature of on(...) to allow a function with arguments (@terencehonles)
+- [fix] Add non-null asserts to min/max function usage (@Uzaaft)
+
+### Chores
+
+- [chores] Dependencies update
+
 ## v4.2.3 [2023-05-21]
 
 ### Fixes
@@ -40,7 +51,7 @@
 
 ### BREAKING CHANGES
 
-- All CSS classname have been refactor, plase update your CSS if required 
+- All CSS classname have been refactor, plase update your CSS if required
 - `domain.subLabel` option has been extracted to `CalendarLabel` plugin
 
 ## v4.1.0 [2023-02-28]
@@ -81,10 +92,10 @@ See all previous changelogs from v4.0.0-beta.1 though 12
 
 ### Bugfixes
 
-- [fix] fix missing data when subDomain range is overflow the domain range 
+- [fix] fix missing data when subDomain range is overflow the domain range
 - [fix] fix cells stroke cut off on calendar edge
 - [fix] week subDomain where first and last week not assigned to correct month
-- [fix] scale color and opacity should always be clamped to the domain 
+- [fix] scale color and opacity should always be clamped to the domain
 
 ### Chores
 
@@ -111,7 +122,7 @@ See all previous changelogs from v4.0.0-beta.1 though 12
 
 ### Features
 
-- [feat] add support for opacity scale 
+- [feat] add support for opacity scale
 
 ## v4.0.0-beta.7 [2023-02-15]
 
