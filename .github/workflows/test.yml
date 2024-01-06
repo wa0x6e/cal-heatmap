@@ -5,7 +5,7 @@ jobs:
   test:
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [16, 21]
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
