@@ -19,7 +19,7 @@
     "max-len": ["error", { "code": 80 }]
   },
   "plugins": ["jest", "@typescript-eslint"],
-  "ignorePatterns": ["test/coverage/**/*.js"],
+  "ignorePatterns": ["test/coverage/**/*.js", "dist/*"],
   "globals": {
     "globalThis": false
   }
