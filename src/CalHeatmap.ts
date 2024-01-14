@@ -244,8 +244,8 @@ export default class CalHeatmap {
    * Listener for all events
    *
    * @since 4.0.0
-   * @param  {string}  eventName  Name of the event to listen to
-   * @param  {function} Callback function to execute on event trigger
+   * @param  {string}  name  Name of the event to listen to
+   * @param  {function} fn function to execute on event trigger
    * @return void
    */
   on(name: string, fn: (...args: any[]) => any): void {

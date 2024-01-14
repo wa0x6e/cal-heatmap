@@ -36,9 +36,7 @@ export default class DataFetcher {
       d = source;
     }
 
-    return new Promise((resolve) => {
-      resolve(d);
-    });
+    return Promise.resolve(d);
   }
 
   parseURI(
@@ -75,9 +73,7 @@ export default class DataFetcher {
       case 'txt':
         return text(url, requestInit);
       default:
-        return new Promise((resolve) => {
-          resolve([]);
-        });
+        return Promise.resolve([]);
     }
   }
 }

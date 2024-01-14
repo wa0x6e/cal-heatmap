@@ -125,7 +125,7 @@ export default class DomainCollection {
       this.collection.set(domainKey, createValueCallback(domainKey, index));
       this.#refreshKeys();
     });
-    this.yankedDomains = this.yankedDomains.sort((a, b) => a - b);
+    this.yankedDomains.sort((a, b) => a - b);
   }
 
   slice(limit: number = 0, fromBeginning: boolean = true): DomainCollection {
@@ -166,7 +166,7 @@ export default class DomainCollection {
     );
 
     this.keys.forEach((domainKey) => {
-      const records = groupedRecords.get(domainKey) || {};
+      const records = groupedRecords.get(domainKey) ?? {};
       this.#setSubDomainValues(domainKey, records, y, groupY, defaultValue);
     });
   }
@@ -209,7 +209,7 @@ export default class DomainCollection {
 
       if (validSubDomainTimestamp.has(timestamp)) {
         const domainKey = validSubDomainTimestamp.get(timestamp)!;
-        const records = results.get(domainKey) || {};
+        const records = results.get(domainKey) ?? {};
         records[timestamp] ||= [];
         records[timestamp].push(d);
 
@@ -253,13 +253,13 @@ export default class DomainCollection {
         }
       }
 
-      switch (groupFn) {
-        case 'count':
-          return cleanedValues.length;
-        default:
-          return null;
+      if (groupFn === 'count') {
+        return cleanedValues.length;
       }
-    } else if (typeof groupFn === 'function') {
+      return null;
+    }
+
+    if (typeof groupFn === 'function') {
       return groupFn(cleanedValues);
     }
 
