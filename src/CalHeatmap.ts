@@ -7,6 +7,7 @@ import Navigator from './calendar/Navigator';
 import CalendarPainter from './calendar/CalendarPainter';
 import Populator from './calendar/Populator';
 import Options from './options/Options';
+import type { DataRecord } from './options/Options';
 import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
 import DateHelper from './helpers/DateHelper';
@@ -207,7 +208,7 @@ export default class CalHeatmap {
    * @return A Promise, which will fulfill once all the underlying asynchronous
    * tasks settle, whether resolved or rejected.
    */
-  fill(dataSource = this.options.options.data.source): Promise<unknown> {
+  fill(dataSource?: DataRecord[] | string): Promise<unknown> {
     const { options } = this.options;
     const template = this.templateCollection;
     const endDate = this.dateHelper.intervals(
@@ -215,6 +216,12 @@ export default class CalHeatmap {
       this.domainCollection.max,
       2,
     )[1];
+
+    if (dataSource == null) {
+      this.options.options.data.source = dataSource;
+    } else {
+      dataSource = this.options.options.data.source;
+    }
 
     const dataPromise = this.dataFetcher.getDatas(
       dataSource,
