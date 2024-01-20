@@ -1,4 +1,4 @@
-import EventEmmiter from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 import castArray from 'lodash-es/castArray';
 import type { PluginFunc } from 'dayjs';
 import type dayjs from 'dayjs';
@@ -39,7 +39,7 @@ export default class CalHeatmap {
 
   navigator: Navigator;
 
-  eventEmitter: EventEmmiter;
+  eventEmitter: EventEmitter;
 
   dataFetcher: DataFetcher;
 
@@ -66,7 +66,7 @@ export default class CalHeatmap {
     this.populator = new Populator(this);
 
     this.calendarPainter = new CalendarPainter(this);
-    this.eventEmitter = new EventEmmiter();
+    this.eventEmitter = new EventEmitter();
     this.pluginManager = new PluginManager(this);
   }
 
