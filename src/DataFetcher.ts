@@ -20,7 +20,7 @@ export default class DataFetcher {
    * @param {number} startTimestamp
    * @param {number} endTimestamp
    *
-   * @return {Promize} A promise, that will return the final data when resolved
+   * @return {Promise} A promise, that will return the final data when resolved
    */
   async getDatas(
     source: DataOptions['source'],

@@ -256,7 +256,7 @@ export default class Options {
 
       data: {
         // Data source
-        // URL, where to fetch the original datas
+        // URL, where to fetch the original data
         source: '',
 
         // Data type
