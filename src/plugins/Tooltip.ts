@@ -1,6 +1,5 @@
 import { createPopper } from '@popperjs/core';
 
-import type dayjs from 'dayjs';
 import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp } from '../../types/index';
