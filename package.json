@@ -87,7 +87,6 @@
     "jsdom": "^23.0.0",
     "postcss": "^8.4.20",
     "prettier": "^3.0.0",
-    "prettier-eslint-cli": "^8.0.0",
     "puppeteer": "^21.0.0",
     "rollup": "^4.0.0",
     "rollup-plugin-filesize": "^10.0.0",
@@ -99,7 +98,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "format": "npx prettier-eslint --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "npm run lint -- --fix",
     "lint": "npx eslint src/ test/",
     "build": "rm -rf dist/* && rollup -c",
     "dev": "rollup --config -w",
