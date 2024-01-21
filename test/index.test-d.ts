@@ -3,6 +3,7 @@ import type dayjs from 'dayjs';
 import type { PluginFunc } from 'dayjs';
 
 import CalHeatmap from '../src/CalHeatmap';
+import { Dimensions, Template } from '../src/types';
 
 const cal = new CalHeatmap();
 
@@ -26,10 +27,10 @@ expectType<Promise<unknown>>(cal.fill([]));
 
 expectType<Promise<unknown>>(cal.destroy());
 
-expectType<CalHeatmap.Dimensions>(cal.dimensions());
+expectType<Dimensions>(cal.dimensions());
 
 expectType<void>(cal.on('eventName', () => {}));
 
-expectType<void>(cal.addTemplates({} as CalHeatmap.Template));
+expectType<void>(cal.addTemplates({} as Template));
 
 expectType<dayjs.Dayjs>(cal.extendDayjs((): PluginFunc => () => {}));

@@ -24,6 +24,7 @@ import type {
   Dimensions,
   PluginDefinition,
   Timestamp,
+  DeepPartial,
 } from './types/index';
 
 import { ScrollDirection } from './constant';
@@ -96,7 +97,7 @@ export default class CalHeatmap {
    * tasks settle, whether resolved or rejected.
    */
   async paint(
-    options?: CalHeatmap.DeepPartial<OptionsType>,
+    options?: DeepPartial<OptionsType>,
     plugins?: PluginDefinition[] | PluginDefinition,
   ): Promise<unknown> {
     this.options.init(options);

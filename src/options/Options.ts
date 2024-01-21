@@ -4,7 +4,7 @@ import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import type { Ls } from 'dayjs';
-import type { DomainType, Timestamp } from '../types/index';
+import type { DeepPartial, DomainType, Timestamp } from '../types/index';
 import {
   OPTIONS_DEFAULT_DOMAIN_TYPE,
   OPTIONS_DEFAULT_SUBDOMAIN_TYPE,
@@ -315,7 +315,7 @@ export default class Options {
     return true;
   }
 
-  init(opts?: CalHeatmap.DeepPartial<OptionsType>): void {
+  init(opts?: DeepPartial<OptionsType>): void {
     this.options = {
       // eslint-disable-next-line arrow-body-style
       ...mergeWith(this.options, opts, (_, srcValue) => {

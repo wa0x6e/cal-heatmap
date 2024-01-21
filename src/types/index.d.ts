@@ -4,9 +4,8 @@ import type dayjs from 'dayjs';
 import type { OptionsType } from '../options/Options';
 import type DateHelper from '../helpers/DateHelper';
 
-declare namespace CalHeatmap {
-  export type Timestamp = number;
-  export type DomainType =
+export type Timestamp = number;
+export type DomainType =
     | 'year'
     | 'month'
     | 'week'
@@ -16,76 +15,75 @@ declare namespace CalHeatmap {
     | 'hour'
     | 'minute';
 
-  export type DeepPartial<T> = T extends object
-    ? {
-      [P in keyof T]?: DeepPartial<T[P]>;
-    }
-    : T;
-
-  // Template
-
-  export type Template = {
-    (dateHelper: DateHelper, options: OptionsType): TemplateResult;
-  };
-
-  export type TemplateResult = {
-    name: string;
-    parent?: string;
-    allowedDomainType: DomainType[];
-    rowsCount: (ts: Timestamp) => number;
-    columnsCount: (ts: Timestamp) => number;
-    mapping: (
-      startTimestamp: Timestamp,
-      endTimestamp: Timestamp,
-    ) => SubDomain[];
-    extractUnit: (ts: Timestamp) => Timestamp;
-  };
-
-  export type SubDomain = {
-    t: Timestamp;
-    x: number;
-    y: number;
-    v?: number | string | null;
-  };
-
-  export type Dimensions = {
-    width: number;
-    height: number;
-  };
-
-  // Plugin
-
-  export interface IPlugin {
-    name: string;
-    calendar: CalHeatmap;
-    options: PluginOptions;
-    root: any;
-
-    setup: (options?: PluginOptions) => void;
-    paint: () => Promise<unknown>;
-    destroy: () => Promise<unknown>;
+export type DeepPartial<T> = T extends object
+  ? {
+    [P in keyof T]?: DeepPartial<T[P]>;
   }
-  export interface IPluginContructor {
-    new (calendar?: CalHeatmap): IPlugin;
-  }
+  : T;
 
-  export interface PluginOptions {
-    position?: 'top' | 'right' | 'bottom' | 'left';
-    dimensions?: Dimensions;
-    key?: string;
-  }
-  export type PluginDefinition = [IPluginContructor, Partial<PluginOptions>?];
+// Template
+
+export type Template = {
+  (dateHelper: DateHelper, options: OptionsType): TemplateResult;
+};
+
+export type TemplateResult = {
+  name: string;
+  parent?: string;
+  allowedDomainType: DomainType[];
+  rowsCount: (ts: Timestamp) => number;
+  columnsCount: (ts: Timestamp) => number;
+  mapping: (
+    startTimestamp: Timestamp,
+    endTimestamp: Timestamp,
+  ) => SubDomain[];
+  extractUnit: (ts: Timestamp) => Timestamp;
+};
+
+export type SubDomain = {
+  t: Timestamp;
+  x: number;
+  y: number;
+  v?: number | string | null;
+};
+
+export type Dimensions = {
+  width: number;
+  height: number;
+};
+
+// Plugin
+
+export interface IPlugin {
+  name: string;
+  calendar: CalHeatmap;
+  options: PluginOptions;
+  root: any;
+
+  setup: (options?: PluginOptions) => void;
+  paint: () => Promise<unknown>;
+  destroy: () => Promise<unknown>;
+}
+export interface IPluginContructor {
+  new (calendar?: CalHeatmap): IPlugin;
 }
 
-declare class CalHeatmap {
+export interface PluginOptions {
+  position?: 'top' | 'right' | 'bottom' | 'left';
+  dimensions?: Dimensions;
+  key?: string;
+}
+export type PluginDefinition = [IPluginContructor, Partial<PluginOptions>?];
+
+export default class CalHeatmap {
   constructor();
 
   paint(
-    options?: CalHeatmap.DeepPartial<OptionsType>,
-    plugins?: CalHeatmap.PluginDefinition[] | CalHeatmap.PluginDefinition,
+    options?: DeepPartial<OptionsType>,
+    plugins?: PluginDefinition[] | PluginDefinition,
   ): Promise<unknown>;
 
-  addTemplates(templates: CalHeatmap.Template | CalHeatmap.Template[]): void;
+  addTemplates(templates: Template | Template[]): void;
 
   next(n?: number): Promise<unknown>;
 
@@ -97,12 +95,9 @@ declare class CalHeatmap {
 
   on(name: string, fn: () => any): void;
 
-  dimensions(): CalHeatmap.Dimensions;
+  dimensions(): Dimensions;
 
   destroy(): Promise<unknown>;
 
   extendDayjs(plugin: PluginFunc): dayjs.Dayjs;
 }
-
-export = CalHeatmap;
-export as namespace CalHeatmap;
