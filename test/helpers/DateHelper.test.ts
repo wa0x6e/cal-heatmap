@@ -6,7 +6,7 @@ import DateHelper from '../../src/helpers/DateHelper';
 import weekData from '../fixtures/weekNumberDates';
 import dates from '../fixtures/dates';
 import Options from '../../src/options/Options';
-import type { DomainType } from '../../types/index';
+import type { DomainType } from '../../src/types/index';
 
 const date = new Date('2020-01-02T04:24:25.256+00:00');
 const DEFAULT_LOCALE = 'en';

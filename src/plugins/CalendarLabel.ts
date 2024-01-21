@@ -12,7 +12,7 @@ import type {
   default as ICalendarLabel,
   ComputedOptions,
   CalendarLabelOptions,
-} from '../../types/plugins/CalendarLabel';
+} from '../types/plugins/CalendarLabel';
 
 const DEFAULT_SELECTOR = '.ch-plugin-calendar-label';
 

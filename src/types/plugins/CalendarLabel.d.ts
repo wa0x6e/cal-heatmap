@@ -1,5 +1,5 @@
 import type { IPlugin, PluginOptions } from '../index';
-import type { TextAlign, Padding } from '../../src/options/Options';
+import type { TextAlign, Padding } from '../../options/Options';
 
 export type ComputedOptions = {
   radius: number;
@@ -16,5 +16,9 @@ export interface CalendarLabelOptions extends PluginOptions,
   padding: Padding;
 }
 
-export default interface ICalendarLabel extends IPlugin {
+export interface ICalendarLabel extends IPlugin {
+}
+
+export default class CalendarLabel {
+  name: string;
 }

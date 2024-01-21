@@ -9,5 +9,10 @@ export interface LegendLiteOptions extends PluginOptions {
   gutter: number;
   includeBlank: boolean;
 }
-export default interface ITooltip extends IPlugin {
+
+export interface ILegendLite extends IPlugin {
+}
+
+export default class LegendLite {
+  name: string;
 }

@@ -7,5 +7,9 @@ export interface LegendOptions extends PluginOptions {
   width: number;
 }
 
-export default interface ILegend extends IPlugin {
+export interface ILegend extends IPlugin {
+}
+
+export default class Legend {
+  name: string;
 }

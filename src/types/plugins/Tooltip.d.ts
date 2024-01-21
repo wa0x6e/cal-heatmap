@@ -1,4 +1,5 @@
-import type { PluginOptions } from '../index';
+import type dayjs from 'dayjs';
+import type { IPlugin, PluginOptions } from '../index';
 
 interface PopperOptions {
   placement: any;
@@ -12,5 +13,9 @@ interface TooltipOptions extends PluginOptions, PopperOptions {
   text: (timestamp: Timestamp, value: number, dayjsDate: dayjs.Dayjs) => string;
 }
 
-export default interface ITooltip extends IPlugin {
+export interface ITooltip extends IPlugin {
+}
+
+export default class Tooltip {
+  name: string;
 }

@@ -2,12 +2,11 @@ import { createPopper } from '@popperjs/core';
 
 import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
-import type { Timestamp } from '../../types/index';
+import type { Timestamp } from '../types/index';
 import type {
-  // eslint-disable-next-line import/no-named-default
-  default as ITooltip,
+  ITooltip,
   TooltipOptions,
-} from '../../types/plugins/Tooltip';
+} from '../types/plugins/Tooltip';
 
 const DEFAULT_SELECTOR = '#ch-tooltip';
 

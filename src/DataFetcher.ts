@@ -3,7 +3,7 @@ import {
 } from 'd3-fetch';
 
 import type { DataOptions, DataRecord } from './options/Options';
-import type { Timestamp } from '../types/index';
+import type { Timestamp } from './types/index';
 import type CalHeatmap from './CalHeatmap';
 
 export default class DataFetcher {

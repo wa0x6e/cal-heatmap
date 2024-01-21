@@ -15,7 +15,7 @@ import updateLocale from 'dayjs/plugin/updateLocale';
 
 import type { ManipulateType, PluginFunc, Ls } from 'dayjs';
 import type { OptionsType } from '../options/Options';
-import type { Timestamp, DomainType } from '../../types/index';
+import type { Timestamp, DomainType } from '../types/index';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeeksInYear);

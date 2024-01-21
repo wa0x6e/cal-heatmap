@@ -1,8 +1,8 @@
 import type { PluginFunc } from 'dayjs';
 import type dayjs from 'dayjs';
 
-import type { OptionsType } from '../src/options/Options';
-import type DateHelper from '../src/helpers/DateHelper';
+import type { OptionsType } from '../options/Options';
+import type DateHelper from '../helpers/DateHelper';
 
 declare namespace CalHeatmap {
   export type Timestamp = number;

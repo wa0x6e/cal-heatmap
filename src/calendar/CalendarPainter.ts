@@ -5,7 +5,7 @@ import PluginPainter from '../plugins/PluginPainter';
 
 import type CalHeatmap from '../CalHeatmap';
 import { ScrollDirection } from '../constant';
-import type { Dimensions } from '../../types/index';
+import type { Dimensions } from '../types/index';
 
 export const DEFAULT_SELECTOR = '.ch-container';
 

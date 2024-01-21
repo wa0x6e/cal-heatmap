@@ -6,7 +6,7 @@ import type {
   // eslint-disable-next-line import/no-named-default
   default as ILegend,
   LegendOptions,
-} from '../../types/plugins/Legend';
+} from '../types/plugins/Legend';
 
 const DEFAULT_SELECTOR = '#ch-plugin-legend';
 

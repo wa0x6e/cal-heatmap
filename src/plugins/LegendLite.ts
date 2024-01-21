@@ -10,7 +10,7 @@ import type {
   // eslint-disable-next-line import/no-named-default
   default as ILegendLite,
   LegendLiteOptions,
-} from '../../types/plugins/LegendLite';
+} from '../types/plugins/LegendLite';
 import {
   OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
   OPTIONS_DEFAULT_SUBDOMAIN_HEIGHT,
