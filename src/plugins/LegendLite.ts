@@ -2,12 +2,15 @@ import { select, create } from 'd3-selection';
 import { normalizedScale, applyScaleStyle } from '../scale';
 import { DEFAULT_SELECTOR as MAIN_SELECTOR } from '../calendar/CalendarPainter';
 import {
-  // force line break from prettier
   DEFAULT_SELECTOR as SUBDOMAIN_SELECTOR,
 } from '../subDomain/SubDomainPainter';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { IPlugin, PluginOptions } from '../index';
+import type {
+  // eslint-disable-next-line import/no-named-default
+  default as ILegendLite,
+  LegendLiteOptions,
+} from '../../types/plugins/LegendLite';
 import {
   OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
   OPTIONS_DEFAULT_SUBDOMAIN_HEIGHT,
@@ -15,19 +18,9 @@ import {
   OPTIONS_DEFAULT_SUBDOMAIN_RADIUS,
 } from '../constant';
 
-interface LegendOptions extends PluginOptions {
-  enabled: boolean;
-  itemSelector: string | null;
-  width: number;
-  height: number;
-  radius: number;
-  gutter: number;
-  includeBlank: boolean;
-}
-
 const DEFAULT_SELECTOR = '.ch-plugin-legend-lite';
 
-const defaultOptions: LegendOptions = {
+const defaultOptions: LegendLiteOptions = {
   enabled: true, // Whether to display the legend
   itemSelector: null,
   width: OPTIONS_DEFAULT_SUBDOMAIN_WIDTH,
@@ -37,7 +30,7 @@ const defaultOptions: LegendOptions = {
   includeBlank: false,
 };
 
-export default class LegendLite implements IPlugin {
+export default class LegendLite implements ILegendLite {
   name = 'LegendLite';
 
   calendar: CalHeatmap;
@@ -46,7 +39,7 @@ export default class LegendLite implements IPlugin {
 
   shown: boolean;
 
-  options: LegendOptions;
+  options: LegendLiteOptions;
 
   constructor(calendar: CalHeatmap) {
     this.calendar = calendar;
@@ -55,7 +48,7 @@ export default class LegendLite implements IPlugin {
     this.options = defaultOptions;
   }
 
-  setup(pluginOptions?: Partial<LegendOptions>): void {
+  setup(pluginOptions?: Partial<LegendLiteOptions>): void {
     this.options = { ...this.options, ...pluginOptions };
   }
 

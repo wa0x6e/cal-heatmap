@@ -3,7 +3,7 @@ import { scale } from '@observablehq/plot';
 import { OptionsType } from './options/Options';
 import { SCALE_BASE_OPACITY_COLOR } from './constant';
 
-import type { SubDomain } from './index';
+import type { SubDomain } from '../types/index';
 
 type ValueType = string | number | undefined;
 

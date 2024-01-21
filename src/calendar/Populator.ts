@@ -3,7 +3,7 @@ import { hcl } from 'd3-color';
 import { normalizedScale, applyScaleStyle } from '../scale';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { SubDomain, Timestamp } from '../index';
+import type { SubDomain, Timestamp } from '../../types/index';
 
 export default class Populator {
   calendar: CalHeatmap;

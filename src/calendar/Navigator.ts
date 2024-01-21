@@ -2,7 +2,7 @@ import { ScrollDirection } from '../constant';
 
 import type CalHeatmap from '../CalHeatmap';
 import type DomainCollection from './DomainCollection';
-import type { Timestamp } from '../index';
+import type { Timestamp } from '../../types/index';
 
 export default class Navigator {
   calendar: CalHeatmap;

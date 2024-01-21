@@ -7,22 +7,12 @@ import {
 } from '../helpers/PositionHelper';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { IPlugin, PluginOptions } from '../index';
-import type { TextAlign, Padding } from '../options/Options';
-
-type ComputedOptions = {
-  radius: number;
-  width: number;
-  height: number;
-  gutter: number;
-  textAlign: TextAlign;
-};
-
-interface CalendarLabelOptions extends PluginOptions, Partial<ComputedOptions> {
-  enabled: boolean;
-  text: () => string[];
-  padding: Padding;
-}
+import type {
+  // eslint-disable-next-line import/no-named-default
+  default as ICalendarLabel,
+  ComputedOptions,
+  CalendarLabelOptions,
+} from '../../types/plugins/CalendarLabel';
 
 const DEFAULT_SELECTOR = '.ch-plugin-calendar-label';
 
@@ -41,7 +31,7 @@ const defaultOptions: CalendarLabelOptions = {
   padding: [0, 0, 0, 0],
 };
 
-export default class CalendarLabel implements IPlugin {
+export default class CalendarLabel implements ICalendarLabel {
   name = 'CalendarLabel';
 
   calendar: CalHeatmap;

@@ -2,7 +2,7 @@ import validate from '../../src/options/OptionsValidator';
 import TemplateCollection from '../../src/TemplateCollection';
 import Options from '../../src/options/Options';
 
-import type { TemplateResult } from '../../src/index';
+import type { TemplateResult } from '../../types/index';
 import DateHelper from '../../src/helpers/DateHelper';
 
 describe('OptionsValidator', () => {

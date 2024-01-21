@@ -2,14 +2,11 @@ import { select } from 'd3-selection';
 import { legend } from '@observablehq/plot';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { IPlugin, PluginOptions } from '../index';
-
-interface LegendOptions extends PluginOptions {
-  enabled: boolean;
-  itemSelector: string | null;
-  label: string | null;
-  width: number;
-}
+import type {
+  // eslint-disable-next-line import/no-named-default
+  default as ILegend,
+  LegendOptions,
+} from '../../types/plugins/Legend';
 
 const DEFAULT_SELECTOR = '#ch-plugin-legend';
 
@@ -24,7 +21,7 @@ const defaultOptions: LegendOptions = {
   width: 130,
 };
 
-export default class Legend implements IPlugin {
+export default class Legend implements ILegend {
   name = 'Legend';
 
   calendar: CalHeatmap;

@@ -24,7 +24,7 @@ import type {
   Dimensions,
   PluginDefinition,
   Timestamp,
-} from './index';
+} from '../types/index';
 
 import { ScrollDirection } from './constant';
 

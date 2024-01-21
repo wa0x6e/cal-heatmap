@@ -1,6 +1,6 @@
 import { Position } from '../constant';
 import type CalHeatmap from '../CalHeatmap';
-import type { Timestamp, SubDomain } from '../index';
+import type { Timestamp, SubDomain } from '../../types/index';
 
 export const DEFAULT_SELECTOR = '.ch-subdomain';
 const HIGHLIGHT_CLASSNAME = 'highlight';

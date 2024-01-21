@@ -4,7 +4,7 @@ import { horizontalPadding, verticalPadding } from '../helpers/PositionHelper';
 import type CalHeatmap from '../CalHeatmap';
 import type DomainPainter from './DomainPainter';
 import type DomainCollection from '../calendar/DomainCollection';
-import type { SubDomain, Dimensions, Timestamp } from '../index';
+import type { SubDomain, Dimensions, Timestamp } from '../../types/index';
 
 type SubDomainWithCoordinates = Required<SubDomain> & {
   pre_x: number;

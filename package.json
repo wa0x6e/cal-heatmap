@@ -18,25 +18,29 @@
     "./cal-heatmap.css": "./dist/cal-heatmap.css",
     "./plugins/Tooltip": {
       "import": "./dist/plugins/Tooltip.esm.js",
-      "require": "./dist/plugins/Tooltip.js"
+      "require": "./dist/plugins/Tooltip.js",
+      "types": "./types/plugins/Tooltip.d.ts"
     },
     "./plugins/Legend": {
       "import": "./dist/plugins/Legend.esm.js",
-      "require": "./dist/plugins/Legend.js"
+      "require": "./dist/plugins/Legend.js",
+      "types": "./types/plugins/Legend.d.ts"
     },
     "./plugins/LegendLite": {
       "import": "./dist/plugins/LegendLite.esm.js",
-      "require": "./dist/plugins/LegendLite.js"
+      "require": "./dist/plugins/LegendLite.js",
+      "types": "./types/plugins/LegendLite.d.ts"
     },
     "./plugins/CalendarLabel": {
       "import": "./dist/plugins/CalendarLabel.esm.js",
-      "require": "./dist/plugins/CalendarLabel.js"
+      "require": "./dist/plugins/CalendarLabel.js",
+      "types": "./types/plugins/CalendarLabel.d.ts"
     }
   },
   "directories": {
     "test": "test"
   },
-  "types": "./src/index.d.ts",
+  "types": "./types/index.d.ts",
   "node": ">=14.16",
   "browserslist": "last 2 versions, not dead, > 0.2%",
   "dependencies": {
@@ -120,7 +124,8 @@
     "Visualization"
   ],
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
   "config": {
     "commitizen": {

@@ -1,12 +1,11 @@
 import castArray from 'lodash-es/castArray';
 
-import type { SubDomain } from '../index';
+import type { SubDomain, DomainType, Timestamp } from '../../types/index';
 import type {
   DataOptions,
   DataGroupType,
   DataRecord,
 } from '../options/Options';
-import { DomainType, Timestamp } from '../index';
 import type DateHelper from '../helpers/DateHelper';
 
 export const DOMAIN_FORMAT: Record<DomainType, string> = {

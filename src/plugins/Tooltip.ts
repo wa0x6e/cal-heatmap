@@ -3,21 +3,14 @@ import { createPopper } from '@popperjs/core';
 import type dayjs from 'dayjs';
 import type { VirtualElement, StrictModifiers } from '@popperjs/core';
 import type CalHeatmap from '../CalHeatmap';
-import type { IPlugin, PluginOptions, Timestamp } from '../index';
+import type { Timestamp } from '../../types/index';
+import type {
+  // eslint-disable-next-line import/no-named-default
+  default as ITooltip,
+  TooltipOptions,
+} from '../../types/plugins/Tooltip';
 
 const DEFAULT_SELECTOR = '#ch-tooltip';
-
-interface PopperOptions {
-  placement: any;
-  modifiers: any[];
-  strategy: any;
-  onFirstUpdate?: any;
-}
-
-interface TooltipOptions extends PluginOptions, PopperOptions {
-  enabled: boolean;
-  text: (timestamp: Timestamp, value: number, dayjsDate: dayjs.Dayjs) => string;
-}
 
 const defaultOptions: Partial<TooltipOptions> = {
   enabled: true,
@@ -56,7 +49,7 @@ const virtualElement: VirtualElement = {
   },
 };
 
-export default class Tooltip implements IPlugin {
+export default class Tooltip implements ITooltip {
   name = 'Tooltip';
 
   calendar: CalHeatmap;
