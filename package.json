@@ -12,7 +12,8 @@
   "exports": {
     ".": {
       "import": "./dist/cal-heatmap.esm.js",
-      "require": "./dist/cal-heatmap.js"
+      "require": "./dist/cal-heatmap.js",
+      "types": "./types/index.d.ts"
     },
     "./package.json": "./package.json",
     "./cal-heatmap.css": "./dist/cal-heatmap.css",
