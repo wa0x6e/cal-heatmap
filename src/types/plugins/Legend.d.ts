@@ -12,4 +12,16 @@ export interface ILegend extends IPlugin {
 
 export default class Legend {
   name: string;
+
+  calendar: CalHeatmap;
+
+  options: PluginOptions;
+
+  root: any;
+
+  setup: (options?: PluginOptions) => void;
+
+  paint: () => Promise<unknown>;
+
+  destroy: () => Promise<unknown>;
 }

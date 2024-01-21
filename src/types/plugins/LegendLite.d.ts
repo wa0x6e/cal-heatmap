@@ -15,4 +15,16 @@ export interface ILegendLite extends IPlugin {
 
 export default class LegendLite {
   name: string;
+
+  calendar: CalHeatmap;
+
+  options: PluginOptions;
+
+  root: any;
+
+  setup: (options?: PluginOptions) => void;
+
+  paint: () => Promise<unknown>;
+
+  destroy: () => Promise<unknown>;
 }

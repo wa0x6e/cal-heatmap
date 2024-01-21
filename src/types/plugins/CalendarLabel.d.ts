@@ -21,4 +21,16 @@ export interface ICalendarLabel extends IPlugin {
 
 export default class CalendarLabel {
   name: string;
+
+  calendar: CalHeatmap;
+
+  options: PluginOptions;
+
+  root: any;
+
+  setup: (options?: PluginOptions) => void;
+
+  paint: () => Promise<unknown>;
+
+  destroy: () => Promise<unknown>;
 }
