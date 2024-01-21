@@ -64,7 +64,7 @@ export interface IPlugin {
   paint: () => Promise<unknown>;
   destroy: () => Promise<unknown>;
 }
-export interface IPluginContructor {
+export interface IPluginConstructor {
   new (calendar?: CalHeatmap): IPlugin;
 }
 
@@ -73,7 +73,7 @@ export interface PluginOptions {
   dimensions?: Dimensions;
   key?: string;
 }
-export type PluginDefinition = [IPluginContructor, Partial<PluginOptions>?];
+export type PluginDefinition = [IPluginConstructor, Partial<PluginOptions>?];
 
 export default class CalHeatmap {
   constructor();

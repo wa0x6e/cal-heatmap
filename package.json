@@ -124,7 +124,8 @@
     "Visualization"
   ],
   "files": [
-    "dist"
+    "dist",
+    "src/types"
   ],
   "config": {
     "commitizen": {

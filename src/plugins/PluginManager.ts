@@ -4,7 +4,7 @@ import type CalHeatmap from '../CalHeatmap';
 import {
   PluginDefinition,
   PluginOptions,
-  IPluginContructor,
+  IPluginConstructor,
   IPlugin,
 } from '../types/index';
 
@@ -14,14 +14,14 @@ type PluginSetting = {
 };
 
 function createPlugin(
-  Creator: IPluginContructor,
+  Creator: IPluginConstructor,
   calendar: CalHeatmap,
 ): IPlugin {
   return new Creator(calendar);
 }
 
 function extractPluginName(
-  PluginClass: IPluginContructor,
+  PluginClass: IPluginConstructor,
   options?: PluginOptions,
 ): string {
   return `${new PluginClass().name}${options?.key || ''}`;
