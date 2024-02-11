@@ -88,7 +88,7 @@
     "jsdom": "^24.0.0",
     "postcss": "^8.4.20",
     "prettier": "^3.0.0",
-    "puppeteer": "^21.0.0",
+    "puppeteer": "^22.0.0",
     "rollup": "^4.0.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-postcss": "^4.0.2",
