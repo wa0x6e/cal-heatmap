@@ -454,7 +454,7 @@ See the [Migration guide](https://cal-heatmap.com/migrate_from_v3.html) if migra
 ## v3.0.0 [2013-07-18]
 
 > v3 is a major release, a lot of changes are not backward compatible with v2.
-> See the [migration guide](http://kamisama.github.io/cal-heatmap/#migrating-from-2x) for update process.
+> See the [migration guide](https://cal-heatmap.com/v3/index.html#migrating-from-2x) for update process.
 
 - [new] Add Vertical orientation
 - [new] Add option to display a date inside subDomain cells
@@ -510,7 +510,7 @@ See the [Migration guide](https://cal-heatmap.com/migrate_from_v3.html) if migra
 - [new#6] Add options to customize all text
 - [fix] Handle not valid callback
 
-> See [documentation](http://kamisama.github.com/cal-heatmap/) for i18n usage
+> See [documentation](https://cal-heatmap.com) for i18n usage
 
 ## v2.0.3 [2013-03-21]
 
@@ -542,7 +542,7 @@ See the [Migration guide](https://cal-heatmap.com/migrate_from_v3.html) if migra
 - [new] Add Bower and Jam support
 - [new] Change `uri` property to `data`. It can now accepts a file path to a JSON file, directly a JSON object, or a string template.
 
-> The string template is usually a dynamic url to an API, like `api.com/get?start=xxx&end=yyy`, where _xxx_ and _yyy_ are respectively the first and last date of the calendar. You can use tokens to dynamically insert the calendar first and last date in the url. See [documentation](http://kamisama.github.com/cal-heatmap/) for accepted tokens.
+> The string template is usually a dynamic url to an API, like `api.com/get?start=xxx&end=yyy`, where _xxx_ and _yyy_ are respectively the first and last date of the calendar. You can use tokens to dynamically insert the calendar first and last date in the url. See [documentation](https://cal-heatmap.com) for accepted tokens.
 > **Example** : `api?start={{t:start}}&end={{d:end}}` will fetch `api?start=1362006000&end=2013-02-27T23:00:00.000Z`
 
 ## v1.0.1 [2013-02-26]
