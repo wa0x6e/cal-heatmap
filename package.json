@@ -99,6 +99,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
+    "prepare": "npm run build && npm test",
     "format": "npm run lint -- --fix",
     "lint": "npx eslint src/ test/",
     "build": "rm -rf dist/* && rollup -c",
