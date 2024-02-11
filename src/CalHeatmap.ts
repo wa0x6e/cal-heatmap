@@ -25,12 +25,12 @@ import type {
   PluginDefinition,
   Timestamp,
   DeepPartial,
-} from './types/index';
+} from './types';
 
 import { ScrollDirection } from './constant';
 
 export default class CalHeatmap {
-  static VERSION = VERSION;
+  static readonly VERSION = VERSION;
 
   options: Options;
 

@@ -1,4 +1,4 @@
-import type { Template, DomainType } from '../types/index';
+import type { Template, DomainType } from '../types';
 
 const dayTemplate: Template = (DateHelper) => {
   const ROWS_COUNT = 7;

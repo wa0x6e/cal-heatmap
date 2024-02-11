@@ -1,8 +1,8 @@
 import type { PluginFunc } from 'dayjs';
 import type dayjs from 'dayjs';
 
-import type { OptionsType } from '../options/Options';
-import type DateHelper from '../helpers/DateHelper';
+import type { OptionsType } from './options/Options';
+import type DateHelper from './helpers/DateHelper';
 
 export type Timestamp = number;
 export type DomainType =

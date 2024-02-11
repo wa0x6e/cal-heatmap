@@ -1,6 +1,6 @@
 import type { OpUnitType } from 'dayjs';
 import type DateHelper from '../../src/helpers/DateHelper';
-import type { DomainType } from '../../src/types/index';
+import type { DomainType } from '../../src/types';
 
 const quarterTemplate = (DateHelper: DateHelper) => ({
   name: 'quarter',

@@ -2,7 +2,7 @@ import castArray from 'lodash-es/castArray';
 
 import DefaultTemplates from './templates/index';
 import type Options from './options/Options';
-import type { Template, TemplateResult } from './types/index';
+import type { Template, TemplateResult } from './types';
 import type DateHelper from './helpers/DateHelper';
 
 export default class TemplateCollection {

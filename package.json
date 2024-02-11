@@ -13,7 +13,7 @@
     ".": {
       "import": "./dist/cal-heatmap.esm.js",
       "require": "./dist/cal-heatmap.js",
-      "types": "./src/types/index.d.ts"
+      "types": "./src/types.d.ts"
     },
     "./package.json": "./package.json",
     "./cal-heatmap.css": "./dist/cal-heatmap.css",
@@ -41,7 +41,7 @@
   "directories": {
     "test": "test"
   },
-  "types": "./src/types/index.d.ts",
+  "types": "./src/types.d.ts",
   "node": ">=14.16",
   "browserslist": "last 2 versions, not dead, > 0.2%",
   "dependencies": {
@@ -127,7 +127,7 @@
   ],
   "files": [
     "dist",
-    "src/types"
+    "src/types.d.ts"
   ],
   "config": {
     "commitizen": {

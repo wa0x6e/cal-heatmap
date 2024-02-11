@@ -4,7 +4,7 @@ import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import type { Ls } from 'dayjs';
-import type { DeepPartial, DomainType, Timestamp } from '../types/index';
+import type { DeepPartial, DomainType, Timestamp } from '../types';
 import {
   OPTIONS_DEFAULT_DOMAIN_TYPE,
   OPTIONS_DEFAULT_SUBDOMAIN_TYPE,

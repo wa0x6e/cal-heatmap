@@ -1,6 +1,6 @@
 import castArray from 'lodash-es/castArray';
 
-import type { SubDomain, DomainType, Timestamp } from '../types/index';
+import type { SubDomain, DomainType, Timestamp } from '../types';
 import type {
   DataOptions,
   DataGroupType,
