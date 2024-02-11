@@ -16,8 +16,6 @@ import domainSort from './domainSort';
 import data from './data';
 import date from './date';
 import verticalOrientation from './verticalOrientation';
-import legend from './legend';
-import tooltip from './tooltip';
 import fill from './fill';
 
 export default [
@@ -37,8 +35,6 @@ export default [
   domainSort,
   data,
   date,
-  legend,
   verticalOrientation,
-  tooltip,
   fill,
 ];

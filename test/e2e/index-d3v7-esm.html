@@ -15,26 +15,14 @@
 			    "d3-color": "https://cdn.skypack.dev/d3-color",
 			    "d3-fetch": "https://cdn.skypack.dev/d3-fetch",
 			    "d3-transition": "https://cdn.skypack.dev/d3-transition",
-			    "d3": "https://cdn.skypack.dev/d3",
-			    "@popperjs/core": "https://cdn.skypack.dev/@popperjs/core"
+			    "d3": "https://cdn.skypack.dev/d3"
 			  }
 			}
 		</script>
-		<script>
-			let cal;
-		</script>
 		<script type="module">
 			import CalHeatmap from "../../dist/cal-heatmap.esm.js";
-			import Tooltip from "../../dist/plugins/Tooltip.esm.js";
-			import Legend from "../../dist/plugins/Legend.esm.js";
-			import LegendLite from "../../dist/plugins/LegendLite.esm.js";
-			import CalendarLabel from "../../dist/plugins/CalendarLabel.esm.js";
-			window.Tooltip = Tooltip;
-			window.Legend = Legend;
-			window.LegendLite = LegendLite;
-			window.CalendarLabel = CalendarLabel;
-
-			cal = new CalHeatmap();
+			
+			const cal = new CalHeatmap();
 			cal.paint();
 		</script>
 		<div id="result"></div>

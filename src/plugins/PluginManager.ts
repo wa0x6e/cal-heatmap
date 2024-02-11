@@ -6,7 +6,7 @@ import {
   PluginOptions,
   IPluginConstructor,
   IPlugin,
-} from '../types/index';
+} from '../types';
 
 type PluginSetting = {
   options?: PluginOptions;
