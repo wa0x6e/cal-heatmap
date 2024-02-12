@@ -16,27 +16,7 @@
       "types": "./src/types.d.ts"
     },
     "./package.json": "./package.json",
-    "./cal-heatmap.css": "./dist/cal-heatmap.css",
-    "./plugins/Tooltip": {
-      "import": "./dist/plugins/Tooltip.esm.js",
-      "require": "./dist/plugins/Tooltip.js",
-      "types": "./src/types/plugins/Tooltip.d.ts"
-    },
-    "./plugins/Legend": {
-      "import": "./dist/plugins/Legend.esm.js",
-      "require": "./dist/plugins/Legend.js",
-      "types": "./src/types/plugins/Legend.d.ts"
-    },
-    "./plugins/LegendLite": {
-      "import": "./dist/plugins/LegendLite.esm.js",
-      "require": "./dist/plugins/LegendLite.js",
-      "types": "./src/types/plugins/LegendLite.d.ts"
-    },
-    "./plugins/CalendarLabel": {
-      "import": "./dist/plugins/CalendarLabel.esm.js",
-      "require": "./dist/plugins/CalendarLabel.js",
-      "types": "./src/types/plugins/CalendarLabel.d.ts"
-    }
+    "./cal-heatmap.css": "./dist/cal-heatmap.css"
   },
   "directories": {
     "test": "test"
