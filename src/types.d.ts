@@ -1,7 +1,7 @@
 import type { PluginFunc } from 'dayjs';
 import type dayjs from 'dayjs';
-
-import type { OptionsType } from './options/Options';
+import type EventEmitter from 'eventemitter3';
+import type Options, { OptionsType } from './options/Options';
 import type DateHelper from './helpers/DateHelper';
 
 export type Timestamp = number;
@@ -55,7 +55,8 @@ export type Dimensions = {
 // Plugin
 
 export interface IPlugin {
-  name: string;
+  readonly VERSION: string;
+  readonly name: string;
   calendar: CalHeatmap;
   options: PluginOptions;
   root: any;
@@ -76,6 +77,14 @@ export interface PluginOptions {
 export type PluginDefinition = [IPluginConstructor, Partial<PluginOptions>?];
 
 export default class CalHeatmap {
+  static readonly VERSION = string;
+
+  options: Options;
+
+  eventEmitter: EventEmitter;
+
+  dateHelper: DateHelper;
+
   constructor();
 
   paint(
