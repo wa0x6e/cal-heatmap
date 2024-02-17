@@ -26,7 +26,6 @@
   "browserslist": "last 2 versions, not dead, > 0.2%",
   "dependencies": {
     "@observablehq/plot": "^0.6.0",
-    "@popperjs/core": "^2.11.6",
     "core-js": "^3.35.1",
     "d3-color": "^3.1.0",
     "d3-fetch": "^3.0.1",
