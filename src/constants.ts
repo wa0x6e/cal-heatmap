@@ -29,8 +29,8 @@ export const SCALE_BASE_COLOR_SCHEME = 'YlOrBr';
 export const SCALE_BASE_COLOR_TYPE = 'quantize';
 export const SCALE_BASE_COLOR_DOMAIN = [0, 100];
 
-export const DEFAULT_CALENDAR_CONTAINER_SELECTOR = '.ch-container';
-export const DEFAULT_DOMAIN_SELECTOR = '.ch-domain';
-export const DEFAULT_DOMAIN_LABEL_SELECTOR = '.ch-domain-text';
-export const DEFAULT_SUBDOMAIN_SELECTOR = '.ch-subdomain';
+export const CALENDAR_CONTAINER_SELECTOR = '.ch-container';
+export const DOMAIN_SELECTOR = '.ch-domain';
+export const DOMAIN_LABEL_SELECTOR = '.ch-domain-text';
+export const SUBDOMAIN_SELECTOR = '.ch-subdomain';
 export const SUBDOMAIN_HIGHLIGHT_CLASSNAME = 'highlight';

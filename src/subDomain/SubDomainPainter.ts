@@ -1,6 +1,6 @@
 import {
   Position,
-  DEFAULT_SUBDOMAIN_SELECTOR,
+  SUBDOMAIN_SELECTOR,
   SUBDOMAIN_HIGHLIGHT_CLASSNAME,
 } from '../constants';
 
@@ -19,7 +19,7 @@ export default class SubDomainPainter {
 
   paint(root: any): void {
     this.root = root || this.root;
-    const containerClassname = `${DEFAULT_SUBDOMAIN_SELECTOR}-container`;
+    const containerClassname = `${SUBDOMAIN_SELECTOR}-container`;
 
     const subDomainSvgGroup = this.root
       .selectAll(containerClassname)
@@ -68,7 +68,7 @@ export default class SubDomainPainter {
             .insert('rect')
             .attr('class', (d: SubDomain) =>
             // eslint-disable-next-line implicit-arrow-linebreak
-              this.#classname(d.t, `${DEFAULT_SUBDOMAIN_SELECTOR.slice(1)}-bg`))
+              this.#classname(d.t, `${SUBDOMAIN_SELECTOR.slice(1)}-bg`))
             .attr('width', width)
             .attr('height', height)
             .attr('x', (d: SubDomain) => this.#getX(d))
@@ -89,7 +89,7 @@ export default class SubDomainPainter {
           .selectAll('rect')
           .attr('class', (d: SubDomain) =>
           // eslint-disable-next-line implicit-arrow-linebreak
-            this.#classname(d.t, `${DEFAULT_SUBDOMAIN_SELECTOR.slice(1)}-bg`))
+            this.#classname(d.t, `${SUBDOMAIN_SELECTOR.slice(1)}-bg`))
           .attr('width', width)
           .attr('height', height)
           .attr('x', (d: SubDomain) => this.#getX(d))
@@ -164,7 +164,7 @@ export default class SubDomainPainter {
       .append('text')
       .attr('class', (d: SubDomain) =>
         // eslint-disable-next-line implicit-arrow-linebreak
-        this.#classname(d.t, `${DEFAULT_SUBDOMAIN_SELECTOR.slice(1)}-text`))
+        this.#classname(d.t, `${SUBDOMAIN_SELECTOR.slice(1)}-text`))
       .attr('x', (d: SubDomain) => this.#getX(d) + width / 2)
       .attr('y', (d: SubDomain) => this.#getY(d) + height / 2)
       .attr('text-anchor', 'middle')

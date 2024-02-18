@@ -4,7 +4,7 @@ import DomainsContainerPainter from '../domain/DomainsContainerPainter';
 import PluginPainter from '../plugins/PluginPainter';
 import {
   ScrollDirection,
-  DEFAULT_CALENDAR_CONTAINER_SELECTOR,
+  CALENDAR_CONTAINER_SELECTOR,
 } from '../constants';
 
 import type CalHeatmap from '../CalHeatmap';
@@ -39,7 +39,7 @@ export default class CalendarPainter {
       this.root = select(itemSelector)
         .append('svg')
         .attr('data-theme', theme)
-        .attr('class', DEFAULT_CALENDAR_CONTAINER_SELECTOR.slice(1));
+        .attr('class', CALENDAR_CONTAINER_SELECTOR.slice(1));
       this.domainsContainerPainter.setup();
     }
 
