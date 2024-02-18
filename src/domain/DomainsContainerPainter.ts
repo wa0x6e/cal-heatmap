@@ -2,7 +2,7 @@ import { select } from 'd3-selection';
 import DomainPainter from './DomainPainter';
 import DomainLabelPainter from './DomainLabelPainter';
 import SubDomainPainter from '../subDomain/SubDomainPainter';
-import { ScrollDirection } from '../constant';
+import { ScrollDirection } from '../constants';
 
 import type CalHeatmap from '../CalHeatmap';
 import type { Dimensions } from '../types';

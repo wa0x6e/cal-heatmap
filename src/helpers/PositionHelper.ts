@@ -1,5 +1,5 @@
-import { Position } from '../constant';
-import type { Padding } from '../options/Options';
+import { Position } from '../constants';
+import type { Padding } from '../types';
 
 export function isHorizontal(position: string): boolean {
   return position === 'left' || position === 'right';

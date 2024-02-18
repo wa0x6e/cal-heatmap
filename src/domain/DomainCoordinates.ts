@@ -1,4 +1,4 @@
-import { ScrollDirection } from '../constant';
+import { ScrollDirection } from '../constants';
 import { horizontalPadding, verticalPadding } from '../helpers/PositionHelper';
 
 import type CalHeatmap from '../CalHeatmap';

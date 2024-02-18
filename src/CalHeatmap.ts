@@ -12,11 +12,11 @@ import DomainCollection from './calendar/DomainCollection';
 import DateHelper from './helpers/DateHelper';
 import validate from './options/OptionsValidator';
 import PluginManager from './plugins/PluginManager';
+import TemplateCollection from './TemplateCollection';
+import { ScrollDirection } from './constants';
 import VERSION from './version';
 
 import './cal-heatmap.scss';
-
-import TemplateCollection from './TemplateCollection';
 
 import type { OptionsType } from './options/Options';
 import type {
@@ -26,8 +26,6 @@ import type {
   Timestamp,
   DeepPartial,
 } from './types';
-
-import { ScrollDirection } from './constant';
 
 export default class CalHeatmap {
   static readonly VERSION = VERSION;

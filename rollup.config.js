@@ -115,7 +115,7 @@ const exportConfig = (input, name, output, options = {}) => {
 };
 
 export default [
-  ...exportConfig('src/CalHeatmap.ts', 'CalHeatmap', pkg.name, {
+  ...exportConfig('src/index.ts', 'CalHeatmap', pkg.name, {
     external: [
       'd3',
       'd3-color',

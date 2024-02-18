@@ -1,4 +1,4 @@
-import { Position } from '../constant';
+import { Position } from '../constants';
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp, SubDomain } from '../types';
 

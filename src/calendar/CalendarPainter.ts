@@ -4,7 +4,7 @@ import DomainsContainerPainter from '../domain/DomainsContainerPainter';
 import PluginPainter from '../plugins/PluginPainter';
 
 import type CalHeatmap from '../CalHeatmap';
-import { ScrollDirection } from '../constant';
+import { ScrollDirection } from '../constants';
 import type { Dimensions } from '../types';
 
 export const DEFAULT_SELECTOR = '.ch-container';

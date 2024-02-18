@@ -1,7 +1,7 @@
 import DomainCoordinates from './DomainCoordinates';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { ScrollDirection } from '../constant';
+import type { ScrollDirection } from '../constants';
 import type { Dimensions, Timestamp } from '../types';
 
 const DEFAULT_SELECTOR = '.ch-domain';

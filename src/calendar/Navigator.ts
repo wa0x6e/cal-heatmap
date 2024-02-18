@@ -1,4 +1,4 @@
-import { ScrollDirection } from '../constant';
+import { ScrollDirection } from '../constants';
 
 import type CalHeatmap from '../CalHeatmap';
 import type DomainCollection from './DomainCollection';
