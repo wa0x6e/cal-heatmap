@@ -1,4 +1,4 @@
-import { Position } from '../constants';
+import { Position, DEFAULT_DOMAIN_LABEL_SELECTOR } from '../constants';
 import {
   isVertical,
   verticalPadding,
@@ -8,8 +8,6 @@ import { DOMAIN_FORMAT } from '../calendar/DomainCollection';
 
 import type CalHeatmap from '../CalHeatmap';
 import type { Timestamp } from '../types';
-
-const DEFAULT_SELECTOR = '.ch-domain-text';
 
 export default class DomainLabelPainter {
   calendar: CalHeatmap;
@@ -31,7 +29,7 @@ export default class DomainLabelPainter {
     }
 
     root
-      .selectAll(DEFAULT_SELECTOR)
+      .selectAll(DEFAULT_DOMAIN_LABEL_SELECTOR)
       .data(
         (d: Timestamp) => [d],
         (d: Timestamp) => d,
@@ -39,7 +37,7 @@ export default class DomainLabelPainter {
       .join(
         (enter: any) => enter
           .append('text')
-          .attr('class', DEFAULT_SELECTOR.slice(1))
+          .attr('class', DEFAULT_DOMAIN_LABEL_SELECTOR.slice(1))
           .attr('x', (d: Timestamp) => this.#getX(d))
           .attr('y', (d: Timestamp) => this.#getY(d))
           .attr('text-anchor', label.textAlign)
