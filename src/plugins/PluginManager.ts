@@ -24,15 +24,15 @@ function extractPluginName(
   PluginClass: IPluginConstructor,
   options?: PluginOptions,
 ): string {
-  return `${new PluginClass().name}${options?.key || ''}`;
+  return `${PluginClass.name}${options?.key || ''}`;
 }
 
 export default class PluginManager {
   calendar: CalHeatmap;
 
-  settings: Map<IPlugin['name'], PluginSetting>;
+  settings: Map<string, PluginSetting>;
 
-  plugins: Map<IPlugin['name'], IPlugin>;
+  plugins: Map<string, IPlugin>;
 
   pendingPaint: Set<IPlugin>;
 
