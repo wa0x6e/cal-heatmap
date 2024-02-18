@@ -1,6 +1,6 @@
 import isFunction from 'lodash-es/isFunction';
 import { hcl } from 'd3-color';
-import { normalizedScale, applyScaleStyle } from '../scale';
+import { normalizedScale, applyScaleStyle } from '../helpers/ScaleHelper';
 
 import type CalHeatmap from '../CalHeatmap';
 import type { SubDomain, Timestamp } from '../types';

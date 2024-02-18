@@ -1,9 +1,9 @@
 // @ts-ignore
 import { scale } from '@observablehq/plot';
-import { OptionsType } from './options/Options';
-import { SCALE_BASE_OPACITY_COLOR } from './constants';
+import { OptionsType } from '../options/Options';
+import { SCALE_BASE_OPACITY_COLOR } from '../constants';
 
-import type { SubDomain } from './types';
+import type { SubDomain } from '../types';
 
 type ValueType = string | number | undefined;
 
