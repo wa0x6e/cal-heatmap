@@ -55,8 +55,6 @@ export type Dimensions = {
 // Plugin
 
 export interface IPlugin {
-  readonly VERSION: string;
-  readonly name: string;
   calendar: CalHeatmap;
   options: PluginOptions;
   root: any;
