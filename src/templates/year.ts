@@ -1,4 +1,4 @@
-import type { Template, DomainType } from '../types/index';
+import type { Template, DomainType } from '../types';
 
 const yearTemplate: Template = (DateHelper) => {
   const ALLOWED_DOMAIN_TYPE: DomainType[] = [];

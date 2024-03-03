@@ -1,8 +1,9 @@
 import type { PluginFunc } from 'dayjs';
 import type dayjs from 'dayjs';
-
-import type { OptionsType } from '../options/Options';
-import type DateHelper from '../helpers/DateHelper';
+import type EventEmitter from 'eventemitter3';
+import type Options, { OptionsType } from './options/Options';
+import type DateHelper from './helpers/DateHelper';
+import type CalendarPainter from './calendar/CalendarPainter';
 
 export type Timestamp = number;
 export type DomainType =
@@ -14,6 +15,8 @@ export type DomainType =
     | 'day'
     | 'hour'
     | 'minute';
+export type TextAlign = 'start' | 'middle' | 'end';
+export type Padding = [number, number, number, number];
 
 export type DeepPartial<T> = T extends object
   ? {
@@ -55,17 +58,13 @@ export type Dimensions = {
 // Plugin
 
 export interface IPlugin {
-  name: string;
   calendar: CalHeatmap;
   options: PluginOptions;
   root: any;
 
-  setup: (options?: PluginOptions) => void;
+  setup: (calendar: CalHeatmap, options?: PluginOptions) => void;
   paint: () => Promise<unknown>;
   destroy: () => Promise<unknown>;
-}
-export interface IPluginConstructor {
-  new (calendar?: CalHeatmap): IPlugin;
 }
 
 export interface PluginOptions {
@@ -73,14 +72,23 @@ export interface PluginOptions {
   dimensions?: Dimensions;
   key?: string;
 }
-export type PluginDefinition = [IPluginConstructor, Partial<PluginOptions>?];
 
-export default class CalHeatmap {
+declare class CalHeatmap {
+  static readonly VERSION = string;
+
+  options: Options;
+
+  eventEmitter: EventEmitter;
+
+  dateHelper: DateHelper;
+
+  calendarPainter: CalendarPainter;
+
   constructor();
 
   paint(
     options?: DeepPartial<OptionsType>,
-    plugins?: PluginDefinition[] | PluginDefinition,
+    plugins?: IPlugin[],
   ): Promise<unknown>;
 
   addTemplates(templates: Template | Template[]): void;
@@ -101,3 +109,25 @@ export default class CalHeatmap {
 
   extendDayjs(plugin: PluginFunc): dayjs.Dayjs;
 }
+
+declare const constants: Record<string, any>;
+declare const helpers: {
+  position: {
+    isHorizontal(position: string): boolean
+    isVertical(position: string): boolean
+    horizontalPadding(padding: Padding): number
+    verticalPadding(padding: Padding): number
+  },
+  scale: {
+    normalizedScale(scaleOptions: OptionsType['scale']): any
+    applyScaleStyle(
+      elem: any,
+      _scale: any,
+      scaleOptions: OptionsType['scale'],
+      keyname?: string,
+    ): void
+  }
+};
+
+export default CalHeatmap;
+export { constants, helpers };

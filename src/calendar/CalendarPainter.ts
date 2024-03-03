@@ -2,12 +2,13 @@ import { select } from 'd3-selection';
 
 import DomainsContainerPainter from '../domain/DomainsContainerPainter';
 import PluginPainter from '../plugins/PluginPainter';
+import {
+  ScrollDirection,
+  CALENDAR_CONTAINER_SELECTOR,
+} from '../constants';
 
 import type CalHeatmap from '../CalHeatmap';
-import { ScrollDirection } from '../constant';
-import type { Dimensions } from '../types/index';
-
-export const DEFAULT_SELECTOR = '.ch-container';
+import type { Dimensions } from '../types';
 
 export default class CalendarPainter {
   calendar: CalHeatmap;
@@ -38,7 +39,7 @@ export default class CalendarPainter {
       this.root = select(itemSelector)
         .append('svg')
         .attr('data-theme', theme)
-        .attr('class', DEFAULT_SELECTOR.slice(1));
+        .attr('class', CALENDAR_CONTAINER_SELECTOR.slice(1));
       this.domainsContainerPainter.setup();
     }
 

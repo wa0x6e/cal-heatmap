@@ -1,6 +1,6 @@
 import type TemplateCollection from '../TemplateCollection';
 import type { DomainOptions, SubDomainOptions, DataOptions } from './Options';
-import type { DomainType } from '../types/index';
+import type { DomainType } from '../types';
 
 const ALLOWED_DATA_TYPES = ['json', 'csv', 'tsv', 'txt'];
 

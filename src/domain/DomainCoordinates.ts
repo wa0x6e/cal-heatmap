@@ -1,10 +1,10 @@
-import { ScrollDirection } from '../constant';
+import { ScrollDirection } from '../constants';
 import { horizontalPadding, verticalPadding } from '../helpers/PositionHelper';
 
 import type CalHeatmap from '../CalHeatmap';
 import type DomainPainter from './DomainPainter';
 import type DomainCollection from '../calendar/DomainCollection';
-import type { SubDomain, Dimensions, Timestamp } from '../types/index';
+import type { SubDomain, Dimensions, Timestamp } from '../types';
 
 type SubDomainWithCoordinates = Required<SubDomain> & {
   pre_x: number;

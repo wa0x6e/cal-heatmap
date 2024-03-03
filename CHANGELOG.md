@@ -1,6 +1,10 @@
 # Changelog
 
-## v4.2.4 [2023-12-29]
+## v4.3.0 []
+
+### BREAKING CHANGES
+
+- [refactor] - Move all plugins to their own repositories in https://github.com/cal-heatmap/
 
 ### Fixes
 

@@ -1,10 +1,8 @@
 import DomainCoordinates from './DomainCoordinates';
+import { ScrollDirection, DOMAIN_SELECTOR } from '../constants';
 
 import type CalHeatmap from '../CalHeatmap';
-import type { ScrollDirection } from '../constant';
-import type { Dimensions, Timestamp } from '../types/index';
-
-const DEFAULT_SELECTOR = '.ch-domain';
+import type { Dimensions, Timestamp } from '../types';
 
 export default class DomainPainter {
   calendar: CalHeatmap;
@@ -41,7 +39,7 @@ export default class DomainPainter {
     const promises: Promise<unknown>[] = [];
 
     this.root = rootNode
-      .selectAll(DEFAULT_SELECTOR)
+      .selectAll(DOMAIN_SELECTOR)
       .data(this.calendar.domainCollection.keys, (d: Timestamp) => d)
       .join(
         (enter: any) => enter
@@ -55,7 +53,7 @@ export default class DomainPainter {
             .append('rect')
             .attr('width', (d: Timestamp) => coor.get(d)!.inner_width)
             .attr('height', (d: Timestamp) => coor.get(d)!.inner_height)
-            .attr('class', `${DEFAULT_SELECTOR.slice(1)}-bg`))
+            .attr('class', `${DOMAIN_SELECTOR.slice(1)}-bg`))
           .call((enterSelection: any) => promises.push(
             enterSelection
               .transition(t)
@@ -75,7 +73,7 @@ export default class DomainPainter {
           ))
           .call((updateSelection: any) => promises.push(
             updateSelection
-              .selectAll(`${DEFAULT_SELECTOR}-bg`)
+              .selectAll(`${DOMAIN_SELECTOR}-bg`)
               .transition(t)
               .attr('width', (d: Timestamp) => coor.get(d)!.inner_width)
               .attr('height', (d: Timestamp) => coor.get(d)!.inner_height)
@@ -95,7 +93,7 @@ export default class DomainPainter {
   }
 
   #getClassName(d: Timestamp): string {
-    let classname = DEFAULT_SELECTOR.slice(1);
+    let classname = DOMAIN_SELECTOR.slice(1);
     const helper = this.calendar.dateHelper.date(d);
 
     switch (this.calendar.options.options.domain.type) {

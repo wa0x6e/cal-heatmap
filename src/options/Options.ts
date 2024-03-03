@@ -4,7 +4,9 @@ import has from 'lodash-es/has';
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import type { Ls } from 'dayjs';
-import type { DeepPartial, DomainType, Timestamp } from '../types/index';
+import type {
+  DeepPartial, DomainType, Timestamp, TextAlign, Padding,
+} from '../types';
 import {
   OPTIONS_DEFAULT_DOMAIN_TYPE,
   OPTIONS_DEFAULT_SUBDOMAIN_TYPE,
@@ -20,13 +22,11 @@ import {
   SCALE_BASE_COLOR_TYPE,
   SCALE_BASE_COLOR_DOMAIN,
   OPTIONS_DEFAULT_LOCALE,
-} from '../constant';
+} from '../constants';
 
 import OptionsPreProcessors from './OptionsPreProcessors';
 
 type SortOrder = 'asc' | 'desc';
-export type TextAlign = 'start' | 'middle' | 'end';
-export type Padding = [number, number, number, number];
 
 export type DomainOptions = {
   type: DomainType;
