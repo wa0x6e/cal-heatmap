@@ -2,10 +2,8 @@ import isEqual from 'lodash-es/isEqual';
 
 import type CalHeatmap from '../CalHeatmap';
 import {
-  PluginDefinition,
-  PluginOptions,
-  IPluginConstructor,
   IPlugin,
+  PluginOptions,
 } from '../types';
 
 type PluginSetting = {
@@ -13,18 +11,8 @@ type PluginSetting = {
   dirty: boolean;
 };
 
-function createPlugin(
-  Creator: IPluginConstructor,
-  calendar: CalHeatmap,
-): IPlugin {
-  return new Creator(calendar);
-}
-
-function extractPluginName(
-  PluginClass: IPluginConstructor,
-  options?: PluginOptions,
-): string {
-  return `${PluginClass.name}${options?.key || ''}`;
+function extractPluginName(plugin: IPlugin): string {
+  return `${plugin.constructor.name}${plugin.options?.key || ''}`;
 }
 
 export default class PluginManager {
@@ -43,27 +31,27 @@ export default class PluginManager {
     this.pendingPaint = new Set();
   }
 
-  add(plugins: PluginDefinition[]): void {
-    plugins.forEach(([PluginClass, pluginOptions]) => {
-      const name = extractPluginName(PluginClass, pluginOptions);
+  add(plugins: IPlugin[]): void {
+    plugins.forEach((plugin) => {
+      const name = extractPluginName(plugin);
 
       const existingPlugin = this.plugins.get(name);
 
       if (
         existingPlugin &&
         this.settings.get(name) &&
-        isEqual(this.settings.get(name)!.options, pluginOptions)
+        isEqual(this.settings.get(name)!.options, plugin.options)
       ) {
         return;
       }
 
       this.settings.set(name, {
-        options: pluginOptions,
+        options: plugin.options,
         dirty: true,
       });
 
       if (!this.plugins.has(name)) {
-        this.plugins.set(name, createPlugin(PluginClass, this.calendar));
+        this.plugins.set(name, plugin);
       }
 
       this.pendingPaint.add(this.plugins.get(name)!);
@@ -76,7 +64,7 @@ export default class PluginManager {
 
       if (typeof settings !== 'undefined') {
         if (settings.dirty) {
-          pluginInstance.setup(settings.options);
+          pluginInstance.setup(this.calendar, settings.options);
           settings.dirty = false;
 
           this.settings.set(name, settings);

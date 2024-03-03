@@ -22,7 +22,7 @@ import type { OptionsType } from './options/Options';
 import type {
   Template,
   Dimensions,
-  PluginDefinition,
+  IPlugin,
   Timestamp,
   DeepPartial,
 } from './types';
@@ -91,12 +91,13 @@ export default class CalHeatmap {
    * Setup and paint the calendar with the given options
    *
    * @param  {Object} options The Options object
+   * @param  {Array} plugins An optional array of plugins to add to the calendar
    * @return A Promise, which will fulfill once all the underlying asynchronous
    * tasks settle, whether resolved or rejected.
    */
   async paint(
     options?: DeepPartial<OptionsType>,
-    plugins?: PluginDefinition[] | PluginDefinition,
+    plugins?: IPlugin[] | IPlugin,
   ): Promise<unknown> {
     this.options.init(options);
     await this.dateHelper.setup(this.options);
@@ -110,7 +111,7 @@ export default class CalHeatmap {
     }
 
     if (plugins) {
-      this.pluginManager.add(castArray(plugins as any) as PluginDefinition[]);
+      this.pluginManager.add(castArray(plugins));
     }
 
     this.calendarPainter.setup();

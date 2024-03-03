@@ -62,12 +62,9 @@ export interface IPlugin {
   options: PluginOptions;
   root: any;
 
-  setup: (options?: PluginOptions) => void;
+  setup: (calendar: CalHeatmap, options?: PluginOptions) => void;
   paint: () => Promise<unknown>;
   destroy: () => Promise<unknown>;
-}
-export interface IPluginConstructor {
-  new (calendar?: CalHeatmap): IPlugin;
 }
 
 export interface PluginOptions {
@@ -75,7 +72,6 @@ export interface PluginOptions {
   dimensions?: Dimensions;
   key?: string;
 }
-export type PluginDefinition = [IPluginConstructor, Partial<PluginOptions>?];
 
 declare class CalHeatmap {
   static readonly VERSION = string;
@@ -92,7 +88,7 @@ declare class CalHeatmap {
 
   paint(
     options?: DeepPartial<OptionsType>,
-    plugins?: PluginDefinition[] | PluginDefinition,
+    plugins?: IPlugin[],
   ): Promise<unknown>;
 
   addTemplates(templates: Template | Template[]): void;
@@ -121,6 +117,15 @@ declare const helpers: {
     isVertical(position: string): boolean
     horizontalPadding(padding: Padding): number
     verticalPadding(padding: Padding): number
+  },
+  scale: {
+    normalizedScale(scaleOptions: OptionsType['scale']): any
+    applyScaleStyle(
+      elem: any,
+      _scale: any,
+      scaleOptions: OptionsType['scale'],
+      keyname?: string,
+    ): void
   }
 };
 

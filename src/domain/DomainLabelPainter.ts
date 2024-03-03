@@ -1,4 +1,4 @@
-import { Position, DEFAULT_DOMAIN_LABEL_SELECTOR } from '../constants';
+import { Position, DOMAIN_LABEL_SELECTOR } from '../constants';
 import {
   isVertical,
   verticalPadding,
@@ -29,7 +29,7 @@ export default class DomainLabelPainter {
     }
 
     root
-      .selectAll(DEFAULT_DOMAIN_LABEL_SELECTOR)
+      .selectAll(DOMAIN_LABEL_SELECTOR)
       .data(
         (d: Timestamp) => [d],
         (d: Timestamp) => d,
@@ -37,7 +37,7 @@ export default class DomainLabelPainter {
       .join(
         (enter: any) => enter
           .append('text')
-          .attr('class', DEFAULT_DOMAIN_LABEL_SELECTOR.slice(1))
+          .attr('class', DOMAIN_LABEL_SELECTOR.slice(1))
           .attr('x', (d: Timestamp) => this.#getX(d))
           .attr('y', (d: Timestamp) => this.#getY(d))
           .attr('text-anchor', label.textAlign)
