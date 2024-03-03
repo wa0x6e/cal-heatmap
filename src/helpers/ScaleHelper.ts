@@ -44,7 +44,7 @@ export function applyScaleStyle(
   _scale: any,
   scaleOptions: OptionsType['scale'],
   keyname?: string,
-) {
+): void {
   Object.entries(scaleStyle(_scale, scaleOptions)).forEach(([prop, val]) =>
     // eslint-disable-next-line implicit-arrow-linebreak
     elem.style(prop, (d: SubDomain | string) =>

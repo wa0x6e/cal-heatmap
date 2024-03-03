@@ -121,6 +121,15 @@ declare const helpers: {
     isVertical(position: string): boolean
     horizontalPadding(padding: Padding): number
     verticalPadding(padding: Padding): number
+  },
+  scale: {
+    normalizedScale(scaleOptions: OptionsType['scale']): any
+    applyScaleStyle(
+      elem: any,
+      _scale: any,
+      scaleOptions: OptionsType['scale'],
+      keyname?: string,
+    ): void
   }
 };
 
