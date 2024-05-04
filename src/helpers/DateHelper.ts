@@ -242,6 +242,6 @@ export default class DateHelper {
 
   // eslint-disable-next-line class-methods-use-this
   loadNodeLocale(userLocale: string): Promise<any> {
-    return import(`dayjs/locale/${userLocale}.js`);
+    return import(/* @vite-ignore */ `dayjs/locale/${userLocale}.js`);
   }
 }
