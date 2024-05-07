@@ -11,7 +11,7 @@ import DataFetcher from './DataFetcher';
 import DomainCollection from './calendar/DomainCollection';
 import DateHelper from './helpers/DateHelper';
 import validate from './options/OptionsValidator';
-import PluginManager from './plugins/PluginManager';
+import PluginManager, { type IPlugin } from './plugins/PluginManager';
 import TemplateCollection from './TemplateCollection';
 import { ScrollDirection } from './constants';
 import VERSION from './version';
@@ -20,11 +20,7 @@ import './cal-heatmap.scss';
 
 import type { OptionsType } from './options/Options';
 import type {
-  Template,
-  Dimensions,
-  IPlugin,
-  Timestamp,
-  DeepPartial,
+  Template, Dimensions, Timestamp, DeepPartial,
 } from './types';
 
 export default class CalHeatmap {

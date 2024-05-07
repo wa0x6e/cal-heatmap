@@ -1,10 +1,22 @@
 import isEqual from 'lodash-es/isEqual';
-
+import type { Dimensions } from '../types';
 import type CalHeatmap from '../CalHeatmap';
-import {
-  IPlugin,
-  PluginOptions,
-} from '../types';
+
+export interface IPlugin {
+  calendar: CalHeatmap;
+  options: PluginOptions;
+  root: any;
+
+  setup: (calendar: CalHeatmap, options?: PluginOptions) => void;
+  paint: () => Promise<unknown>;
+  destroy: () => Promise<unknown>;
+}
+
+export interface PluginOptions {
+  position?: 'top' | 'right' | 'bottom' | 'left';
+  dimensions?: Dimensions;
+  key?: string;
+}
 
 type PluginSetting = {
   options?: PluginOptions;
