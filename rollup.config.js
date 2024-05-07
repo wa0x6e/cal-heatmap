@@ -11,10 +11,14 @@ import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
 import { babel } from '@rollup/plugin-babel';
 
-const pkg = JSON.parse(readFileSync('./package.json'));
+const pkg = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url)),
+);
+
+const external = Object.keys(pkg.dependencies);
 
 let basePlugins = [
-  typescript(),
+  typescript({ declaration: false }),
   json(),
   commonjs(),
   resolve(),
@@ -52,78 +56,25 @@ writeFileSync(
   )}';\nexport default VERSION;\n`,
 );
 
-const globals = {
-  'd3-selection': 'd3',
-  d3: 'd3',
-  'd3-color': 'd3',
-  'd3-fetch': 'd3',
-  'd3-transition': 'd3',
-};
-
-const exportConfig = (input, name, output, options = {}) => {
+const exportConfig = (input, output) => {
   return [
     {
       input,
+      watch: false,
       output: [
         {
           file: `dist/${output}.js`,
-          name,
-          format: 'umd',
-          globals,
-        },
-      ],
-      plugins: basePlugins,
-      ...options,
-    },
-    {
-      input,
-      watch: false,
-      output: [
-        {
-          file: `dist/${output}.esm.js`,
           format: 'esm',
-          globals,
-        },
-      ],
-      plugins: basePlugins,
-      ...options,
-    },
-    {
-      input,
-      watch: false,
-      output: [
-        {
-          compact: true,
-          file: `dist/${output}.min.esm.js`,
-          format: 'esm',
-          sourcemap: true,
-          globals,
         },
         {
-          compact: true,
-          file: `dist/${output}.min.js`,
-          name,
-          format: 'umd',
-          sourcemap: true,
-          globals,
+          file: `dist/${output}.cjs`,
+          format: 'cjs',
         },
       ],
+      external,
       plugins: [...basePlugins, terser()],
-      ...options,
     },
   ];
 };
 
-export default [
-  ...exportConfig('src/index.ts', 'CalHeatmap', pkg.name, {
-    external: [
-      'd3',
-      'd3-color',
-      'd3-fetch',
-      'd3-format',
-      'd3-scale',
-      'd3-selection',
-      'd3-transition',
-    ],
-  })
-];
+export default [...exportConfig('src/index.ts', pkg.name)];

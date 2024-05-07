@@ -11,9 +11,9 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/cal-heatmap.esm.js",
-      "require": "./dist/cal-heatmap.js",
-      "types": "./src/types.d.ts"
+      "import": "./dist/cal-heatmap.js",
+      "require": "./dist/cal-heatmap.cjs",
+      "types": "./dist/index.d.ts"
     },
     "./package.json": "./package.json",
     "./cal-heatmap.css": "./dist/cal-heatmap.css"
@@ -21,7 +21,7 @@
   "directories": {
     "test": "test"
   },
-  "types": "./src/types.d.ts",
+  "types": "./dist/index.d.ts",
   "node": ">=14.16",
   "browserslist": "last 2 versions, not dead, > 0.2%",
   "dependencies": {
@@ -78,7 +78,7 @@
     "prepare": "npm run build && npm test",
     "format": "npm run lint -- --fix",
     "lint": "npx eslint src/ test/",
-    "build": "rm -rf dist/* && rollup -c",
+    "build": "rm -rf dist/* && tsc -p tsconfig.build.json && rollup -c",
     "dev": "rollup --config -w",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest test/",
     "test:e2e": "node --experimental-vm-modules ./node_modules/.bin/jest -c jest-e2e.config.mjs test/",
